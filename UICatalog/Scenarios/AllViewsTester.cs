@@ -78,7 +78,7 @@ namespace UICatalog {
 
 			_leftPane = new Window ("Classes") {
 				X = 0,
-				Y = 0, 
+				Y = 0,
 				Width = 15,
 				Height = Dim.Fill (1), // for status bar
 				CanFocus = false,
@@ -89,7 +89,7 @@ namespace UICatalog {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (0),
-				Height = Dim.Fill (0), 
+				Height = Dim.Fill (0),
 				AllowsMarking = false,
 				ColorScheme = Colors.TopLevel,
 			};
@@ -344,12 +344,27 @@ namespace UICatalog {
 
 		View CreateClass (Type type)
 		{
+			// If we are to create a generic Type
+			if (type.IsGenericType) {
+
+				// For each of the <T> arguments
+				List<Type> typeArguments = new List<Type> ();
+
+				// use <object>
+				foreach (var arg in type.GetGenericArguments ()) {
+					typeArguments.Add (typeof (object));
+				}
+
+				// And change what type we are instantiating from MyClass<T> to MyClass<object>
+				type = type.MakeGenericType (typeArguments.ToArray ());
+			}
+
 			// Instantiate view
 			var view = (View)Activator.CreateInstance (type);
 
 			//_curView.X = Pos.Center ();
 			//_curView.Y = Pos.Center ();
-			view.Width = Dim.Percent(75);
+			view.Width = Dim.Percent (75);
 			view.Height = Dim.Percent (75);
 
 			// Set the colorscheme to make it stand out
@@ -371,7 +386,7 @@ namespace UICatalog {
 			}
 
 			// If the view supports a Source property, set it so we have something to look at
-			if (view != null && view.GetType ().GetProperty ("Source") != null && view.GetType().GetProperty("Source").PropertyType == typeof(Terminal.Gui.IListDataSource)) {
+			if (view != null && view.GetType ().GetProperty ("Source") != null && view.GetType ().GetProperty ("Source").PropertyType == typeof (Terminal.Gui.IListDataSource)) {
 				var source = new ListWrapper (new List<ustring> () { ustring.Make ("Test Text #1"), ustring.Make ("Test Text #2"), ustring.Make ("Test Text #3") });
 				view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, new [] { source });
 			}
@@ -393,7 +408,7 @@ namespace UICatalog {
 			return view;
 		}
 
-		void LayoutCompleteHandler(View.LayoutEventArgs args)
+		void LayoutCompleteHandler (View.LayoutEventArgs args)
 		{
 			UpdateTitle (_curView);
 		}
