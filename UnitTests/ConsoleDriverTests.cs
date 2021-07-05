@@ -231,6 +231,9 @@ namespace Terminal.Gui.ConsoleDrivers {
 		[Fact]
 		public void Test_Construct_NCurses ()
 		{
+			var t = Environment.GetEnvironmentVariable ("TERM");
+			Console.WriteLine ("Term is:" + t);
+
 			var type = typeof (View).Assembly.GetType ("Terminal.Gui.CursesDriver");
 			var driver = Activator.CreateInstance (type, true);
 
