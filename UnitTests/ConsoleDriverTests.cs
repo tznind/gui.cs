@@ -231,16 +231,8 @@ namespace Terminal.Gui.ConsoleDrivers {
 		[Fact]
 		public void Test_Construct_NCurses ()
 		{
-//			if(string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("TERM"))){
-				Environment.SetEnvironmentVariable("TERM","xterm");
-//			}
-
 			var type = typeof (View).Assembly.GetType ("Terminal.Gui.CursesDriver");
 			var driver = Activator.CreateInstance (type, true);
-
-			var d = ((ConsoleDriver)driver);
-			d.Init (() => { });
-			d.End ();
 		}
 	}
 }
