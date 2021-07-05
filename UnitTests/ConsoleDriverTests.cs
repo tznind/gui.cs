@@ -413,5 +413,12 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 			Application.Shutdown ();
 		}
+
+		[Fact]
+		public void Test_Construct_NCurses ()
+		{
+			var type = typeof (View).Assembly.GetType ("Terminal.Gui.CursesDriver");
+			var driver = Activator.CreateInstance (type, true);
+		}
 	}
 }
