@@ -231,7 +231,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		[Fact]
 		public void Test_Construct_NCurses ()
 		{
-			var t = Environment.GetEnvironmentVariable ("TERM");
+			var t = Environment.GetEnvironmentVariable ("TERM") ?? "Not Defined";
 			Console.WriteLine ("Term is:" + t);
 
 			var type = typeof (View).Assembly.GetType ("Terminal.Gui.CursesDriver");
