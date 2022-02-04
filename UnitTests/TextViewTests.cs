@@ -2745,5 +2745,289 @@ line.
 			Assert.False (tv.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
 			Assert.False (tv.ProcessKey (new KeyEvent (Application.AlternateBackwardKey, new KeyModifiers ())));
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void HistoryText_Undo_Redo_Single_Line_InsertText ()
+		{
+			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
+			var tv = new TextView () {
+				Width = 10,
+				Height = 2,
+				Text = text
+			};
+			var top = Application.Top;
+			top.Add (tv);
+			Application.Begin (top);
+
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (Point.Empty, tv.CursorPosition);
+
+			var messy = " messy";
+			tv.CursorPosition = new Point (7, 1);
+			tv.InsertText (messy);
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (new Point (13, 1), tv.CursorPosition);
+
+			for (int i = 0; i < messy.Length; i++) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			}
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (new Point (7, 1), tv.CursorPosition);
+
+			for (int i = 0; i < messy.Length; i++) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			}
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (new Point (13, 1), tv.CursorPosition);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void HistoryText_Undo_Redo_Single_Line_DeleteCharLeft ()
+		{
+			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
+			var tv = new TextView () {
+				Width = 10,
+				Height = 2,
+				Text = text
+			};
+			var top = Application.Top;
+			top.Add (tv);
+			Application.Begin (top);
+
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (Point.Empty, tv.CursorPosition);
+
+			var ntimes = 3;
+			tv.CursorPosition = new Point (7, 1);
+			for (int i = 0; i < ntimes; i++) {
+				tv.DeleteCharLeft ();
+			}
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (new Point (4, 1), tv.CursorPosition);
+
+			for (int i = 0; i < ntimes; i++) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			}
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (new Point (7, 1), tv.CursorPosition);
+
+			for (int i = 0; i < ntimes; i++) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			}
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (new Point (4, 1), tv.CursorPosition);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void HistoryText_Undo_Redo_Single_Line_DeleteCharRight ()
+		{
+			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
+			var tv = new TextView () {
+				Width = 10,
+				Height = 2,
+				Text = text
+			};
+			var top = Application.Top;
+			top.Add (tv);
+			Application.Begin (top);
+
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (Point.Empty, tv.CursorPosition);
+
+			var ntimes = 3;
+			tv.CursorPosition = new Point (7, 1);
+			for (int i = 0; i < ntimes; i++) {
+				tv.DeleteCharRight ();
+			}
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (new Point (7, 1), tv.CursorPosition);
+
+			for (int i = 0; i < ntimes; i++) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			}
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (new Point (7, 1), tv.CursorPosition);
+
+			for (int i = 0; i < ntimes; i++) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			}
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (new Point (7, 1), tv.CursorPosition);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void HistoryText_Undo_Redo_Single_Line_Selected_InsertText ()
+		{
+			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
+			var tv = new TextView () {
+				Width = 10,
+				Height = 2,
+				Text = text
+			};
+			var top = Application.Top;
+			top.Add (tv);
+			Application.Begin (top);
+
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (Point.Empty, tv.CursorPosition);
+
+			var messy = " messy";
+			tv.CursorPosition = new Point (7, 1);
+			tv.SelectionStartColumn = 11;
+			tv.SelectionStartRow = 1;
+			Assert.Equal (4, tv.SelectedLength);
+			tv.InsertText (messy);
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is messy second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (new Point (13, 1), tv.CursorPosition);
+			Assert.Equal (11, tv.SelectionStartColumn);
+			Assert.Equal (1, tv.SelectionStartRow);
+			Assert.Equal (0, tv.SelectedLength);
+
+			for (int i = 0; i < messy.Length + 1; i++) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			}
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (new Point (7, 1), tv.CursorPosition);
+			Assert.Equal (11, tv.SelectionStartColumn);
+			Assert.Equal (1, tv.SelectionStartRow);
+			Assert.Equal (0, tv.SelectedLength);
+
+			for (int i = 0; i < messy.Length + 1; i++) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			}
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is messy second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (new Point (13, 1), tv.CursorPosition);
+			Assert.Equal (11, tv.SelectionStartColumn);
+			Assert.Equal (1, tv.SelectionStartRow);
+			Assert.Equal (0, tv.SelectedLength);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void HistoryText_Undo_Redo_Single_Line_Selected_DeleteCharLeft ()
+		{
+			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
+			var tv = new TextView () {
+				Width = 10,
+				Height = 2,
+				Text = text
+			};
+			var top = Application.Top;
+			top.Add (tv);
+			Application.Begin (top);
+
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (Point.Empty, tv.CursorPosition);
+
+			var ntimes = 3;
+			tv.CursorPosition = new Point (7, 1);
+			tv.SelectionStartColumn = 11;
+			tv.SelectionStartRow = 1;
+			Assert.Equal (4, tv.SelectedLength);
+			for (int i = 0; i < ntimes; i++) {
+				tv.DeleteCharLeft ();
+			}
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This  second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (new Point (5, 1), tv.CursorPosition);
+			Assert.Equal (11, tv.SelectionStartColumn);
+			Assert.Equal (1, tv.SelectionStartRow);
+			Assert.Equal (0, tv.SelectedLength);
+
+			for (int i = 0; i < ntimes; i++) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			}
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (new Point (7, 1), tv.CursorPosition);
+			Assert.Equal (11, tv.SelectionStartColumn);
+			Assert.Equal (1, tv.SelectionStartRow);
+			Assert.Equal (0, tv.SelectedLength);
+
+			for (int i = 0; i < ntimes; i++) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			}
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This  second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (new Point (5, 1), tv.CursorPosition);
+			Assert.Equal (11, tv.SelectionStartColumn);
+			Assert.Equal (1, tv.SelectionStartRow);
+			Assert.Equal (0, tv.SelectedLength);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void HistoryText_Undo_Redo_Single_Line_Selected_DeleteCharRight ()
+		{
+			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
+			var tv = new TextView () {
+				Width = 10,
+				Height = 2,
+				Text = text
+			};
+			var top = Application.Top;
+			top.Add (tv);
+			Application.Begin (top);
+
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (Point.Empty, tv.CursorPosition);
+
+			var ntimes = 3;
+			tv.CursorPosition = new Point (7, 1);
+			tv.SelectionStartColumn = 11;
+			tv.SelectionStartRow = 1;
+			Assert.Equal (4, tv.SelectedLength);
+			for (int i = 0; i < ntimes; i++) {
+				tv.DeleteCharRight ();
+			}
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This isecond line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (new Point (7, 1), tv.CursorPosition);
+			Assert.Equal (11, tv.SelectionStartColumn);
+			Assert.Equal (1, tv.SelectionStartRow);
+			Assert.Equal (0, tv.SelectedLength);
+
+			for (int i = 0; i < ntimes; i++) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			}
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (new Point (7, 1), tv.CursorPosition);
+			Assert.Equal (11, tv.SelectionStartColumn);
+			Assert.Equal (1, tv.SelectionStartRow);
+			Assert.Equal (0, tv.SelectedLength);
+
+			for (int i = 0; i < ntimes; i++) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			}
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This isecond line.{Environment.NewLine}This is the third line.", tv.Text);
+			Assert.Equal (3, tv.Lines);
+			Assert.Equal (new Point (7, 1), tv.CursorPosition);
+			Assert.Equal (11, tv.SelectionStartColumn);
+			Assert.Equal (1, tv.SelectionStartRow);
+			Assert.Equal (0, tv.SelectedLength);
+		}
 	}
 }
