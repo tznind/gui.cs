@@ -2998,7 +2998,10 @@ namespace Terminal.Gui {
 			DoNeededAction ();
 		}
 
-		void DeleteCharRight ()
+		/// <summary>
+		/// Deletes all the selected or a single character at right from the position of the cursor.
+		/// </summary>
+		public void DeleteCharRight ()
 		{
 			if (isReadOnly)
 				return;
@@ -3012,7 +3015,10 @@ namespace Terminal.Gui {
 			DoNeededAction ();
 		}
 
-		void DeleteCharLeft ()
+		/// <summary>
+		/// Deletes all the selected or a single character at left from the position of the cursor.
+		/// </summary>
+		public void DeleteCharLeft ()
 		{
 			if (isReadOnly)
 				return;
@@ -3211,11 +3217,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		/// <summary>
-		/// Deletes a single character from the position of the cursor
-		/// </summary>
-		/// <returns></returns>
-		public bool DeleteTextBackwards ()
+		bool DeleteTextBackwards ()
 		{
 			if (currentColumn > 0) {
 				// Delete backwards 
@@ -3837,7 +3839,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		protected override void DeleteTextBackwards ()
 		{
-			((TextView)HostControl).DeleteTextBackwards ();
+			((TextView)HostControl).DeleteCharLeft ();
 		}
 
 		/// <inheritdoc/>
