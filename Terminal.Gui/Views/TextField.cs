@@ -23,6 +23,7 @@ namespace Terminal.Gui {
 		int first, point;
 		int selectedStart = -1; // -1 represents there is no text selection.
 		ustring selectedText;
+		HistoryText historyText = new HistoryText ();
 
 		/// <summary>
 		/// Tracks whether the text field should be considered "used", that is, that the user has moved in the entry, so new input should be appended at the cursor position, rather than clearing the entry
@@ -95,6 +96,8 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			Used = true;
 			WantMousePositionReports = true;
+
+			historyText.ChangeText += HistoryText_ChangeText;
 
 			Initialized += TextField_Initialized;
 
@@ -193,6 +196,12 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.V | Key.CtrlMask, Command.Paste);
 		}
 
+		private void HistoryText_ChangeText (HistoryText.HistoryTextItem obj)
+		{
+			Text = ustring.Make (obj.Lines [obj.CursorPosition.Y]);
+			CursorPosition = obj.CursorPosition.X;
+			Adjust ();
+		}
 
 		void TextField_Initialized (object sender, EventArgs e)
 		{
@@ -226,10 +235,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		List<ustring> historyText;
-		int idxhistoryText;
-		bool isFromHistory;
-
 		/// <summary>
 		///   Sets or gets the text held by the view.
 		/// </summary>
@@ -254,14 +259,12 @@ namespace Terminal.Gui {
 					return;
 				}
 				text = TextModel.ToRunes (newText.NewText);
-				if (!Secret && !isFromHistory) {
-					if (historyText == null)
-						historyText = new List<ustring> () { oldText };
-					if (idxhistoryText > 0 && idxhistoryText + 1 < historyText.Count)
-						historyText.RemoveRange (idxhistoryText + 1, historyText.Count - idxhistoryText - 1);
-					historyText.Add (ustring.Make (text));
-					idxhistoryText++;
+
+				if (!Secret && !historyText.IsFromHistory) {
+					historyText.Add (new List<List<Rune>> () { oldText.ToRuneList () }, new Point (point, 0), true);
+					historyText.Add (new List<List<Rune>> () { text }, new Point (point, 0));
 				}
+
 				TextChanged?.Invoke (oldText);
 
 				if (point > text.Count) {
@@ -480,6 +483,8 @@ namespace Terminal.Gui {
 
 		void InsertText (KeyEvent kb, bool useOldCursorPos = true)
 		{
+			historyText.Add (new List<List<Rune>> () { text }, new Point (point, 0), true);
+
 			if (length > 0) {
 				DeleteSelectedText ();
 				oldCursorPos = point;
@@ -561,19 +566,7 @@ namespace Terminal.Gui {
 			if (ReadOnly)
 				return;
 
-			if (historyText != null && historyText.Count > 0) {
-				isFromHistory = true;
-				if (idxhistoryText < historyText.Count - 1) {
-					idxhistoryText++;
-					if (idxhistoryText < historyText.Count) {
-						Text = historyText [idxhistoryText];
-					} else if (idxhistoryText == historyText.Count - 1) {
-						Text = historyText [historyText.Count - 1];
-					}
-					point = text.Count;
-				}
-				isFromHistory = false;
-			}
+			historyText.Redo ();
 
 			//if (Clipboard.Contents == null)
 			//	return true;
@@ -596,15 +589,7 @@ namespace Terminal.Gui {
 			if (ReadOnly)
 				return;
 
-			if (historyText != null && historyText.Count > 0) {
-				isFromHistory = true;
-				if (idxhistoryText > 0)
-					idxhistoryText--;
-				if (idxhistoryText > -1)
-					Text = historyText [idxhistoryText];
-				point = text.Count;
-				isFromHistory = false;
-			}
+			historyText.Undo ();
 		}
 
 		void KillToStart ()
@@ -730,6 +715,8 @@ namespace Terminal.Gui {
 			if (ReadOnly)
 				return;
 
+			historyText.Add (new List<List<Rune>> () { text }, new Point (point, 0), true);
+
 			if (length == 0) {
 				if (point == 0)
 					return;
@@ -756,6 +743,8 @@ namespace Terminal.Gui {
 		{
 			if (ReadOnly)
 				return;
+
+			historyText.Add (new List<List<Rune>> () { text }, new Point (point, 0), true);
 
 			if (length == 0) {
 				if (text.Count == 0 || text.Count == point)
