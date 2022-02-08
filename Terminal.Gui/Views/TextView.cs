@@ -536,21 +536,36 @@ namespace Terminal.Gui {
 	}
 
 	class HistoryText {
+		public enum LineStatus {
+			Original,
+			Replaced,
+			Removed,
+			Added
+		}
+
 		public class HistoryTextItem {
 			public List<List<Rune>> Lines;
 			public Point CursorPosition;
-			public bool OriginalLines;
+			public LineStatus LineStatus;
+			public bool IsUndoing;
 
-			public HistoryTextItem (List<List<Rune>> lines, Point curPos, bool originalLines)
+			public HistoryTextItem (List<List<Rune>> lines, Point curPos, LineStatus linesStatus)
 			{
 				Lines = lines;
 				CursorPosition = curPos;
-				OriginalLines = originalLines;
+				LineStatus = linesStatus;
+			}
+
+			public HistoryTextItem (HistoryTextItem historyTextItem)
+			{
+				Lines = new List<List<Rune>> (historyTextItem.Lines);
+				CursorPosition = new Point (historyTextItem.CursorPosition.X, historyTextItem.CursorPosition.Y);
+				LineStatus = historyTextItem.LineStatus;
 			}
 
 			public override string ToString ()
 			{
-				return $"(Count: {Lines.Count}, Cursor: {CursorPosition}, Original: {OriginalLines})";
+				return $"(Count: {Lines.Count}, Cursor: {CursorPosition}, Status: {LineStatus})";
 			}
 		}
 
@@ -559,12 +574,29 @@ namespace Terminal.Gui {
 
 		public bool IsFromHistory { get; private set; }
 
+		public bool IsDirty => CheckIsDirty ();
+
+		bool CheckIsDirty ()
+		{
+			if (idxHistoryText < 1) {
+				return false;
+			}
+			for (int i = 0; i <= idxHistoryText; i++) {
+				if (historyTextItems [i].LineStatus != LineStatus.Original) {
+					return true;
+				}
+			}
+			return false;
+		}
+
 		public event Action<HistoryTextItem> ChangeText;
 
-		public void Add (List<List<Rune>> lines, Point curPos, bool originalLines = false)
+		public void Add (List<List<Rune>> lines, Point curPos, LineStatus lineStatus = LineStatus.Original)
 		{
-			if (originalLines) {
-				var found = historyTextItems.Find (x => x.OriginalLines && x.CursorPosition.Y == curPos.Y);
+			if (lineStatus == LineStatus.Original) {
+				var found = historyTextItems.Find (x => x.LineStatus == LineStatus.Original
+					&& x.CursorPosition.Y == curPos.Y);
+
 				if (found != null) {
 					if (idxHistoryText == 0 && found.CursorPosition.X != curPos.X) {
 						found.CursorPosition.X = curPos.X;
@@ -573,24 +605,30 @@ namespace Terminal.Gui {
 				}
 			}
 
+			if (historyTextItems.Count == 0 && lineStatus != LineStatus.Original)
+				throw new ArgumentException ("The first item must be the original.");
+
 			if (idxHistoryText >= 0 && idxHistoryText + 1 < historyTextItems.Count)
 				historyTextItems.RemoveRange (idxHistoryText + 1, historyTextItems.Count - idxHistoryText - 1);
 
-			historyTextItems.Add (new HistoryTextItem (lines, curPos, originalLines));
+			historyTextItems.Add (new HistoryTextItem (lines, curPos, lineStatus));
 			idxHistoryText++;
 		}
 
 		public void Undo ()
 		{
-			if (historyTextItems != null && historyTextItems.Count > 0) {
-				if (idxHistoryText - 1 == -1)
-					return;
-
+			if (historyTextItems?.Count > 0 && idxHistoryText > 0) {
 				IsFromHistory = true;
 
 				idxHistoryText--;
 
-				OnChangeText (historyTextItems [idxHistoryText]);
+				var historyTextItem = new HistoryTextItem (historyTextItems [idxHistoryText]) {
+					IsUndoing = true
+				};
+
+				JoinWith (ref historyTextItem);
+
+				OnChangeText (historyTextItem);
 
 				IsFromHistory = false;
 			}
@@ -598,17 +636,92 @@ namespace Terminal.Gui {
 
 		public void Redo ()
 		{
-			if (historyTextItems != null && historyTextItems.Count > 0) {
-				if (idxHistoryText + 1 == historyTextItems.Count)
-					return;
-
+			if (historyTextItems?.Count > 0 && idxHistoryText < historyTextItems.Count - 1) {
 				IsFromHistory = true;
 
 				idxHistoryText++;
 
-				OnChangeText (historyTextItems [idxHistoryText]);
+				var historyTextItem = new HistoryTextItem (historyTextItems [idxHistoryText]) {
+					IsUndoing = false
+				};
+
+				JoinWith (ref historyTextItem);
+
+				OnChangeText (historyTextItem);
 
 				IsFromHistory = false;
+			}
+		}
+
+		void JoinWith (ref HistoryTextItem historyTextItem)
+		{
+			if (historyTextItem.LineStatus == LineStatus.Added) {
+				return;
+			}
+
+			HistoryTextItem itemsToJoin = null;
+
+			if (historyTextItem.IsUndoing) {
+				if (idxHistoryText - 1 > -1 && ((historyTextItems [idxHistoryText - 1].LineStatus == LineStatus.Added)
+					|| historyTextItems [idxHistoryText + 1].LineStatus == LineStatus.Added
+					|| historyTextItems [idxHistoryText + 1].LineStatus == LineStatus.Removed)) {
+
+					idxHistoryText--;
+					historyTextItem = new HistoryTextItem (historyTextItems [idxHistoryText]);
+					historyTextItem.IsUndoing = true;
+					if (idxHistoryText - 1 > -1 && historyTextItems [idxHistoryText - 1].LineStatus == LineStatus.Original) {
+						idxHistoryText--;
+					}
+				}
+			} else if (!historyTextItem.IsUndoing) {
+				if ((historyTextItem.LineStatus == LineStatus.Removed && idxHistoryText + 1 < historyTextItems.Count
+					&& historyTextItems [idxHistoryText + 1].LineStatus == LineStatus.Replaced)) {
+
+					idxHistoryText++;
+					historyTextItem = new HistoryTextItem (historyTextItems [idxHistoryText]);
+					historyTextItem.IsUndoing = false;
+
+					itemsToJoin = new HistoryTextItem (historyTextItems [idxHistoryText - 1]);
+					historyTextItem.LineStatus = LineStatus.Removed;
+
+				} else if (historyTextItem.LineStatus == LineStatus.Replaced && idxHistoryText + 1 < historyTextItems.Count - 1
+					&& historyTextItems [idxHistoryText - 1].LineStatus == LineStatus.Added) {
+
+					idxHistoryText++;
+					if (historyTextItems [idxHistoryText].LineStatus == LineStatus.Original) {
+						idxHistoryText++;
+						historyTextItem = new HistoryTextItem (historyTextItems [idxHistoryText]);
+						historyTextItem.IsUndoing = false;
+						historyTextItem.LineStatus = LineStatus.Added;
+					} else if (historyTextItems [idxHistoryText].LineStatus == LineStatus.Removed) {
+						var nRemoved = 0;
+						do {
+							nRemoved++;
+							idxHistoryText++;
+						} while (historyTextItems [idxHistoryText].LineStatus == LineStatus.Removed);
+						historyTextItem = new HistoryTextItem (historyTextItems [idxHistoryText]);
+						historyTextItem.IsUndoing = false;
+						historyTextItem.LineStatus = LineStatus.Removed;
+						for (int i = 0; i < nRemoved; i++) {
+							historyTextItem.Lines.Add (new List<Rune> ());
+						}
+					}
+
+				} else if (historyTextItems [idxHistoryText - 1].LineStatus == LineStatus.Removed) {
+					itemsToJoin = new HistoryTextItem (historyTextItems [idxHistoryText - 1]);
+					historyTextItem.LineStatus = LineStatus.Removed;
+				}
+			}
+
+			if (itemsToJoin == null) {
+				return;
+			}
+
+			for (int i = 0; i < itemsToJoin.Lines.Count; i++) {
+				if (i == 0) {
+					continue;
+				}
+				historyTextItem.Lines.Add (itemsToJoin.Lines [i]);
 			}
 		}
 
@@ -1213,22 +1326,27 @@ namespace Terminal.Gui {
 
 		private void HistoryText_ChangeText (HistoryText.HistoryTextItem obj)
 		{
-			for (int i = CursorPosition.Y; i > obj.CursorPosition.Y; i--) {
-				model.RemoveLine (i);
-			}
-
 			var startLine = obj.CursorPosition.Y;
+			var curPos = obj.CursorPosition;
 
 			for (int i = 0; i < obj.Lines.Count; i++) {
-				if (i < obj.Lines.Count - 1) {
-					model.AddLine (startLine, obj.Lines [i]);
-				} else {
+				if (i == 0) {
 					model.ReplaceLine (startLine, obj.Lines [i]);
+				} else if ((obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Removed)
+						|| !obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Added) {
+					model.AddLine (startLine, obj.Lines [i]);
+					if (obj.LineStatus == HistoryText.LineStatus.Added) {
+						curPos = new Point (0, startLine);
+					}
+				} else if (model.Count > obj.CursorPosition.Y + 1) {
+					model.RemoveLine (obj.CursorPosition.Y + 1);
+				} else {
+					break;
 				}
 				startLine++;
 			}
 
-			CursorPosition = obj.CursorPosition;
+			CursorPosition = curPos;
 			Adjust ();
 		}
 
@@ -1564,6 +1682,12 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Indicates whatever the text was changed or not.
+		/// <see langword="true"/> if the text was changed <see langword="false"/> otherwise.
+		/// </summary>
+		public bool IsDirty => historyText.IsDirty;
+
 		int GetSelectedLength ()
 		{
 			return SelectedText.Length;
@@ -1838,10 +1962,12 @@ namespace Terminal.Gui {
 			var endCol = (int)(end & 0xffffffff);
 			var line = model.GetLine (startRow);
 
-			List<List<Rune>> removedLines = new List<List<Rune>> () { new List<Rune> (line) };
+			historyText.Add (new List<List<Rune>> () { new List<Rune> (line) }, new Point (startCol, startRow));
+
+			List<List<Rune>> removedLines = new List<List<Rune>> ();
 
 			if (startRow == maxrow) {
-				historyText.Add (new List<List<Rune>> (removedLines), CursorPosition);
+				removedLines.Add (new List<Rune> (line));
 
 				line.RemoveRange (startCol, endCol - startCol);
 				currentColumn = startCol;
@@ -1850,15 +1976,20 @@ namespace Terminal.Gui {
 				} else {
 					SetNeedsDisplay (new Rect (0, startRow - topRow, Frame.Width, startRow - topRow + 1));
 				}
+
+				historyText.Add (new List<List<Rune>> (removedLines), CursorPosition, HistoryText.LineStatus.Removed);
+
 				return;
 			}
+
+			removedLines.Add (new List<Rune> (line));
 
 			line.RemoveRange (startCol, line.Count - startCol);
 			var line2 = model.GetLine (maxrow);
 			line.AddRange (line2.Skip (endCol));
 			for (int row = startRow + 1; row <= maxrow; row++) {
 
-				removedLines.Add (model.GetLine (startRow + 1));
+				removedLines.Add (new List<Rune> (model.GetLine (startRow + 1)));
 
 				model.RemoveLine (startRow + 1);
 			}
@@ -1867,7 +1998,8 @@ namespace Terminal.Gui {
 			}
 			currentColumn = startCol;
 
-			historyText.Add (new List<List<Rune>> (removedLines), CursorPosition);
+			historyText.Add (new List<List<Rune>> (removedLines), CursorPosition,
+				HistoryText.LineStatus.Removed);
 
 			SetNeedsDisplay ();
 		}
@@ -2164,8 +2296,6 @@ namespace Terminal.Gui {
 		{
 			var line = GetCurrentLine ();
 
-			historyText.Add (new List<List<Rune>> () { new List<Rune> (line) }, CursorPosition, true);
-
 			if (Used) {
 				line.Insert (Math.Min (currentColumn, line.Count), rune);
 			} else {
@@ -2229,14 +2359,15 @@ namespace Terminal.Gui {
 
 			var line = GetCurrentLine ();
 
-			historyText.Add (new List<List<Rune>> () { new List<Rune> (line) }, CursorPosition, true);
+			historyText.Add (new List<List<Rune>> () { new List<Rune> (line) }, CursorPosition);
 
 			// Optimize single line
 			if (lines.Count == 1) {
 				line.InsertRange (currentColumn, lines [0]);
 				currentColumn += lines [0].Count;
 
-				historyText.Add (new List<List<Rune>> () { new List<Rune> (line) }, CursorPosition);
+				historyText.Add (new List<List<Rune>> () { new List<Rune> (line) }, CursorPosition,
+					HistoryText.LineStatus.Replaced);
 
 				if (!wordWrap && currentColumn - leftColumn > Frame.Width) {
 					leftColumn = Math.Max (currentColumn - Frame.Width + 1, 0);
@@ -2278,7 +2409,8 @@ namespace Terminal.Gui {
 			currentColumn = rest != null ? lastp : lines [lines.Count - 1].Count;
 			Adjust ();
 
-			historyText.Add (new List<List<Rune>> () { new List<Rune> (line) }, CursorPosition);
+			historyText.Add (new List<List<Rune>> () { new List<Rune> (line) }, CursorPosition,
+				HistoryText.LineStatus.Replaced);
 		}
 
 		// The column we are tracking, or -1 if we are not tracking any column
@@ -2771,7 +2903,7 @@ namespace Terminal.Gui {
 				return true;
 			var currentLine = GetCurrentLine ();
 
-			historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition, true);
+			historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
 
 			var restCount = currentLine.Count - currentColumn;
 			var rest = currentLine.GetRange (currentColumn, restCount);
@@ -2783,13 +2915,16 @@ namespace Terminal.Gui {
 
 			addedLines.Add (new List<Rune> (model.GetLine (currentRow + 1)));
 
+			historyText.Add (addedLines, CursorPosition, HistoryText.LineStatus.Added);
+
 			if (wordWrap) {
 				wrapManager.AddLine (currentRow, currentColumn);
 				wrapNeeded = true;
 			}
 			currentRow++;
 
-			historyText.Add (addedLines, CursorPosition);
+			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
+				HistoryText.LineStatus.Replaced);
 
 			bool fullNeedsDisplay = false;
 			if (currentRow >= topRow + Frame.Height) {
@@ -3136,6 +3271,9 @@ namespace Terminal.Gui {
 			//So that special keys like tab can be processed
 			if (isReadOnly)
 				return true;
+
+			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition);
+
 			if (selecting) {
 				ClearSelectedRegion ();
 			}
@@ -3151,7 +3289,8 @@ namespace Terminal.Gui {
 				currentColumn++;
 			}
 
-			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition);
+			historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
+				HistoryText.LineStatus.Replaced);
 
 			return true;
 		}
@@ -3183,12 +3322,15 @@ namespace Terminal.Gui {
 				if (currentRow + 1 == model.Count)
 					return true;
 
+				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
+
 				List<List<Rune>> removedLines = new List<List<Rune>> () { new List<Rune> (currentLine) };
 
 				var nextLine = model.GetLine (currentRow + 1);
 
-				removedLines.Add (nextLine);
-				historyText.Add (removedLines, CursorPosition);
+				removedLines.Add (new List<Rune> (nextLine));
+
+				historyText.Add (removedLines, CursorPosition, HistoryText.LineStatus.Removed);
 
 				currentLine.AddRange (nextLine);
 				model.RemoveLine (currentRow + 1);
@@ -3201,11 +3343,12 @@ namespace Terminal.Gui {
 				var sr = currentRow - topRow;
 				SetNeedsDisplay (new Rect (0, sr, Frame.Width, sr + 1));
 			} else {
-				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition, true);
+				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
 
 				currentLine.RemoveAt (currentColumn);
 
-				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
+				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition,
+					HistoryText.LineStatus.Replaced);
 
 				if (wordWrap && wrapManager.RemoveAt (currentRow, currentColumn)) {
 					wrapNeeded = true;
@@ -3223,7 +3366,7 @@ namespace Terminal.Gui {
 				// Delete backwards 
 				var currentLine = GetCurrentLine ();
 
-				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition, true);
+				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
 
 				currentLine.RemoveAt (currentColumn - 1);
 				if (wordWrap && wrapManager.RemoveAt (currentRow, currentColumn - 1)) {
@@ -3231,7 +3374,8 @@ namespace Terminal.Gui {
 				}
 				currentColumn--;
 
-				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
+				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition,
+					HistoryText.LineStatus.Replaced);
 
 				if (currentColumn < leftColumn) {
 					leftColumn--;
@@ -3245,10 +3389,14 @@ namespace Terminal.Gui {
 				var prowIdx = currentRow - 1;
 				var prevRow = model.GetLine (prowIdx);
 
+				historyText.Add (new List<List<Rune>> () { new List<Rune> (prevRow) }, CursorPosition);
+
 				List<List<Rune>> removedLines = new List<List<Rune>> () { new List<Rune> (prevRow) };
 
-				removedLines.Add (GetCurrentLine ());
-				historyText.Add (removedLines, new Point (currentColumn, prowIdx));
+				removedLines.Add (new List<Rune> (GetCurrentLine ()));
+
+				historyText.Add (removedLines, new Point (currentColumn, prowIdx),
+					HistoryText.LineStatus.Removed);
 
 				var prevCount = prevRow.Count;
 				model.GetLine (prowIdx).AddRange (GetCurrentLine ());
@@ -3259,7 +3407,8 @@ namespace Terminal.Gui {
 				}
 				currentRow--;
 
-				historyText.Add (new List<List<Rune>> () { model.GetLine (prowIdx) }, new Point (currentColumn, prowIdx));
+				historyText.Add (new List<List<Rune>> () { model.GetLine (prowIdx) }, new Point (currentColumn, prowIdx),
+					HistoryText.LineStatus.Replaced);
 
 				if (wrapNeeded && !lineRemoved) {
 					currentColumn = Math.Max (prevCount - 1, 0);

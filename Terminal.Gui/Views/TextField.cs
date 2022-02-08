@@ -261,8 +261,10 @@ namespace Terminal.Gui {
 				text = TextModel.ToRunes (newText.NewText);
 
 				if (!Secret && !historyText.IsFromHistory) {
-					historyText.Add (new List<List<Rune>> () { oldText.ToRuneList () }, new Point (point, 0), true);
-					historyText.Add (new List<List<Rune>> () { text }, new Point (point, 0));
+					historyText.Add (new List<List<Rune>> () { oldText.ToRuneList () },
+						new Point (point, 0));
+					historyText.Add (new List<List<Rune>> () { text }, new Point (point, 0)
+						, HistoryText.LineStatus.Replaced);
 				}
 
 				TextChanged?.Invoke (oldText);
@@ -483,7 +485,7 @@ namespace Terminal.Gui {
 
 		void InsertText (KeyEvent kb, bool useOldCursorPos = true)
 		{
-			historyText.Add (new List<List<Rune>> () { text }, new Point (point, 0), true);
+			historyText.Add (new List<List<Rune>> () { text }, new Point (point, 0));
 
 			if (length > 0) {
 				DeleteSelectedText ();
@@ -715,7 +717,7 @@ namespace Terminal.Gui {
 			if (ReadOnly)
 				return;
 
-			historyText.Add (new List<List<Rune>> () { text }, new Point (point, 0), true);
+			historyText.Add (new List<List<Rune>> () { text }, new Point (point, 0));
 
 			if (length == 0) {
 				if (point == 0)
@@ -744,7 +746,7 @@ namespace Terminal.Gui {
 			if (ReadOnly)
 				return;
 
-			historyText.Add (new List<List<Rune>> () { text }, new Point (point, 0), true);
+			historyText.Add (new List<List<Rune>> () { text }, new Point (point, 0));
 
 			if (length == 0) {
 				if (text.Count == 0 || text.Count == point)
