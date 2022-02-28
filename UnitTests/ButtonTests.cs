@@ -11,8 +11,7 @@ namespace Terminal.Gui.Views {
 		public void Constructors_Defaults ()
 		{
 			var btn = new Button ();
-			Assert.Equal (string.Empty, btn.Text);
-			Assert.Equal ("[  ]", btn.GetType ().BaseType.GetProperty ("Text").GetValue (btn).ToString ());
+			Assert.Equal ("[  ]", btn.Text);
 			Assert.False (btn.IsDefault);
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
 			Assert.Equal ('_', btn.HotKeySpecifier);
@@ -21,7 +20,6 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (Key.Null, btn.HotKey);
 
 			btn = new Button ("Test", true);
-			Assert.Equal ("Test", btn.Text);
 			Assert.Equal ("[< Test >]", btn.GetType ().BaseType.GetProperty ("Text").GetValue (btn).ToString ());
 			Assert.True (btn.IsDefault);
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
@@ -31,7 +29,6 @@ namespace Terminal.Gui.Views {
 			Assert.Equal (Key.Null, btn.HotKey);
 
 			btn = new Button (3, 4, "Test", true);
-			Assert.Equal ("Test", btn.Text);
 			Assert.Equal ("[< Test >]", btn.GetType ().BaseType.GetProperty ("Text").GetValue (btn).ToString ());
 			Assert.True (btn.IsDefault);
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);

@@ -110,8 +110,7 @@ namespace Terminal.Gui {
 
 			CanFocus = true;
 			this.is_default = is_default;
-			this.text = text ?? string.Empty;
-			Update ();
+			Text = text ?? string.Empty;
 
 			HotKeyChanged += Button_HotKeyChanged;
 
@@ -141,9 +140,6 @@ namespace Terminal.Gui {
 		///   The text displayed by this <see cref="Button"/>.
 		/// </summary>
 		public override ustring Text {
-			get {
-				return text;
-			}
 
 			set {
 				text = value;
