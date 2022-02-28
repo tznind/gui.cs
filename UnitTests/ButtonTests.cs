@@ -137,5 +137,14 @@ namespace Terminal.Gui.Views {
 			Application.Driver.SendKeys ('b', ConsoleKey.B, false, false, false);
 			Assert.Equal (2, pressed);
 		}
+
+		[Fact]
+		public void TestButtonCastToView()
+		{
+			View b = new Button ();
+			b.Text = "heya";
+			Assert.Equal ("heya", b.Text);
+			Assert.Equal ("heya", ((Button)b).Text);
+		}
 	}
 }

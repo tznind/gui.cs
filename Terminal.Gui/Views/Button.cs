@@ -140,7 +140,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		///   The text displayed by this <see cref="Button"/>.
 		/// </summary>
-		public new ustring Text {
+		public override ustring Text {
 			get {
 				return text;
 			}
