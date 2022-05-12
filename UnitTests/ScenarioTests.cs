@@ -52,6 +52,8 @@ namespace Terminal.Gui {
 
 			foreach (var scenarioClass in scenarioClasses) {
 
+				output.WriteLine ("Beginning Scenario:" + scenarioClass.Name);
+
 				// Setup some fake keypresses 
 				// Passing empty string will cause just a ctrl-q to be fired
 				Console.MockKeyPresses.Clear ();
