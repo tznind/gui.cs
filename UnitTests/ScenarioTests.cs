@@ -110,6 +110,8 @@ namespace Terminal.Gui {
 			}
 			Responder.Instances.Clear ();
 #endif
+			//clear the logging callback
+			Console.TraceLoggingDelegate = null;
 		}
 
 		[Fact]
