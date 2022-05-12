@@ -48,6 +48,8 @@ namespace Terminal.Gui {
 			List<Type> scenarioClasses = Scenario.GetDerivedClasses<Scenario> ();
 			Assert.NotEmpty (scenarioClasses);
 
+			Console.TraceLoggingDelegate = output.WriteLine;
+
 			foreach (var scenarioClass in scenarioClasses) {
 
 				// Setup some fake keypresses 

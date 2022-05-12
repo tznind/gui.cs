@@ -52,6 +52,12 @@ namespace Terminal.Gui {
 		public const int HEIGHT = 25;
 
 		/// <summary>
+		/// Callback to invoke when reporting information
+		/// about what activities the driver is doing
+		/// </summary>
+		public static Action<string> TraceLoggingDelegate;
+
+		/// <summary>
 		/// 
 		/// </summary>
 		public static int WindowWidth { get; set; } = WIDTH;
@@ -782,7 +788,6 @@ namespace Terminal.Gui {
 		{
 			throw new NotImplementedException ();
 		}
-
 		//
 		// Summary:
 		//     Obtains the next character or function key pressed by the user. The pressed key
@@ -811,7 +816,13 @@ namespace Terminal.Gui {
 		public static ConsoleKeyInfo ReadKey (bool intercept)
 		{
 			if (MockKeyPresses.Count > 0) {
-				return MockKeyPresses.Pop();
+
+				var popped = MockKeyPresses.Pop ();
+
+				TraceLoggingDelegate?.Invoke ($"{DateTime.Now.TimeOfDay} - Popped '{popped}' for consumer: {Environment.NewLine}{Environment.StackTrace}");
+
+				return popped;
+
 			} else {
 				return new ConsoleKeyInfo ('\0', (ConsoleKey)'\0', false,false,false);
 			}
