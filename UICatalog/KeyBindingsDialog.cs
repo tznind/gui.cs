@@ -183,6 +183,9 @@ namespace UICatalog {
 
 		private void SetTextBoxToShowBinding (Command cmd)
 		{
+			if (keyLabel == null)
+				return;
+
 			if (CurrentBindings.ContainsKey (cmd)) {
 				keyLabel.Text = "Key: " + CurrentBindings [cmd].ToString ();
 			} else {
