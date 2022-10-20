@@ -677,7 +677,7 @@ namespace Terminal.Gui.Core {
 
 				// Also goes fine
 				Action a2 = () => Application.MainLoop.Invoke (StartWindow);
-				yield return new object [] { a1, "Click Me", "Cancel", "Pew Pew", 0, 1, 2, 3, 4 };
+				yield return new object [] { a2, "Click Me", "Cancel", "Pew Pew", 0, 1, 2, 3, 4 };
 			}
 		}
 
