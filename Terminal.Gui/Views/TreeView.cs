@@ -605,14 +605,15 @@ namespace Terminal.Gui {
 					
 					// Find the current selected object within the tree
 					var current = map.IndexOf (b => b.Model == SelectedObject);
-					var newIndex = searchCollectionNavigator.CalculateNewIndex (current, (char)keyEvent.KeyValue);
+					var newIndex = searchCollectionNavigator.CalculateNewIndex (current, (char)keyEvent.KeyValue, out bool foundMatch);
 
 					if (newIndex != current) {
 						SelectedObject = map.ElementAt (newIndex).Model;
 						EnsureVisible (selectedObject);
 						SetNeedsDisplay ();
-						return true;
 					}
+
+					return foundMatch;
 				}
 
 			} finally {
