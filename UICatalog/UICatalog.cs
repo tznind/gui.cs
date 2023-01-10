@@ -71,7 +71,13 @@ namespace UICatalog {
 			}
 
 			_watcher.NotifyFilter = NotifyFilters.LastWrite;
-			_watcher.Path = Path.GetDirectoryName (Assembly.GetExecutingAssembly ().Location) + "/.tui/";
+
+			var tuiDir = Path.Combine (Path.GetDirectoryName (Assembly.GetExecutingAssembly ().Location), ".tui");
+			if(!Directory.Exists(tuiDir)) {
+				Directory.CreateDirectory (tuiDir);
+			}
+
+			_watcher.Path = tuiDir;
 			_watcher.Filter = _visualStylesFile;
 
 			// If a Scenario name has been provided on the commandline
