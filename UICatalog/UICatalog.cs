@@ -72,7 +72,9 @@ namespace UICatalog {
 
 			_watcher.NotifyFilter = NotifyFilters.LastWrite;
 
-			var tuiDir = Path.Combine (Path.GetDirectoryName (Assembly.GetExecutingAssembly ().Location), ".tui");
+			var f = new FileInfo (Assembly.GetExecutingAssembly ().Location);			
+			var tuiDir = Path.Combine (f.Directory.FullName, ".tui");
+
 			if(!Directory.Exists(tuiDir)) {
 				Directory.CreateDirectory (tuiDir);
 			}
