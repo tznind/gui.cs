@@ -140,7 +140,7 @@ namespace UICatalog {
 		private static void VisualStylesConfigChanged (object sender, FileSystemEventArgs e)
 		{
 			Thread.Sleep (500);
-			ConfigurationManager.UpdateConfigurationFromFile (_watcher.Path + _visualStylesFile);
+			ConfigurationManager.UpdateConfigurationFromFile (Path.Combine(_watcher.Path , _visualStylesFile));
 			ConfigurationManager.Config.VisualStyles.Apply ();
 			ColorScheme s;
 			if (Colors.ColorSchemes.TryGetValue ("UICatalog", out s)) {
