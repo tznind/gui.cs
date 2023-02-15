@@ -238,6 +238,9 @@ namespace Terminal.Gui.Graphs {
 		/// </summary>
 		public bool BeforeSeries { get; set; }
 
+		//TODO: Document and be false default
+		public bool UseBraille {get;set;} = true;
+
 
 		/// <summary>
 		/// Draws lines connecting each of the <see cref="Points"/>
@@ -251,7 +254,16 @@ namespace Terminal.Gui.Graphs {
 
 				var start = graph.GraphSpaceToScreen (line.Start);
 				var end = graph.GraphSpaceToScreen (line.End);
-				graph.DrawLine (start, end, LineRune);
+				
+				if(UseBraille)
+				{
+					graph.DrawBrailleLine (start, end);
+				}
+				else
+				{
+					graph.DrawLine (start, end, LineRune);
+				}
+				
 			}
 		}
 

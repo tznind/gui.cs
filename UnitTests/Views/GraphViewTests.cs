@@ -1304,6 +1304,35 @@ namespace Terminal.Gui.ViewTests {
 		}
 
 		[Fact]
+		public void TestBraille()
+		{
+
+string[] bitmap = @"  oooo
+ o    o
+o o  o o
+o      o
+o o  o o
+o  oo  o
+ o    o
+  oooo
+".Split(Environment.NewLine,StringSplitOptions.None)
+.Select(s=>s.PadRight(8))
+.ToArray();
+
+			var builder = new BitmapToBraille(8,8,(x,y)=>bitmap[y][x] == 'o');
+			var braille = builder.GenerateImage();
+
+output.WriteLine(braille);
+
+			Assert.Equal(
+				@"
+⡔⠍⠩⢢
+⠣⣑⣊⠜
+".Trim(),braille.Trim());
+
+		}
+
+		[Fact]
 		public void PathAnnotation_Box ()
 		{
 			var gv = GraphViewTests.GetGraph ();
