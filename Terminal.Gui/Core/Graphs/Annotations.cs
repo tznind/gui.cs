@@ -238,8 +238,7 @@ namespace Terminal.Gui.Graphs {
 		/// </summary>
 		public bool BeforeSeries { get; set; }
 
-		//TODO: Document and be false default
-		public bool UseBraille {get;set;} = true;
+		public bool UseBraille {get;set;}
 
 
 		/// <summary>

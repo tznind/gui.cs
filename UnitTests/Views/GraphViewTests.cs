@@ -1364,6 +1364,39 @@ output.WriteLine(braille);
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
 		}
+		[Fact]
+		public void PathAnnotation_Box_Braille ()
+		{
+			var gv = GraphViewTests.GetGraph ();
+			
+			var path = new PathAnnotation ();
+			path.UseBraille = true;
+			path.Points.Add (new PointF (1, 1));
+			path.Points.Add (new PointF (1, 3));
+			path.Points.Add (new PointF (6, 3));
+			path.Points.Add (new PointF (6, 1));
+
+			// list the starting point again so that it draws a complete square
+			// (otherwise it will miss out the last line along the bottom)
+			path.Points.Add (new PointF (1, 1));
+
+			gv.Annotations.Add (path);
+			gv.Redraw (gv.Bounds);
+
+			var expected =
+@"    
+ │⠉⠉⠉⠉⠉⡇
+ ┤⡇    ⡇
+ ┤⠉⠉⠉⠉⠉⠁
+0┼┬┬┬┬┬┬┬┬
+ 0    5";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+		}
 
 		[Fact]
 		public void YAxisLabels_With_MarginBottom ()

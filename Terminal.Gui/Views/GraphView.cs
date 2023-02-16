@@ -360,11 +360,11 @@ namespace Terminal.Gui {
 			var minY = Math.Min(start.Y,end.Y);
 			var maxY = Math.Max(start.Y,end.Y);
 			
-			for(int y = minY; y < maxY;y++)
+			for(int y = minY; y <= maxY;y++)
 			{
 				var line = runes[y - minY];
 
-				for(int x = minX; x < maxX;x++)
+				for(int x = minX; x <= maxX;x++)
 				{
 					var rune = line[x - minX];
 					if(rune != ' ')

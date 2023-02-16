@@ -175,6 +175,9 @@ namespace UICatalog.Scenarios {
 				LineColor = cyan,
 				Points = randomPoints.OrderBy (p => p.X).ToList (),
 				BeforeSeries = true,
+				
+				//TODO: Make toggleable
+				UseBraille = true,
 			};
 
 			graphView.Series.Add (points);
