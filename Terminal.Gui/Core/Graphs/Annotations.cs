@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -249,22 +250,121 @@ namespace Terminal.Gui.Graphs {
 		{
 			View.Driver.SetAttribute (LineColor ?? graph.ColorScheme.Normal);
 
+			if(UseBraille) {
+				RenderAsBraille (graph);
+			}
+			else {
+				RenderAsLineRune (graph);
+			}
+		}
+
+		private void RenderAsLineRune (GraphView graph)
+		{
+			foreach (var line in PointsToLines())
+			{
+				var start = graph.GraphSpaceToScreen (line.Start);
+				var end = graph.GraphSpaceToScreen (line.End);
+
+				graph.DrawLine (start, end, LineRune);
+			}
+		}
+
+
+		private void RenderAsBraille (GraphView graph)
+		{
+			// with Braille we can render 8 'pixels' (i.e 4x2)
+			// per Rune instead of only 1. So we need to create
+			// a coordinate space that is ScreenSpace upscaled 4x2
+
+			// within the upscaled coordinate space what cells
+			// are have line pass through them
+			List<Point> upscaledLitPoints = new List<Point> ();
+			int minScreenX = int.MaxValue;
+			int maxScreenX = int.MinValue;
+			int minScreenY = int.MaxValue;
+			int maxScreenY = int.MinValue;
+
+			// 'draw' all the lines at once
 			foreach (var line in PointsToLines ()) {
 
 				var start = graph.GraphSpaceToScreen (line.Start);
 				var end = graph.GraphSpaceToScreen (line.End);
-				
-				if(UseBraille)
-				{
-					graph.DrawBrailleLine (start, end);
+
+				foreach(int x in new int []{ start.X,end.X }) {
+					if(minScreenX > x) {
+						minScreenX = x;
+					}
+					if(x > maxScreenX) {
+						maxScreenX = x;
+					}
 				}
-				else
-				{
-					graph.DrawLine (start, end, LineRune);
+				foreach (int y in new int [] { start.Y, end.Y }) {
+					if (minScreenX > y) {
+						minScreenY = y;
+					}
+					if (y > maxScreenY) {
+						maxScreenY = y;
+					}
 				}
+
+				var upScaleStart = new Point (
+				start.X * BitmapToBraille.CHAR_WIDTH,
+				start.Y * BitmapToBraille.CHAR_HEIGHT);
+
+				var upScaleEnd = new Point (
+					end.X * BitmapToBraille.CHAR_WIDTH,
+					end.Y * BitmapToBraille.CHAR_HEIGHT);
 				
+				// 'Draw' all the line points to the collection so we can render
+				// a single Braille 'bitmap' that represents all the points smoothly
+				graph.DrawLine (
+					upScaleStart,
+					upScaleEnd,
+					(x, y) => {
+						var p = new Point (x, y);
+						if (!upscaledLitPoints.Contains (p)) {
+							upscaledLitPoints.Add (p);
+						}
+					});
 			}
+
+			if(upscaledLitPoints.Count == 0) {
+				return;
+			}
+
+			var upScaledMinX = upscaledLitPoints.Min (p => p.X);
+			var upScaledMaxX = upscaledLitPoints.Max (p => p.X);
+			var upScaledWidth = Math.Abs (upScaledMaxX - upScaledMinX) + 1;
+
+			var upScaledMinY = upscaledLitPoints.Min (p => p.Y);
+			var upScaledMaxY = upscaledLitPoints.Max (p => p.Y);
+			var upScaledHeight = Math.Abs (upScaledMaxY - upScaledMinY) + 1;
+
+			var builder = new BitmapToBraille (
+				upScaledWidth,
+				upScaledHeight,
+				(x, y) => upscaledLitPoints.Contains (
+					new Point (
+						upScaledMinX + x,
+						upScaledMinY + y))
+					);
+
+			var runes = builder.GenerateImage ().Split ('\n');
+			
+
+			for (int y = minScreenY; y < maxScreenY; y++) {
+				var bmp = runes [y - minScreenY];
+
+				for (int x = minScreenX; x < maxScreenX; x++) {
+					var rune = bmp [x - minScreenX];
+					if (rune != ' ') {
+						graph.AddRune (x, y, rune);
+					}
+				}
+			}
+
 		}
+
 
 		/// <summary>
 		/// Generates lines joining <see cref="Points"/> 

@@ -1,5 +1,6 @@
 ﻿using NStack;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui.Graphs;
@@ -314,68 +315,8 @@ namespace Terminal.Gui {
 			DrawLine(start,end,(x,y)=>AddRune(x,y,symbol));
 		}
 
-		public void DrawBrailleLine(Point start, Point end)
-		{
-			// with Braille we can render 8 squares per Rune
-			// instead of only 1.  So first we calculate draw
-			// area upscaled
-			var upScaleStart = new Point(
-				start.X * BitmapToBraille.CHAR_WIDTH,
-				start.Y * BitmapToBraille.CHAR_HEIGHT);
-				
-			var upScaleEnd = new Point(
-				end.X * BitmapToBraille.CHAR_WIDTH,
-				end.Y * BitmapToBraille.CHAR_HEIGHT);
 
-			// within the upscaled coordinate space what cells
-			// are have line pass through them
-			List<Point> upscaledLitPoints = new List<Point>();
-
-			DrawLine(
-				upScaleStart,
-				upScaleEnd,
-				(x,y)=>upscaledLitPoints.Add(new Point(x,y))
-				);
-
-
-			var upScaledWidth = Math.Abs(upScaleStart.X - upScaleEnd.X)+1;
-			var upScaledMinX = Math.Min(upScaleStart.X,upScaleEnd.X);
-
-			var upScaledHeight = Math.Abs(upScaleStart.Y - upScaleEnd.Y)+1;
-			var upScaledMinY = Math.Min(upScaleStart.Y,upScaleEnd.Y);
-
-			var builder = new BitmapToBraille(
-				upScaledWidth,
-				upScaledHeight,
-				(x,y)=>upscaledLitPoints.Contains(
-					new Point(
-						upScaledMinX + x,
-						upScaledMinY + y))
-					);
-
-			var runes = builder.GenerateImage().Split('\n');
-
-			var minX = Math.Min(start.X,end.X);
-			var maxX = Math.Max(start.X,end.X);
-			var minY = Math.Min(start.Y,end.Y);
-			var maxY = Math.Max(start.Y,end.Y);
-			
-			for(int y = minY; y <= maxY;y++)
-			{
-				var line = runes[y - minY];
-
-				for(int x = minX; x <= maxX;x++)
-				{
-					var rune = line[x - minX];
-					if(rune != ' ')
-					{
-						AddRune(x,y,rune);
-					}
-				}
-			}
-		}
-
-		private void DrawLine(Point start, Point end, Action<int,int> action)
+		internal void DrawLine(Point start, Point end, Action<int,int> action)
 		{
 			if (Equals (start, end)) {
 				return;
