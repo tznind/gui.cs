@@ -260,7 +260,7 @@ namespace Terminal.Gui.Graphs {
 
 		private void RenderAsLineRune (GraphView graph)
 		{
-			foreach (var line in PointsToLines())
+			foreach (var line in DiscardIfOffScreen(graph, PointsToLines ()))
 			{
 				var start = graph.GraphSpaceToScreen (line.Start);
 				var end = graph.GraphSpaceToScreen (line.End);
@@ -285,7 +285,8 @@ namespace Terminal.Gui.Graphs {
 			int maxScreenY = int.MinValue;
 
 			// 'draw' all the lines at once
-			foreach (var line in PointsToLines ()) {
+			foreach (var line in DiscardIfOffScreen(graph, PointsToLines ())) {
+
 
 				var start = graph.GraphSpaceToScreen (line.Start);
 				var end = graph.GraphSpaceToScreen (line.End);
@@ -363,6 +364,33 @@ namespace Terminal.Gui.Graphs {
 				}
 			}
 
+		}
+
+		private IEnumerable<LineF> DiscardIfOffScreen (GraphView graph, IEnumerable<LineF> lines)
+		{
+			// Note that margin and title etc will mean this calculation is inaccurate but
+			// it is over conservative so that's ok
+			var ul = graph.ScreenToGraphSpace (0, 0);
+			var lr = graph.ScreenToGraphSpace (graph.Bounds.Width, graph.Bounds.Height);
+
+
+			foreach (var line in lines) {
+				if(line.Start.X < ul.X && line.End.X < ul.X) {
+					continue;
+				}
+				if (line.Start.X > lr.X && line.End.X > lr.X) {
+					continue;
+				}
+
+				if (line.Start.Y > ul.Y && line.End.Y > ul.Y) {
+					continue;
+				}
+				if (line.Start.Y < lr.Y && line.End.Y < lr.Y) {
+					continue;
+				}
+
+				yield return line;
+			}
 		}
 
 
