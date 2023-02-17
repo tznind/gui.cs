@@ -1383,13 +1383,15 @@ output.WriteLine(braille);
 			gv.Annotations.Add (path);
 			gv.Redraw (gv.Bounds);
 
+// TODO: Why is that right line looking janky?
 			var expected =
-@"    
- │⠉⠉⠉⠉⠉⡇
+@"
+ │⡏⠉⠉⠉⠉⡇
  ┤⡇    ⡇
  ┤⠉⠉⠉⠉⠉⠁
 0┼┬┬┬┬┬┬┬┬
- 0    5";
+ 0    5
+";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 

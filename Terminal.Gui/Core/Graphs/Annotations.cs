@@ -335,11 +335,11 @@ namespace Terminal.Gui.Graphs {
 
 			var upScaledMinX = upscaledLitPoints.Min (p => p.X);
 			var upScaledMaxX = upscaledLitPoints.Max (p => p.X);
-			var upScaledWidth = Math.Abs (upScaledMaxX - upScaledMinX) + 1;
+			var upScaledWidth = (upScaledMaxX - upScaledMinX) + 1;
 
 			var upScaledMinY = upscaledLitPoints.Min (p => p.Y);
 			var upScaledMaxY = upscaledLitPoints.Max (p => p.Y);
-			var upScaledHeight = Math.Abs (upScaledMaxY - upScaledMinY) + 1;
+			var upScaledHeight = (upScaledMaxY - upScaledMinY) + 1;
 
 			var builder = new BitmapToBraille (
 				upScaledWidth,
@@ -352,14 +352,16 @@ namespace Terminal.Gui.Graphs {
 
 			var runes = builder.GenerateImage ().Split ('\n');
 			
+			for (int y = 0; y < runes.Length; y++) {
+				var line = runes [y];
 
-			for (int y = minScreenY; y < maxScreenY; y++) {
-				var bmp = runes [y - minScreenY];
+				for (int x = 0; x < line.Length; x++) {
 
-				for (int x = minScreenX; x < maxScreenX; x++) {
-					var rune = bmp [x - minScreenX];
+					var rune = line [x];
 					if (rune != ' ') {
-						graph.AddRune (x, y, rune);
+						graph.AddRune (
+							x + minScreenX,
+							y + minScreenY, rune);
 					}
 				}
 			}
