@@ -16,15 +16,15 @@ namespace Terminal.Gui {
 		[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
 		public static bool Enable { get; set; } = false;
 
-		public string GetNerdIcon(FileDialogIconGetterArgs args)
+		public string GetNerdIcon(FileIconGetterArgs args)
 		{
 			return GetNerdIconChar(args) + " ";
 		}
 
-		private char GetNerdIconChar(FileDialogIconGetterArgs args)
+		private char GetNerdIconChar(FileIconGetterArgs args)
 		{
 			var file = args.File;
-			var path = args.FileDialog.Path;
+			var path = args.CurrentDirectory;
 
 			if(FilenameToIcon.ContainsKey(file.Name))
 			{

@@ -12,6 +12,11 @@ using static Terminal.Gui.ConfigurationManager;
 namespace Terminal.Gui {
 
 	/// <summary>
+	/// Delegate defining arguments for assigning an icon to a file/directory
+	/// </summary>
+	public delegate string FileIconGetterDelegate(FileIconGetterArgs args);
+	
+	/// <summary>
 	/// Stores style settings for <see cref="FileDialog"/>.
 	/// </summary>
 	public class FileDialogStyle {
@@ -168,7 +173,7 @@ namespace Terminal.Gui {
 		/// User defined delegate for picking which character(s)/unicode
 		/// symbol(s) to use as an 'icon' for files/folders. 
 		/// </summary>
-		public Func<FileDialogIconGetterArgs, string> IconGetter { get; set; }
+		public FileIconGetterDelegate IconGetter { get; set; }
 
 		/// <summary>
 		/// Gets or sets the format to use for date/times in the Modified column.
@@ -232,7 +237,7 @@ namespace Terminal.Gui {
 			IconGetter = nerd.GetNerdIcon;
 		}
 
-		private string DefaultIconGetter (FileDialogIconGetterArgs args)
+		private string DefaultIconGetter (FileIconGetterArgs args)
 		{
 			var file = args.File;
 

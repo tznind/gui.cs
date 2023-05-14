@@ -25,7 +25,7 @@ namespace Terminal.Gui {
 			switch (col) {
 			case 0:
 				var icon = stats.IsParent ? null : style.IconGetter?.Invoke (
-					new FileDialogIconGetterArgs(dlg,stats.FileSystemInfo, FileDialogIconGetterContext.Table));
+					new FileIconGetterArgs(dlg.Path, stats.FileSystemInfo, FileDialogIconGetterContext.Table));
 				return icon + (stats?.Name ?? string.Empty);
 			case 1:
 				return stats?.HumanReadableLength ?? string.Empty;

@@ -1,7 +1,7 @@
 namespace Terminal.Gui {
 	/// <summary>
 	/// Describes the context in which icons are being sought
-	/// during <see cref="FileDialogIconGetterArgs"/>.
+	/// during <see cref="FileIconGetterArgs"/>.
 	/// </summary>
 	public enum FileDialogIconGetterContext {
 

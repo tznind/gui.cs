@@ -5,22 +5,21 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Arguments for the <see cref="FileDialogStyle.IconGetter"/> delegate
 	/// </summary>
-	public class FileDialogIconGetterArgs {
+	public class FileIconGetterArgs {
 
 		/// <summary>
 		/// Creates a new instance of the class
 		/// </summary>
-		public FileDialogIconGetterArgs (FileDialog fileDialog, IFileSystemInfo file, FileDialogIconGetterContext context)
+		public FileIconGetterArgs (string currentDirectory, IFileSystemInfo file, FileDialogIconGetterContext context)
 		{
-			FileDialog = fileDialog;
-			File = file;
+			CurrentDirectory = currentDirectory;
 			Context = context;
 		}
 
 		/// <summary>
-		/// Gets the dialog that requires the icon.
+		/// Gets the currently open directory
 		/// </summary>
-		public FileDialog FileDialog { get; }
+		public string CurrentDirectory { get; }
 
 		/// <summary>
 		/// Gets the file/folder for which the icon is required.
