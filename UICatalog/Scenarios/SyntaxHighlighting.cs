@@ -37,7 +37,7 @@ namespace UICatalog.Scenarios {
 			});
 			Application.Top.Add (menu);
 
-			textView = new SqlTextView () {
+			textView = new TextView () {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
@@ -54,7 +54,7 @@ namespace UICatalog.Scenarios {
 
 			ApplyHighlighting ();
 
-			textView.TextChanged += (s,e)=> ApplyHighlighting ();
+			textView.KeyPress += (s,e)=> ApplyHighlighting ();
 
 			Application.Top.Add (statusBar);
 		}
@@ -71,7 +71,7 @@ namespace UICatalog.Scenarios {
 
 				for(int x=0;x<line.Count;x++) {
 					if (line [x].Rune == quoteRune) {
-						areInQuotes = true;
+						areInQuotes = !areInQuotes;
 					}
 					if(areInQuotes) {
 						line [x].Attribute = magenta;
@@ -93,7 +93,7 @@ namespace UICatalog.Scenarios {
 		{
 			Application.RequestStop ();
 		}
-
+		/*
 		private class SqlTextView : TextView {
 
 			private HashSet<string> keywords = new HashSet<string> (StringComparer.CurrentCultureIgnoreCase);
@@ -224,6 +224,6 @@ namespace UICatalog.Scenarios {
 
 				return current?.Trim ();
 			}
-		}
+		}*/
 	}
 }
