@@ -14,8 +14,10 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("TextView")]
 	public class SyntaxHighlighting : Scenario {
 
-		SqlTextView textView;
+		TextView textView;
 		MenuItem miWrap;
+		private Attribute magenta;
+		private Attribute white;
 
 		public override void Setup ()
 		{
@@ -23,6 +25,9 @@ namespace UICatalog.Scenarios {
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill (1); // status bar
 			Application.Top.LayoutSubviews ();
+
+			magenta = new Attribute(Color.Magenta, Color.Black);
+			white = new Attribute (Color.White, Color.Black);
 
 			var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
@@ -39,8 +44,6 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (1),
 			};
 
-			textView.Init ();
-
 			textView.Text = "SELECT TOP 100 * \nfrom\n MyDb.dbo.Biochemistry;";
 
 			Win.Add (textView);
@@ -49,7 +52,35 @@ namespace UICatalog.Scenarios {
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 			});
 
+			ApplyHighlighting ();
+
+			textView.TextChanged += (s,e)=> ApplyHighlighting ();
+
 			Application.Top.Add (statusBar);
+		}
+
+		private void ApplyHighlighting ()
+		{
+			bool areInQuotes = false;
+			var quoteRune = new Rune ('"');
+
+			var textModel = textView.TextViewModel;
+			for (int y=0;y< textModel.Count;y++) {
+				
+				var line = textView.TextViewModel.GetLine (y);
+
+				for(int x=0;x<line.Count;x++) {
+					if (line [x].Rune == quoteRune) {
+						areInQuotes = true;
+					}
+					if(areInQuotes) {
+						line [x].Attribute = magenta;
+					} else {
+						line [x].Attribute = white;
+					}
+				}
+			}
+			
 		}
 
 		private void WordWrap ()
@@ -67,8 +98,6 @@ namespace UICatalog.Scenarios {
 
 			private HashSet<string> keywords = new HashSet<string> (StringComparer.CurrentCultureIgnoreCase);
 			private Attribute blue;
-			private Attribute white;
-			private Attribute magenta;
 
 			public void Init ()
 			{
@@ -141,25 +170,14 @@ namespace UICatalog.Scenarios {
 					AllSuggestions = keywords.ToList ()
 				};
 
-				magenta = Driver.MakeAttribute (Color.Magenta, Color.Black);
 				blue = Driver.MakeAttribute (Color.Cyan, Color.Black);
-				white = Driver.MakeAttribute (Color.White, Color.Black);
 			}
 
-			protected override void SetNormalColor ()
-			{
-				Driver.SetAttribute (white);
-			}
 
 			protected override void SetNormalColor (List<RuneCell> line, int idx)
 			{
-				if (IsInStringLiteral (line.Select (c => c.Rune).ToList (), idx)) {
-					Driver.SetAttribute (magenta);
-				} else
 				if (IsKeyword (line.Select(c => c.Rune).ToList(), idx)) {
 					Driver.SetAttribute (blue);
-				} else {
-					Driver.SetAttribute (white);
 				}
 			}
 

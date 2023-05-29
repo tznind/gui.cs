@@ -13,7 +13,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Represents a single row/column within the <see cref="TextView"/>. Includes the glyph and the foreground/background colors.
 	/// </summary>
-	public struct RuneCell {
+	public class RuneCell {
 		/// <summary>
 		/// The glyph to draw.
 		/// </summary>
@@ -25,7 +25,7 @@ namespace Terminal.Gui {
 		public Attribute? Attribute { get; set; }
 	}
 
-	class TextModel {
+	class TextModel : ITextModel{
 		List<List<RuneCell>> _lines = new List<List<RuneCell>> ();
 
 		public event EventHandler LinesLoaded;
@@ -159,6 +159,7 @@ namespace Terminal.Gui {
 		}
 
 		public string FilePath { get; set; }
+
 
 		/// <summary>
 		/// The number of text lines in the model
@@ -1387,6 +1388,13 @@ namespace Terminal.Gui {
 	///  </list>
 	/// </remarks>
 	public class TextView : View {
+
+		/// <summary>
+		/// The internal representation of <see cref="Text"/> as <see cref="RuneCell"/>.
+		/// Can be used for advanced highlighting/parsing etc.
+		/// </summary>
+		public ITextModel TextViewModel => _model;
+
 		TextModel _model = new TextModel ();
 		int _topRow;
 		int _leftColumn;
