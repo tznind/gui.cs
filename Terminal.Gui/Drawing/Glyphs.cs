@@ -211,6 +211,9 @@ public class GlyphDefinitions
     /// <summary>Box Drawings Heavy Vertical and Light Horizontal (U+257F) - ╿</summary>
     public Rune TopSideLineHvLt { get; set; } = (Rune)'╿';
 
+    /// <summary>Box Drawing Upper Half Block (U+2580) - ▀</summary>
+    public Rune UpperHalfBlock { get; set; } = (Rune)'▀';
+
     #endregion
 
     #region ----------------- Upper Left Corners -----------------

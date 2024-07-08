@@ -84,6 +84,14 @@ public class ColorPickers : Scenario
         backgroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Background.GetClosestNamedColor ();
         app.Initialized += (s, e) => app.LayoutSubviews ();
 
+        app.Add (new AttributeView ()
+        {
+            Width = 1,
+            Height = 1,
+            Y = 5,
+            Value = new Terminal.Gui.Attribute (Color.Cyan, Color.White)
+        }); ;
+
         Application.Run (app);
         app.Dispose ();
         Application.Shutdown ();
