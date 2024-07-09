@@ -90,7 +90,26 @@ public class ColorPickers : Scenario
             Height = 1,
             Y = 5,
             Value = new Terminal.Gui.Attribute (Color.Cyan, Color.White)
-        }); ;
+        });
+
+        app.Add (new AttributeView ()
+        {
+            Width = 3,
+            Height = 3,
+            X = 3,
+            Y = 5,
+            Value = new Terminal.Gui.Attribute (Color.Cyan, Color.White)
+        });
+
+        app.Add (new AttributeView ()
+        {
+            Width = 5,
+            Height = 3,
+            X = 6,
+            Y = 5,
+            Value = new Terminal.Gui.Attribute (Color.Cyan, Color.White)
+        });
+
 
         Application.Run (app);
         app.Dispose ();
