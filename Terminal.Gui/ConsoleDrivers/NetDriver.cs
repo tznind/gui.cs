@@ -136,7 +136,7 @@ internal class NetEvents : IDisposable
 {
     private readonly ManualResetEventSlim _inputReady = new (false);
     private CancellationTokenSource _inputReadyCancellationTokenSource;
-    private readonly ManualResetEventSlim _waitForStart = new (false);
+    internal readonly ManualResetEventSlim _waitForStart = new (false);
 
     //CancellationTokenSource _waitForStartCancellationTokenSource;
     private readonly ManualResetEventSlim _winChange = new (false);
@@ -202,7 +202,7 @@ internal class NetEvents : IDisposable
     {
         // if there is a key available, return it without waiting
         //  (or dispatching work to the thread queue)
-        if (Console.KeyAvailable)
+        if (Console.KeyAvailable && !_suspendRead)
         {
             return Console.ReadKey (intercept);
         }
@@ -211,7 +211,7 @@ internal class NetEvents : IDisposable
         {
             Task.Delay (100, cancellationToken).Wait (cancellationToken);
 
-            if (Console.KeyAvailable)
+            if (Console.KeyAvailable && !_suspendRead)
             {
                 return Console.ReadKey (intercept);
             }
@@ -221,6 +221,9 @@ internal class NetEvents : IDisposable
 
         return default (ConsoleKeyInfo);
     }
+
+    internal bool _forceRead;
+    internal static bool _suspendRead;
 
     private void ProcessInputQueue ()
     {
@@ -237,7 +240,7 @@ internal class NetEvents : IDisposable
 
             _waitForStart.Reset ();
 
-            if (_inputQueue.Count == 0)
+            if (_inputQueue.Count == 0 || _forceRead)
             {
                 ConsoleKey key = 0;
                 ConsoleModifiers mod = 0;
@@ -591,55 +594,48 @@ internal class NetEvents : IDisposable
 
     private void HandleRequestResponseEvent (string c1Control, string code, string [] values, string terminating)
     {
-        switch (terminating)
-        {
+        if (terminating ==
+
             // BUGBUG: I can't find where we send a request for cursor position (ESC[?6n), so I'm not sure if this is needed.
-            case EscSeqUtils.CSI_RequestCursorPositionReport_Terminator:
-                var point = new Point { X = int.Parse (values [1]) - 1, Y = int.Parse (values [0]) - 1 };
+            // The observation is correct because the response isn't immediate and this is useless
+            EscSeqUtils.CSI_RequestCursorPositionReport.Terminator)
+        {
+            var point = new Point { X = int.Parse (values [1]) - 1, Y = int.Parse (values [0]) - 1 };
 
-                if (_lastCursorPosition.Y != point.Y)
-                {
-                    _lastCursorPosition = point;
-                    var eventType = EventType.WindowPosition;
-                    var winPositionEv = new WindowPositionEvent { CursorPosition = point };
+            if (_lastCursorPosition.Y != point.Y)
+            {
+                _lastCursorPosition = point;
+                var eventType = EventType.WindowPosition;
+                var winPositionEv = new WindowPositionEvent { CursorPosition = point };
 
-                    _inputQueue.Enqueue (
-                                         new InputResult { EventType = eventType, WindowPositionEvent = winPositionEv }
-                                        );
-                }
-                else
-                {
-                    return;
-                }
-
-                break;
-
-            case EscSeqUtils.CSI_ReportTerminalSizeInChars_Terminator:
-                switch (values [0])
-                {
-                    case EscSeqUtils.CSI_ReportTerminalSizeInChars_ResponseValue:
-                        EnqueueWindowSizeEvent (
-                                                Math.Max (int.Parse (values [1]), 0),
-                                                Math.Max (int.Parse (values [2]), 0),
-                                                Math.Max (int.Parse (values [1]), 0),
-                                                Math.Max (int.Parse (values [2]), 0)
-                                               );
-
-                        break;
-                    default:
-                        EnqueueRequestResponseEvent (c1Control, code, values, terminating);
-
-                        break;
-                }
-
-                break;
-            case EscSeqUtils.CSI_ReportDeviceAttributes_Terminator:
-                ConsoleDriver.SupportsSixel = values.Any (v => v == "4");
-                break;
-            default:
+                _inputQueue.Enqueue (
+                                     new InputResult { EventType = eventType, WindowPositionEvent = winPositionEv }
+                                    );
+            }
+            else
+            {
+                return;
+            }
+        }
+        else if (terminating == EscSeqUtils.CSI_ReportTerminalSizeInChars.Terminator)
+        {
+            if (values [0] == EscSeqUtils.CSI_ReportTerminalSizeInChars.Value)
+            {
+                EnqueueWindowSizeEvent (
+                                        Math.Max (int.Parse (values [1]), 0),
+                                        Math.Max (int.Parse (values [2]), 0),
+                                        Math.Max (int.Parse (values [1]), 0),
+                                        Math.Max (int.Parse (values [2]), 0)
+                                       );
+            }
+            else
+            {
                 EnqueueRequestResponseEvent (c1Control, code, values, terminating);
-
-                break;
+            }
+        }
+        else
+        {
+            EnqueueRequestResponseEvent (c1Control, code, values, terminating);
         }
 
         _inputReady.Set ();
@@ -819,7 +815,7 @@ internal class NetDriver : ConsoleDriver
     private const int COLOR_RED = 31;
     private const int COLOR_WHITE = 37;
     private const int COLOR_YELLOW = 33;
-    private NetMainLoop _mainLoopDriver;
+    internal NetMainLoop _mainLoopDriver;
     public bool IsWinPlatform { get; private set; }
     public NetWinVTConsole NetWinConsole { get; private set; }
 
@@ -1141,13 +1137,9 @@ internal class NetDriver : ConsoleDriver
         _mainLoopDriver = new NetMainLoop (this);
         _mainLoopDriver.ProcessInput = ProcessInput;
 
-        _mainLoopDriver._netEvents.EscSeqRequests.Add ("c");
-        // Determine if sixel is supported
-        Console.Out.Write (EscSeqUtils.CSI_SendDeviceAttributes);
-
         return new MainLoop (_mainLoopDriver);
     }
-    
+
     private void ProcessInput (InputResult inputEvent)
     {
         switch (inputEvent.EventType)
@@ -1348,7 +1340,6 @@ internal class NetDriver : ConsoleDriver
     }
 
     private CursorVisibility? _cachedCursorVisibility;
-    private static bool _supportsSixel;
 
     public override void UpdateCursor ()
     {
@@ -1397,11 +1388,15 @@ internal class NetDriver : ConsoleDriver
 
     #region Mouse Handling
 
+    public bool IsReportingMouseMoves { get; private set; }
+
     public void StartReportingMouseMoves ()
     {
         if (!RunningUnitTests)
         {
             Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
+
+            IsReportingMouseMoves = true;
         }
     }
 
@@ -1410,6 +1405,8 @@ internal class NetDriver : ConsoleDriver
         if (!RunningUnitTests)
         {
             Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
+
+            IsReportingMouseMoves = false;
         }
     }
 
@@ -1769,7 +1766,13 @@ internal class NetMainLoop : IMainLoopDriver
     {
         while (_resultQueue.Count > 0)
         {
-            ProcessInput?.Invoke (_resultQueue.Dequeue ().Value);
+            // Always dequeue even if it's null and invoke if isn't null
+            InputResult? dequeueResult = _resultQueue.Dequeue ();
+
+            if (dequeueResult is { })
+            {
+                ProcessInput?.Invoke (dequeueResult.Value);
+            }
         }
     }
 
@@ -1825,10 +1828,16 @@ internal class NetMainLoop : IMainLoopDriver
                 _resultQueue.Enqueue (_netEvents.DequeueInput ());
             }
 
-            while (_resultQueue.Count > 0 && _resultQueue.Peek () is null)
+            try
             {
-                _resultQueue.Dequeue ();
+                while (_resultQueue.Count > 0 && _resultQueue.Peek () is null)
+                {
+                    // Dequeue null values
+                    _resultQueue.Dequeue ();
+                }
             }
+            catch (InvalidOperationException) // Peek can raise an exception
+            { }
 
             if (_resultQueue.Count > 0)
             {
