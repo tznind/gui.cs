@@ -1351,6 +1351,12 @@ public static class EscSeqUtils
     public static readonly AnsiEscapeSequenceRequest CSI_SendDeviceAttributes2 = new () { Request = CSI + ">0c", Terminator = "c" };
 
     /// <summary>
+    ///     CSI 16 t - Request sixel resolution (width and height in pixels)
+    /// </summary>
+    public static readonly AnsiEscapeSequenceRequest CSI_RequestSixelResolution = new () { Request = CSI + "16t", Terminator = "t" };
+
+
+    /// <summary>
     ///     CSI 1 8 t  | yes | yes |  yes  | report window size in chars
     ///     https://terminalguide.namepad.de/seq/csi_st-18/
     ///     The terminator indicating a reply to <see cref="CSI_ReportTerminalSizeInChars"/> : ESC [ 8 ; height ; width t
