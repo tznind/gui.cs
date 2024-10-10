@@ -65,8 +65,7 @@ public class Images : Scenario
 
     public override void Main ()
     {
-        // TODO: Change to the one that uses Ansi Requests later
-        var sixelSupportDetector = new AssumeSupportDetector ();
+        var sixelSupportDetector = new SixelSupportDetector ();
         _sixelSupportResult = sixelSupportDetector.Detect ();
 
         Application.Init ();
