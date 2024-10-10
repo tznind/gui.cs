@@ -1316,13 +1316,9 @@ public static class EscSeqUtils
     /// <summary>
     ///     ESC [ ? 6 n - Request Cursor Position Report (?) (DECXCPR)
     ///     https://terminalguide.namepad.de/seq/csi_sn__p-6/
+    ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ ? (y) ; (x) ; 1 R
     /// </summary>
-    public static readonly string CSI_RequestCursorPositionReport = CSI + "?6n";
-
-    /// <summary>
-    ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ ? (y) ; (x) R
-    /// </summary>
-    public const string CSI_RequestCursorPositionReport_Terminator = "R";
+    public static readonly AnsiEscapeSequenceRequest CSI_RequestCursorPositionReport = new () { Request = CSI + "?6n", Terminator = "R" };
 
     /// <summary>
     ///     ESC [ 0 c - Send Device Attributes (Primary DA)
@@ -1341,20 +1337,18 @@ public static class EscSeqUtils
     ///     28 = Rectangular area operations
     ///     32 = Text macros
     ///     42 = ISO Latin-2 character set
+    ///     The terminator indicating a reply to <see cref="CSI_SendDeviceAttributes"/> or
+    ///     <see cref="CSI_SendDeviceAttributes2"/>
     /// </summary>
-    public static readonly string CSI_SendDeviceAttributes = CSI + "0c";
+    public static readonly AnsiEscapeSequenceRequest CSI_SendDeviceAttributes = new () { Request = CSI + "0c", Terminator = "c" };
 
     /// <summary>
     ///     ESC [ > 0 c - Send Device Attributes (Secondary DA)
     ///     Windows Terminal v1.18+ emits: "\x1b[>0;10;1c" (vt100, firmware version 1.0, vt220)
-    /// </summary>
-    public static readonly string CSI_SendDeviceAttributes2 = CSI + ">0c";
-
-    /// <summary>
     ///     The terminator indicating a reply to <see cref="CSI_SendDeviceAttributes"/> or
     ///     <see cref="CSI_SendDeviceAttributes2"/>
     /// </summary>
-    public const string CSI_ReportDeviceAttributes_Terminator = "c";
+    public static readonly AnsiEscapeSequenceRequest CSI_SendDeviceAttributes2 = new () { Request = CSI + ">0c", Terminator = "c" };
 
     /*
      TODO: depends on https://github.com/gui-cs/Terminal.Gui/pull/3768
@@ -1372,19 +1366,9 @@ public static class EscSeqUtils
     /// <summary>
     ///     CSI 1 8 t  | yes | yes |  yes  | report window size in chars
     ///     https://terminalguide.namepad.de/seq/csi_st-18/
-    /// </summary>
-    public static readonly string CSI_ReportTerminalSizeInChars = CSI + "18t";
-
-    /// <summary>
     ///     The terminator indicating a reply to <see cref="CSI_ReportTerminalSizeInChars"/> : ESC [ 8 ; height ; width t
     /// </summary>
-    public const string CSI_ReportTerminalSizeInChars_Terminator = "t";
-
-    /// <summary>
-    ///     The value of the response to <see cref="CSI_ReportTerminalSizeInChars"/> indicating value 1 and 2 are the terminal
-    ///     size in chars.
-    /// </summary>
-    public const string CSI_ReportTerminalSizeInChars_ResponseValue = "8";
+    public static readonly AnsiEscapeSequenceRequest CSI_ReportTerminalSizeInChars = new () { Request = CSI + "18t", Terminator = "t", Value = "8" };
 
     #endregion
 }
