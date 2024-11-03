@@ -126,4 +126,47 @@ public class AnsiEscapeSequenceRequest
     internal void RaiseResponseFromInput (AnsiEscapeSequenceRequest ansiRequest, string response) { ResponseFromInput?.Invoke (ansiRequest, response); }
 
     internal event EventHandler<string>? ResponseFromInput;
+
+    /// <summary>
+    /// Raises the <see cref="ResponseReceived"/> event
+    /// </summary>
+    /// <param name="response"></param>
+    internal void OnResponseReceived (string response)
+    {
+        ResponseReceived?.Invoke (this,
+                                  new()
+                                  {
+                                      Error = string.Empty,
+                                      Response = response,
+                                      Terminator = Terminator,
+                                      Value = null
+                                  });
+
+    }
+    /// <summary>
+    /// Raises the <see cref="ResponseReceived"/> event
+    /// with <see cref="AnsiEscapeSequenceResponse.Error"/>
+    /// </summary>
+    internal void OnAbandoned ()
+    {
+        ResponseReceived?.Invoke (this,
+                                  new ()
+                                  {
+                                      Error = "No response from terminal",
+                                      Response = string.Empty,
+                                      Terminator = Terminator,
+                                      Value = null
+                                  });
+
+    }
+
+
+    /// <summary>
+    /// Sends the <see cref="Request"/> direct to the console out (requires an <see cref="AnsiResponseParser"/>
+    /// to be in place in application driver.
+    /// </summary>
+    public void Send ()
+    {
+        Application.Driver?.WriteRaw (Request);
+    }
 }
