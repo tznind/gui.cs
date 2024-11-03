@@ -15,11 +15,6 @@ namespace Terminal.Gui;
 /// </remarks>
 public abstract class ConsoleDriver
 {
-    /// <summary>
-    /// How long after Esc has been pressed before we give up on getting an Ansi escape sequence
-    /// </summary>
-    internal TimeSpan EscTimeout = TimeSpan.FromMilliseconds (50);
-
     // As performance is a concern, we keep track of the dirty lines and only refresh those.
     // This is in addition to the dirty flag on each cell.
     internal bool []? _dirtyLines;

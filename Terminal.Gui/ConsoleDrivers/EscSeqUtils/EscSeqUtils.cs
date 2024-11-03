@@ -1653,7 +1653,6 @@ public static class EscSeqUtils
     ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ ? (y) ; (x) ; 1 R
     /// </summary>
     public static readonly AnsiEscapeSequenceRequest CSI_RequestCursorPositionReport = new () { Request = CSI + "?6n", Terminator = "R" };
-    public const string CSI_RequestCursorPositionReport_Terminator = "R";
 
     /// <summary>
     ///     ESC [ 0 c - Send Device Attributes (Primary DA)
@@ -1704,9 +1703,6 @@ public static class EscSeqUtils
     ///     The terminator indicating a reply to <see cref="CSI_ReportTerminalSizeInChars"/> : ESC [ 8 ; height ; width t
     /// </summary>
     public static readonly AnsiEscapeSequenceRequest CSI_ReportTerminalSizeInChars = new () { Request = CSI + "18t", Terminator = "t", Value = "8" };
-
-    public const string CSI_ReportTerminalSizeInChars_Terminator = "t";
-    public const string CSI_ReportTerminalSizeInChars_ResponseValue = "8";
 
     #endregion
 }
