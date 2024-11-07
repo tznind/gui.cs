@@ -16,7 +16,7 @@ internal class NetMainLoop : IMainLoopDriver
 
     private readonly ManualResetEventSlim _eventReady = new (false);
     private readonly CancellationTokenSource _inputHandlerTokenSource = new ();
-    private readonly ConcurrentQueue<NetEvents.InputResult?> _resultQueue = new ();
+    private readonly ConcurrentQueue<NetEvents.InputResult> _resultQueue = new ();
     internal readonly ManualResetEventSlim _waitForProbe = new (false);
     private readonly CancellationTokenSource _eventReadyTokenSource = new ();
     private MainLoop _mainLoop;
@@ -91,12 +91,9 @@ internal class NetMainLoop : IMainLoopDriver
         while (_resultQueue.Count > 0)
         {
             // Always dequeue even if it's null and invoke if isn't null
-            if (_resultQueue.TryDequeue (out NetEvents.InputResult? dequeueResult))
+            if (_resultQueue.TryDequeue (out NetEvents.InputResult dequeueResult))
             {
-                if (dequeueResult is { })
-                {
-                    ProcessInput?.Invoke (dequeueResult.Value);
-                }
+                ProcessInput?.Invoke (dequeueResult);
             }
         }
     }
@@ -150,19 +147,13 @@ internal class NetMainLoop : IMainLoopDriver
 
             if (_resultQueue.Count == 0)
             {
-                _resultQueue.Enqueue (_netEvents.DequeueInput ());
-            }
+                var result = _netEvents.DequeueInput ();
 
-            try
-            {
-                while (_resultQueue.Count > 0 && _resultQueue.TryPeek (out NetEvents.InputResult? result) && result is null)
+                if (result.HasValue)
                 {
-                    // Dequeue null values
-                    _resultQueue.TryDequeue (out _);
+                    _resultQueue.Enqueue (result.Value);
                 }
             }
-            catch (InvalidOperationException) // Peek can raise an exception
-            { }
 
             if (_resultQueue.Count > 0)
             {
