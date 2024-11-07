@@ -6,13 +6,12 @@ namespace Terminal.Gui;
 
 internal class NetEvents : IDisposable
 {
-    private readonly ManualResetEventSlim _inputReady = new (false);
     private CancellationTokenSource _inputReadyCancellationTokenSource;
     internal readonly ManualResetEventSlim _waitForStart = new (false);
 
     //CancellationTokenSource _waitForStartCancellationTokenSource;
     private readonly ManualResetEventSlim _winChange = new (false);
-    private readonly ConcurrentQueue<InputResult?> _inputQueue = new ();
+    private readonly BlockingCollection<InputResult> _inputQueue = new (new ConcurrentQueue<InputResult> ());
     private readonly ConsoleDriver _consoleDriver;
     private ConsoleKeyInfo [] _cki;
     private bool _isEscSeq;
@@ -33,41 +32,15 @@ internal class NetEvents : IDisposable
 
     public InputResult? DequeueInput ()
     {
-        while (_inputReadyCancellationTokenSource != null
-               && !_inputReadyCancellationTokenSource.Token.IsCancellationRequested)
+        while (_inputReadyCancellationTokenSource != null)
         {
             _waitForStart.Set ();
             _winChange.Set ();
 
-            try
-            {
-                if (!_inputReadyCancellationTokenSource.Token.IsCancellationRequested)
-                {
-                    if (_inputQueue.Count == 0)
-                    {
-                        _inputReady.Wait (_inputReadyCancellationTokenSource.Token);
-                    }
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                return null;
-            }
-            finally
-            {
-                _inputReady.Reset ();
-            }
-
 #if PROCESS_REQUEST
             _neededProcessRequest = false;
 #endif
-            if (_inputQueue.Count > 0)
-            {
-                if (_inputQueue.TryDequeue (out InputResult? result))
-                {
-                    return result;
-                }
-            }
+            return _inputQueue.Take(_inputReadyCancellationTokenSource.Token);
         }
 
         return null;
@@ -241,13 +214,11 @@ internal class NetEvents : IDisposable
                     break;
                 }
             }
-
-            _inputReady.Set ();
         }
 
         void ProcessMapConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
         {
-            _inputQueue.Enqueue (
+            _inputQueue.Add (
                                  new InputResult
                                  {
                                      EventType = EventType.Key, ConsoleKeyInfo = AnsiEscapeSequenceRequestUtils.MapConsoleKeyInfo (consoleKeyInfo)
@@ -306,8 +277,6 @@ internal class NetEvents : IDisposable
             {
                 return;
             }
-
-            _inputReady.Set ();
         }
     }
 
@@ -327,7 +296,7 @@ internal class NetEvents : IDisposable
         int w = Math.Max (winWidth, 0);
         int h = Math.Max (winHeight, 0);
 
-        _inputQueue.Enqueue (
+        _inputQueue.Add  (
                              new InputResult
                              {
                                  EventType = EventType.WindowSize, WindowSizeEvent = new WindowSizeEvent { Size = new (w, h) }
@@ -609,11 +578,9 @@ internal class NetEvents : IDisposable
     {
         var mouseEvent = new MouseEvent { Position = pos, ButtonState = buttonState };
 
-        _inputQueue.Enqueue (
+        _inputQueue.Add (
                              new InputResult { EventType = EventType.Mouse, MouseEvent = mouseEvent }
                             );
-
-        _inputReady.Set ();
     }
 
     public enum EventType
@@ -726,7 +693,7 @@ internal class NetEvents : IDisposable
     {
         var inputResult = new InputResult { EventType = EventType.Key, ConsoleKeyInfo = cki };
 
-        _inputQueue.Enqueue (inputResult);
+        _inputQueue.Add (inputResult);
     }
 
     public void Dispose ()
