@@ -15,6 +15,12 @@ internal class NetEvents : IDisposable
     /// </summary>
     private readonly TimeSpan _abandonAfter = TimeSpan.FromMilliseconds (200);
 
+    /// <summary>
+    /// How long after seeing an Esc should we give up on seeing the rest of the response
+    /// and assume it is purely a key strike.
+    /// </summary>
+    private readonly TimeSpan _escTimeout = TimeSpan.FromMilliseconds (20);
+
 #if PROCESS_REQUEST
     bool _neededProcessRequest;
 #endif
@@ -66,13 +72,9 @@ internal class NetEvents : IDisposable
                 return Console.ReadKey (intercept);
             }
 
-            var oldest = EscSeqRequests.Statuses.MinBy (s => s.Sent);
+            AbandonOldRequests ();
 
-            if (oldest != null && DateTime.Now.Subtract (oldest.Sent) > _abandonAfter)
-            {
-                EscSeqRequests.Remove (oldest);
-                oldest.AnsiRequest.RaiseResponseFromInput (null);
-            }
+            ReleaseHeldIfOld ();
 
             if (!_forceRead)
             {
@@ -85,8 +87,38 @@ internal class NetEvents : IDisposable
         return default (ConsoleKeyInfo);
     }
 
-    internal bool _forceRead;
+    /// <summary>
+    /// If <see cref="Parser"/> has grabbed some content e.g. Esc and its been a while
+    /// with nothing more arriving then release the keys.
+    /// </summary>
+    private void ReleaseHeldIfOld ()
+    {
+        if (Parser.State == AnsiResponseParserState.ExpectingBracket &&
+            DateTime.Now - Parser.StateChangedAt > _escTimeout)
+        {
+            foreach (var k in Parser.Release ().Select (o => o.Item2))
+            {
+                ProcessMapConsoleKeyInfo (k);
+            }
+        }
+    }
 
+    /// <summary>
+    /// Identifies any <see cref="EscSeqRequests"/> that are very old i.e. we do
+    /// not expect to see any response from terminal anymore.
+    /// </summary>
+    private void AbandonOldRequests ()
+    {
+        var oldest = EscSeqRequests.Statuses.MinBy (s => s.Sent);
+
+        if (oldest != null && DateTime.Now.Subtract (oldest.Sent) > _abandonAfter)
+        {
+            EscSeqRequests.Remove (oldest);
+            oldest.AnsiRequest.RaiseResponseFromInput (null);
+        }
+    }
+
+    internal bool _forceRead;
     private void ProcessInputQueue ()
     {
         while (_inputReadyCancellationTokenSource is { IsCancellationRequested: false })
