@@ -9,6 +9,12 @@ internal class NetEvents : IDisposable
     private CancellationTokenSource? _inputReadyCancellationTokenSource;
     private readonly BlockingCollection<InputResult> _inputQueue = new (new ConcurrentQueue<InputResult> ());
     private readonly ConsoleDriver _consoleDriver;
+
+    /// <summary>
+    /// How long to wait before giving up on an <see cref="AnsiEscapeSequenceRequest"/>
+    /// </summary>
+    private readonly TimeSpan _abandonAfter = TimeSpan.FromMilliseconds (200);
+
 #if PROCESS_REQUEST
     bool _neededProcessRequest;
 #endif
@@ -58,6 +64,14 @@ internal class NetEvents : IDisposable
             if (Console.KeyAvailable)
             {
                 return Console.ReadKey (intercept);
+            }
+
+            var oldest = EscSeqRequests.Statuses.MinBy (s => s.Sent);
+
+            if (oldest != null && DateTime.Now.Subtract (oldest.Sent) > _abandonAfter)
+            {
+                EscSeqRequests.Remove (oldest);
+                oldest.AnsiRequest.RaiseResponseFromInput (null);
             }
 
             if (!_forceRead)

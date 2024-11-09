@@ -8,6 +8,11 @@ namespace Terminal.Gui;
 /// <remarks></remarks>
 public class AnsiEscapeSequenceRequestStatus
 {
+    /// <summary>
+    /// The time at which the request was sent
+    /// </summary>
+    public DateTime Sent { get; } = DateTime.Now;
+
     /// <summary>Creates a new state of escape sequence request.</summary>
     /// <param name="ansiRequest">The <see cref="AnsiEscapeSequenceRequest"/> object.</param>
     public AnsiEscapeSequenceRequestStatus (AnsiEscapeSequenceRequest ansiRequest) { AnsiRequest = ansiRequest; }
