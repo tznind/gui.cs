@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Terminal.Gui.WindowsInput" Collapsed="true">
+    <Position X="7.25" Y="8.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAACAEAAAAAAAAAAAkAAAAAAAAAgAAAAAAABA=</HashCode>
+      <FileName>ConsoleDrivers\V2\WindowsInput.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.NetInput" Collapsed="true">
+    <Position X="10.25" Y="8.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAEAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\NetInput.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.ConsoleInput&lt;T&gt;">
+    <Position X="9" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAEAQAAAAAAAAAgAAAAAAAAAAAAAAAAAAo=</HashCode>
+      <FileName>ConsoleDrivers\V2\ConsoleInput.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.MainLoop&lt;T&gt;" BaseTypeListCollapsed="true">
+    <Position X="9" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAgAAAAACAAAQQAAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>ConsoleDrivers\V2\MainLoop.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Parser" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.ConsoleDrivers.V2.MainLoopCoordinator&lt;T&gt;">
+    <Position X="5" Y="1.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAJAAAACIAAAAAAAAAAAAAAAAQAAQAIAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\MainLoopCoordinator.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_input" />
+      <Field Name="_loop" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Terminal.Gui.AnsiResponseParser&lt;T&gt;" Collapsed="true">
+    <Position X="12.5" Y="1.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAACIAAAAAAAAAAAAAgAABAAAAAABAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\AnsiResponseParser.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Terminal.Gui.IConsoleInput&lt;T&gt;">
+    <Position X="9" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>ConsoleDrivers\V2\IConsoleInput.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.IMainLoop&lt;T&gt;" Collapsed="true">
+    <Position X="9" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQQAAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>ConsoleDrivers\V2\IMainLoop.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

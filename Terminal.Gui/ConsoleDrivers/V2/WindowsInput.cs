@@ -27,7 +27,7 @@ class WindowsInput : ConsoleInput<InputRecord>
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern nint GetStdHandle (int nStdHandle);
 
-    public WindowsInput (ConcurrentQueue<InputRecord> inputBuffer) : base (inputBuffer)
+    public WindowsInput ()
     {
         _inputHandle = GetStdHandle (STD_INPUT_HANDLE);
     }

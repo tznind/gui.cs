@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-class NetInput (ConcurrentQueue<ConsoleKeyInfo> inputBuffer) : ConsoleInput<ConsoleKeyInfo> (inputBuffer)
+class NetInput : ConsoleInput<ConsoleKeyInfo>
 {
     /// <inheritdoc />
     protected override bool Peek () => Console.KeyAvailable;

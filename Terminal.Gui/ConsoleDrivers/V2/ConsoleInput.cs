@@ -1,9 +1,13 @@
-﻿using System.Collections.Concurrent;
+﻿#nullable enable
+using System.Collections.Concurrent;
+
 
 namespace Terminal.Gui;
 
-abstract class ConsoleInput<T>(ConcurrentQueue<T> inputBuffer) : IConsoleInput
+abstract class ConsoleInput<T> : IConsoleInput<T>
 {
+    private ConcurrentQueue<T>? _inputBuffer;
+
     /// <inheritdoc />
     public virtual void Dispose ()
     {
@@ -11,15 +15,26 @@ abstract class ConsoleInput<T>(ConcurrentQueue<T> inputBuffer) : IConsoleInput
     }
 
     /// <inheritdoc />
+    public void Initialize (ConcurrentQueue<T> inputBuffer)
+    {
+        _inputBuffer = inputBuffer;
+    }
+
+    /// <inheritdoc />
     public void Run (CancellationToken token)
     {
+        if (_inputBuffer == null)
+        {
+            throw new ("Cannot run input before Initialization");
+        }
+
         do
         {
             if (Peek ())
             {
                 foreach (var r in Read ())
                 {
-                    inputBuffer.Enqueue (r);
+                    _inputBuffer.Enqueue (r);
                 }
             }
 
