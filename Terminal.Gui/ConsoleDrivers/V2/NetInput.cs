@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-class NetInput : ConsoleInput<ConsoleKeyInfo>
+public class NetInput : ConsoleInput<ConsoleKeyInfo>
 {
     /// <inheritdoc />
     protected override bool Peek () => Console.KeyAvailable;

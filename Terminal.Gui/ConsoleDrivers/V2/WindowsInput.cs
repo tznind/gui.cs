@@ -4,7 +4,7 @@ using static Terminal.Gui.WindowsConsole;
 
 namespace Terminal.Gui;
 
-class WindowsInput : ConsoleInput<InputRecord>
+public class WindowsInput : ConsoleInput<InputRecord>
 {
     private readonly nint _inputHandle;
 

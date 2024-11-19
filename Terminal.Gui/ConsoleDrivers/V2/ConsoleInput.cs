@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 
 namespace Terminal.Gui;
 
-abstract class ConsoleInput<T> : IConsoleInput<T>
+public abstract class ConsoleInput<T> : IConsoleInput<T>
 {
     private ConcurrentQueue<T>? _inputBuffer;
 

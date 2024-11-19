@@ -25,16 +25,17 @@
   <Class Name="Terminal.Gui.MainLoop&lt;T&gt;" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="9" Y="2.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AQAgAAAAACAAAQQAAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <HashCode>QQAgAAAAACAAAQQAAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
       <FileName>ConsoleDrivers\V2\MainLoop.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Property Name="Parser" />
+      <Property Name="Out" />
     </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="Terminal.Gui.ConsoleDrivers.V2.MainLoopCoordinator&lt;T&gt;">
-    <Position X="5" Y="1.75" Width="2" />
+  <Class Name="Terminal.Gui.MainLoopCoordinator&lt;T&gt;">
+    <Position X="5.75" Y="1.75" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAJAAAACIAAAAAAAAAAAAAAAAQAAQAIAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\MainLoopCoordinator.cs</FileName>
@@ -45,7 +46,7 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="Terminal.Gui.AnsiResponseParser&lt;T&gt;" Collapsed="true">
-    <Position X="11.5" Y="2.5" Width="2" />
+    <Position X="11.75" Y="1.75" Width="2" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAACIAAAAAAAAAAAAAgAABAAAAAABAAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\AnsiResponseParser.cs</FileName>
@@ -63,6 +64,13 @@
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAQQAAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
       <FileName>ConsoleDrivers\V2\IMainLoop.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.IConsoleOutput" Collapsed="true">
+    <Position X="12.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\IConsoleOutput.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Font Name="Segoe UI" Size="9" />

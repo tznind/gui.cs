@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-internal interface IConsoleInput<T> : IDisposable
+public interface IConsoleInput<T> : IDisposable
 {
     /// <summary>
     /// Initializes the input with a buffer into which to put data read

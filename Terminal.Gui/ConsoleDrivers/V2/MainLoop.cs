@@ -1,7 +1,8 @@
 ﻿using System.Collections.Concurrent;
 
 namespace Terminal.Gui;
-class MainLoop<T> : IMainLoop<T>
+
+public class MainLoop<T> : IMainLoop<T>
 {
     public ConcurrentQueue<T> InputBuffer { get; private set; } = new ();
 
@@ -11,11 +12,14 @@ class MainLoop<T> : IMainLoop<T>
         private set;
     }
 
+    public IConsoleOutput Out { get;private set; }
+
     /// <inheritdoc />
-    public void Initialize (ConcurrentQueue<T> inputBuffer, AnsiResponseParser<T> parser)
+    public void Initialize (ConcurrentQueue<T> inputBuffer, AnsiResponseParser<T> parser, IConsoleOutput consoleOutput)
     {
         InputBuffer = inputBuffer;
         Parser = parser;
+        Out = consoleOutput;
     }
 
 

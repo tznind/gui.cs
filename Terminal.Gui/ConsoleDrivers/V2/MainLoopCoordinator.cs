@@ -1,9 +1,10 @@
-﻿namespace Terminal.Gui.ConsoleDrivers.V2;
-class MainLoopCoordinator<T>
+﻿namespace Terminal.Gui;
+
+public class MainLoopCoordinator<T>
 {
     private readonly IConsoleInput<T> _input;
     private readonly IMainLoop<T> _loop;
-    private CancellationTokenSource tokenSource = new CancellationTokenSource ();
+    private CancellationTokenSource tokenSource = new ();
 
     public MainLoopCoordinator (IConsoleInput<T> input, IMainLoop<T> loop)
     {

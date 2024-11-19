@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-internal abstract class AnsiResponseParserBase : IAnsiResponseParser
+public abstract class AnsiResponseParserBase : IAnsiResponseParser
 {
     protected object lockExpectedResponses = new ();
 
@@ -333,7 +333,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
     }
 }
 
-internal class AnsiResponseParser<T> : AnsiResponseParserBase
+public class AnsiResponseParser<T> : AnsiResponseParserBase
 {
     public AnsiResponseParser () : base (new GenericHeld<T> ()) { }
 
