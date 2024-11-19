@@ -109,9 +109,6 @@
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Views\Scroll\" />
-  </ItemGroup>
   <!-- =================================================================== -->
   <!-- Nuget  -->
   <!-- =================================================================== -->

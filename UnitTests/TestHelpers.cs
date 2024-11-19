@@ -86,13 +86,13 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
                 Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
-                if (Responder.Instances.Count == 0)
+                if (View.Instances.Count == 0)
                 {
-                    Assert.Empty (Responder.Instances);
+                    Assert.Empty (View.Instances);
                 }
                 else
                 {
-                    Responder.Instances.Clear ();
+                    View.Instances.Clear ();
                 }
 #endif
             }
@@ -103,7 +103,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
             //finally
             {
 #if DEBUG_IDISPOSABLE
-                Responder.Instances.Clear ();
+                View.Instances.Clear ();
                 Application.ResetState (true);
 #endif
             }
@@ -126,13 +126,13 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 #if DEBUG_IDISPOSABLE
 
             // Clear out any lingering Responder instances from previous tests
-            if (Responder.Instances.Count == 0)
+            if (View.Instances.Count == 0)
             {
-                Assert.Empty (Responder.Instances);
+                Assert.Empty (View.Instances);
             }
             else
             {
-                Responder.Instances.Clear ();
+                View.Instances.Clear ();
             }
 #endif
             Application.Init ((ConsoleDriver)Activator.CreateInstance (_driverType));
@@ -160,7 +160,7 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
         base.After (methodUnderTest);
 
 #if DEBUG_IDISPOSABLE
-        Assert.Empty (Responder.Instances);
+        Assert.Empty (View.Instances);
 #endif
     }
 
@@ -172,8 +172,8 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
 #if DEBUG_IDISPOSABLE
 
         // Clear out any lingering Responder instances from previous tests
-        Responder.Instances.Clear ();
-        Assert.Empty (Responder.Instances);
+        View.Instances.Clear ();
+        Assert.Empty (View.Instances);
 #endif
     }
 }

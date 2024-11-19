@@ -259,4 +259,55 @@ public class FrameTests (ITestOutputHelper output)
         Assert.Equal (Dim.Absolute (40), v.Height);
         v.Dispose ();
     }
+
+    private class TestFrameEventsView : View
+    {
+        public int OnFrameChangedCallCount { get; private set; }
+        public int FrameChangedEventCallCount { get; private set; }
+
+        public TestFrameEventsView ()
+        {
+            FrameChanged += (sender, args) => FrameChangedEventCallCount++;
+        }
+
+        protected override void OnFrameChanged (in Rectangle frame)
+        {
+            OnFrameChangedCallCount++;
+            base.OnFrameChanged (frame);
+        }
+    }
+
+    [Fact]
+    public void OnFrameChanged_Called_When_Frame_Changes ()
+    {
+        // Arrange
+        var view = new TestFrameEventsView ();
+        var initialFrame = new Rectangle (0, 0, 10, 10);
+        var newFrame = new Rectangle (0, 0, 20, 20);
+        view.Frame = initialFrame;
+        Assert.Equal (1, view.OnFrameChangedCallCount);
+
+        // Act
+        view.Frame = newFrame;
+
+        // Assert
+        Assert.Equal (2, view.OnFrameChangedCallCount);
+    }
+
+    [Fact]
+    public void FrameChanged_Event_Raised_When_Frame_Changes ()
+    {
+        // Arrange
+        var view = new TestFrameEventsView ();
+        var initialFrame = new Rectangle (0, 0, 10, 10);
+        var newFrame = new Rectangle (0, 0, 20, 20);
+        view.Frame = initialFrame;
+        Assert.Equal (1, view.FrameChangedEventCallCount);
+
+        // Act
+        view.Frame = newFrame;
+
+        // Assert
+        Assert.Equal (2, view.FrameChangedEventCallCount);
+    }
 }

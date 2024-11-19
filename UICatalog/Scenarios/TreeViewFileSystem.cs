@@ -182,6 +182,8 @@ public class TreeViewFileSystem : Scenario
         _treeViewFiles = new TreeView<IFileSystemInfo> { X = 0, Y = 0, Width = Dim.Percent (50), Height = Dim.Fill () };
         _treeViewFiles.DrawLine += TreeViewFiles_DrawLine;
 
+        _treeViewFiles.VerticalScrollBar.AutoShow = false;
+
         _detailsFrame = new DetailsFrame (_iconProvider)
         {
             X = Pos.Right (_treeViewFiles), Y = 0, Width = Dim.Fill (), Height = Dim.Fill ()
@@ -199,7 +201,7 @@ public class TreeViewFileSystem : Scenario
         _treeViewFiles.GoToFirst ();
         _treeViewFiles.Expand ();
 
-        SetupScrollBar ();
+        //SetupScrollBar ();
 
         _treeViewFiles.SetFocus ();
 
@@ -364,46 +366,46 @@ public class TreeViewFileSystem : Scenario
         _iconProvider.IsOpenGetter = _treeViewFiles.IsExpanded;
     }
 
-    private void SetupScrollBar ()
-    {
-        // When using scroll bar leave the last row of the control free (for over-rendering with scroll bar)
-        _treeViewFiles.Style.LeaveLastRow = true;
+    //private void SetupScrollBar ()
+    //{
+    //    // When using scroll bar leave the last row of the control free (for over-rendering with scroll bar)
+    //    _treeViewFiles.Style.LeaveLastRow = true;
 
-        var scrollBar = new ScrollBarView (_treeViewFiles, true);
+    //    var scrollBar = new ScrollBarView (_treeViewFiles, true);
 
-        scrollBar.ChangedPosition += (s, e) =>
-                                     {
-                                         _treeViewFiles.ScrollOffsetVertical = scrollBar.Position;
+    //    scrollBar.ChangedPosition += (s, e) =>
+    //                                 {
+    //                                     _treeViewFiles.ScrollOffsetVertical = scrollBar.Position;
 
-                                         if (_treeViewFiles.ScrollOffsetVertical != scrollBar.Position)
-                                         {
-                                             scrollBar.Position = _treeViewFiles.ScrollOffsetVertical;
-                                         }
+    //                                     if (_treeViewFiles.ScrollOffsetVertical != scrollBar.Position)
+    //                                     {
+    //                                         scrollBar.Position = _treeViewFiles.ScrollOffsetVertical;
+    //                                     }
 
-                                         _treeViewFiles.SetNeedsDraw ();
-                                     };
+    //                                     _treeViewFiles.SetNeedsDraw ();
+    //                                 };
 
-        scrollBar.OtherScrollBarView.ChangedPosition += (s, e) =>
-                                                        {
-                                                            _treeViewFiles.ScrollOffsetHorizontal = scrollBar.OtherScrollBarView.Position;
+    //    scrollBar.OtherScrollBarView.ChangedPosition += (s, e) =>
+    //                                                    {
+    //                                                        _treeViewFiles.ScrollOffsetHorizontal = scrollBar.OtherScrollBarView.Position;
 
-                                                            if (_treeViewFiles.ScrollOffsetHorizontal != scrollBar.OtherScrollBarView.Position)
-                                                            {
-                                                                scrollBar.OtherScrollBarView.Position = _treeViewFiles.ScrollOffsetHorizontal;
-                                                            }
+    //                                                        if (_treeViewFiles.ScrollOffsetHorizontal != scrollBar.OtherScrollBarView.Position)
+    //                                                        {
+    //                                                            scrollBar.OtherScrollBarView.Position = _treeViewFiles.ScrollOffsetHorizontal;
+    //                                                        }
 
-                                                            _treeViewFiles.SetNeedsDraw ();
-                                                        };
+    //                                                        _treeViewFiles.SetNeedsDraw ();
+    //                                                    };
 
-        _treeViewFiles.DrawingContent += (s, e) =>
-                                      {
-                                          scrollBar.Size = _treeViewFiles.ContentHeight;
-                                          scrollBar.Position = _treeViewFiles.ScrollOffsetVertical;
-                                          scrollBar.OtherScrollBarView.Size = _treeViewFiles.GetContentWidth (true);
-                                          scrollBar.OtherScrollBarView.Position = _treeViewFiles.ScrollOffsetHorizontal;
-                                          scrollBar.Refresh ();
-                                      };
-    }
+    //    _treeViewFiles.DrawingContent += (s, e) =>
+    //                                  {
+    //                                      scrollBar.Size = _treeViewFiles.ContentHeight;
+    //                                      scrollBar.Position = _treeViewFiles.ScrollOffsetVertical;
+    //                                      scrollBar.OtherScrollBarView.Size = _treeViewFiles.GetContentWidth (true);
+    //                                      scrollBar.OtherScrollBarView.Position = _treeViewFiles.ScrollOffsetHorizontal;
+    //                                      scrollBar.Refresh ();
+    //                                  };
+    //}
 
     private void ShowColoredExpandableSymbols ()
     {

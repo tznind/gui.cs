@@ -104,7 +104,7 @@ public partial class View
         if (this is Adornment adornment && adornment.Thickness != Thickness.Empty)
         {
             // Ensure adornments can't draw outside their thickness
-            frameRegion.Exclude (adornment.Thickness.GetInside (Frame));
+            frameRegion.Exclude (adornment.Thickness.GetInside (FrameToScreen()));
         }
 
         SetClip (frameRegion);

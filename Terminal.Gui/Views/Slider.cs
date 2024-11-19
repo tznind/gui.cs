@@ -47,7 +47,7 @@ public class Slider<T> : View, IOrientation
 
         _options = options ?? new List<SliderOption<T>> ();
 
-        _orientationHelper = new (this);
+        _orientationHelper = new (this); // Do not use object initializer!
         _orientationHelper.Orientation = _config._sliderOrientation = orientation;
         _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
         _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
