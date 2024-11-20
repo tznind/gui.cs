@@ -44,7 +44,7 @@ public class MainLoop<T> : IMainLoop<T>
     /// <inheritdoc />
     public void Iteration ()
     {
-
+        Out.Write ("h");
     }
     /// <inheritdoc />
     public void Dispose ()

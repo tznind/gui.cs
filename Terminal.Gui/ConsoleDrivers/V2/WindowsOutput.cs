@@ -80,8 +80,10 @@ public class WindowsOutput : IConsoleOutput
     }
     public void Write (string str)
     {
-        WriteConsole (_screenBuffer, str, (uint)str.Length, out uint _, nint.Zero);
-
+        if (!WriteConsole (_screenBuffer, str, (uint)str.Length, out uint _, nint.Zero))
+        {
+            throw new Win32Exception (Marshal.GetLastWin32Error (), "Failed to write to console screen buffer.");
+        }
     }
 
     /// <inheritdoc />

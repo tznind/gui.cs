@@ -26,43 +26,30 @@ class Program
             }
         }
 
+        IMainLoopCoordinator coordinator;
         if (win)
         {
-            using var input = new WindowsInput ();
-            using var output = new WindowsOutput ();
-            var parser = new AnsiResponseParser<InputRecord> ();
-            var buffer = new ConcurrentQueue<InputRecord> ();
-
             var loop = new MainLoop<InputRecord> ();
-            loop.Initialize (buffer,parser,output);
-
-            var coordinator = new MainLoopCoordinator<InputRecord> (input,loop);
-
-            coordinator.Start ();
-
-            output.Write ("Hello World");
-
-            coordinator.Stop ();
+            coordinator = new MainLoopCoordinator<InputRecord> (
+                                                                ()=>new WindowsInput (),
+                                                                ()=>new WindowsOutput (),
+                                                                loop);
         }
         else
         {
-            using var input = new NetInput ();
-            using var output = new NetOutput () ;
-            var parser = new AnsiResponseParser<ConsoleKeyInfo> ();
-            var buffer = new ConcurrentQueue<ConsoleKeyInfo> ();
-
             var loop = new MainLoop<ConsoleKeyInfo> ();
-            loop.Initialize (buffer, parser, output);
-
-            var coordinator = new MainLoopCoordinator<ConsoleKeyInfo> (input, loop);
-
-            coordinator.Start ();
-
-            output.Write ("Hello World");
-
-
-            coordinator.Stop ();
+            coordinator = new MainLoopCoordinator<ConsoleKeyInfo> (()=>new NetInput (),
+                                                                   ()=>new NetOutput (),
+                                                                   loop);
         }
 
+        // Register the event handler for Ctrl+C
+        Console.CancelKeyPress += (s,e)=>
+                                  {
+                                      e.Cancel = true;
+                                      coordinator.Stop ();
+                                  };
+
+        coordinator.StartBlocking ();
     }
 }

@@ -10,7 +10,7 @@ public class NetOutput : IConsoleOutput
     /// <inheritdoc />
     public void Write (string text)
     {
-        Console.WriteLine (text);
+        Console.Write (text);
     }
 
     /// <inheritdoc />
