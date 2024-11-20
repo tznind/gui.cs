@@ -6,6 +6,155 @@ namespace Terminal.Gui.ViewTests;
 
 public class ViewTests (ITestOutputHelper output)
 {
+    // Generic lifetime (IDisposable) tests
+    [Fact]
+    [TestRespondersDisposed]
+    public void Dispose_Works ()
+    {
+        var r = new View ();
+#if DEBUG_IDISPOSABL
+        Assert.Equals (3, View.Instances.Count);
+#endif
+
+        r.Dispose ();
+#if DEBUG_IDISPOSABLE
+        Assert.Empty (View.Instances);
+#endif
+    }
+
+    [Fact]
+    public void Disposing_Event_Notify_All_Subscribers_On_The_First_Container ()
+    {
+#if DEBUG_IDISPOSABLE
+        // Only clear before because need to test after assert
+        View.Instances.Clear ();
+#endif
+
+        var container1 = new View { Id = "Container1" };
+        var count = 0;
+
+        var view = new View { Id = "View" };
+        view.Disposing += View_Disposing;
+        container1.Add (view);
+        Assert.Equal (container1, view.SuperView);
+
+        void View_Disposing (object sender, EventArgs e)
+        {
+            count++;
+            Assert.Equal (view, sender);
+            container1.Remove ((View)sender);
+        }
+
+        Assert.Single (container1.Subviews);
+
+        var container2 = new View { Id = "Container2" };
+
+        container2.Add (view);
+        Assert.Equal (container2, view.SuperView);
+        Assert.Equal (container1.Subviews.Count, container2.Subviews.Count);
+        container2.Dispose ();
+
+        Assert.Empty (container1.Subviews);
+        Assert.Empty (container2.Subviews);
+        Assert.Equal (1, count);
+        Assert.Null (view.SuperView);
+
+        container1.Dispose ();
+
+#if DEBUG_IDISPOSABLE
+        Assert.Empty (View.Instances);
+#endif
+    }
+
+    [Fact]
+    public void Disposing_Event_Notify_All_Subscribers_On_The_Second_Container ()
+    {
+#if DEBUG_IDISPOSABLE
+        // Only clear before because need to test after assert
+        View.Instances.Clear ();
+#endif
+
+        var container1 = new View { Id = "Container1" };
+
+        var view = new View { Id = "View" };
+        container1.Add (view);
+        Assert.Equal (container1, view.SuperView);
+        Assert.Single (container1.Subviews);
+
+        var container2 = new View { Id = "Container2" };
+        var count = 0;
+
+        view.Disposing += View_Disposing;
+        container2.Add (view);
+        Assert.Equal (container2, view.SuperView);
+
+        void View_Disposing (object sender, EventArgs e)
+        {
+            count++;
+            Assert.Equal (view, sender);
+            container2.Remove ((View)sender);
+        }
+
+        Assert.Equal (container1.Subviews.Count, container2.Subviews.Count);
+        container1.Dispose ();
+
+        Assert.Empty (container1.Subviews);
+        Assert.Empty (container2.Subviews);
+        Assert.Equal (1, count);
+        Assert.Null (view.SuperView);
+
+        container2.Dispose ();
+
+#if DEBUG_IDISPOSABLE
+        Assert.Empty (View.Instances);
+#endif
+    }
+
+
+    [Fact]
+    public void Not_Notifying_Dispose ()
+    {
+        // Only clear before because need to test after assert
+#if DEBUG_IDISPOSABLE
+        View.Instances.Clear ();
+#endif
+        var container1 = new View { Id = "Container1" };
+
+        var view = new View { Id = "View" };
+        container1.Add (view);
+        Assert.Equal (container1, view.SuperView);
+
+        Assert.Single (container1.Subviews);
+
+        var container2 = new View { Id = "Container2" };
+
+        container2.Add (view);
+        Assert.Equal (container2, view.SuperView);
+        Assert.Equal (container1.Subviews.Count, container2.Subviews.Count);
+        container1.Dispose ();
+
+        Assert.Empty (container1.Subviews);
+        Assert.NotEmpty (container2.Subviews);
+        Assert.Single (container2.Subviews);
+        Assert.Null (view.SuperView);
+
+        // Trying access disposed properties
+#if DEBUG_IDISPOSABLE
+        Assert.True (container2.Subviews [0].WasDisposed);
+#endif
+        Assert.False (container2.Subviews [0].CanFocus);
+        Assert.Null (container2.Subviews [0].Margin);
+        Assert.Null (container2.Subviews [0].Border);
+        Assert.Null (container2.Subviews [0].Padding);
+        Assert.Null (view.SuperView);
+
+        container2.Dispose ();
+
+#if DEBUG_IDISPOSABLE
+        Assert.Empty (View.Instances);
+#endif
+    }
+
     [Fact]
     [AutoInitShutdown]
     public void Clear_Viewport_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
@@ -428,7 +577,7 @@ At 0,0
         Assert.NotNull (view.Padding);
 
 #if DEBUG_IDISPOSABLE
-        Assert.Equal (4, Responder.Instances.Count);
+        Assert.Equal (4, View.Instances.Count);
 #endif
 
         view.Dispose ();
@@ -948,7 +1097,7 @@ At 0,0
         super.Dispose ();
 
 #if DEBUG_IDISPOSABLE
-        Assert.Empty (Responder.Instances);
+        Assert.Empty (View.Instances);
 #endif
 
         // Default Constructor

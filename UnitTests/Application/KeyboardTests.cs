@@ -11,7 +11,7 @@ public class KeyboardTests
     {
         _output = output;
 #if DEBUG_IDISPOSABLE
-        Responder.Instances.Clear ();
+        View.Instances.Clear ();
         RunState.Instances.Clear ();
 #endif
     }
@@ -671,7 +671,7 @@ public class KeyboardTests
         Assert.True (shutdown);
 
 #if DEBUG_IDISPOSABLE
-        Assert.Empty (Responder.Instances);
+        Assert.Empty (View.Instances);
 #endif
         lock (_timeoutLock)
         {

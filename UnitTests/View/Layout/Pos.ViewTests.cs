@@ -249,7 +249,7 @@ public class PosViewTests (ITestOutputHelper output)
 #if DEBUG_IDISPOSABLE
 
         // HACK: Force clean up of Responders to avoid having to Dispose all the Views created above.
-        Responder.Instances.Clear ();
+        View.Instances.Clear ();
 #endif
     }
 

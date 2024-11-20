@@ -722,61 +722,6 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void Toplevel_Inside_ScrollView_MouseGrabView ()
-    {
-        var scrollView = new ScrollView
-        {
-            X = 3,
-            Y = 3,
-            Width = 40,
-            Height = 16
-        };
-        scrollView.SetContentSize (new (200, 100));
-        var win = new Window { X = 3, Y = 3, Width = Dim.Fill (3), Height = Dim.Fill (3), Arrangement = ViewArrangement.Movable };
-        scrollView.Add (win);
-        Toplevel top = new ();
-        top.Add (scrollView);
-        Application.Begin (top);
-
-        Assert.Equal (new (0, 0, 80, 25), top.Frame);
-        Assert.Equal (new (3, 3, 40, 16), scrollView.Frame);
-        Assert.Equal (new (0, 0, 200, 100), scrollView.Subviews [0].Frame);
-        Assert.Equal (new (3, 3, 194, 94), win.Frame);
-
-        Application.RaiseMouseEvent (new () { ScreenPosition = new (6, 6), Flags = MouseFlags.Button1Pressed });
-        Assert.Equal (win.Border, Application.MouseGrabView);
-        Assert.Equal (new (3, 3, 194, 94), win.Frame);
-
-        Application.RaiseMouseEvent (new () { ScreenPosition = new (9, 9), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
-        Assert.Equal (win.Border, Application.MouseGrabView);
-        top.SetNeedsLayout ();
-        top.LayoutSubviews ();
-        Assert.Equal (new (6, 6, 191, 91), win.Frame);
-        Application.LayoutAndDraw ();
-
-        Application.RaiseMouseEvent (
-                                  new ()
-                                  {
-                                      ScreenPosition = new (5, 5), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-                                  });
-        Assert.Equal (win.Border, Application.MouseGrabView);
-        top.SetNeedsLayout ();
-        top.LayoutSubviews ();
-        Assert.Equal (new (2, 2, 195, 95), win.Frame);
-        Application.LayoutAndDraw ();
-
-        Application.RaiseMouseEvent (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.Button1Released });
-
-        // ScrollView always grab the mouse when the container's subview OnMouseEnter don't want grab the mouse
-        Assert.Equal (scrollView, Application.MouseGrabView);
-
-        Application.RaiseMouseEvent (new () { ScreenPosition = new (4, 4), Flags = MouseFlags.ReportMousePosition });
-        Assert.Equal (scrollView, Application.MouseGrabView);
-        top.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
     public void Window_Viewport_Bigger_Than_Driver_Cols_And_Rows_Allow_Drag_Beyond_Left_Right_And_Bottom ()
     {
         Toplevel top = new ();

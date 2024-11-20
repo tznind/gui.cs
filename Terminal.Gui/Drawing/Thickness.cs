@@ -236,7 +236,7 @@ public record struct Thickness
     }
 
     /// <summary>
-    ///     Gets the total width of the left and right sides of the rectangle. Sets the width of the left and rigth sides
+    ///     Gets the total width of the left and right sides of the rectangle. Sets the width of the left and right sides
     ///     of the rectangle to half the specified value.
     /// </summary>
     public int Horizontal

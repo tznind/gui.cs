@@ -18,11 +18,18 @@ public class EventLog : ListView
     public EventLog ()
     {
         Title = "Event Log";
-        CanFocus = false;
+        CanFocus = true;
 
         X = Pos.AnchorEnd ();
         Y = 0;
-        Width = Dim.Func (() => Math.Min (SuperView!.Viewport.Width / 3, MaxLength + GetAdornmentsThickness ().Horizontal));
+        Width = Dim.Func (() =>
+                          {
+                              if (!IsInitialized)
+                              {
+                                  return 0;
+                              }
+                              return Math.Min (SuperView!.Viewport.Width / 3, MaxLength + GetAdornmentsThickness ().Horizontal);
+                          });
         Height = Dim.Fill ();
 
         ExpandButton = new ()
@@ -31,6 +38,20 @@ public class EventLog : ListView
         };
 
         Initialized += EventLog_Initialized;
+
+        HorizontalScrollBar.AutoShow = true;
+        VerticalScrollBar.AutoShow = true;
+
+        AddCommand (Command.DeleteAll,
+                   () =>
+                   {
+                       _eventSource.Clear ();
+
+                       return true;
+                   });
+
+        KeyBindings.Add (Key.Delete, Command.DeleteAll);
+
     }
     public ExpanderButton? ExpandButton { get; }
 
@@ -55,45 +76,40 @@ public class EventLog : ListView
                 _viewToLog.Initialized += (s, args) =>
                                              {
                                                  View? sender = s as View;
-                                                 _eventSource.Add ($"Initialized: {GetIdentifyingString (sender)}");
-                                                 MoveEnd ();
+                                                 Log ($"Initialized: {GetIdentifyingString (sender)}");
                                              };
 
                 _viewToLog.MouseClick += (s, args) =>
                 {
-                    View? sender = s as View;
-                    _eventSource.Add ($"MouseClick: {args}");
-                    MoveEnd ();
+                    Log ($"MouseClick: {args}");
                 };
 
                 _viewToLog.HandlingHotKey += (s, args) =>
                                         {
-                                            View? sender = s as View;
-                                            _eventSource.Add ($"HandlingHotKey: {args.Context.Command} {args.Context.Data}");
-                                            MoveEnd ();
+                                            Log ($"HandlingHotKey: {args.Context.Command} {args.Context.Data}");
                                         };
                 _viewToLog.Selecting += (s, args) =>
                                         {
-                                            View? sender = s as View;
-                                            _eventSource.Add ($"Selecting: {args.Context.Command} {args.Context.Data}");
-                                            MoveEnd ();
+                                            Log ($"Selecting: {args.Context.Command} {args.Context.Data}");
                                         };
                 _viewToLog.Accepting += (s, args) =>
                                         {
-                                            View? sender = s as View;
-                                            _eventSource.Add ($"Accepting: {args.Context.Command} {args.Context.Data}");
-                                            MoveEnd ();
+                                            Log ($"Accepting: {args.Context.Command} {args.Context.Data}");
                                         };
             }
         }
     }
 
+    public void Log (string text)
+    {
+        _eventSource.Add (text);
+        MoveEnd ();
+    }
+
     private void EventLog_Initialized (object? _, EventArgs e)
     {
-
         Border?.Add (ExpandButton!);
         Source = new ListWrapper<string> (_eventSource);
-
     }
     private string GetIdentifyingString (View? view)
     {

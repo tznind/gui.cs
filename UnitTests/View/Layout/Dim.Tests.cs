@@ -470,8 +470,8 @@ public class DimTests
 #if DEBUG_IDISPOSABLE
 
         // HACK: Force clean up of Responders to avoid having to Dispose all the Views created above.
-        Responder.Instances.Clear ();
-        Assert.Empty (Responder.Instances);
+        View.Instances.Clear ();
+        Assert.Empty (View.Instances);
 #endif
     }
 

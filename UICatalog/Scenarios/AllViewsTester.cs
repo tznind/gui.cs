@@ -302,6 +302,7 @@ public class AllViewsTester : Scenario
 
         view.Id = "_curView";
         _curView = view;
+        _curView = view;
 
         _hostPane!.Add (_curView);
         _layoutEditor!.ViewToEdit = _curView;
@@ -348,12 +349,12 @@ public class AllViewsTester : Scenario
             return;
         }
 
-        if (!view.Width!.Has<DimAuto> (out _) || view.Width is null)
+        if (view.Width == Dim.Absolute(0) || view.Width is null)
         {
             view.Width = Dim.Fill ();
         }
 
-        if (!view.Height!.Has<DimAuto> (out _) || view.Height is null)
+        if (view.Height == Dim.Absolute (0) || view.Height is null)
         {
             view.Height = Dim.Fill ();
         }

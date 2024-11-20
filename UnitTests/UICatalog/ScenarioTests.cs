@@ -10,7 +10,7 @@ public class ScenarioTests : TestsAllViews
     public ScenarioTests (ITestOutputHelper output)
     {
 #if DEBUG_IDISPOSABLE
-        Responder.Instances.Clear ();
+        View.Instances.Clear ();
 #endif
         _output = output;
     }
@@ -68,7 +68,7 @@ public class ScenarioTests : TestsAllViews
         Assert.True (shutdown);
 
 #if DEBUG_IDISPOSABLE
-        Assert.Empty (Responder.Instances);
+        Assert.Empty (View.Instances);
 #endif
 
         lock (_timeoutLock)
@@ -836,7 +836,7 @@ public class ScenarioTests : TestsAllViews
         ConfigurationManager.Reset ();
 
 #if DEBUG_IDISPOSABLE
-        Assert.Empty (Responder.Instances);
+        Assert.Empty (View.Instances);
 #endif
     }
 

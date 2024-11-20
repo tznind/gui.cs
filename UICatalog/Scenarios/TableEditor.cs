@@ -65,8 +65,8 @@ public class TableEditor : Scenario
              "Cuneiform Numbers and Punctuation"
             ),
         new (
-             (uint)(CharMap.MaxCodePoint - 16),
-             (uint)CharMap.MaxCodePoint,
+             (uint)(UICatalog.Scenarios.UnicodeRange.Ranges.Max (r => r.End) - 16),
+             (uint)UICatalog.Scenarios.UnicodeRange.Ranges.Max (r => r.End),
              "End"
             ),
         new (0x0020, 0x007F, "Basic Latin"),
@@ -666,7 +666,7 @@ public class TableEditor : Scenario
         _tableView.CellActivated += EditCurrentCell;
         _tableView.KeyDown += TableViewKeyPress;
 
-        SetupScrollBar ();
+        //SetupScrollBar ();
 
         _redColorScheme = new ()
         {
@@ -1157,40 +1157,40 @@ public class TableEditor : Scenario
 
     private void SetTable (DataTable dataTable) { _tableView.Table = new DataTableSource (_currentTable = dataTable); }
 
-    private void SetupScrollBar ()
-    {
-        var scrollBar = new ScrollBarView (_tableView, true);
+    //private void SetupScrollBar ()
+    //{
+    //    var scrollBar = new ScrollBarView (_tableView, true);
 
-        scrollBar.ChangedPosition += (s, e) =>
-                                     {
-                                         _tableView.RowOffset = scrollBar.Position;
+    //    scrollBar.ChangedPosition += (s, e) =>
+    //                                 {
+    //                                     _tableView.RowOffset = scrollBar.Position;
 
-                                         if (_tableView.RowOffset != scrollBar.Position)
-                                         {
-                                             scrollBar.Position = _tableView.RowOffset;
-                                         }
+    //                                     if (_tableView.RowOffset != scrollBar.Position)
+    //                                     {
+    //                                         scrollBar.Position = _tableView.RowOffset;
+    //                                     }
 
-                                         _tableView.SetNeedsDraw ();
-                                     };
-        /*
-        scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
-            tableView.LeftItem = scrollBar.OtherScrollBarView.Position;
-            if (tableView.LeftItem != scrollBar.OtherScrollBarView.Position) {
-                scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
-            }
-            tableView.SetNeedsDraw ();
-        };*/
+    //                                     _tableView.SetNeedsDraw ();
+    //                                 };
+    //    /*
+    //    scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
+    //        tableView.LeftItem = scrollBar.OtherScrollBarView.Position;
+    //        if (tableView.LeftItem != scrollBar.OtherScrollBarView.Position) {
+    //            scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
+    //        }
+    //        tableView.SetNeedsDraw ();
+    //    };*/
 
-        _tableView.DrawingContent += (s, e) =>
-                                  {
-                                      scrollBar.Size = _tableView.Table?.Rows ?? 0;
-                                      scrollBar.Position = _tableView.RowOffset;
+    //    _tableView.DrawingContent += (s, e) =>
+    //                              {
+    //                                  scrollBar.Size = _tableView.Table?.Rows ?? 0;
+    //                                  scrollBar.Position = _tableView.RowOffset;
 
-                                      //scrollBar.OtherScrollBarView.Size = tableView.Maxlength - 1;
-                                      //scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
-                                      scrollBar.Refresh ();
-                                  };
-    }
+    //                                  //scrollBar.OtherScrollBarView.Size = tableView.Maxlength - 1;
+    //                                  //scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
+    //                                  scrollBar.Refresh ();
+    //                              };
+    //}
 
     private void ShowAllColumns ()
     {
@@ -1533,17 +1533,10 @@ public class TableEditor : Scenario
                                   );
     }
 
-    private class UnicodeRange
+    public class UnicodeRange (uint start, uint end, string category)
     {
-        public readonly string Category;
-        public readonly uint End;
-        public readonly uint Start;
-
-        public UnicodeRange (uint start, uint end, string category)
-        {
-            Start = start;
-            End = end;
-            Category = category;
-        }
+        public readonly string Category = category;
+        public readonly uint End = end;
+        public readonly uint Start = start;
     }
 }

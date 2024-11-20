@@ -96,10 +96,27 @@ public partial class View // Layout APIs
         SetNeedsLayout ();
 
         // BUGBUG: When SetFrame is called from Frame_set, this event gets raised BEFORE OnResizeNeeded. Is that OK?
-        OnViewportChanged (new (IsInitialized ? Viewport : Rectangle.Empty, oldViewport));
+        OnFrameChanged (in frame);
+        FrameChanged?.Invoke (this, new (in frame));
 
+        if (oldViewport != Viewport)
+        {
+            RaiseViewportChangedEvent (oldViewport);
+        }
         return true;
     }
+
+    /// <summary>
+    ///     Called when <see cref="Frame"/> changes.
+    /// </summary>
+    /// <param name="frame">The new Frame.</param>
+    protected virtual void OnFrameChanged (in Rectangle frame) { }
+
+    /// <summary>
+    ///     Raised when the <see cref="Frame"/> changes. This event is raised after the <see cref="Frame"/> has been
+    ///     updated.
+    /// </summary>
+    public event EventHandler<EventArgs<Rectangle>>? FrameChanged;
 
     /// <summary>Gets the <see cref="Frame"/> with a screen-relative location.</summary>
     /// <returns>The location and size of the view in screen-relative coordinates.</returns>

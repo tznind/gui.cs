@@ -22,6 +22,15 @@ public class DimEditor : EditorBase
     private RadioGroup? _dimRadioGroup;
     private TextField? _valueEdit;
 
+    /// <inheritdoc />
+    protected override void OnViewToEditChanged ()
+    {
+        if (ViewToEdit is { })
+        {
+            ViewToEdit.SubviewsLaidOut += (_, _) => { OnUpdateSettings (); };
+        }
+    }
+
     protected override void OnUpdateSettings ()
     {
         Enabled = ViewToEdit is not Adornment;
@@ -110,6 +119,7 @@ public class DimEditor : EditorBase
         Add (_valueEdit);
 
         Add (_dimRadioGroup);
+
     }
 
     private void OnRadioGroupOnSelectedItemChanged (object? s, SelectedItemChangedArgs selected) { DimChanged (); }

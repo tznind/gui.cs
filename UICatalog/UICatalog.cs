@@ -607,12 +607,12 @@ public class UICatalogApp
         // Validate there are no outstanding Responder-based instances 
         // after a scenario was selected to run. This proves the main UI Catalog
         // 'app' closed cleanly.
-        foreach (Responder? inst in Responder.Instances)
+        foreach (View? inst in View.Instances)
         {
             Debug.Assert (inst.WasDisposed);
         }
 
-        Responder.Instances.Clear ();
+        View.Instances.Clear ();
 
         // Validate there are no outstanding Application.RunState-based instances 
         // after a scenario was selected to run. This proves the main UI Catalog
@@ -799,6 +799,9 @@ public class UICatalogApp
             CategoryList.OpenSelectedItem += (s, a) => { ScenarioList!.SetFocus (); };
             CategoryList.SelectedItemChanged += CategoryView_SelectedChanged;
 
+            // This enables the scrollbar by causing lazy instantiation to happen
+            CategoryList.VerticalScrollBar.AutoShow = true;
+
             // Create the scenario list. The contents of the scenario list changes whenever the
             // Category list selection changes (to show just the scenarios that belong to the selected
             // category).
@@ -821,6 +824,8 @@ public class UICatalogApp
                 BorderStyle = CategoryList.BorderStyle,
                 SuperViewRendersLineCanvas = true
             };
+            //ScenarioList.VerticalScrollBar.AutoHide = false;
+            //ScenarioList.HorizontalScrollBar.AutoHide = false;
 
             // TableView provides many options for table headers. For simplicity we turn all 
             // of these off. By enabling FullRowSelect and turning off headers, TableView looks just

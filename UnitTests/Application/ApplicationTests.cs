@@ -13,7 +13,7 @@ public class ApplicationTests
         ConfigurationManager.Locations = ConfigurationManager.ConfigLocations.None;
 
 #if DEBUG_IDISPOSABLE
-        Responder.Instances.Clear ();
+        View.Instances.Clear ();
         RunState.Instances.Clear ();
 #endif
     }
@@ -66,7 +66,7 @@ public class ApplicationTests
         Assert.True (shutdown);
 
 #if DEBUG_IDISPOSABLE
-        Assert.Empty (Responder.Instances);
+        Assert.Empty (View.Instances);
 #endif
         lock (_timeoutLock)
         {
@@ -393,7 +393,7 @@ public class ApplicationTests
         // Validate there are no outstanding Responder-based instances 
         // after a scenario was selected to run. This proves the main UI Catalog
         // 'app' closed cleanly.
-        Assert.Empty (Responder.Instances);
+        Assert.Empty (View.Instances);
 #endif
     }
 
