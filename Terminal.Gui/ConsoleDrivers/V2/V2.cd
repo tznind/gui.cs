@@ -24,11 +24,26 @@
   </Class>
   <Class Name="Terminal.Gui.MainLoop&lt;T&gt;" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="9" Y="2.5" Width="1.5" />
+    <AssociationLine Name="Parser" Type="Terminal.Gui.AnsiResponseParser&lt;T&gt;" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="10.5" Y="2.688" />
+        <Point X="11.875" Y="2.688" />
+        <Point X="11.875" Y="1.691" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="Out" Type="Terminal.Gui.IConsoleOutput" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="10.5" Y="2.75" />
+        <Point X="14.25" Y="2.75" />
+        <Point X="14.25" Y="3.25" />
+      </Path>
+    </AssociationLine>
     <TypeIdentifier>
-      <HashCode>QQAgAAAAACAAAQQAAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <HashCode>QQAgAAAAACAAAQQAAAAAAAAAAAAAAAACAAAAAAAAAAI=</HashCode>
       <FileName>ConsoleDrivers\V2\MainLoop.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
+      <Property Name="OutputBuffer" />
       <Property Name="Parser" />
       <Property Name="Out" />
     </ShowAsAssociation>
@@ -37,20 +52,28 @@
   <Class Name="Terminal.Gui.MainLoopCoordinator&lt;T&gt;">
     <Position X="5.75" Y="1.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAJAAAACIAAAAAAAAAAAAAAAAQAAQAIAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAJAEAAAAAAAAAABAAAAAAAAAQIAQAIQAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\MainLoopCoordinator.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
-      <Field Name="_input" />
       <Field Name="_loop" />
     </ShowAsAssociation>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.AnsiResponseParser&lt;T&gt;" Collapsed="true">
-    <Position X="11.75" Y="1.75" Width="2" />
+    <Position X="11.25" Y="1" Width="2" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAACIAAAAAAAAAAAAAgAABAAAAAABAAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\AnsiResponseParser.cs</FileName>
     </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.OutputBuffer" Collapsed="true">
+    <Position X="11.25" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AwAAAAAAAIAAAECIBgAEAIAAAAEIRgAACAAAKABAgAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\OutputBuffer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Interface Name="Terminal.Gui.IConsoleInput&lt;T&gt;">
     <Position X="9" Y="3.25" Width="1.5" />
@@ -67,10 +90,17 @@
     </TypeIdentifier>
   </Interface>
   <Interface Name="Terminal.Gui.IConsoleOutput" Collapsed="true">
-    <Position X="12.25" Y="3.25" Width="1.5" />
+    <Position X="13.5" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\IConsoleOutput.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.IOutputBuffer" Collapsed="true">
+    <Position X="11.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAEAAAAAAAIAAAAAABAAAAAAAAABAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\IOutputBuffer.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Font Name="Segoe UI" Size="9" />

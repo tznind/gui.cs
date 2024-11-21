@@ -6,6 +6,8 @@ public class MainLoop<T> : IMainLoop<T>
 {
     public ConcurrentQueue<T> InputBuffer { get; private set; } = new ();
 
+    public IOutputBuffer OutputBuffer { get; private set; } = new OutputBuffer();
+
     public AnsiResponseParser<T> Parser
     {
         get;
