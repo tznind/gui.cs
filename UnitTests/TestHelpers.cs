@@ -197,6 +197,11 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
         // Turn off diagnostic flags in case some test left them on
         View.Diagnostics = ViewDiagnosticFlags.Off;
 
+        if (Application.Driver is { })
+        {
+            ((FakeDriver)Application.Driver).End ();
+        }
+
         Application.Driver = null;
         base.After (methodUnderTest);
     }
