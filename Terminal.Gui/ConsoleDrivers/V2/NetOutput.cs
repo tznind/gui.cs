@@ -35,7 +35,7 @@ public class NetOutput : IConsoleOutput
             || buffer.Contents.Length != buffer.Rows * buffer.Cols
             || buffer.Rows != Console.WindowHeight)
         {
-            return;
+       //     return;
         }
 
         var top = 0;
