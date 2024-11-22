@@ -50,7 +50,56 @@ public class MainLoop<T> : IMainLoop<T>
 
         OutputBuffer.CurrentAttribute = new Attribute (Color.White, Color.Black);
         OutputBuffer.Move (5, 3);
-        OutputBuffer.AddStr ("Hello World!");
+
+        // Red
+        OutputBuffer.CurrentAttribute = new Attribute (new Color (255, 0, 0), Color.Black);
+        OutputBuffer.AddRune ('H');
+
+        // Orange
+        OutputBuffer.CurrentAttribute = new Attribute (new Color (255, 165, 0), Color.Black);
+        OutputBuffer.AddRune ('e');
+
+        // Yellow
+        OutputBuffer.CurrentAttribute = new Attribute (new Color (255, 255, 0), Color.Black);
+        OutputBuffer.AddRune ('l');
+
+        // Green
+        OutputBuffer.CurrentAttribute = new Attribute (new Color (0, 255, 0), Color.Black);
+        OutputBuffer.AddRune ('l');
+
+        // Blue
+        OutputBuffer.CurrentAttribute = new Attribute (new Color (100, 100, 255), Color.Black);
+        OutputBuffer.AddRune ('o');
+
+        // Indigo
+        OutputBuffer.CurrentAttribute = new Attribute (new Color (75, 0, 130), Color.Black);
+        OutputBuffer.AddRune (' ');
+
+        // Violet
+        OutputBuffer.CurrentAttribute = new Attribute (new Color (238, 130, 238), Color.Black);
+        OutputBuffer.AddRune ('W');
+
+        // Red
+        OutputBuffer.CurrentAttribute = new Attribute (new Color (255, 0, 0), Color.Black);
+        OutputBuffer.AddRune ('o');
+
+        // Orange
+        OutputBuffer.CurrentAttribute = new Attribute (new Color (255, 165, 0), Color.Black);
+        OutputBuffer.AddRune ('r');
+
+        // Yellow
+        OutputBuffer.CurrentAttribute = new Attribute (new Color (255, 255, 0), Color.Black);
+        OutputBuffer.AddRune ('l');
+
+        // Green
+        OutputBuffer.CurrentAttribute = new Attribute (new Color (0, 255, 0), Color.Black);
+        OutputBuffer.AddRune ('d');
+
+        // Blue
+        OutputBuffer.CurrentAttribute = new Attribute (new Color (100, 100, 255), Color.Black);
+        OutputBuffer.AddRune ('!');
+
+
         Out.Write (OutputBuffer);
     }
     /// <inheritdoc />
