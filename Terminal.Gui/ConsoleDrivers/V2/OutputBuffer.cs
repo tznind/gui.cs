@@ -48,14 +48,14 @@ public class OutputBuffer : IOutputBuffer
     ///     Gets the row last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
     ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
     /// </summary>
-    internal int Row { get; private set; }
+    public int Row { get; private set; }
 
 
     /// <summary>
     ///     Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
     ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
     /// </summary>
-    internal int Col { get; private set; }
+    public int Col { get; private set; }
 
     /// <summary>The number of rows visible in the terminal.</summary>
     public int Rows

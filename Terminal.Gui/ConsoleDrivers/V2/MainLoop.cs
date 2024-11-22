@@ -46,10 +46,11 @@ public class MainLoop<T> : IMainLoop<T>
     /// <inheritdoc />
     public void Iteration ()
     {
+        Random r = new Random ();
         OutputBuffer.SetWindowSize (20, 10);
 
         OutputBuffer.CurrentAttribute = new Attribute (Color.White, Color.Black);
-        OutputBuffer.Move (5, 3);
+        OutputBuffer.Move (r.Next(10), r.Next (10));
 
         // Red
         OutputBuffer.CurrentAttribute = new Attribute (new Color (255, 0, 0), Color.Black);

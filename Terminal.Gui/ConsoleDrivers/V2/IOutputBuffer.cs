@@ -25,6 +25,18 @@ public interface IOutputBuffer
     int Cols { get; set; }
 
     /// <summary>
+    ///     Gets the row last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
+    ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
+    /// </summary>
+    public int Row { get;}
+
+
+    /// <summary>
+    ///     Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
+    ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
+    /// </summary>
+    public int Col { get; }
+    /// <summary>
     /// Updates the column and row to the specified location in the buffer.
     /// </summary>
     /// <param name="col">The column to move to.</param>
