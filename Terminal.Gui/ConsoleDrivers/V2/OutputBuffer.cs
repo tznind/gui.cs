@@ -133,7 +133,7 @@ public class OutputBuffer : IOutputBuffer
     ///     </para>
     /// </remarks>
     /// <param name="rune">Rune to add.</param>
-    internal void AddRune (Rune rune)
+    public void AddRune (Rune rune)
     {
         int runeWidth = -1;
         bool validLocation = IsValidLocation (rune, Col, Row);
@@ -308,7 +308,7 @@ public class OutputBuffer : IOutputBuffer
     ///     convenience method that calls <see cref="AddRune(Rune)"/> with the <see cref="Rune"/> constructor.
     /// </summary>
     /// <param name="c">Character to add.</param>
-    internal void AddRune (char c) { AddRune (new Rune (c)); }
+    public void AddRune (char c) { AddRune (new Rune (c)); }
 
     /// <summary>Adds the <paramref name="str"/> to the display at the cursor position.</summary>
     /// <remarks>
@@ -320,7 +320,7 @@ public class OutputBuffer : IOutputBuffer
     ///     <para>If <paramref name="str"/> requires more columns than are available, the output will be clipped.</para>
     /// </remarks>
     /// <param name="str">String.</param>
-    internal void AddStr (string str)
+    public void AddStr (string str)
     {
         List<Rune> runes = str.EnumerateRunes ().ToList ();
 
@@ -331,7 +331,7 @@ public class OutputBuffer : IOutputBuffer
     }
 
     /// <summary>Clears the <see cref="Contents"/> of the driver.</summary>
-    internal void ClearContents ()
+    public void ClearContents ()
     {
         Contents = new Cell [Rows, Cols];
 
@@ -369,7 +369,7 @@ public class OutputBuffer : IOutputBuffer
     ///     <see langword="false"/> if the coordinate is outside the screen bounds or outside of <see cref="Clip"/>.
     ///     <see langword="true"/> otherwise.
     /// </returns>
-    internal bool IsValidLocation (Rune rune, int col, int row)
+    public bool IsValidLocation (Rune rune, int col, int row)
     {
         if (rune.GetColumns () < 2)
         {
@@ -380,6 +380,14 @@ public class OutputBuffer : IOutputBuffer
 
             return Clip!.Contains (col, row) || Clip!.Contains (col + 1, row);
         }
+    }
+
+    /// <inheritdoc />
+    public void SetWindowSize (int cols, int rows)
+    {
+        Cols = cols;
+        Rows = rows;
+        ClearContents ();
     }
 
     // TODO: Make internal once Menu is upgraded

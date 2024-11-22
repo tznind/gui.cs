@@ -26,6 +26,9 @@ class Program
             }
         }
 
+        // Required to set up colors etc?
+        Application.Init ();
+
         IMainLoopCoordinator coordinator;
         if (win)
         {

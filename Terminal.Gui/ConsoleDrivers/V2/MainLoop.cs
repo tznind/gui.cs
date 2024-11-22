@@ -46,7 +46,12 @@ public class MainLoop<T> : IMainLoop<T>
     /// <inheritdoc />
     public void Iteration ()
     {
-        Out.Write ("h");
+        OutputBuffer.SetWindowSize (20, 10);
+
+        OutputBuffer.CurrentAttribute = new Attribute (Color.White, Color.Black);
+        OutputBuffer.Move (5, 3);
+        OutputBuffer.AddStr ("Hello World!");
+        Out.Write (OutputBuffer);
     }
     /// <inheritdoc />
     public void Dispose ()
