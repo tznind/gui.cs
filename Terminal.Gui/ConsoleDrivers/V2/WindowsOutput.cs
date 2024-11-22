@@ -48,7 +48,7 @@ public class WindowsOutput : IConsoleOutput
 
     private nint _screenBuffer;
 
-    public WindowsConsole WinConsole { get; private set; }
+    public WindowsConsole WinConsole { get; private set; } = new WindowsConsole ();
 
     public WindowsOutput ()
     {
