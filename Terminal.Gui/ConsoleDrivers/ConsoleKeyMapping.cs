@@ -711,6 +711,137 @@ public static class ConsoleKeyMapping
         return (uint)keyValue;
     }
 
+    public static KeyCode MapKey (ConsoleKeyInfo keyInfo)
+    {
+        // TODO: I Copied this from NetDriver and made it static because it is about ConsoleKeyMapping so belongs here
+        //       However there is a separate version in FakeDriver ?! Is that just an older version of the same code?!
+
+        switch (keyInfo.Key)
+        {
+            case ConsoleKey.OemPeriod:
+            case ConsoleKey.OemComma:
+            case ConsoleKey.OemPlus:
+            case ConsoleKey.OemMinus:
+            case ConsoleKey.Packet:
+            case ConsoleKey.Oem1:
+            case ConsoleKey.Oem2:
+            case ConsoleKey.Oem3:
+            case ConsoleKey.Oem4:
+            case ConsoleKey.Oem5:
+            case ConsoleKey.Oem6:
+            case ConsoleKey.Oem7:
+            case ConsoleKey.Oem8:
+            case ConsoleKey.Oem102:
+                if (keyInfo.KeyChar == 0)
+                {
+                    // If the keyChar is 0, keyInfo.Key value is not a printable character. 
+
+                    return KeyCode.Null; // MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode)keyInfo.Key);
+                }
+
+                if (keyInfo.Modifiers != ConsoleModifiers.Shift)
+                {
+                    // If Shift wasn't down we don't need to do anything but return the keyInfo.KeyChar
+                    return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
+                }
+
+                // Strip off Shift - We got here because they KeyChar from Windows is the shifted char (e.g. "Ç")
+                // and passing on Shift would be redundant.
+                return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar);
+        }
+
+        // Handle control keys whose VK codes match the related ASCII value (those below ASCII 33) like ESC
+        if (keyInfo.Key != ConsoleKey.None && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key))
+        {
+            if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control) && keyInfo.Key == ConsoleKey.I)
+            {
+                return KeyCode.Tab;
+            }
+
+            return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key));
+        }
+
+        // Handle control keys (e.g. CursorUp)
+        if (keyInfo.Key != ConsoleKey.None
+            && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint))
+        {
+            return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint));
+        }
+
+        if (((ConsoleKey)keyInfo.KeyChar) is >= ConsoleKey.A and <= ConsoleKey.Z)
+        {
+            // Shifted
+            keyInfo = new ConsoleKeyInfo (
+                                          keyInfo.KeyChar,
+                                          (ConsoleKey)keyInfo.KeyChar,
+                                          true,
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt),
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
+        }
+
+        if ((ConsoleKey)keyInfo.KeyChar - 32 is >= ConsoleKey.A and <= ConsoleKey.Z)
+        {
+            // Unshifted
+            keyInfo = new ConsoleKeyInfo (
+                                          keyInfo.KeyChar,
+                                          (ConsoleKey)(keyInfo.KeyChar - 32),
+                                          false,
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt),
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
+        }
+
+        if (keyInfo.Key is >= ConsoleKey.A and <= ConsoleKey.Z)
+        {
+            if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)
+                || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
+            {
+                // NetDriver doesn't support Shift-Ctrl/Shift-Alt combos
+                return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.Key);
+            }
+
+            if (keyInfo.Modifiers == ConsoleModifiers.Shift)
+            {
+                // If ShiftMask is on  add the ShiftMask
+                if (char.IsUpper (keyInfo.KeyChar))
+                {
+                    return (KeyCode)keyInfo.Key | KeyCode.ShiftMask;
+                }
+            }
+
+            return (KeyCode)keyInfo.Key;
+        }
+
+
+        return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
+    }
+
+    public static Key ToKey<T> (T result)
+    {
+        // TODO: Requires testing
+        return result switch
+               {
+                   ConsoleKeyInfo keyInfo =>MapKey (keyInfo),
+
+                   // TODO: how?
+                   // WindowsConsole.InputRecord inputRecord => inputRecord.KeyEvent.UnicodeChar,
+                   _ => throw new ArgumentException ($"Unsupported type {typeof (T).Name}")
+               };
+    }
+
+    public static char ToChar<T> (T result)
+    {
+        // TODO: Requires testing
+        return result switch
+               {
+                   ConsoleKeyInfo keyInfo => keyInfo.KeyChar,
+                   Key key => (char)key,
+
+                   // TODO: probably not that simple
+                   WindowsConsole.InputRecord inputRecord => inputRecord.KeyEvent.UnicodeChar,
+                   _ => throw new ArgumentException ($"Unsupported type {typeof (T).Name}")
+               };
+    }
+
     /// <summary>Maps a <see cref="ConsoleKeyInfo"/> to a <see cref="KeyCode"/>.</summary>
     /// <param name="consoleKeyInfo">The console key.</param>
     /// <returns>The <see cref="KeyCode"/> or the <paramref name="consoleKeyInfo"/>.</returns>

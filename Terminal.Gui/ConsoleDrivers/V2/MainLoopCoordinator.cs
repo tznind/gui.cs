@@ -9,6 +9,8 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     private CancellationTokenSource tokenSource = new ();
     private readonly Func<IConsoleOutput> _outputFactory;
 
+    ConcurrentQueue<T> _inputBuffer = new ();
+
     /// <summary>
     /// Creates a new coordinator
     /// </summary>
@@ -47,7 +49,7 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     {
         // Instance must be constructed on the thread in which it is used.
         IConsoleInput<T> input = _inputFactory.Invoke ();
-
+        input.Initialize (_inputBuffer);
         try
         {
             input.Run (tokenSource.Token);
@@ -63,10 +65,7 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
         // Instance must be constructed on the thread in which it is used.
         IConsoleOutput output = _outputFactory.Invoke ();
 
-        var parser = new AnsiResponseParser<T> ();
-        var buffer = new ConcurrentQueue<T> ();
-
-        _loop.Initialize (buffer, parser, output);
+        _loop.Initialize (_inputBuffer, output);
 
         try
         {

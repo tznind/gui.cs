@@ -1,16 +1,19 @@
 ﻿using System.Collections.Concurrent;
+using Terminal.Gui.ConsoleDrivers.V2;
 
 namespace Terminal.Gui;
 
 public interface IMainLoop<T> : IDisposable
 {
+
+    public IInputProcessor InputProcessor { get; }
+
     /// <summary>
     /// Initializes the loop with a buffer from which data can be read
     /// </summary>
     /// <param name="inputBuffer"></param>
-    /// <param name="parser"></param>
     /// <param name="consoleOutput"></param>
-    void Initialize (ConcurrentQueue<T> inputBuffer, AnsiResponseParser<T> parser, IConsoleOutput consoleOutput);
+    void Initialize (ConcurrentQueue<T> inputBuffer, IConsoleOutput consoleOutput);
 
     /// <summary>
     /// Runs <see cref="Iteration"/> in an infinite loop.

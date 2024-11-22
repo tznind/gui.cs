@@ -1,4 +1,7 @@
 ﻿using System.Collections.Concurrent;
+using Terminal.Gui.ConsoleDrivers;
+using Terminal.Gui.ConsoleDrivers.V2;
+using static Terminal.Gui.WindowsConsole;
 
 namespace Terminal.Gui;
 
@@ -6,22 +9,24 @@ public class MainLoop<T> : IMainLoop<T>
 {
     public ConcurrentQueue<T> InputBuffer { get; private set; } = new ();
 
-    public IOutputBuffer OutputBuffer { get; private set; } = new OutputBuffer();
+    public IInputProcessor InputProcessor { get; private set; }
 
-    public AnsiResponseParser<T> Parser
-    {
-        get;
-        private set;
-    }
+    public IOutputBuffer OutputBuffer { get; private set; } = new OutputBuffer();
 
     public IConsoleOutput Out { get;private set; }
 
-    /// <inheritdoc />
-    public void Initialize (ConcurrentQueue<T> inputBuffer, AnsiResponseParser<T> parser, IConsoleOutput consoleOutput)
+
+    // TODO: Remove later
+    StringBuilder sb = new StringBuilder ();
+
+    public void Initialize (ConcurrentQueue<T> inputBuffer, IConsoleOutput consoleOutput)
     {
         InputBuffer = inputBuffer;
-        Parser = parser;
         Out = consoleOutput;
+        InputProcessor = new InputProcessor<T> (inputBuffer);
+
+        // TODO: Remove later
+        InputProcessor.KeyDown += (s,k) => sb.Append (ConsoleKeyMapping.ToChar (k));
     }
 
 
@@ -46,63 +51,24 @@ public class MainLoop<T> : IMainLoop<T>
     /// <inheritdoc />
     public void Iteration ()
     {
+        InputProcessor.ProcessQueue ();
+
+
         Random r = new Random ();
         OutputBuffer.SetWindowSize (20, 10);
 
         OutputBuffer.CurrentAttribute = new Attribute (Color.White, Color.Black);
-        OutputBuffer.Move (r.Next(10), r.Next (10));
+        OutputBuffer.Move (0,0);
 
-        // Red
-        OutputBuffer.CurrentAttribute = new Attribute (new Color (255, 0, 0), Color.Black);
-        OutputBuffer.AddRune ('H');
-
-        // Orange
-        OutputBuffer.CurrentAttribute = new Attribute (new Color (255, 165, 0), Color.Black);
-        OutputBuffer.AddRune ('e');
-
-        // Yellow
-        OutputBuffer.CurrentAttribute = new Attribute (new Color (255, 255, 0), Color.Black);
-        OutputBuffer.AddRune ('l');
-
-        // Green
-        OutputBuffer.CurrentAttribute = new Attribute (new Color (0, 255, 0), Color.Black);
-        OutputBuffer.AddRune ('l');
-
-        // Blue
-        OutputBuffer.CurrentAttribute = new Attribute (new Color (100, 100, 255), Color.Black);
-        OutputBuffer.AddRune ('o');
-
-        // Indigo
-        OutputBuffer.CurrentAttribute = new Attribute (new Color (75, 0, 130), Color.Black);
-        OutputBuffer.AddRune (' ');
-
-        // Violet
-        OutputBuffer.CurrentAttribute = new Attribute (new Color (238, 130, 238), Color.Black);
-        OutputBuffer.AddRune ('W');
-
-        // Red
-        OutputBuffer.CurrentAttribute = new Attribute (new Color (255, 0, 0), Color.Black);
-        OutputBuffer.AddRune ('o');
-
-        // Orange
-        OutputBuffer.CurrentAttribute = new Attribute (new Color (255, 165, 0), Color.Black);
-        OutputBuffer.AddRune ('r');
-
-        // Yellow
-        OutputBuffer.CurrentAttribute = new Attribute (new Color (255, 255, 0), Color.Black);
-        OutputBuffer.AddRune ('l');
-
-        // Green
-        OutputBuffer.CurrentAttribute = new Attribute (new Color (0, 255, 0), Color.Black);
-        OutputBuffer.AddRune ('d');
-
-        // Blue
-        OutputBuffer.CurrentAttribute = new Attribute (new Color (100, 100, 255), Color.Black);
-        OutputBuffer.AddRune ('!');
-
+        foreach (var ch in sb.ToString())
+        {
+            OutputBuffer.CurrentAttribute = new Attribute (new Color (r.Next (255), r.Next (255), r.Next (255)), Color.Black);
+            OutputBuffer.AddRune (ch);
+        }
 
         Out.Write (OutputBuffer);
     }
+
     /// <inheritdoc />
     public void Dispose ()
     { // TODO release managed resources here

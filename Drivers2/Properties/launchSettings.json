@@ -1,8 +1,7 @@
 {
   "profiles": {
     "Drivers2": {
-      "commandName": "Project",
-      "commandLineArgs": "win"
+      "commandName": "Project"
     }
   }
 }
