@@ -1,25 +1,39 @@
 ﻿using System.Collections.Concurrent;
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
+using static Terminal.Gui.WindowsConsole;
 
-namespace Terminal.Gui.ConsoleDrivers.V2;
+namespace Terminal.Gui;
+using InputRecord = InputRecord;
 
 /// <summary>
 /// Input processor for <see cref="WindowsInput"/>, deals in <see cref="WindowsConsole.InputRecord"/> stream.
 /// </summary>
-public class WindowsInputProcessor : InputProcessor<WindowsConsole.InputRecord>
+public class WindowsInputProcessor : InputProcessor<InputRecord>
 {
     /// <inheritdoc />
-    public WindowsInputProcessor (ConcurrentQueue<WindowsConsole.InputRecord> inputBuffer) : base (inputBuffer) { }
+    public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer) : base (inputBuffer) { }
 
     /// <inheritdoc />
-    protected override void Process (WindowsConsole.InputRecord inputEvent)
+    protected override void Process (InputRecord inputEvent)
     {
         switch (inputEvent.EventType)
         {
 
-            case WindowsConsole.EventType.Key:
+            case EventType.Key:
 
-                var mapped = (Key)inputEvent.KeyEvent.UnicodeChar;
+                // TODO: For now ignore keyup because ANSI comes in as down+up which is confusing to try and parse/pair these things up
+                if (!inputEvent.KeyEvent.bKeyDown)
+                {
+                    return;
+                }
+
+                foreach (Tuple<char, InputRecord> released in Parser.ProcessInput (Tuple.Create (inputEvent.KeyEvent.UnicodeChar, inputEvent)))
+                {
+                    var key = (Key) (released.Item2.KeyEvent.UnicodeChar);
+                    OnKeyDown (key);
+                    OnKeyUp (key);
+                }
+
                 /*
                 if (inputEvent.KeyEvent.wVirtualKeyCode == (VK)ConsoleKey.Packet)
                 {
@@ -42,18 +56,9 @@ public class WindowsInputProcessor : InputProcessor<WindowsConsole.InputRecord>
                 */
                 // This follows convention in NetDriver
 
-                if (inputEvent.KeyEvent.bKeyDown)
-                {
-                    OnKeyDown (mapped);
-                }
-                else
-                {
-                    OnKeyUp (mapped);
-                }
-
                 break;
 
-            case WindowsConsole.EventType.Mouse:
+            case EventType.Mouse:
                 MouseEventArgs me = ToDriverMouse (inputEvent.MouseEvent);
 
                 OnMouseEvent (me);
@@ -62,9 +67,9 @@ public class WindowsInputProcessor : InputProcessor<WindowsConsole.InputRecord>
         }
     }
 
-    private MouseEventArgs ToDriverMouse (WindowsConsole.MouseEventRecord e)
+    private MouseEventArgs ToDriverMouse (MouseEventRecord e)
     {
-        var result = new MouseEventArgs ()
+        var result = new MouseEventArgs
         {
             Position = new (e.MousePosition.X, e.MousePosition.Y)
         };

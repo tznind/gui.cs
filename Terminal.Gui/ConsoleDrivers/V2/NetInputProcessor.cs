@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Concurrent;
+using Terminal.Gui.ConsoleDrivers;
 
-namespace Terminal.Gui.ConsoleDrivers.V2;
+namespace Terminal.Gui;
 
 /// <summary>
 /// Input processor for <see cref="NetInput"/>, deals in <see cref="ConsoleKeyInfo"/> stream
@@ -20,7 +16,7 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
     {
         foreach (Tuple<char, ConsoleKeyInfo> released in Parser.ProcessInput (Tuple.Create (consoleKeyInfo.KeyChar, consoleKeyInfo)))
         {
-            var key = ConsoleKeyMapping.ToKey (released.Item2);
+            var key = ConsoleKeyMapping.MapKey (released.Item2);
             OnKeyDown (key);
             OnKeyUp (key);
         }

@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
 
-
 namespace Terminal.Gui;
 
 public abstract class ConsoleInput<T> : IConsoleInput<T>

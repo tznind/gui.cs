@@ -91,7 +91,7 @@ public class WindowsOutput : IConsoleOutput
     public void Write (IOutputBuffer buffer)
     {
 
-        var outputBuffer = new WindowsConsole.ExtendedCharInfo [buffer.Rows * buffer.Cols];
+        var outputBuffer = new ExtendedCharInfo [buffer.Rows * buffer.Cols];
 
         Size windowSize = WinConsole?.GetConsoleBufferWindow (out Point _) ?? new Size (buffer.Cols, buffer.Rows);
         
@@ -102,7 +102,7 @@ public class WindowsOutput : IConsoleOutput
             return;
         }*/
 
-        var bufferCoords = new WindowsConsole.Coord
+        var bufferCoords = new Coord
         {
             X = (short)buffer.Cols, //Clip.Width,
             Y = (short)buffer.Rows, //Clip.Height
@@ -153,7 +153,7 @@ public class WindowsOutput : IConsoleOutput
             }
         }
 
-        var damageRegion = new WindowsConsole.SmallRect
+        var damageRegion = new SmallRect
         {
             Top = 0,
             Left = 0,
@@ -172,7 +172,7 @@ public class WindowsOutput : IConsoleOutput
             }
         }
 
-        WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
+        SmallRect.MakeEmpty (ref damageRegion);
     }
 
     public Size GetWindowSize ()

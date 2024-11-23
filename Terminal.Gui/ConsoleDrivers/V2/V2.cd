@@ -47,7 +47,7 @@
   <Class Name="Terminal.Gui.MainLoopCoordinator&lt;T&gt;">
     <Position X="5" Y="1.25" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAJAEAAAAAAAAAABAAAAAAAAAQIAQAIQAAAAAAAAg=</HashCode>
+      <HashCode>AAAAJAEAAAAAAAAAABAAAAAAAAAQIAQAIQAAAAAAAgg=</HashCode>
       <FileName>ConsoleDrivers\V2\MainLoopCoordinator.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -77,7 +77,7 @@
   <Class Name="Terminal.Gui.NetOutput" Collapsed="true">
     <Position X="13.5" Y="8.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AEAAAAAAACAAAAAAAAAAAAAAAQAAAAAAMACAAAEAAAA=</HashCode>
+      <HashCode>AEAAAAAAACAAAAAAAAAAAAAAAQAAQAAAMACAAAEAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\NetOutput.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -85,12 +85,12 @@
   <Class Name="Terminal.Gui.WindowsOutput" Collapsed="true">
     <Position X="12" Y="8.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAABAAACAAhAAACAAAACAAAAAAAAAIAAAAAAEAAAQ=</HashCode>
+      <HashCode>AAAAABAAACAAhAAACAAAACAAAAgAQAAIAAAAAAEAAAQ=</HashCode>
       <FileName>ConsoleDrivers\V2\WindowsOutput.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="Terminal.Gui.ConsoleDrivers.V2.InputProcessor&lt;T&gt;" Collapsed="true">
+  <Class Name="Terminal.Gui.InputProcessor&lt;T&gt;" Collapsed="true">
     <Position X="15.75" Y="4.75" Width="2" />
     <TypeIdentifier>
       <HashCode>AQAkAAAAAACAgAAAAggAAAAABAIAAAAAAAAAAAAAAAA=</HashCode>
@@ -101,17 +101,17 @@
     </ShowAsAssociation>
     <Lollipop Position="0.1" />
   </Class>
-  <Class Name="Terminal.Gui.ConsoleDrivers.V2.NetInputProcessor" Collapsed="true">
+  <Class Name="Terminal.Gui.NetInputProcessor" Collapsed="true">
     <Position X="16.75" Y="5.75" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\NetInputProcessor.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Terminal.Gui.ConsoleDrivers.V2.WindowsInputProcessor" Collapsed="true">
+  <Class Name="Terminal.Gui.WindowsInputProcessor" Collapsed="true">
     <Position X="14.75" Y="5.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AQAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\WindowsInputProcessor.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -139,7 +139,7 @@
   <Interface Name="Terminal.Gui.IConsoleOutput" Collapsed="true">
     <Position X="12.75" Y="7.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAEAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\IConsoleOutput.cs</FileName>
     </TypeIdentifier>
   </Interface>

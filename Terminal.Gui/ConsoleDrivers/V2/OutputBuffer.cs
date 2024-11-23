@@ -92,7 +92,7 @@ public class OutputBuffer : IOutputBuffer
     /// <summary>Gets the location and size of the terminal screen.</summary>
     internal Rectangle Screen => new (0, 0, Cols, Rows);
 
-    private Region? _clip = null;
+    private Region? _clip;
 
     /// <summary>
     ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
@@ -375,11 +375,8 @@ public class OutputBuffer : IOutputBuffer
         {
             return col >= 0 && row >= 0 && col < Cols && row < Rows && Clip!.Contains (col, row);
         }
-        else
-        {
 
-            return Clip!.Contains (col, row) || Clip!.Contains (col + 1, row);
-        }
+        return Clip!.Contains (col, row) || Clip!.Contains (col + 1, row);
     }
 
     /// <inheritdoc />

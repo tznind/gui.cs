@@ -815,20 +815,6 @@ public static class ConsoleKeyMapping
         return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
     }
 
-    public static Key ToKey<T> (T result)
-    {
-        // TODO: Requires testing
-        return result switch
-               {
-                   ConsoleKeyInfo keyInfo =>MapKey (keyInfo),
-
-                   // TODO: how?
-                   // WindowsConsole.InputRecord inputRecord => inputRecord.KeyEvent.UnicodeChar,
-                   _ => throw new ArgumentException ($"Unsupported type {typeof (T).Name}")
-               };
-    }
-
-
     /// <summary>Maps a <see cref="ConsoleKeyInfo"/> to a <see cref="KeyCode"/>.</summary>
     /// <param name="consoleKeyInfo">The console key.</param>
     /// <returns>The <see cref="KeyCode"/> or the <paramref name="consoleKeyInfo"/>.</returns>

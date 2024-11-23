@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using static Terminal.Gui.WindowsConsole;
 
 namespace Terminal.Gui;
@@ -40,7 +39,7 @@ public class WindowsInput : ConsoleInput<InputRecord>
         try
         {
             // Use PeekConsoleInput to inspect the input buffer without removing events
-            if (PeekConsoleInput (_inputHandle, pRecord, (uint)bufferSize, out uint numberOfEventsRead))
+            if (PeekConsoleInput (_inputHandle, pRecord, bufferSize, out uint numberOfEventsRead))
             {
                 // Return true if there's at least one event in the buffer
                 return numberOfEventsRead > 0;

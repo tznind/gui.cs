@@ -1,8 +1,6 @@
 ﻿using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
-namespace Terminal.Gui.ConsoleDrivers.V2;
+namespace Terminal.Gui;
 
 public abstract class InputProcessor<T> : IInputProcessor
 {
@@ -65,7 +63,7 @@ public abstract class InputProcessor<T> : IInputProcessor
 
         while (InputBuffer.TryDequeue (out T input))
         {
-            this.Process (input);
+            Process (input);
         }
     }
 

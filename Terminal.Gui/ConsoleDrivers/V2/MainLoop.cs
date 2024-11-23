@@ -1,6 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using Terminal.Gui.ConsoleDrivers;
-using Terminal.Gui.ConsoleDrivers.V2;
 
 namespace Terminal.Gui;
 

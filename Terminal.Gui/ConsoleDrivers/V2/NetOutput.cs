@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualBasic;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 public class NetOutput : IConsoleOutput
 {
     public bool IsWinPlatform { get; }
