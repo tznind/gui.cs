@@ -27,6 +27,10 @@ public class WindowsOutput : IConsoleOutput
         nint screenBufferData
     );
 
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool GetConsoleScreenBufferInfoEx (nint hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFOEX csbi);
+
     [Flags]
     private enum ShareMode : uint
     {
@@ -169,6 +173,23 @@ public class WindowsOutput : IConsoleOutput
         }
 
         WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
+    }
+
+    public Size GetWindowSize ()
+    {
+        var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
+        csbi.cbSize = (uint)Marshal.SizeOf (csbi);
+
+        if (!GetConsoleScreenBufferInfoEx (_screenBuffer, ref csbi))
+        {
+            //throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+            return Size.Empty;
+        }
+
+        Size sz = new (
+                       csbi.srWindow.Right - csbi.srWindow.Left + 1,
+                       csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
+        return sz;
     }
 
     /// <inheritdoc />

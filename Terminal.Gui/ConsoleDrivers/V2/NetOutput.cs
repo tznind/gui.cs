@@ -171,6 +171,13 @@ public class NetOutput : IConsoleOutput
 
         _cachedCursorVisibility = savedVisibility;
     }
+
+    /// <inheritdoc />
+    public Size GetWindowSize ()
+    {
+        return new Size (Console.BufferWidth, Console.BufferHeight);
+    }
+
     void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
     {
         SetCursorPosition (lastCol, row);

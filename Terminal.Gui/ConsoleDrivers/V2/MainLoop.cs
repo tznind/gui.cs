@@ -57,7 +57,10 @@ public class MainLoop<T> : IMainLoop<T>
 
         Random r = new Random ();
 
-        OutputBuffer.SetWindowSize (20, 10);
+        // TODO: throttle this
+        var size = Out.GetWindowSize ();
+
+        OutputBuffer.SetWindowSize (size.Width, size.Height);
 
         OutputBuffer.CurrentAttribute = new Attribute (Color.White, Color.Black);
         OutputBuffer.Move (_lastMousePos.X,_lastMousePos.Y);
