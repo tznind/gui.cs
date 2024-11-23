@@ -195,7 +195,7 @@ public abstract class AnsiResponseParserBase : IAnsiResponseParser
         if (HandleMouse && IsMouse (cur))
         {
             RaiseMouseEvent (cur);
-            heldContent.ClearHeld ();
+            ResetState ();
             return false;
         }
 
