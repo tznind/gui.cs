@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui.ConsoleDrivers.V2;
 
@@ -45,26 +46,27 @@ public class InputProcessor<T> : IInputProcessor
         MouseEvent?.Invoke (this, a);
     }
 
-    public InputProcessor ( ConcurrentQueue<T> inputBuffer)
+    public InputProcessor (ConcurrentQueue<T> inputBuffer)
     {
         InputBuffer = inputBuffer;
-
-        // TODO: For now handle all escape codes with ignore - later add mouse etc
-        Parser.UnexpectedResponseHandler = (str) => { return true; };
+        Parser.HandleMouse = true;
+        Parser.Mouse += (s, e) => OnMouseEvent (e);
+        // TODO: For now handle all other escape codes with ignore
+        Parser.UnexpectedResponseHandler = str => { return true; };
     }
 
     /// <summary>
-    /// Drains the <see cref="InputBuffer"/> buffer, processing all available keystrokes
+    ///     Drains the <see cref="InputBuffer"/> buffer, processing all available keystrokes
     /// </summary>
     public void ProcessQueue ()
     {
         // TODO: Esc timeout etc
 
-        while (InputBuffer.TryDequeue (out var input))
+        while (InputBuffer.TryDequeue (out T input))
         {
-            foreach (var released in Parser.ProcessInput (Tuple.Create (ConsoleKeyMapping.ToChar (input), input)))
+            foreach (Tuple<char, T> released in Parser.ProcessInput (Tuple.Create (ConsoleKeyMapping.ToChar (input), input)))
             {
-                Key key = ConsoleKeyMapping.ToKey (released.Item2);
+                var key = ConsoleKeyMapping.ToKey (released.Item2);
                 OnKeyDown (key);
                 OnKeyUp (key);
             }

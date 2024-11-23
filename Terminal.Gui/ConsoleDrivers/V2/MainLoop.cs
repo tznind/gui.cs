@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Terminal.Gui.ConsoleDrivers;
 using Terminal.Gui.ConsoleDrivers.V2;
-using static Terminal.Gui.WindowsConsole;
 
 namespace Terminal.Gui;
 
@@ -17,7 +16,8 @@ public class MainLoop<T> : IMainLoop<T>
 
 
     // TODO: Remove later
-    StringBuilder sb = new StringBuilder ();
+    StringBuilder sb = new StringBuilder ("*");
+    private Point _lastMousePos = new Point(0,0);
 
     public void Initialize (ConcurrentQueue<T> inputBuffer, IConsoleOutput consoleOutput)
     {
@@ -27,6 +27,7 @@ public class MainLoop<T> : IMainLoop<T>
 
         // TODO: Remove later
         InputProcessor.KeyDown += (s,k) => sb.Append (ConsoleKeyMapping.ToChar (k));
+        InputProcessor.MouseEvent += (s, e) => { _lastMousePos = e.Position; };
     }
 
 
@@ -53,12 +54,11 @@ public class MainLoop<T> : IMainLoop<T>
     {
         InputProcessor.ProcessQueue ();
 
-
         Random r = new Random ();
         OutputBuffer.SetWindowSize (20, 10);
 
         OutputBuffer.CurrentAttribute = new Attribute (Color.White, Color.Black);
-        OutputBuffer.Move (0,0);
+        OutputBuffer.Move (_lastMousePos.X,_lastMousePos.Y);
 
         foreach (var ch in sb.ToString())
         {

@@ -4,9 +4,21 @@ namespace Terminal.Gui;
 
 public abstract class AnsiResponseParserBase : IAnsiResponseParser
 {
+    private readonly MouseParser _mouseParser = new  ();
     protected object lockExpectedResponses = new ();
 
     protected object lockState = new ();
+
+    /// <summary>
+    /// Event raised when mouse events are detected - requires setting <see cref="HandleMouse"/> to true
+    /// </summary>
+    public event EventHandler<MouseEventArgs> Mouse;
+
+    /// <summary>
+    /// True to explicitly handle mouse escape sequences by passing them to <see cref="Mouse"/> event.
+    /// Defaults to <see langword="false"/>
+    /// </summary>
+    public bool HandleMouse { get; set; } = false;
 
     /// <summary>
     ///     Responses we are expecting to come in.
@@ -180,6 +192,13 @@ public abstract class AnsiResponseParserBase : IAnsiResponseParser
     {
         string cur = heldContent.HeldToString ();
 
+        if (HandleMouse && IsMouse (cur))
+        {
+            RaiseMouseEvent (cur);
+            heldContent.ClearHeld ();
+            return false;
+        }
+
         lock (lockExpectedResponses)
         {
             // Look for an expected response for what is accumulated so far (since Esc)
@@ -236,6 +255,23 @@ public abstract class AnsiResponseParserBase : IAnsiResponseParser
         }
 
         return false; // Continue accumulating
+    }
+
+    private void RaiseMouseEvent (string cur)
+    {
+        var ev = _mouseParser.ProcessMouseInput (cur);
+
+        if (ev != null)
+        {
+            Mouse?.Invoke (this,ev);
+        }
+    }
+
+    private bool IsMouse (string cur)
+    {
+        // Typically in this format
+        // ESC [ < {button_code};{x_pos};{y_pos}{final_byte}
+        return cur.EndsWith ('M') || cur.EndsWith ('m');
     }
 
     /// <summary>
