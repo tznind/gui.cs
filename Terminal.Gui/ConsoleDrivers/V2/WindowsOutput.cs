@@ -90,11 +90,13 @@ public class WindowsOutput : IConsoleOutput
         var outputBuffer = new WindowsConsole.ExtendedCharInfo [buffer.Rows * buffer.Cols];
 
         Size windowSize = WinConsole?.GetConsoleBufferWindow (out Point _) ?? new Size (buffer.Cols, buffer.Rows);
-
+        
+        // TODO: probably do need this right?
+        /*
         if (!windowSize.IsEmpty && (windowSize.Width != buffer.Cols || windowSize.Height != buffer.Rows))
         {
             return;
-        }
+        }*/
 
         var bufferCoords = new WindowsConsole.Coord
         {

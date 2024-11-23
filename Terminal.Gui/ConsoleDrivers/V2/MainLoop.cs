@@ -49,12 +49,14 @@ public class MainLoop<T> : IMainLoop<T>
         }
         while (!token.IsCancellationRequested);
     }
+
     /// <inheritdoc />
     public void Iteration ()
     {
         InputProcessor.ProcessQueue ();
 
         Random r = new Random ();
+
         OutputBuffer.SetWindowSize (20, 10);
 
         OutputBuffer.CurrentAttribute = new Attribute (Color.White, Color.Black);
