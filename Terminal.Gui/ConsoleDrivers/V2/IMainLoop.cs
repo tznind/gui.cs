@@ -12,8 +12,9 @@ public interface IMainLoop<T> : IDisposable
     /// Initializes the loop with a buffer from which data can be read
     /// </summary>
     /// <param name="inputBuffer"></param>
+    /// <param name="inputProcessor"></param>
     /// <param name="consoleOutput"></param>
-    void Initialize (ConcurrentQueue<T> inputBuffer, IConsoleOutput consoleOutput);
+    void Initialize (ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput);
 
     /// <summary>
     /// Runs <see cref="Iteration"/> in an infinite loop.

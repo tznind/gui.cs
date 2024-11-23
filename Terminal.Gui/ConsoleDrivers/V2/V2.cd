@@ -34,13 +34,13 @@
   <Class Name="Terminal.Gui.MainLoop&lt;T&gt;" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="10" Y="4.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>QQQAAAAAACAAAQQCAAAAAAAAAAAAAAACAAAAAAAAAAI=</HashCode>
+      <HashCode>QQQAAAAAACAAAQQCAAAAAAAAAAAAAAACAAAAAAABAAI=</HashCode>
       <FileName>ConsoleDrivers\V2\MainLoop.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
+      <Property Name="InputProcessor" />
       <Property Name="OutputBuffer" />
       <Property Name="Out" />
-      <Property Name="InputProcessor" />
     </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
@@ -56,14 +56,14 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.AnsiResponseParser&lt;T&gt;" Collapsed="true">
-    <Position X="16" Y="5.75" Width="2" />
+    <Position X="18.75" Y="4.75" Width="2" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAACIAAAAAAAAAAAAAgAABAAAAAABAAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\AnsiResponseParser.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Terminal.Gui.OutputBuffer" Collapsed="true">
-    <Position X="13" Y="7.5" Width="1.5" />
+    <Position X="10" Y="8.25" Width="1.5" />
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
       <Compartment Name="Methods" Collapsed="true" />
@@ -75,7 +75,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.NetOutput" Collapsed="true">
-    <Position X="13.75" Y="9.25" Width="1.5" />
+    <Position X="13.5" Y="8.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AEAAAAAAACAAAAAAAAAAAAAAAQAAAAAAMACAAAEAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\NetOutput.cs</FileName>
@@ -83,7 +83,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.WindowsOutput" Collapsed="true">
-    <Position X="12.25" Y="9.25" Width="1.5" />
+    <Position X="12" Y="8.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAABAAACAAhAAACAAAACAAAAAAAAAIAAAAAAEAAAQ=</HashCode>
       <FileName>ConsoleDrivers\V2\WindowsOutput.cs</FileName>
@@ -91,15 +91,36 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.ConsoleDrivers.V2.InputProcessor&lt;T&gt;" Collapsed="true">
-    <Position X="13" Y="5.75" Width="2" />
+    <Position X="15.75" Y="4.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AQAkAAAAAACAgAAAAAgAAAAABAIAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AQAkAAAAAACAgAAAAggAAAAABAIAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\InputProcessor.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Property Name="Parser" />
     </ShowAsAssociation>
     <Lollipop Position="0.1" />
+  </Class>
+  <Class Name="Terminal.Gui.ConsoleDrivers.V2.NetInputProcessor" Collapsed="true">
+    <Position X="16.75" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\NetInputProcessor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.ConsoleDrivers.V2.WindowsInputProcessor" Collapsed="true">
+    <Position X="14.75" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\WindowsInputProcessor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.MouseParser" Collapsed="true">
+    <Position X="20.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\MouseParser.cs</FileName>
+    </TypeIdentifier>
   </Class>
   <Interface Name="Terminal.Gui.IConsoleInput&lt;T&gt;" Collapsed="true">
     <Position X="11.5" Y="1" Width="1.5" />
@@ -116,21 +137,21 @@
     </TypeIdentifier>
   </Interface>
   <Interface Name="Terminal.Gui.IConsoleOutput" Collapsed="true">
-    <Position X="13" Y="8.25" Width="1.5" />
+    <Position X="12.75" Y="7.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\IConsoleOutput.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Terminal.Gui.IOutputBuffer" Collapsed="true">
-    <Position X="13" Y="6.5" Width="1.5" />
+    <Position X="10" Y="7.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AQAAAAAAAIAAAEAIAAAAAIAAAAEERgAAAAAACABAgAA=</HashCode>
       <FileName>ConsoleDrivers\V2\IOutputBuffer.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="Terminal.Gui.IInputProcessor" Collapsed="true">
-    <Position X="13" Y="4.75" Width="1.5" />
+  <Interface Name="Terminal.Gui.IInputProcessor">
+    <Position X="13" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAkAAAAAACAgAAAAAgAAAAABAIAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\IInputProcessor.cs</FileName>

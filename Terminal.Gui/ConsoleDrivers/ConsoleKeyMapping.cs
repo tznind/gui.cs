@@ -828,19 +828,6 @@ public static class ConsoleKeyMapping
                };
     }
 
-    public static char ToChar<T> (T result)
-    {
-        // TODO: Requires testing
-        return result switch
-               {
-                   ConsoleKeyInfo keyInfo => keyInfo.KeyChar,
-                   Key key => (char)key,
-
-                   // TODO: probably not that simple
-                   WindowsConsole.InputRecord inputRecord => inputRecord.KeyEvent.UnicodeChar,
-                   _ => throw new ArgumentException ($"Unsupported type {typeof (T).Name}")
-               };
-    }
 
     /// <summary>Maps a <see cref="ConsoleKeyInfo"/> to a <see cref="KeyCode"/>.</summary>
     /// <param name="consoleKeyInfo">The console key.</param>

@@ -5,25 +5,29 @@ namespace Terminal.Gui;
 public class MainLoopCoordinator<T> : IMainLoopCoordinator
 {
     private readonly Func<IConsoleInput<T>> _inputFactory;
+    private readonly ConcurrentQueue<T> _inputBuffer;
+    private readonly IInputProcessor _inputProcessor;
     private readonly IMainLoop<T> _loop;
     private CancellationTokenSource tokenSource = new ();
     private readonly Func<IConsoleOutput> _outputFactory;
-
-    ConcurrentQueue<T> _inputBuffer = new ();
 
     /// <summary>
     /// Creates a new coordinator
     /// </summary>
     /// <param name="inputFactory">Function to create a new input. This must call <see langword="new"/>
-    /// explicitly and cannot return an existing instance. This requirement arises because Windows
-    /// console screen buffer APIs are thread-specific for certain operations.</param>
+    ///     explicitly and cannot return an existing instance. This requirement arises because Windows
+    ///     console screen buffer APIs are thread-specific for certain operations.</param>
+    /// <param name="inputBuffer"></param>
+    /// <param name="inputProcessor"></param>
     /// <param name="outputFactory">Function to create a new output. This must call <see langword="new"/>
-    /// explicitly and cannot return an existing instance. This requirement arises because Windows
-    /// console screen buffer APIs are thread-specific for certain operations.</param>
+    ///     explicitly and cannot return an existing instance. This requirement arises because Windows
+    ///     console screen buffer APIs are thread-specific for certain operations.</param>
     /// <param name="loop"></param>
-    public MainLoopCoordinator (Func<IConsoleInput<T>> inputFactory, Func<IConsoleOutput> outputFactory, IMainLoop<T> loop)
+    public MainLoopCoordinator (Func<IConsoleInput<T>> inputFactory, ConcurrentQueue<T> inputBuffer,IInputProcessor inputProcessor, Func<IConsoleOutput> outputFactory, IMainLoop<T> loop)
     {
         _inputFactory = inputFactory;
+        _inputBuffer = inputBuffer;
+        _inputProcessor = inputProcessor;
         _outputFactory = outputFactory;
         _loop = loop;
     }
@@ -65,7 +69,7 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
         // Instance must be constructed on the thread in which it is used.
         IConsoleOutput output = _outputFactory.Invoke ();
 
-        _loop.Initialize (_inputBuffer, output);
+        _loop.Initialize (_inputBuffer, _inputProcessor, output);
 
         try
         {

@@ -1,9 +1,10 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui.ConsoleDrivers.V2;
 
-public class InputProcessor<T> : IInputProcessor
+public abstract class InputProcessor<T> : IInputProcessor
 {
     public AnsiResponseParser<T> Parser { get; } = new ();
     public ConcurrentQueue<T> InputBuffer { get; }
@@ -64,12 +65,9 @@ public class InputProcessor<T> : IInputProcessor
 
         while (InputBuffer.TryDequeue (out T input))
         {
-            foreach (Tuple<char, T> released in Parser.ProcessInput (Tuple.Create (ConsoleKeyMapping.ToChar (input), input)))
-            {
-                var key = ConsoleKeyMapping.ToKey (released.Item2);
-                OnKeyDown (key);
-                OnKeyUp (key);
-            }
+            this.Process (input);
         }
     }
+
+    protected abstract void Process (T result);
 }

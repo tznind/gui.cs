@@ -19,14 +19,14 @@ public class MainLoop<T> : IMainLoop<T>
     StringBuilder sb = new StringBuilder ("*");
     private Point _lastMousePos = new Point(0,0);
 
-    public void Initialize (ConcurrentQueue<T> inputBuffer, IConsoleOutput consoleOutput)
+    public void Initialize (ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput)
     {
         InputBuffer = inputBuffer;
         Out = consoleOutput;
-        InputProcessor = new InputProcessor<T> (inputBuffer);
+        InputProcessor = inputProcessor;
 
         // TODO: Remove later
-        InputProcessor.KeyDown += (s,k) => sb.Append (ConsoleKeyMapping.ToChar (k));
+        InputProcessor.KeyDown += (s,k) => sb.Append ((char)k);
         InputProcessor.MouseEvent += (s, e) => { _lastMousePos = e.Position; };
     }
 
