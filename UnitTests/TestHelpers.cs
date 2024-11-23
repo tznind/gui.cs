@@ -49,7 +49,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         bool useFakeClipboard = true,
         bool fakeClipboardAlwaysThrowsNotSupportedException = false,
         bool fakeClipboardIsSupportedAlwaysTrue = false,
-        ConfigLocations configLocation = ConfigLocations.None,
+        ConfigLocations configLocation = ConfigLocations.Default, // DefaultOnly is the default for tests
         bool verifyShutdown = false
     )
     {
@@ -110,7 +110,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         }
 
         // Reset to defaults
-        Locations = ConfigLocations.DefaultOnly;
+        Locations = ConfigLocations.Default;
         Reset ();
 
         // Enable subsequent tests that call Init to get all config files (the default).

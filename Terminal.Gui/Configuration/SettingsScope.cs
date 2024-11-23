@@ -117,8 +117,13 @@ public class SettingsScope : Scope<SettingsScope>
     /// <param name="source">The source (filename/resource name) the Json document was read from.</param>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public SettingsScope? Update (string json, string source)
+    public SettingsScope? Update (string? json, string source)
     {
+        //if (string.IsNullOrEmpty (json))
+        //{
+        //    Debug.WriteLine ($"ConfigurationManager: Configuration file \"{source}\" is empty.");
+        //    return this;
+        //}
         var stream = new MemoryStream ();
         var writer = new StreamWriter (stream);
         writer.Write (json);
