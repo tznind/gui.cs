@@ -1,18 +1,19 @@
 ﻿namespace Terminal.Gui.ConsoleDrivers.V2;
 class ConsoleDriverFacade<T> : IConsoleDriver
 {
-    
     private readonly IConsoleOutput _output;
     private readonly IConsoleInput<T> _input;
     private readonly InputProcessor<T> _inputProcessor;
     private readonly IOutputBuffer _outputBuffer;
+    private readonly AnsiRequestScheduler _ansiRequestScheduler;
 
-    public ConsoleDriverFacade (IConsoleInput<T> input,InputProcessor<T> inputProcessor,IOutputBuffer outputBuffer, IConsoleOutput output )
+    public ConsoleDriverFacade (IConsoleInput<T> input,InputProcessor<T> inputProcessor,IOutputBuffer outputBuffer, IConsoleOutput output, AnsiRequestScheduler ansiRequestScheduler)
     {
         _output = output;
         _input = input;
         _inputProcessor = inputProcessor;
         _outputBuffer = outputBuffer;
+        _ansiRequestScheduler = ansiRequestScheduler;
     }
     /// <summary>
     /// How long after Esc has been pressed before we give up on getting an Ansi escape sequence
@@ -185,7 +186,7 @@ class ConsoleDriverFacade<T> : IConsoleDriver
 
     /// <summary>Returns the name of the driver and relevant library version information.</summary>
     /// <returns></returns>
-    public string GetVersionInfo ();
+    public string GetVersionInfo () { return GetType ().Name; }
 
     /// <summary>Tests if the specified rune is supported by the driver.</summary>
     /// <param name="rune"></param>
@@ -289,14 +290,14 @@ class ConsoleDriverFacade<T> : IConsoleDriver
     /// Queues the given <paramref name="request"/> for execution
     /// </summary>
     /// <param name="request"></param>
-    public void QueueAnsiRequest (AnsiEscapeSequenceRequest request);
+    public void QueueAnsiRequest (AnsiEscapeSequenceRequest request) => _ansiRequestScheduler.SendOrSchedule (request);
 
-    public AnsiRequestScheduler GetRequestScheduler ();
+    public AnsiRequestScheduler GetRequestScheduler () => _ansiRequestScheduler;
 
     /// <summary>
     /// Writes the given <paramref name="str"/> directly to the console (rather than the output
     /// draw buffer).
     /// </summary>
     /// <param name="str"></param>
-    public void RawWrite (string str);
+    public void RawWrite (string str) => _output.Write (str);
 }
