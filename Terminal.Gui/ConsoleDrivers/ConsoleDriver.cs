@@ -364,25 +364,6 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// </summary>
     public event EventHandler<EventArgs>? ClearedContents;
 
-    /// <summary>
-    /// Sets <see cref="Contents"/> as dirty for situations where views
-    /// don't need layout and redrawing, but just refresh the screen.
-    /// </summary>
-    public void SetContentsAsDirty ()
-    {
-        lock (Contents!)
-        {
-            for (var row = 0; row < Rows; row++)
-            {
-                for (var c = 0; c < Cols; c++)
-                {
-                    Contents [row, c].IsDirty = true;
-                }
-                _dirtyLines! [row] = true;
-            }
-        }
-    }
-
     /// <summary>Determines if the terminal cursor should be visible or not and sets it accordingly.</summary>
     /// <returns><see langword="true"/> upon success</returns>
     public abstract bool EnsureCursorVisibility ();

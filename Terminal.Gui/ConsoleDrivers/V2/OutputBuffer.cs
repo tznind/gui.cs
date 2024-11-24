@@ -42,7 +42,7 @@ public class OutputBuffer : IOutputBuffer
     }
 
     /// <summary>The leftmost column in the terminal.</summary>
-    internal virtual int Left { get; set; } = 0;
+    public virtual int Left { get; set; } = 0;
 
     /// <summary>
     ///     Gets the row last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
@@ -81,7 +81,7 @@ public class OutputBuffer : IOutputBuffer
 
 
     /// <summary>The topmost row in the terminal.</summary>
-    internal virtual int Top { get; set; } = 0;
+    public virtual int Top { get; set; } = 0;
 
 
     // As performance is a concern, we keep track of the dirty lines and only refresh those.
@@ -99,7 +99,7 @@ public class OutputBuffer : IOutputBuffer
     ///     to.
     /// </summary>
     /// <value>The rectangle describing the of <see cref="Clip"/> region.</value>
-    internal Region? Clip
+    public Region? Clip
     {
         get => _clip;
         set
@@ -385,6 +385,31 @@ public class OutputBuffer : IOutputBuffer
         Cols = cols;
         Rows = rows;
         ClearContents ();
+    }
+
+    /// <inheritdoc />
+    public void FillRect (Rectangle rect, Rune rune)
+    {
+        // BUGBUG: This should be a method on Region
+        rect = Rectangle.Intersect (rect, Clip?.GetBounds () ?? Screen);
+        lock (Contents!)
+        {
+            for (int r = rect.Y; r < rect.Y + rect.Height; r++)
+            {
+                for (int c = rect.X; c < rect.X + rect.Width; c++)
+                {
+                    if (!IsValidLocation (rune, c, r))
+                    {
+                        continue;
+                    }
+                    Contents [r, c] = new Cell
+                    {
+                        Rune = (rune != default ? rune : (Rune)' '),
+                        Attribute = CurrentAttribute, IsDirty = true
+                    };
+                }
+            }
+        }
     }
 
     // TODO: Make internal once Menu is upgraded

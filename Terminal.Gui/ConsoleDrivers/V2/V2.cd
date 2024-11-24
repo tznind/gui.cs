@@ -62,7 +62,7 @@
       <FileName>ConsoleDrivers\AnsiResponseParser\AnsiResponseParser.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Terminal.Gui.OutputBuffer" Collapsed="true">
+  <Class Name="Terminal.Gui.OutputBuffer">
     <Position X="10" Y="8.25" Width="1.5" />
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
@@ -146,7 +146,7 @@
   <Interface Name="Terminal.Gui.IOutputBuffer" Collapsed="true">
     <Position X="10" Y="7.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AQAAAAAAAIAAAEAIAAAAAIAAAAEERgAAAAAACABAgAA=</HashCode>
+      <HashCode>AQAAAAAAAIAAAEAIAAAAAIAAAAEERgAAAAAAKABAgAA=</HashCode>
       <FileName>ConsoleDrivers\V2\IOutputBuffer.cs</FileName>
     </TypeIdentifier>
   </Interface>

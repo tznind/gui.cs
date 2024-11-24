@@ -14,6 +14,13 @@ public interface IOutputBuffer
     Cell [,] Contents { get; set; }
 
     /// <summary>
+    ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
+    ///     to.
+    /// </summary>
+    /// <value>The rectangle describing the of <see cref="Clip"/> region.</value>
+    public Region? Clip { get; set; }
+
+    /// <summary>
     /// The <see cref="Attribute"/> that will be used for the next AddRune or AddStr call.
     /// </summary>
     Attribute CurrentAttribute { get; set; }
@@ -36,6 +43,10 @@ public interface IOutputBuffer
     ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
     /// </summary>
     public int Col { get; }
+
+    int Left { get; set; }
+    int Top { get; set; }
+
     /// <summary>
     /// Updates the column and row to the specified location in the buffer.
     /// </summary>
@@ -77,4 +88,7 @@ public interface IOutputBuffer
     /// <param name="cols"></param>
     /// <param name="rows"></param>
     void SetWindowSize (int cols, int rows);
+
+    void FillRect (Rectangle rect, Rune rune);
+    void FillRect (Rectangle rect, char rune);
 }

@@ -1,60 +1,97 @@
-namespace Terminal.Gui;
-
-public interface IConsoleDriver
+﻿namespace Terminal.Gui.ConsoleDrivers.V2;
+class ConsoleDriverFacade<T> : IConsoleDriver
 {
+    
+    private readonly IConsoleOutput _output;
+    private readonly IConsoleInput<T> _input;
+    private readonly InputProcessor<T> _inputProcessor;
+    private readonly IOutputBuffer _outputBuffer;
 
+    public ConsoleDriverFacade (IConsoleInput<T> input,InputProcessor<T> inputProcessor,IOutputBuffer outputBuffer, IConsoleOutput output )
+    {
+        _output = output;
+        _input = input;
+        _inputProcessor = inputProcessor;
+        _outputBuffer = outputBuffer;
+    }
     /// <summary>
     /// How long after Esc has been pressed before we give up on getting an Ansi escape sequence
     /// </summary>
-    TimeSpan EscTimeout { get; }
+    public TimeSpan EscTimeout { get; } = TimeSpan.FromMilliseconds (50);
 
     /// <summary>Gets the location and size of the terminal screen.</summary>
-    Rectangle Screen { get; }
+    public Rectangle Screen => new (new (0,0),_output.GetWindowSize ());
 
     /// <summary>
     ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
     ///     to.
     /// </summary>
     /// <value>The rectangle describing the of <see cref="Clip"/> region.</value>
-    Region Clip { get; set; }
+    public Region Clip {
+        get => _outputBuffer.Clip;
+        set => _outputBuffer.Clip = value;
+    }
 
+    // TODO: Clipboard support
     /// <summary>Get the operating system clipboard.</summary>
-    IClipboard Clipboard { get; }
+    public IClipboard Clipboard { get; } = new FakeDriver.FakeClipboard ();
 
     /// <summary>
     ///     Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
     ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
     /// </summary>
-    int Col { get; }
+    public int Col => _outputBuffer.Col;
 
     /// <summary>The number of columns visible in the terminal.</summary>
-    int Cols { get; set; }
+    public int Cols
+    {
+        get => _outputBuffer.Cols;
+        set => _outputBuffer.Cols = value;
+    }
 
     /// <summary>
     ///     The contents of the application output. The driver outputs this buffer to the terminal when
     ///     <see cref="UpdateScreen"/> is called.
     ///     <remarks>The format of the array is rows, columns. The first index is the row, the second index is the column.</remarks>
     /// </summary>
-    Cell [,] Contents { get; set; }
+    public Cell [,] Contents
+    {
+        get => _outputBuffer.Contents;
+        set => _outputBuffer.Contents = value;
+    }
 
     /// <summary>The leftmost column in the terminal.</summary>
-    int Left { get; set; }
+    public int Left
+    {
+        get => _outputBuffer.Left; set => _outputBuffer.Left = value; }
 
     /// <summary>
     ///     Gets the row last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
     ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
     /// </summary>
-    int Row { get; }
+    public int Row => _outputBuffer.Row;
 
     /// <summary>The number of rows visible in the terminal.</summary>
-    int Rows { get; set; }
+    public int Rows
+    {
+        get => _outputBuffer.Rows;
+        set => _outputBuffer.Rows = value;
+    }
 
     /// <summary>The topmost row in the terminal.</summary>
-    int Top { get; set; }
+    public int Top
+    {
+        get => _outputBuffer.Top;
+        set => _outputBuffer.Top = value;
+    }
+
+    // TODO: Probably not everyone right?
 
     /// <summary>Gets whether the <see cref="ConsoleDriver"/> supports TrueColor output.</summary>
-    bool SupportsTrueColor { get; }
+    public bool SupportsTrueColor => true;
 
+
+    // TODO: Currently ignored
     /// <summary>
     ///     Gets or sets whether the <see cref="ConsoleDriver"/> should use 16 colors instead of the default TrueColors.
     ///     See <see cref="Application.Force16Colors"/> to change this setting via <see cref="ConfigurationManager"/>.
@@ -65,13 +102,17 @@ public interface IConsoleDriver
     ///         <see langword="false"/>, indicating that the <see cref="ConsoleDriver"/> cannot support TrueColor.
     ///     </para>
     /// </remarks>
-    bool Force16Colors { get; set; }
+    public bool Force16Colors { get; set; }
 
     /// <summary>
     ///     The <see cref="Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or <see cref="AddStr"/>
     ///     call.
     /// </summary>
-    Attribute CurrentAttribute { get; set; }
+    public Attribute CurrentAttribute
+    {
+        get => _outputBuffer.CurrentAttribute;
+        set => _outputBuffer.CurrentAttribute = value;
+    }
 
     /// <summary>Adds the specified rune to the display at the current cursor position.</summary>
     /// <remarks>
@@ -87,14 +128,14 @@ public interface IConsoleDriver
     ///     </para>
     /// </remarks>
     /// <param name="rune">Rune to add.</param>
-    void AddRune (Rune rune);
+    public void AddRune (Rune rune) => _outputBuffer.AddRune (rune);
 
     /// <summary>
     ///     Adds the specified <see langword="char"/> to the display at the current cursor position. This method is a
     ///     convenience method that calls <see cref="ConsoleDriver.AddRune(System.Text.Rune)"/> with the <see cref="Rune"/> constructor.
     /// </summary>
     /// <param name="c">Character to add.</param>
-    void AddRune (char c);
+    public void AddRune (char c) => _outputBuffer.AddRune (c);
 
     /// <summary>Adds the <paramref name="str"/> to the display at the cursor position.</summary>
     /// <remarks>
@@ -106,15 +147,20 @@ public interface IConsoleDriver
     ///     <para>If <paramref name="str"/> requires more columns than are available, the output will be clipped.</para>
     /// </remarks>
     /// <param name="str">String.</param>
-    void AddStr (string str);
+    public void AddStr (string str) => _outputBuffer.AddStr (str);
 
     /// <summary>Clears the <see cref="ConsoleDriver.Contents"/> of the driver.</summary>
-    void ClearContents ();
+    public void ClearContents ()
+    {
+        _outputBuffer.ClearContents ();
+        ClearedContents?.Invoke (this,new MouseEventArgs ());
+    }
 
     /// <summary>
     ///     Raised each time <see cref="ConsoleDriver.ClearContents"/> is called. For benchmarking.
     /// </summary>
-    event EventHandler<EventArgs> ClearedContents;
+    public event EventHandler<EventArgs> ClearedContents;
+
 
     /// <summary>Fills the specified rectangle with the specified rune, using <see cref="ConsoleDriver.CurrentAttribute"/></summary>
     /// <remarks>
@@ -122,7 +168,7 @@ public interface IConsoleDriver
     /// </remarks>
     /// <param name="rect">The Screen-relative rectangle.</param>
     /// <param name="rune">The Rune used to fill the rectangle</param>
-    void FillRect (Rectangle rect, Rune rune = default);
+    public void FillRect (Rectangle rect, Rune rune = default) => _outputBuffer.FillRect (rect, rune);
 
     /// <summary>
     ///     Fills the specified rectangle with the specified <see langword="char"/>. This method is a convenience method
@@ -130,16 +176,16 @@ public interface IConsoleDriver
     /// </summary>
     /// <param name="rect"></param>
     /// <param name="c"></param>
-    void FillRect (Rectangle rect, char c);
+    public void FillRect (Rectangle rect, char c) => _outputBuffer.FillRect (rect, c);
 
     /// <summary>Gets the terminal cursor visibility.</summary>
     /// <param name="visibility">The current <see cref="CursorVisibility"/></param>
     /// <returns><see langword="true"/> upon success</returns>
-    bool GetCursorVisibility (out CursorVisibility visibility);
+    public bool GetCursorVisibility (out CursorVisibility visibility);
 
     /// <summary>Returns the name of the driver and relevant library version information.</summary>
     /// <returns></returns>
-    string GetVersionInfo ();
+    public string GetVersionInfo ();
 
     /// <summary>Tests if the specified rune is supported by the driver.</summary>
     /// <param name="rune"></param>
@@ -147,7 +193,7 @@ public interface IConsoleDriver
     ///     <see langword="true"/> if the rune can be properly presented; <see langword="false"/> if the driver does not
     ///     support displaying this rune.
     /// </returns>
-    bool IsRuneSupported (Rune rune);
+    public bool IsRuneSupported (Rune rune) => Rune.IsValid(rune.Value);
 
     /// <summary>Tests whether the specified coordinate are valid for drawing the specified Rune.</summary>
     /// <param name="rune">Used to determine if one or two columns are required.</param>
@@ -157,7 +203,7 @@ public interface IConsoleDriver
     ///     <see langword="false"/> if the coordinate is outside the screen bounds or outside of <see cref="ConsoleDriver.Clip"/>.
     ///     <see langword="true"/> otherwise.
     /// </returns>
-    bool IsValidLocation (Rune rune, int col, int row);
+    public bool IsValidLocation (Rune rune, int col, int row) => _outputBuffer.IsValidLocation (rune, col, row);
 
     /// <summary>
     ///     Updates <see cref="ConsoleDriver.Col"/> and <see cref="ConsoleDriver.Row"/> to the specified column and row in <see cref="ConsoleDriver.Contents"/>.
@@ -172,62 +218,64 @@ public interface IConsoleDriver
     /// </remarks>
     /// <param name="col">Column to move to.</param>
     /// <param name="row">Row to move to.</param>
-    void Move (int col, int row);
+    public void Move (int col, int row) => _outputBuffer.Move (col, row);
+
+    // TODO: Probably part of output
 
     /// <summary>Sets the terminal cursor visibility.</summary>
     /// <param name="visibility">The wished <see cref="CursorVisibility"/></param>
     /// <returns><see langword="true"/> upon success</returns>
-    bool SetCursorVisibility (CursorVisibility visibility);
+    public bool SetCursorVisibility (CursorVisibility visibility);
 
     /// <summary>The event fired when the terminal is resized.</summary>
-    event EventHandler<SizeChangedEventArgs> SizeChanged;
+    public event EventHandler<SizeChangedEventArgs> SizeChanged;
 
-    /// <summary>Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.</summary>
-    /// <remarks>This is only implemented in <see cref="CursesDriver"/>.</remarks>
-    void Suspend ();
+    // TODO: probably output
 
     /// <summary>Sets the position of the terminal cursor to <see cref="ConsoleDriver.Col"/> and <see cref="ConsoleDriver.Row"/>.</summary>
-    void UpdateCursor ();
+    public void UpdateCursor ();
 
     /// <summary>Redraws the physical screen with the contents that have been queued up via any of the printing commands.</summary>
     /// <returns><see langword="true"/> if any updates to the screen were made.</returns>
-    bool UpdateScreen ();
+    public bool UpdateScreen ();
 
     /// <summary>Initializes the driver</summary>
     /// <returns>Returns an instance of <see cref="MainLoop"/> using the <see cref="IMainLoopDriver"/> for the driver.</returns>
-    MainLoop Init ();
+    public MainLoop Init ();
 
     /// <summary>Ends the execution of the console driver.</summary>
-    void End ();
+    public void End ()
+    {
+        // TODO: Nope
+    }
 
     /// <summary>Selects the specified attribute as the attribute to use for future calls to AddRune and AddString.</summary>
     /// <remarks>Implementations should call <c>base.SetAttribute(c)</c>.</remarks>
     /// <param name="c">C.</param>
-    Attribute SetAttribute (Attribute c);
+    public Attribute SetAttribute (Attribute c) => _outputBuffer.CurrentAttribute = c;
 
     /// <summary>Gets the current <see cref="Attribute"/>.</summary>
     /// <returns>The current attribute.</returns>
-    Attribute GetAttribute ();
+    public Attribute GetAttribute () => _outputBuffer.CurrentAttribute;
 
     /// <summary>Makes an <see cref="Attribute"/>.</summary>
     /// <param name="foreground">The foreground color.</param>
     /// <param name="background">The background color.</param>
     /// <returns>The attribute for the foreground and background colors.</returns>
-    Attribute MakeColor (in Color foreground, in Color background);
+    public Attribute MakeColor (in Color foreground, in Color background);
 
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="ConsoleDriver.KeyUp"/>.</summary>
-    event EventHandler<Key> KeyDown;
-
+    public event EventHandler<Key> KeyDown;
 
     /// <summary>Event fired when a key is released.</summary>
     /// <remarks>
     ///     Drivers that do not support key release events will fire this event after <see cref="ConsoleDriver.KeyDown"/> processing is
     ///     complete.
     /// </remarks>
-    event EventHandler<Key> KeyUp;
+    public event EventHandler<Key> KeyUp;
 
     /// <summary>Event fired when a mouse event occurs.</summary>
-    event EventHandler<MouseEventArgs> MouseEvent;
+    public event EventHandler<MouseEventArgs> MouseEvent;
 
     /// <summary>Simulates a key press.</summary>
     /// <param name="keyChar">The key character.</param>
@@ -235,20 +283,20 @@ public interface IConsoleDriver
     /// <param name="shift">If <see langword="true"/> simulates the Shift key being pressed.</param>
     /// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
     /// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
-    void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
+    public void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
 
     /// <summary>
     /// Queues the given <paramref name="request"/> for execution
     /// </summary>
     /// <param name="request"></param>
-    void QueueAnsiRequest (AnsiEscapeSequenceRequest request);
+    public void QueueAnsiRequest (AnsiEscapeSequenceRequest request);
 
-    AnsiRequestScheduler GetRequestScheduler ();
+    public AnsiRequestScheduler GetRequestScheduler ();
 
     /// <summary>
     /// Writes the given <paramref name="str"/> directly to the console (rather than the output
     /// draw buffer).
     /// </summary>
     /// <param name="str"></param>
-    void RawWrite (string str);
+    public void RawWrite (string str);
 }
