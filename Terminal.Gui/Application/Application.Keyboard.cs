@@ -4,7 +4,7 @@ namespace Terminal.Gui;
 public static partial class Application // Keyboard handling
 {
     /// <summary>
-    ///     Called when the user presses a key (by the <see cref="ConsoleDriver"/>). Raises the cancelable
+    ///     Called when the user presses a key (by the <see cref="IConsoleDriver"/>). Raises the cancelable
     ///     <see cref="KeyDown"/> event, then calls <see cref="View.NewKeyDownEvent"/> on all top level views, and finally
     ///     if the key was not handled, invokes any Application-scoped <see cref="KeyBindings"/>.
     /// </summary>
@@ -111,7 +111,7 @@ public static partial class Application // Keyboard handling
     public static event EventHandler<Key>? KeyDown;
 
     /// <summary>
-    ///     Called when the user releases a key (by the <see cref="ConsoleDriver"/>). Raises the cancelable <see cref="KeyUp"/>
+    ///     Called when the user releases a key (by the <see cref="IConsoleDriver"/>). Raises the cancelable <see cref="KeyUp"/>
     ///     event
     ///     then calls <see cref="View.NewKeyUpEvent"/> on all top level views. Called after <see cref="RaiseKeyDownEvent"/>.
     /// </summary>
@@ -290,7 +290,15 @@ public static partial class Application // Keyboard handling
         }
         else
         {
-            KeyBindings.ReplaceKey (oldKey, newKey);
+            if (KeyBindings.TryGet(oldKey, out KeyBinding binding))
+            {
+                KeyBindings.Remove (oldKey);
+                KeyBindings.Add (newKey, binding);
+            }
+            else
+            {
+                KeyBindings.Add (newKey, binding);
+            }
         }
     }
 

@@ -76,7 +76,7 @@ public class FakeDriver : ConsoleDriver
         }
     }
 
-    internal override void End ()
+    public override void End ()
     {
         FakeConsole.ResetColor ();
         FakeConsole.Clear ();
@@ -84,7 +84,7 @@ public class FakeDriver : ConsoleDriver
 
     private FakeMainLoop _mainLoopDriver;
 
-    internal override MainLoop Init ()
+    public override MainLoop Init ()
     {
         FakeConsole.MockKeyPresses.Clear ();
 
@@ -392,13 +392,8 @@ public class FakeDriver : ConsoleDriver
         MockKeyPressedHandler (new ConsoleKeyInfo (keyChar, key, shift, alt, control));
     }
 
-    private AnsiResponseParser _parser = new ();
-
     /// <inheritdoc />
-    internal override IAnsiResponseParser GetParser () => _parser;
-
-    /// <inheritdoc />
-    internal override void RawWrite (string str) { }
+    public override void WriteRaw (string ansi) { throw new NotImplementedException (); }
 
     public void SetBufferSize (int width, int height)
     {
