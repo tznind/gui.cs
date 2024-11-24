@@ -29,7 +29,7 @@ public class OutputBuffer : IOutputBuffer
         get => _currentAttribute;
         set
         {
-            // TODO: This makes ConsoleDriver dependent on Application, which is not ideal. Once Attribute.PlatformColor is removed, this can be fixed.
+            // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. Once Attribute.PlatformColor is removed, this can be fixed.
             if (Application.Driver is { })
             {
                 _currentAttribute = new Attribute (value.Foreground, value.Background);

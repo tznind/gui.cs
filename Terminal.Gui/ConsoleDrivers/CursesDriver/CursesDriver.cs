@@ -19,7 +19,7 @@ internal class CursesDriver : ConsoleDriver
     private UnixMainLoop _mainLoopDriver;
     private object _processInputToken;
 
-    internal override int Cols
+    public override int Cols
     {
         get => Curses.Cols;
         set
@@ -29,7 +29,7 @@ internal class CursesDriver : ConsoleDriver
         }
     }
 
-    internal override int Rows
+    public override int Rows
     {
         get => Curses.Lines;
         set
@@ -190,7 +190,7 @@ internal class CursesDriver : ConsoleDriver
     }
 
     /// <inheritdoc />
-    internal override void RawWrite (string str)
+    public override void RawWrite (string str)
     {
         Console.Out.Write (str);
     }
@@ -457,7 +457,7 @@ internal class CursesDriver : ConsoleDriver
         return true;
     }
 
-    internal override void End ()
+    public override void End ()
     {
         StopReportingMouseMoves ();
         SetCursorVisibility (CursorVisibility.Default);
@@ -479,7 +479,7 @@ internal class CursesDriver : ConsoleDriver
         Curses.endwin ();
     }
 
-    internal override MainLoop Init ()
+    public override MainLoop Init ()
     {
         _mainLoopDriver = new UnixMainLoop (this);
 
@@ -592,7 +592,7 @@ internal class CursesDriver : ConsoleDriver
 
     private readonly AnsiResponseParser _parser = new ();
     /// <inheritdoc />
-    internal override IAnsiResponseParser GetParser () => _parser;
+    public override IAnsiResponseParser GetParser () => _parser;
 
     internal void ProcessInput ()
     {

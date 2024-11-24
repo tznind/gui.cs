@@ -48,7 +48,7 @@ public class AnsiEscapeSequenceRequest
     public required string Terminator { get; init; }
 
     /// <summary>
-    ///     Sends the <see cref="Request"/> to the raw output stream of the current <see cref="ConsoleDriver"/>.
+    ///     Sends the <see cref="Request"/> to the raw output stream of the current <see cref="IConsoleDriver"/>.
     ///     Only call this method from the main UI thread. You should use <see cref="AnsiRequestScheduler"/> if
     ///     sending many requests.
     /// </summary>

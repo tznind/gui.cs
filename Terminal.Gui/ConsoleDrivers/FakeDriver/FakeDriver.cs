@@ -1,5 +1,5 @@
 ﻿//
-// FakeDriver.cs: A fake ConsoleDriver for unit tests. 
+// FakeDriver.cs: A fake IConsoleDriver for unit tests. 
 //
 
 using System.Diagnostics;
@@ -10,7 +10,7 @@ using Terminal.Gui.ConsoleDrivers;
 
 namespace Terminal.Gui;
 
-/// <summary>Implements a mock ConsoleDriver for unit testing</summary>
+/// <summary>Implements a mock IConsoleDriver for unit testing</summary>
 public class FakeDriver : ConsoleDriver
 {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -76,7 +76,7 @@ public class FakeDriver : ConsoleDriver
         }
     }
 
-    internal override void End ()
+    public override void End ()
     {
         FakeConsole.ResetColor ();
         FakeConsole.Clear ();
@@ -84,7 +84,7 @@ public class FakeDriver : ConsoleDriver
 
     private FakeMainLoop _mainLoopDriver;
 
-    internal override MainLoop Init ()
+    public override MainLoop Init ()
     {
         FakeConsole.MockKeyPresses.Clear ();
 
@@ -395,10 +395,10 @@ public class FakeDriver : ConsoleDriver
     private AnsiResponseParser _parser = new ();
 
     /// <inheritdoc />
-    internal override IAnsiResponseParser GetParser () => _parser;
+    public override IAnsiResponseParser GetParser () => _parser;
 
     /// <inheritdoc />
-    internal override void RawWrite (string str) { }
+    public override void RawWrite (string str) { }
 
     public void SetBufferSize (int width, int height)
     {

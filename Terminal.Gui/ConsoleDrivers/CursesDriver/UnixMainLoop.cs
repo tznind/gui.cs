@@ -47,7 +47,7 @@ internal class UnixMainLoop : IMainLoopDriver
     private Pollfd [] _pollMap;
     private bool _winChanged;
 
-    public UnixMainLoop (ConsoleDriver consoleDriver = null)
+    public UnixMainLoop (IConsoleDriver consoleDriver = null)
     {
         // UnixDriver doesn't use the consoleDriver parameter, but the WindowsDriver does.
         _cursesDriver = (CursesDriver)Application.Driver;

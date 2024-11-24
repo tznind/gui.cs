@@ -9,7 +9,7 @@ namespace Terminal.Gui;
 ///     to prevent console becoming unresponsive and handles evicting ignored requests (no reply from
 ///     terminal).
 /// </summary>
-internal class AnsiRequestScheduler
+public class AnsiRequestScheduler
 {
     private readonly IAnsiResponseParser _parser;
 

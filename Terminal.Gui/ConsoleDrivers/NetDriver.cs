@@ -140,13 +140,13 @@ internal class NetEvents : IDisposable
     //CancellationTokenSource _waitForStartCancellationTokenSource;
     private readonly ManualResetEventSlim _winChange = new (false);
     private readonly BlockingCollection<InputResult?> _inputQueue = new (new ConcurrentQueue<InputResult?> ());
-    private readonly ConsoleDriver _consoleDriver;
+    private readonly IConsoleDriver _consoleDriver;
 
     public EscSeqRequests EscSeqRequests { get; } = new ();
 
     public AnsiResponseParser<ConsoleKeyInfo> Parser { get; private set; } = new ();
 
-    public NetEvents (ConsoleDriver consoleDriver)
+    public NetEvents (IConsoleDriver consoleDriver)
     {
         _consoleDriver = consoleDriver ?? throw new ArgumentNullException (nameof (consoleDriver));
 
@@ -992,15 +992,15 @@ internal class NetDriver : ConsoleDriver
     }
 
     /// <inheritdoc />
-    internal override IAnsiResponseParser GetParser () => _mainLoopDriver._netEvents.Parser;
+    public override IAnsiResponseParser GetParser () => _mainLoopDriver._netEvents.Parser;
 
     /// <inheritdoc />
-    internal override void RawWrite (string str)
+    public override void RawWrite (string str)
     {
         Console.Write (str);
     }
 
-    internal override void End ()
+    public override void End ()
     {
         if (IsWinPlatform)
         {
@@ -1022,7 +1022,7 @@ internal class NetDriver : ConsoleDriver
         }
     }
 
-    internal override MainLoop Init ()
+    public override MainLoop Init ()
     {
         PlatformID p = Environment.OSVersion.Platform;
 
@@ -1558,7 +1558,7 @@ internal class NetMainLoop : IMainLoopDriver
     /// <remarks>Passing a consoleDriver is provided to capture windows resizing.</remarks>
     /// <param name="consoleDriver">The console driver used by this Net main loop.</param>
     /// <exception cref="ArgumentNullException"></exception>
-    public NetMainLoop (ConsoleDriver consoleDriver = null)
+    public NetMainLoop (IConsoleDriver consoleDriver = null)
     {
         if (consoleDriver is null)
         {

@@ -248,7 +248,7 @@ public class ApplicationTests
     [InlineData (typeof (CursesDriver))]
     public void Init_DriverName_Should_Pick_Correct_Driver (Type driverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driverName: driverType.Name);
         Assert.NotNull (Application.Driver);
         Assert.NotEqual (driver, Application.Driver);
