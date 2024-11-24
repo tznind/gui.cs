@@ -189,7 +189,7 @@ public class ConfigurationManagerTests
         Updated += ConfigurationManager_Updated;
         var fired = false;
 
-        void ConfigurationManager_Updated (object? sender, ConfigurationManagerEventArgs obj)
+        void ConfigurationManager_Updated (object sender, ConfigurationManagerEventArgs obj)
         {
             fired = true;
         }
@@ -285,7 +285,7 @@ public class ConfigurationManagerTests
         Updated += ConfigurationManager_Updated;
         var fired = false;
 
-        void ConfigurationManager_Updated (object? sender, ConfigurationManagerEventArgs obj)
+        void ConfigurationManager_Updated (object sender, ConfigurationManagerEventArgs obj)
         {
             fired = true;
         }
@@ -522,7 +522,7 @@ public class ConfigurationManagerTests
         // Change Base
         Stream json = ToStream ();
 
-        Settings!.Update (json, "TestConfigurationManagerInitDriver");
+        Settings!.Update (json, "TestConfigurationManagerInitDriver", ConfigLocations.Runtime);
 
         Dictionary<string, ColorScheme> colorSchemes =
             (Dictionary<string, ColorScheme>)Themes [Themes.Theme] ["ColorSchemes"].PropertyValue;
@@ -580,7 +580,7 @@ public class ConfigurationManagerTests
 				}
 			}";
 
-        Settings!.Update (json, "test");
+        Settings!.Update (json, "test", ConfigLocations.Runtime);
 
         // AbNormal is not a ColorScheme attribute
         json = @"
@@ -603,7 +603,7 @@ public class ConfigurationManagerTests
 				}
 			}";
 
-        Settings.Update (json, "test");
+        Settings.Update (json, "test", ConfigLocations.Runtime);
 
         // Modify hotNormal background only
         json = @"
@@ -625,9 +625,9 @@ public class ConfigurationManagerTests
 				}
 			}";
 
-        Settings.Update (json, "test");
+        Settings.Update (json, "test", ConfigLocations.Runtime);
 
-        Settings.Update ("{}}", "test");
+        Settings.Update ("{}}", "test", ConfigLocations.Runtime);
 
         Assert.NotEqual (0, _jsonErrors.Length);
 
@@ -663,7 +663,7 @@ public class ConfigurationManagerTests
 				]
 			}";
 
-        var jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test"));
+        var jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test", ConfigLocations.Runtime));
         Assert.Equal ("Unexpected color name: brownish.", jsonException.Message);
 
         // AbNormal is not a ColorScheme attribute
@@ -687,7 +687,7 @@ public class ConfigurationManagerTests
 				]
 			}";
 
-        jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test"));
+        jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test", ConfigLocations.Runtime));
         Assert.Equal ("Unrecognized ColorScheme Attribute name: AbNormal.", jsonException.Message);
 
         // Modify hotNormal background only
@@ -710,7 +710,7 @@ public class ConfigurationManagerTests
 				]
 			}";
 
-        jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test"));
+        jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test", ConfigLocations.Runtime));
         Assert.Equal ("Both Foreground and Background colors must be provided.", jsonException.Message);
 
         // Unknown property
@@ -719,7 +719,7 @@ public class ConfigurationManagerTests
 				""Unknown"" : ""Not known""
 			}";
 
-        jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test"));
+        jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test", ConfigLocations.Runtime));
         Assert.StartsWith ("Unknown property", jsonException.Message);
 
         Assert.Equal (0, _jsonErrors.Length);
@@ -735,7 +735,7 @@ public class ConfigurationManagerTests
         GetHardCodedDefaults ();
         Stream stream = ToStream ();
 
-        Settings!.Update (stream, "TestConfigurationManagerToJson");
+        Settings!.Update (stream, "TestConfigurationManagerToJson", ConfigLocations.Runtime);
     }
 
     [Fact]
@@ -884,7 +884,7 @@ public class ConfigurationManagerTests
         Reset ();
         ThrowOnJsonErrors = true;
 
-        Settings!.Update (json, "TestConfigurationManagerUpdateFromJson");
+        Settings!.Update (json, "TestConfigurationManagerUpdateFromJson", ConfigLocations.Runtime);
 
         Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
         Assert.Equal (KeyCode.Z | KeyCode.AltMask, ((Key)Settings ["Application.QuitKey"].PropertyValue)!.KeyCode);

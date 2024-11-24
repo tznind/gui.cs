@@ -23,7 +23,7 @@ public class SettingsScopeTests
                            }
                    """;
 
-        Settings!.Update (json, "test");
+        Settings!.Update (json, "test", ConfigLocations.Runtime);
 
         // assert
         Assert.Equal (Key.Q.WithCtrl, (Key)Settings ["Application.QuitKey"].PropertyValue);
