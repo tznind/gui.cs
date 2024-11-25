@@ -222,15 +222,20 @@ public class ScenarioTests : TestsAllViews
                 initialized = true;
                 Application.Iteration += OnApplicationOnIteration;
                 Application.Driver!.ClearedContents += (sender, args) => clearedContentCount++;
-                Application.Driver!.Refreshed += (sender, args) =>
-                                                 {
-                                                     refreshedCount++;
 
-                                                     if (args.CurrentValue)
-                                                     {
-                                                         updatedCount++;
-                                                     }
-                                                 };
+                if (Application.Driver is ConsoleDriver cd)
+                {
+                    cd!.Refreshed += (sender, args) =>
+                                     {
+                                         refreshedCount++;
+
+                                         if (args.CurrentValue)
+                                         {
+                                             updatedCount++;
+                                         }
+                                     };
+                }
+
                 Application.NotifyNewRunState += OnApplicationNotifyNewRunState;
 
                 stopwatch = Stopwatch.StartNew ();

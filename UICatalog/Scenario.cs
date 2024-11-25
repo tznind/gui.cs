@@ -192,6 +192,19 @@ public class Scenario : IDisposable
 
             Application.Iteration += OnApplicationOnIteration;
             Application.Driver!.ClearedContents += (sender, args) => BenchmarkResults.ClearedContentCount++;
+
+            if (Application.Driver is ConsoleDriver cd)
+            {
+                cd.Refreshed += (sender, args) =>
+                                                 {
+                                                     BenchmarkResults.RefreshedCount++;
+                                                     if (args.CurrentValue)
+                                                     {
+                                                         BenchmarkResults.UpdatedCount++;
+                                                     }
+                                                 };
+
+            }
             Application.NotifyNewRunState += OnApplicationNotifyNewRunState;
 
 

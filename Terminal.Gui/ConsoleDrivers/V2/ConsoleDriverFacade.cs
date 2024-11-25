@@ -6,6 +6,7 @@ class ConsoleDriverFacade<T> : IConsoleDriver
     private readonly InputProcessor<T> _inputProcessor;
     private readonly IOutputBuffer _outputBuffer;
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
+    private CursorVisibility _lastCursor = CursorVisibility.Default;
 
     public ConsoleDriverFacade (IConsoleInput<T> input,InputProcessor<T> inputProcessor,IOutputBuffer outputBuffer, IConsoleOutput output, AnsiRequestScheduler ansiRequestScheduler)
     {
@@ -225,11 +226,19 @@ class ConsoleDriverFacade<T> : IConsoleDriver
     /// <returns><see langword="true"/> upon success</returns>
     public bool SetCursorVisibility (CursorVisibility visibility)
     {
+        _lastCursor = visibility;
         _output.SetCursorVisibility (visibility);
 
         return true;
     }
 
+    /// <inheritdoc />
+    public bool GetCursorVisibility (out CursorVisibility current)
+    {
+        current = _lastCursor;
+
+        return true;
+    }
     /// <summary>The event fired when the terminal is resized.</summary>
     public event EventHandler<SizeChangedEventArgs> SizeChanged;
 
@@ -320,4 +329,5 @@ class ConsoleDriverFacade<T> : IConsoleDriver
     {
         // No need we will always draw when dirty
     }
+
 }

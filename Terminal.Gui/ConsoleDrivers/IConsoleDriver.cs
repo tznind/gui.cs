@@ -241,4 +241,5 @@ public interface IConsoleDriver
     void RawWrite (string str);
 
     void Refresh ();
+    bool GetCursorVisibility (out CursorVisibility current);
 }
