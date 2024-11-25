@@ -56,32 +56,17 @@ public class MainLoop<T> : IMainLoop<T>
     {
         InputProcessor.ProcessQueue ();
 
-        Random r = new Random ();
-
         // TODO: throttle this
         var size = Out.GetWindowSize ();
 
         OutputBuffer.SetWindowSize (size.Width, size.Height);
         // TODO: Test only
 
-        var w = new Window
+        if (Application.Top != null)
         {
-            Title = "Hello World",
-            Width = 30,
-            Height = 5
-        };
-        w.Add (new Button { Text = "OMG!", X = 5, Y = 2 ,Width = Dim.Auto ()});
-        w.Layout ();
-        w.Draw ();
-
-
-        OutputBuffer.CurrentAttribute = new Attribute (Color.White, Color.Black);
-        OutputBuffer.Move (_lastMousePos.X,_lastMousePos.Y);
-
-        foreach (var ch in sb.ToString())
-        {
-            OutputBuffer.CurrentAttribute = new Attribute (new Color (r.Next (255), r.Next (255), r.Next (255)), Color.Black);
-            OutputBuffer.AddRune (ch);
+            Application.Top.NeedsDraw = true;
+            Application.Top.Layout ();
+            Application.Top.Draw ();
         }
 
         Out.Write (OutputBuffer);

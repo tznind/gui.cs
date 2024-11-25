@@ -1,16 +1,22 @@
 ﻿namespace Terminal.Gui.ConsoleDrivers.V2;
 class ConsoleDriverFacade<T> : IConsoleDriver
 {
+    private readonly IInputProcessor _inputProcessor;
     private readonly IConsoleOutput _output;
     private readonly IOutputBuffer _outputBuffer;
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
     private CursorVisibility _lastCursor = CursorVisibility.Default;
 
-    public ConsoleDriverFacade (IOutputBuffer outputBuffer, IConsoleOutput output, AnsiRequestScheduler ansiRequestScheduler)
+    public ConsoleDriverFacade (IInputProcessor inputProcessor, IOutputBuffer outputBuffer, IConsoleOutput output, AnsiRequestScheduler ansiRequestScheduler)
     {
+        _inputProcessor = inputProcessor;
         _output = output;
         _outputBuffer = outputBuffer;
         _ansiRequestScheduler = ansiRequestScheduler;
+
+        _inputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
+        _inputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
+        _inputProcessor.MouseEvent += (s, e) => MouseEvent?.Invoke (s, e);
     }
     /// <summary>
     /// How long after Esc has been pressed before we give up on getting an Ansi escape sequence

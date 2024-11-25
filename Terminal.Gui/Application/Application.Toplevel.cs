@@ -10,5 +10,5 @@ public static partial class Application // Toplevel handling
 
     /// <summary>The <see cref="Toplevel"/> that is currently active.</summary>
     /// <value>The top.</value>
-    public static Toplevel? Top { get; internal set; }
+    public static Toplevel? Top { get; set; }
 }

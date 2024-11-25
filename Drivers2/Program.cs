@@ -28,6 +28,9 @@ class Program
 
         // Required to set up colors etc?
         Application.Init ();
+
+        var top = CreateTestWindow ();
+
         IMainLoopCoordinator coordinator;
         if (win)
         {
@@ -44,7 +47,6 @@ class Program
         }
         else
         {
-
             var inputBuffer = new ConcurrentQueue<ConsoleKeyInfo> ();
             var loop = new MainLoop<ConsoleKeyInfo> ();
             coordinator = new MainLoopCoordinator<ConsoleKeyInfo> (()=>new NetInput (),
@@ -61,6 +63,35 @@ class Program
                                       coordinator.Stop ();
                                   };
 
+        BeginTestWindow (top);
+
+
+
         coordinator.StartBlocking ();
+    }
+
+    private static void BeginTestWindow (Toplevel top)
+    {
+        Application.Top = top;
+    }
+
+    private static Toplevel CreateTestWindow ()
+    {
+        var w = new Window
+        {
+            Title = "Hello World",
+            Width = 30,
+            Height = 5
+        };
+
+        var tf = new TextField { X = 5, Y = 0, Width = 10 };
+        w.AdvanceFocus (NavigationDirection.Forward, null);
+        w.Add (tf);
+
+        var tf2 = new TextField { X = 5, Y = 2, Width = 10 };
+        w.AdvanceFocus (NavigationDirection.Forward, null);
+        w.Add (tf2);
+
+        return w;
     }
 }
