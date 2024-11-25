@@ -50,6 +50,9 @@ public class WindowsOutput : IConsoleOutput
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool SetConsoleActiveScreenBuffer (nint Handle);
 
+    [DllImport ("kernel32.dll")]
+    private static extern bool SetConsoleCursorPosition (nint hConsoleOutput, Coord dwCursorPosition);
+
     private nint _screenBuffer;
 
     public WindowsConsole WinConsole { get; private set; } = new WindowsConsole ();
@@ -190,6 +193,20 @@ public class WindowsOutput : IConsoleOutput
                        csbi.srWindow.Right - csbi.srWindow.Left + 1,
                        csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
         return sz;
+    }
+
+    /// <inheritdoc />
+    public void SetCursorVisibility (CursorVisibility visibility)
+    {
+        var sb = new StringBuilder ();
+        sb.Append (visibility != CursorVisibility.Invisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
+        WinConsole?.WriteANSI (sb.ToString ());
+    }
+
+    /// <inheritdoc />
+    public void SetCursorPosition (int col, int row)
+    {
+        SetConsoleCursorPosition (_screenBuffer, new Coord ((short)col, (short)row));
     }
 
     /// <inheritdoc />

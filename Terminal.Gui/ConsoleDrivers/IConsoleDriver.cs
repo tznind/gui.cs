@@ -132,10 +132,6 @@ public interface IConsoleDriver
     /// <param name="c"></param>
     void FillRect (Rectangle rect, char c);
 
-    /// <summary>Gets the terminal cursor visibility.</summary>
-    /// <param name="visibility">The current <see cref="CursorVisibility"/></param>
-    /// <returns><see langword="true"/> upon success</returns>
-    bool GetCursorVisibility (out CursorVisibility visibility);
 
     /// <summary>Returns the name of the driver and relevant library version information.</summary>
     /// <returns></returns>
@@ -184,10 +180,6 @@ public interface IConsoleDriver
 
     /// <summary>Sets the position of the terminal cursor to <see cref="ConsoleDriver.Col"/> and <see cref="ConsoleDriver.Row"/>.</summary>
     void UpdateCursor ();
-
-    /// <summary>Redraws the physical screen with the contents that have been queued up via any of the printing commands.</summary>
-    /// <returns><see langword="true"/> if any updates to the screen were made.</returns>
-    bool UpdateScreen ();
 
     /// <summary>Initializes the driver</summary>
     /// <returns>Returns an instance of <see cref="MainLoop"/> using the <see cref="IMainLoopDriver"/> for the driver.</returns>
@@ -247,4 +239,6 @@ public interface IConsoleDriver
     /// </summary>
     /// <param name="str"></param>
     void RawWrite (string str);
+
+    void Refresh ();
 }

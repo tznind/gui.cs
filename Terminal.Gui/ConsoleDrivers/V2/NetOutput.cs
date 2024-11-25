@@ -217,4 +217,13 @@ public class NetOutput : IConsoleOutput
         Console.Clear ();
     }
 
+    void IConsoleOutput.SetCursorVisibility (CursorVisibility visibility)
+    {
+        Console.Out.Write (visibility == CursorVisibility.Default ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
+    }
+
+    void IConsoleOutput.SetCursorPosition (int col, int row)
+    {
+        Console.SetCursorPosition (col, row);
+    }
 }

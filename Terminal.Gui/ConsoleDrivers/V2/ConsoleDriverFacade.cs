@@ -179,10 +179,7 @@ class ConsoleDriverFacade<T> : IConsoleDriver
     /// <param name="c"></param>
     public void FillRect (Rectangle rect, char c) => _outputBuffer.FillRect (rect, c);
 
-    /// <summary>Gets the terminal cursor visibility.</summary>
-    /// <param name="visibility">The current <see cref="CursorVisibility"/></param>
-    /// <returns><see langword="true"/> upon success</returns>
-    public bool GetCursorVisibility (out CursorVisibility visibility);
+
 
     /// <summary>Returns the name of the driver and relevant library version information.</summary>
     /// <returns></returns>
@@ -226,23 +223,28 @@ class ConsoleDriverFacade<T> : IConsoleDriver
     /// <summary>Sets the terminal cursor visibility.</summary>
     /// <param name="visibility">The wished <see cref="CursorVisibility"/></param>
     /// <returns><see langword="true"/> upon success</returns>
-    public bool SetCursorVisibility (CursorVisibility visibility);
+    public bool SetCursorVisibility (CursorVisibility visibility)
+    {
+        _output.SetCursorVisibility (visibility);
+
+        return true;
+    }
 
     /// <summary>The event fired when the terminal is resized.</summary>
     public event EventHandler<SizeChangedEventArgs> SizeChanged;
 
-    // TODO: probably output
-
     /// <summary>Sets the position of the terminal cursor to <see cref="ConsoleDriver.Col"/> and <see cref="ConsoleDriver.Row"/>.</summary>
-    public void UpdateCursor ();
-
-    /// <summary>Redraws the physical screen with the contents that have been queued up via any of the printing commands.</summary>
-    /// <returns><see langword="true"/> if any updates to the screen were made.</returns>
-    public bool UpdateScreen ();
+    public void UpdateCursor ()
+    {
+        _output.SetCursorPosition (Col, Row);
+    }
 
     /// <summary>Initializes the driver</summary>
     /// <returns>Returns an instance of <see cref="MainLoop"/> using the <see cref="IMainLoopDriver"/> for the driver.</returns>
-    public MainLoop Init ();
+    public MainLoop Init ()
+    {
+        throw new NotSupportedException ();
+    }
 
     /// <summary>Ends the execution of the console driver.</summary>
     public void End ()
@@ -263,7 +265,15 @@ class ConsoleDriverFacade<T> : IConsoleDriver
     /// <param name="foreground">The foreground color.</param>
     /// <param name="background">The background color.</param>
     /// <returns>The attribute for the foreground and background colors.</returns>
-    public Attribute MakeColor (in Color foreground, in Color background);
+    public Attribute MakeColor (in Color foreground, in Color background)
+    {
+        // TODO: what even is this? why Attribute constructor wants to call Driver method which must return an instance of Attribute? ?!?!?!
+        return new Attribute (
+                              -1, // only used by cursesdriver!
+                              foreground,
+                              background
+                             );
+    }
 
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="ConsoleDriver.KeyUp"/>.</summary>
     public event EventHandler<Key> KeyDown;
@@ -284,7 +294,11 @@ class ConsoleDriverFacade<T> : IConsoleDriver
     /// <param name="shift">If <see langword="true"/> simulates the Shift key being pressed.</param>
     /// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
     /// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
-    public void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
+    public void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl)
+    {
+        // TODO: implement
+
+    }
 
     /// <summary>
     /// Queues the given <paramref name="request"/> for execution
@@ -300,4 +314,10 @@ class ConsoleDriverFacade<T> : IConsoleDriver
     /// </summary>
     /// <param name="str"></param>
     public void RawWrite (string str) => _output.Write (str);
+
+    /// <inheritdoc />
+    public void Refresh ()
+    {
+        // No need we will always draw when dirty
+    }
 }

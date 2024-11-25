@@ -811,7 +811,6 @@ internal class NetDriver : ConsoleDriver
             //Enable alternative screen buffer.
             Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
 
-            SetContentsAsDirty ();
             Refresh ();
         }
 

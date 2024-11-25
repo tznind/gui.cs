@@ -171,16 +171,6 @@ public static partial class Application // Keyboard handling
                    );
 
         AddCommand (
-                    Command.Suspend,
-                    static () =>
-                    {
-                        Driver?.Suspend ();
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
                     Command.NextTabStop,
                     static () => Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop));
 

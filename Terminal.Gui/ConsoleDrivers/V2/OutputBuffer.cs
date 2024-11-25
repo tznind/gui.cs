@@ -412,6 +412,20 @@ public class OutputBuffer : IOutputBuffer
         }
     }
 
+    /// <inheritdoc />
+    public void FillRect (Rectangle rect, char rune)
+    {
+        for (int y = rect.Top; y < rect.Top + rect.Height; y++)
+        {
+            for (int x = rect.Left; x < rect.Left + rect.Width; x++)
+            {
+                Move (x, y);
+                AddRune (rune);
+            }
+        }
+    }
+
+
     // TODO: Make internal once Menu is upgraded
     /// <summary>
     ///     Updates <see cref="Col"/> and <see cref="Row"/> to the specified column and row in <see cref="Contents"/>.
