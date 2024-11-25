@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using Terminal.Gui.ConsoleDrivers.V2;
 
 namespace Terminal.Gui;
 
@@ -10,6 +11,10 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     private readonly IMainLoop<T> _loop;
     private CancellationTokenSource tokenSource = new ();
     private readonly Func<IConsoleOutput> _outputFactory;
+    private IConsoleInput<T> _input;
+    private IConsoleOutput _output;
+    object oLockInitialization = new ();
+    private ConsoleDriverFacade<T> _facade;
 
     /// <summary>
     /// Creates a new coordinator
@@ -51,25 +56,36 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     }
     private void RunInput ()
     {
-        // Instance must be constructed on the thread in which it is used.
-        IConsoleInput<T> input = _inputFactory.Invoke ();
-        input.Initialize (_inputBuffer);
+        lock (oLockInitialization)
+        {
+            // Instance must be constructed on the thread in which it is used.
+            _input = _inputFactory.Invoke ();
+            _input.Initialize (_inputBuffer);
+
+            BuildFacadeIfPossible ();
+        }
+
         try
         {
-            input.Run (tokenSource.Token);
+            _input.Run (tokenSource.Token);
         }
         catch (OperationCanceledException)
         {
         }
-        input.Dispose ();
+        _input.Dispose ();
     }
 
     private void RunLoop ()
     {
-        // Instance must be constructed on the thread in which it is used.
-        IConsoleOutput output = _outputFactory.Invoke ();
 
-        _loop.Initialize (_inputBuffer, _inputProcessor, output);
+        lock (oLockInitialization)
+        {
+            // Instance must be constructed on the thread in which it is used.
+            _output = _outputFactory.Invoke ();
+            _loop.Initialize (_inputBuffer, _inputProcessor, _output);
+
+            BuildFacadeIfPossible ();
+        }
 
         try
         {
@@ -79,6 +95,15 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
         {
         }
         _loop.Dispose ();
+    }
+
+    private void BuildFacadeIfPossible ()
+    {
+        if (_input != null && _output != null)
+        {
+            _facade = new ConsoleDriverFacade<T> (_loop.OutputBuffer,_output,_loop.AnsiRequestScheduler);
+            Application.Driver = _facade;
+        }
     }
 
     public void Stop ()

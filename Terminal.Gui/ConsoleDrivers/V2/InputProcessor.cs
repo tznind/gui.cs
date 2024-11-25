@@ -7,6 +7,8 @@ public abstract class InputProcessor<T> : IInputProcessor
     public AnsiResponseParser<T> Parser { get; } = new ();
     public ConcurrentQueue<T> InputBuffer { get; }
 
+    public IAnsiResponseParser GetParser () => Parser;
+
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="KeyUp"/>.</summary>
     public event EventHandler<Key>? KeyDown;
 

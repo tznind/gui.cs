@@ -4,8 +4,10 @@ namespace Terminal.Gui;
 
 public interface IMainLoop<T> : IDisposable
 {
-
+    public IOutputBuffer OutputBuffer { get; }
     public IInputProcessor InputProcessor { get; }
+
+    public AnsiRequestScheduler AnsiRequestScheduler { get; }
 
     /// <summary>
     /// Initializes the loop with a buffer from which data can be read

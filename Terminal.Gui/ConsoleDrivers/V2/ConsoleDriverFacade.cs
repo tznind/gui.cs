@@ -2,17 +2,13 @@
 class ConsoleDriverFacade<T> : IConsoleDriver
 {
     private readonly IConsoleOutput _output;
-    private readonly IConsoleInput<T> _input;
-    private readonly InputProcessor<T> _inputProcessor;
     private readonly IOutputBuffer _outputBuffer;
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
     private CursorVisibility _lastCursor = CursorVisibility.Default;
 
-    public ConsoleDriverFacade (IConsoleInput<T> input,InputProcessor<T> inputProcessor,IOutputBuffer outputBuffer, IConsoleOutput output, AnsiRequestScheduler ansiRequestScheduler)
+    public ConsoleDriverFacade (IOutputBuffer outputBuffer, IConsoleOutput output, AnsiRequestScheduler ansiRequestScheduler)
     {
         _output = output;
-        _input = input;
-        _inputProcessor = inputProcessor;
         _outputBuffer = outputBuffer;
         _ansiRequestScheduler = ansiRequestScheduler;
     }

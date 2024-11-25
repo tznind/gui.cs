@@ -43,4 +43,5 @@ public interface IInputProcessor
     /// Drains the input buffer, processing all available keystrokes
     /// </summary>
     void ProcessQueue ();
+    public IAnsiResponseParser GetParser ();
 }

@@ -11,6 +11,7 @@ public class MainLoop<T> : IMainLoop<T>
     public IOutputBuffer OutputBuffer { get; private set; } = new OutputBuffer();
 
     public IConsoleOutput Out { get;private set; }
+    public AnsiRequestScheduler AnsiRequestScheduler { get; private set; }
 
 
     // TODO: Remove later
@@ -22,6 +23,8 @@ public class MainLoop<T> : IMainLoop<T>
         InputBuffer = inputBuffer;
         Out = consoleOutput;
         InputProcessor = inputProcessor;
+
+        AnsiRequestScheduler = new AnsiRequestScheduler (InputProcessor.GetParser ());
 
         // TODO: Remove later
         InputProcessor.KeyDown += (s,k) => sb.Append ((char)k);
@@ -59,6 +62,18 @@ public class MainLoop<T> : IMainLoop<T>
         var size = Out.GetWindowSize ();
 
         OutputBuffer.SetWindowSize (size.Width, size.Height);
+        // TODO: Test only
+
+        var w = new Window
+        {
+            Title = "Hello World",
+            Width = 30,
+            Height = 5
+        };
+        w.Add (new Button { Text = "OMG!", X = 5, Y = 2 ,Width = Dim.Auto ()});
+        w.Layout ();
+        w.Draw ();
+
 
         OutputBuffer.CurrentAttribute = new Attribute (Color.White, Color.Black);
         OutputBuffer.Move (_lastMousePos.X,_lastMousePos.Y);
