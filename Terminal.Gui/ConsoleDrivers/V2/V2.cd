@@ -46,7 +46,7 @@
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>QQQAAAAAACABAQQCAAAAAAAAAAAAAAACAAAAAAABAAI=</HashCode>
+      <HashCode>QQQAAAAAACABAQQAAAAAAAAAAAAAAAACAAAAAAAAAAI=</HashCode>
       <FileName>ConsoleDrivers\V2\MainLoop.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -106,7 +106,7 @@
   <Class Name="Terminal.Gui.InputProcessor&lt;T&gt;" Collapsed="true">
     <Position X="15.75" Y="5.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AQAkAAAAAACAgAAAAgggAAAABAIAAAAAAAgAAAAAAAA=</HashCode>
+      <HashCode>AQAkAAAAAACAgAAAAgggAAAABAoAAAAAAAgAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\InputProcessor.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -165,10 +165,36 @@
     </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="Terminal.Gui.MouseInterpreter" Collapsed="true">
-    <Position X="22" Y="6.5" Width="1.5" />
+  <Class Name="Terminal.Gui.MouseInterpreter">
+    <Position X="19.25" Y="6.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAQAAAAAAAABAAIAAkAAACAAACgAAAAAAABAAAAAAgA=</HashCode>
+      <HashCode>AAQAAAAAAAABAAIAAkAAACAAICgIAAAAAABAAAAAAgA=</HashCode>
+      <FileName>ConsoleDrivers\V2\MouseState.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_viewFinder" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Field Name="_ongoingNarratives" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Terminal.Gui.ButtonNarrative">
+    <Position X="22.25" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAAgAAAAAAICAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\MouseState.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_viewFinder" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="MouseStates" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Terminal.Gui.ButtonState">
+    <Position X="25" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAggAAAAAAAAAACJAAAAAoAAAAAEAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\MouseState.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -209,6 +235,13 @@
     <ShowAsAssociation>
       <Property Name="MouseInterpreter" />
     </ShowAsAssociation>
+  </Interface>
+  <Interface Name="Terminal.Gui.ConsoleDrivers.V2.IViewFinder">
+    <Position X="22.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\IViewFinder.cs</FileName>
+    </TypeIdentifier>
   </Interface>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>
