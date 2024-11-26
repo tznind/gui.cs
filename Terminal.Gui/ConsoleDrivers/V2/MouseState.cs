@@ -1,9 +1,13 @@
 ﻿#nullable enable
 
+using Terminal.Gui.ConsoleDrivers.V2;
+
 namespace Terminal.Gui;
 
 public class MouseInterpreter
 {
+    private readonly IViewFinder _viewFinder;
+
     /// <summary>
     /// Function for returning the current time. Use in unit tests to
     /// ensure repeatable tests.
@@ -37,11 +41,13 @@ public class MouseInterpreter
 
     public MouseInterpreter (
         Func<DateTime>? now = null,
+        IViewFinder viewFinder = null,
         TimeSpan? doubleClickThreshold = null,
         TimeSpan? tripleClickThreshold = null,
         int dragThreshold = 5
     )
     {
+        _viewFinder = viewFinder ?? new StaticViewFinder ();
         Now = now ?? (() => DateTime.Now);
         DoubleClickThreshold = doubleClickThreshold ?? TimeSpan.FromMilliseconds (500);
         TripleClickThreshold = tripleClickThreshold ?? TimeSpan.FromMilliseconds (1000);
@@ -95,21 +101,23 @@ public class MouseInterpreter
 
     private ButtonNarrative BeginPressedNarrative (int buttonIdx, MouseEventArgs e)
     {
-        return new ButtonNarrative
+        var view = _viewFinder.GetViewAt (e.Position, out var viewport);
+
+        return new ButtonNarrative(Now,_viewFinder)
         {
             NumberOfClicks = 0,
-            Now = Now,
             MouseStates =
             [
-                new ButtonState
+                new ButtonState()
                 {
                     Button = buttonIdx,
                     At = Now(),
                     Pressed = true,
                     Position = e.ScreenPosition,
+                    View = view,
+                    ViewportPosition = viewport,
 
                     /* TODO: Do these too*/
-                    View = null,
                     Shift = false,
                     Ctrl = false,
                     Alt = false
@@ -117,6 +125,8 @@ public class MouseInterpreter
             ]
         };
     }
+
+    public Point ViewportPosition { get; set; }
 
     /* TODO: Probably need this at some point
     public static double DistanceTo (Point p1, Point p2)
@@ -135,6 +145,7 @@ public class MouseInterpreter
 /// user clicked then user double-clicked then user triple clicked</remarks>
 public class ButtonNarrative
 {
+    private readonly IViewFinder _viewFinder;
     public int NumberOfClicks { get; set; }
 
     /// <summary>
@@ -149,6 +160,12 @@ public class ButtonNarrative
     /// </summary>
     public Func<DateTime> Now { get; set; }
 
+    public ButtonNarrative (Func<DateTime> now, IViewFinder viewFinder)
+    {
+        Now = now;
+        _viewFinder = viewFinder;
+    }
+
     public void Process (int buttonIdx, Point position, bool pressed)
     {
         var last = MouseStates.Last ();
@@ -160,6 +177,8 @@ public class ButtonNarrative
             return;
         }
 
+        var view = _viewFinder.GetViewAt (position, out var viewport);
+
         NumberOfClicks++;
         MouseStates.Add (new ButtonState
         {
@@ -168,8 +187,10 @@ public class ButtonNarrative
             Pressed = false,
             Position = position,
 
+            View = view,
+            ViewportPosition = viewport,
+
             /* TODO: Need these probably*/
-            View = null,
             Shift = false,
             Ctrl = false,
             Alt = false,
@@ -209,6 +230,11 @@ public class ButtonState
     /// when the button entered its current state.
     /// </summary>
     public View? View { get; set; }
+
+    /// <summary>
+    /// Viewport relative position within <see cref="View"/> (if there is one)
+    /// </summary>
+    public Point ViewportPosition { get; set; }
 
     /// <summary>
     /// True if shift was provided by the console at the time the mouse
