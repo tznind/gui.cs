@@ -13,11 +13,6 @@ public class MainLoop<T> : IMainLoop<T>
     public IConsoleOutput Out { get;private set; }
     public AnsiRequestScheduler AnsiRequestScheduler { get; private set; }
 
-
-    // TODO: Remove later
-    StringBuilder sb = new StringBuilder ("*");
-    private Point _lastMousePos = new Point(0,0);
-
     public void Initialize (ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput)
     {
         InputBuffer = inputBuffer;
@@ -26,11 +21,7 @@ public class MainLoop<T> : IMainLoop<T>
 
         AnsiRequestScheduler = new AnsiRequestScheduler (InputProcessor.GetParser ());
 
-        // TODO: Remove later
-        InputProcessor.KeyDown += (s,k) => sb.Append ((char)k);
-        InputProcessor.MouseEvent += (s, e) => { _lastMousePos = e.Position; };
     }
-
 
     public void Run (CancellationToken token)
     {

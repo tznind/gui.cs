@@ -56,12 +56,16 @@ public abstract class InputProcessor<T> : IInputProcessor
     {
         if (narrative.NumberOfClicks == 1)
         {
+            var last = narrative.MouseStates.Last ();
+
             // its a click
             MouseEvent?.Invoke (this, new MouseEventArgs
             {
                 Handled = false,
                 Flags = MouseFlags.Button1Clicked,
-                ScreenPosition = narrative.MouseStates.Last().Position
+                ScreenPosition = last.Position,
+                Position = last.ViewportPosition,
+                View = last.View,
             });
         }
     }

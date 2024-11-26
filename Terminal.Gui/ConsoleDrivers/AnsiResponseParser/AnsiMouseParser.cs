@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Buffers.Text;
 using System.Text.RegularExpressions;
 
 namespace Terminal.Gui;
@@ -26,8 +27,12 @@ public class AnsiMouseParser
         if (match.Success)
         {
             int buttonCode = int.Parse (match.Groups [1].Value);
-            int x = int.Parse (match.Groups [2].Value);
-            int y = int.Parse (match.Groups [3].Value);
+
+            // The top-left corner of the terminal corresponds to (1, 1) for both X (column) and Y (row) coordinates.
+            // ANSI standards and terminal conventions historically treat screen positions as 1 - based.
+
+            int x = int.Parse (match.Groups [2].Value) - 1;
+            int y = int.Parse (match.Groups [3].Value) - 1;
             char terminator = match.Groups [4].Value.Single ();
 
             return new()
