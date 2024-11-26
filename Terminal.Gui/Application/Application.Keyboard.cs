@@ -49,6 +49,11 @@ public static partial class Application // Keyboard handling
         {
             if (binding.Value.BoundView is { })
             {
+                if (!binding.Value.BoundView.Enabled)
+                {
+                    return false;
+                }
+
                 bool? handled = binding.Value.BoundView?.InvokeCommands (binding.Value.Commands, binding.Key, binding.Value);
 
                 if (handled != null && (bool)handled)
