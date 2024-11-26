@@ -7,7 +7,7 @@ namespace Terminal.Gui;
 ///     Parses mouse ansi escape sequences into <see cref="MouseEventArgs"/>
 ///     including support for pressed, released and mouse wheel.
 /// </summary>
-public class MouseParser
+public class AnsiMouseParser
 {
     // Regex patterns for button press/release, wheel scroll, and mouse position reporting
     private readonly Regex _mouseEventPattern = new (@"\u001b\[<(\d+);(\d+);(\d+)(M|m)", RegexOptions.Compiled);

@@ -4,7 +4,7 @@ namespace Terminal.Gui;
 
 public abstract class AnsiResponseParserBase : IAnsiResponseParser
 {
-    private readonly MouseParser _mouseParser = new  ();
+    private readonly AnsiMouseParser _mouseParser = new  ();
     protected object lockExpectedResponses = new ();
 
     protected object lockState = new ();

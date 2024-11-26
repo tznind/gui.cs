@@ -1,8 +1,8 @@
 ﻿#nullable enable
 
 namespace Terminal.Gui;
-/*
-public class MouseStateManager
+
+public class MouseInterpreter
 {
     /// <summary>
     /// Function for returning the current time. Use in unit tests to
@@ -33,7 +33,9 @@ public class MouseStateManager
 
     private ButtonNarrative? [] _ongoingNarratives = new ButtonNarrative? [4];
 
-    public MouseStateManager (
+    public Action<ButtonNarrative> Click { get; set; }
+
+    public MouseInterpreter (
         Func<DateTime>? now = null,
         TimeSpan? doubleClickThreshold = null,
         TimeSpan? tripleClickThreshold = null,
@@ -46,51 +48,83 @@ public class MouseStateManager
         DragThreshold = dragThreshold;
     }
 
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="e"></param>
-    /// <returns></returns>
-    public IEnumerable<ButtonNarrative> UpdateState (MouseEventArgs e)
+    public IEnumerable<ButtonNarrative> Process (MouseEventArgs e)
     {
-        // TODO: manage transitions
+        // Update narratives
+       if (e.Flags.HasFlag (MouseFlags.Button1Pressed))
+       {
+           if (_ongoingNarratives [0] == null)
+           {
+               _ongoingNarratives [0] = BeginPressedNarrative (0,e);
+           }
+           else
+           {
+               _ongoingNarratives [0]?.Process (0,e.Position,true);
+           }
+       }
+       else
+       {
+           _ongoingNarratives [0]?.Process (0,e.Position,false);
+       }
 
-        for (int i = 0; i < 4; i++)
+       for (var i = 0; i < _ongoingNarratives.Length; i++)
+       {
+           ButtonNarrative? narrative = _ongoingNarratives [i];
+
+           if (narrative != null)
+           {
+               if (ShouldRelease (narrative))
+               {
+                   yield return narrative;
+                   _ongoingNarratives [i] = null;
+               }
+           }
+       }
+    }
+
+    private bool ShouldRelease (ButtonNarrative narrative)
+    {
+        // TODO: needs to be way smarter
+        if (narrative.NumberOfClicks > 0)
         {
-           // Update narratives
-
-           // Release stale or naturally complete ones based on thresholds
+            return true;
         }
+
+        return false;
     }
 
-    /// <summary>
-    /// If user double clicks and we are waiting for a triple click
-    /// we should give up after a short time and just assume no more
-    /// clicks are coming. Call this method if the state for a given button
-    /// has not changed in a while.
-    /// </summary>
-    /// <returns></returns>
-    public ButtonNarrative? ReleaseState (int button)
+    private ButtonNarrative BeginPressedNarrative (int buttonIdx, MouseEventArgs e)
     {
-        
+        return new ButtonNarrative
+        {
+            NumberOfClicks = 0,
+            Now = Now,
+            MouseStates =
+            [
+                new ButtonState
+                {
+                    Button = buttonIdx,
+                    At = Now(),
+                    Pressed = true,
+                    Position = e.ScreenPosition,
+
+                    /* TODO: Do these too*/
+                    View = null,
+                    Shift = false,
+                    Ctrl = false,
+                    Alt = false
+                }
+            ]
+        };
     }
 
-    private void PromoteSingleToDoubleClick ()
-    {
-
-    }
-    private void PromoteDoubleToTripleClick ()
-    {
-
-    }
-
+    /* TODO: Probably need this at some point
     public static double DistanceTo (Point p1, Point p2)
     {
         int deltaX = p2.X - p1.X;
         int deltaY = p2.Y - p1.Y;
         return Math.Sqrt (deltaX * deltaX + deltaY * deltaY);
-    }
+    }*/
 }
 
 /// <summary>
@@ -101,20 +135,47 @@ public class MouseStateManager
 /// user clicked then user double-clicked then user triple clicked</remarks>
 public class ButtonNarrative
 {
-    public int Button { get; set; }
     public int NumberOfClicks { get; set; }
 
     /// <summary>
     /// Mouse states during which click was generated.
     /// N = 2x<see cref="NumberOfClicks"/>
     /// </summary>
-    public List<ButtonState> MouseStates { get; set; }
+    public List<ButtonState> MouseStates { get; set; } = new ();
 
     /// <summary>
-    /// <see langword="true"/> if distance between first mouse down and all
-    /// subsequent events is greater than a given threshold.
+    /// Function for returning the current time. Use in unit tests to
+    /// ensure repeatable tests.
     /// </summary>
-    public bool IsDrag { get; set; }
+    public Func<DateTime> Now { get; set; }
+
+    public void Process (int buttonIdx, Point position, bool pressed)
+    {
+        var last = MouseStates.Last ();
+
+        // Still pressed
+        if (last.Pressed && pressed)
+        {
+            // No change
+            return;
+        }
+
+        NumberOfClicks++;
+        MouseStates.Add (new ButtonState
+        {
+            Button = buttonIdx,
+            At = Now(),
+            Pressed = false,
+            Position = position,
+
+            /* TODO: Need these probably*/
+            View = null,
+            Shift = false,
+            Ctrl = false,
+            Alt = false,
+
+        });
+    }
 }
 
 public class MouseState
@@ -126,6 +187,7 @@ public class MouseState
 
 public class ButtonState
 {
+    public required int Button { get; set; }
     /// <summary>
     ///     When the button entered its current state.
     /// </summary>
@@ -134,11 +196,11 @@ public class ButtonState
     /// <summary>
     /// <see langword="true"/> if the button is currently down
     /// </summary>
-    private bool Depressed { get; set; }
+    public bool Pressed { get; set; }
 
     /// <summary>
     /// The screen location when the mouse button entered its current state
-    /// (became depressed or was released)
+    /// (became pressed or was released)
     /// </summary>
     public Point Position { get; set; }
 
@@ -165,4 +227,4 @@ public class ButtonState
     /// button entered its current state.
     /// </summary>
     public bool Alt { get; set; }
-}*/
+}

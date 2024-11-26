@@ -107,6 +107,8 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
             Application.Driver.KeyDown += (s, e) => Application.Top?.NewKeyDownEvent (e);
             Application.Driver.KeyUp += (s, e) => Application.Top?.NewKeyUpEvent (e);
             Application.Driver.MouseEvent += (s, e) => Application.Top?.NewMouseEvent (e);
+
+            
         }
     }
 

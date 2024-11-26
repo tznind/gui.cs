@@ -9,6 +9,8 @@ public abstract class InputProcessor<T> : IInputProcessor
 
     public IAnsiResponseParser GetParser () => Parser;
 
+    public MouseInterpreter MouseInterpreter { get; } = new ();
+
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="KeyUp"/>.</summary>
     public event EventHandler<Key>? KeyDown;
 
@@ -44,7 +46,24 @@ public abstract class InputProcessor<T> : IInputProcessor
         // Ensure ScreenPosition is set
         a.ScreenPosition = a.Position;
 
-        MouseEvent?.Invoke (this, a);
+        foreach (var narrative in MouseInterpreter.Process (a))
+        {
+            ResolveNarrative (narrative);
+        }
+    }
+
+    private void ResolveNarrative (ButtonNarrative narrative)
+    {
+        if (narrative.NumberOfClicks == 1)
+        {
+            // its a click
+            MouseEvent?.Invoke (this, new MouseEventArgs
+            {
+                Handled = false,
+                Flags = MouseFlags.Button1Clicked,
+                ScreenPosition = narrative.MouseStates.Last().Position
+            });
+        }
     }
 
     public InputProcessor (ConcurrentQueue<T> inputBuffer)
