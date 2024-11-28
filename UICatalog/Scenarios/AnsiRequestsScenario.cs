@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace UICatalog.Scenarios;
 
@@ -13,14 +12,13 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
 {
     private GraphView _graphView;
 
-    private DateTime start = DateTime.Now;
     private ScatterSeries _sentSeries;
     private ScatterSeries _answeredSeries;
 
-    private List<DateTime> sends = new ();
+    private readonly List<DateTime> _sends = new ();
 
-    private object lockAnswers = new object ();
-    private Dictionary<DateTime, string> answers = new ();
+    private readonly object _lockAnswers = new object ();
+    private readonly Dictionary<DateTime, string> _answers = new ();
     private Label _lblSummary;
 
     public override void Main ()
@@ -82,7 +80,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
             "CSI_RequestCursorPositionReport",
             "CSI_SendDeviceAttributes2"
         };
-
+        // TODO: This UI would be cleaner/less rigid if Pos.Align were used
         var cbRequests = new ComboBox () { Width = 40, Height = 5, ReadOnly = true, Source = new ListWrapper<string> (new (scrRequests)) };
         w.Add (cbRequests);
 
@@ -106,7 +104,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
                                               }
 
                                               var selAnsiEscapeSequenceRequestName = scrRequests [cbRequests.SelectedItem];
-                                              AnsiEscapeSequenceRequest selAnsiEscapeSequenceRequest = null;
+                                              AnsiEscapeSequence selAnsiEscapeSequenceRequest = null;
 
                                               switch (selAnsiEscapeSequenceRequestName)
                                               {
@@ -159,7 +157,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
 
         btnResponse.Accepting += (s, e) =>
                                  {
-                                     var ansiEscapeSequenceRequest = new AnsiEscapeSequenceRequest
+                                     var ansiEscapeSequenceRequest = new AnsiEscapeSequence
                                      {
                                          Request = tfRequest.Text,
                                          Terminator = tfTerminator.Text,
@@ -225,7 +223,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
                                 TimeSpan.FromMilliseconds (1000),
                                 () =>
                                 {
-                                    lock (lockAnswers)
+                                    lock (_lockAnswers)
                                     {
                                         UpdateGraph ();
 
@@ -327,15 +325,15 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
 
     private string GetSummary ()
     {
-        if (answers.Count == 0)
+        if (_answers.Count == 0)
         {
             return "No requests sent yet";
         }
 
-        var last = answers.Last ().Value;
+        var last = _answers.Last ().Value;
 
-        var unique = answers.Values.Distinct ().Count ();
-        var total = answers.Count;
+        var unique = _answers.Values.Distinct ().Count ();
+        var total = _answers.Count;
 
         return $"Last:{last} U:{unique} T:{total}";
     }
@@ -361,12 +359,12 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
 
     private void UpdateGraph ()
     {
-        _sentSeries.Points = sends
+        _sentSeries.Points = _sends
                              .GroupBy (ToSeconds)
                              .Select (g => new PointF (g.Key, g.Count ()))
                              .ToList ();
 
-        _answeredSeries.Points = answers.Keys
+        _answeredSeries.Points = _answers.Keys
                                         .GroupBy (ToSeconds)
                                         .Select (g => new PointF (g.Key, g.Count ()))
                                         .ToList ();
@@ -386,17 +384,17 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
                                              new ()
                                              {
                                                  Request = EscSeqUtils.CSI_SendDeviceAttributes.Request,
-                                                 Terminator = EscSeqUtils.CSI_ReportDeviceAttributes_Terminator,
+                                                 Terminator = EscSeqUtils.CSI_SendDeviceAttributes.Terminator,
                                                  ResponseReceived = HandleResponse
                                              });
-        sends.Add (DateTime.Now);
+        _sends.Add (DateTime.Now);
     }
 
     private void HandleResponse (string response)
     {
-        lock (lockAnswers)
+        lock (_lockAnswers)
         {
-            answers.Add (DateTime.Now, response);
+            _answers.Add (DateTime.Now, response);
         }
     }
 }

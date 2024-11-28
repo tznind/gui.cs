@@ -369,7 +369,14 @@ public partial class View : IDisposable, ISupportInitializeNotification
             SetNeedsLayout ();
             SuperView?.SetNeedsLayout ();
             SetNeedsDraw ();
-            SuperView?.SetNeedsDraw ();
+            if (SuperView is { })
+            {
+                SuperView?.SetNeedsDraw ();
+            }
+            else
+            {
+                Application.ClearScreenNextIteration = true;
+            }
         }
     }
 

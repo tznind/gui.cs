@@ -1,23 +1,18 @@
-﻿//
+﻿#nullable enable
+//
 // Driver.cs: Curses-based Driver
 //
 
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Terminal.Gui.ConsoleDrivers;
 using Unix.Terminal;
 
 namespace Terminal.Gui;
 
-/// <summary>This is the Curses driver for the gui.cs/Terminal framework.</summary>
+/// <summary>A Linux/Mac driver based on the Curses library.</summary>
 internal class CursesDriver : ConsoleDriver
 {
-    public Curses.Window _window;
-    private CursorVisibility? _currentCursorVisibility;
-    private CursorVisibility? _initialCursorVisibility;
-    private MouseFlags _lastMouseFlags;
-    private UnixMainLoop _mainLoopDriver;
-    private object _processInputToken;
+    public override string GetVersionInfo () { return $"{Curses.curses_version ()}"; }
 
     public override int Cols
     {
@@ -37,45 +32,6 @@ internal class CursesDriver : ConsoleDriver
             Curses.Lines = value;
             ClearContents ();
         }
-    }
-
-    public override bool SupportsTrueColor => true;
-
-    /// <inheritdoc/>
-    public override bool EnsureCursorVisibility () { return false; }
-
-    /// <inheritdoc/>
-    public override bool GetCursorVisibility (out CursorVisibility visibility)
-    {
-        visibility = CursorVisibility.Invisible;
-
-        if (!_currentCursorVisibility.HasValue)
-        {
-            return false;
-        }
-
-        visibility = _currentCursorVisibility.Value;
-
-        return true;
-    }
-
-    public override string GetVersionInfo () { return $"{Curses.curses_version ()}"; }
-
-    public static bool Is_WSL_Platform ()
-    {
-        // xclip does not work on WSL, so we need to use the Windows clipboard vis Powershell
-        //if (new CursesClipboard ().IsSupported) {
-        //	// If xclip is installed on Linux under WSL, this will return true.
-        //	return false;
-        //}
-        (int exitCode, string result) = ClipboardProcessRunner.Bash ("uname -a", waitForOutput: true);
-
-        if (exitCode == 0 && result.Contains ("microsoft") && result.Contains ("WSL"))
-        {
-            return true;
-        }
-
-        return false;
     }
 
     public override bool IsRuneSupported (Rune rune)
@@ -101,34 +57,33 @@ internal class CursesDriver : ConsoleDriver
         {
             // Not a valid location (outside screen or clip region)
             // Move within the clip region, then AddRune will actually move to Col, Row
-            Rectangle clipRect = Clip.GetBounds ();
+            Rectangle clipRect = Clip!.GetBounds ();
             Curses.move (clipRect.Y, clipRect.X);
         }
     }
 
-    
     public override void SendKeys (char keyChar, ConsoleKey consoleKey, bool shift, bool alt, bool control)
     {
         KeyCode key;
 
         if (consoleKey == ConsoleKey.Packet)
         {
-            var mod = new ConsoleModifiers ();
+            //var mod = new ConsoleModifiers ();
 
-            if (shift)
-            {
-                mod |= ConsoleModifiers.Shift;
-            }
+            //if (shift)
+            //{
+            //    mod |= ConsoleModifiers.Shift;
+            //}
 
-            if (alt)
-            {
-                mod |= ConsoleModifiers.Alt;
-            }
+            //if (alt)
+            //{
+            //    mod |= ConsoleModifiers.Alt;
+            //}
 
-            if (control)
-            {
-                mod |= ConsoleModifiers.Control;
-            }
+            //if (control)
+            //{
+            //    mod |= ConsoleModifiers.Control;
+            //}
 
             var cKeyInfo = new ConsoleKeyInfo (keyChar, consoleKey, shift, alt, control);
             cKeyInfo = ConsoleKeyMapping.DecodeVKPacketToKConsoleKeyInfo (cKeyInfo);
@@ -139,38 +94,10 @@ internal class CursesDriver : ConsoleDriver
             key = (KeyCode)keyChar;
         }
 
-        OnKeyDown (new Key (key));
-        OnKeyUp (new Key (key));
+        OnKeyDown (new (key));
+        OnKeyUp (new (key));
 
         //OnKeyPressed (new KeyEventArgsEventArgs (key));
-    }
-
-    /// <inheritdoc/>
-    public override bool SetCursorVisibility (CursorVisibility visibility)
-    {
-        if (_initialCursorVisibility.HasValue == false)
-        {
-            return false;
-        }
-
-        if (!RunningUnitTests)
-        {
-            Curses.curs_set (((int)visibility >> 16) & 0x000000FF);
-        }
-
-        if (visibility != CursorVisibility.Invisible)
-        {
-            Console.Out.Write (
-                               EscSeqUtils.CSI_SetCursorStyle (
-                                                               (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24)
-                                                                                            & 0xFF)
-                                                              )
-                              );
-        }
-
-        _currentCursorVisibility = visibility;
-
-        return true;
     }
 
     public void StartReportingMouseMoves ()
@@ -189,11 +116,6 @@ internal class CursesDriver : ConsoleDriver
         }
     }
 
-    /// <inheritdoc />
-    public override void RawWrite (string str)
-    {
-        Console.Out.Write (str);
-    }
 
     public override void Suspend ()
     {
@@ -219,13 +141,17 @@ internal class CursesDriver : ConsoleDriver
 
         if (!RunningUnitTests && Col >= 0 && Col < Cols && Row >= 0 && Row < Rows)
         {
-            Curses.move (Row, Col);
-
             if (Force16Colors)
             {
+                Curses.move (Row, Col);
+
                 Curses.raw ();
                 Curses.noecho ();
                 Curses.refresh ();
+            }
+            else
+            {
+                _mainLoopDriver?.WriteRaw (EscSeqUtils.CSI_SetCursorPosition (Row + 1, Col + 1));
             }
         }
     }
@@ -237,7 +163,7 @@ internal class CursesDriver : ConsoleDriver
         {
             for (var row = 0; row < Rows; row++)
             {
-                if (!_dirtyLines [row])
+                if (!_dirtyLines! [row])
                 {
                     continue;
                 }
@@ -246,7 +172,7 @@ internal class CursesDriver : ConsoleDriver
 
                 for (var col = 0; col < Cols; col++)
                 {
-                    if (Contents [row, col].IsDirty == false)
+                    if (Contents! [row, col].IsDirty == false)
                     {
                         continue;
                     }
@@ -290,14 +216,14 @@ internal class CursesDriver : ConsoleDriver
             if (!RunningUnitTests)
             {
                 Curses.move (Row, Col);
-                _window.wrefresh ();
+                _window?.wrefresh ();
             }
         }
         else
         {
             if (RunningUnitTests
                 || Console.WindowHeight < 1
-                || Contents.Length != Rows * Cols
+                || Contents!.Length != Rows * Cols
                 || Rows != Console.WindowHeight)
             {
                 return updated;
@@ -321,7 +247,7 @@ internal class CursesDriver : ConsoleDriver
                     return updated;
                 }
 
-                if (!_dirtyLines [row])
+                if (!_dirtyLines! [row])
                 {
                     continue;
                 }
@@ -366,7 +292,7 @@ internal class CursesDriver : ConsoleDriver
                             lastCol = col;
                         }
 
-                        Attribute attr = Contents [row, col].Attribute.Value;
+                        Attribute attr = Contents [row, col].Attribute!.Value;
 
                         // Performance: Only send the escape sequence if the attribute has changed.
                         if (attr != redrawAttr)
@@ -425,10 +351,10 @@ internal class CursesDriver : ConsoleDriver
             }
 
             // SIXELS
-            foreach (var s in Application.Sixel)
+            foreach (SixelToRender s in Application.Sixel)
             {
                 SetCursorPosition (s.ScreenPosition.X, s.ScreenPosition.Y);
-                Console.Write(s.SixelData);
+                Console.Write (s.SixelData);
             }
 
             SetCursorPosition (0, 0);
@@ -448,6 +374,198 @@ internal class CursesDriver : ConsoleDriver
         return updated;
     }
 
+    #region Color Handling
+
+    public override bool SupportsTrueColor => true;
+
+    /// <summary>Creates an Attribute from the provided curses-based foreground and background color numbers</summary>
+    /// <param name="foreground">Contains the curses color number for the foreground (color, plus any attributes)</param>
+    /// <param name="background">Contains the curses color number for the background (color, plus any attributes)</param>
+    /// <returns></returns>
+    private static Attribute MakeColor (short foreground, short background)
+    {
+        //var v = (short)((ushort)foreground | (background << 4));
+        var v = (short)(((ushort)(foreground & 0xffff) << 16) | (background & 0xffff));
+
+        // TODO: for TrueColor - Use InitExtendedPair
+        Curses.InitColorPair (v, foreground, background);
+
+        return new (
+                    Curses.ColorPair (v),
+                    CursesColorNumberToColorName16 (foreground),
+                    CursesColorNumberToColorName16 (background)
+                   );
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     In the CursesDriver, colors are encoded as an int. The foreground color is stored in the most significant 4
+    ///     bits, and the background color is stored in the least significant 4 bits. The Terminal.GUi Color values are
+    ///     converted to curses color encoding before being encoded.
+    /// </remarks>
+    public override Attribute MakeColor (in Color foreground, in Color background)
+    {
+        if (!RunningUnitTests && Force16Colors)
+        {
+            return MakeColor (
+                              ColorNameToCursesColorNumber (foreground.GetClosestNamedColor16 ()),
+                              ColorNameToCursesColorNumber (background.GetClosestNamedColor16 ())
+                             );
+        }
+
+        return new (
+                    0,
+                    foreground,
+                    background
+                   );
+    }
+
+    private static short ColorNameToCursesColorNumber (ColorName16 color)
+    {
+        switch (color)
+        {
+            case ColorName16.Black:
+                return Curses.COLOR_BLACK;
+            case ColorName16.Blue:
+                return Curses.COLOR_BLUE;
+            case ColorName16.Green:
+                return Curses.COLOR_GREEN;
+            case ColorName16.Cyan:
+                return Curses.COLOR_CYAN;
+            case ColorName16.Red:
+                return Curses.COLOR_RED;
+            case ColorName16.Magenta:
+                return Curses.COLOR_MAGENTA;
+            case ColorName16.Yellow:
+                return Curses.COLOR_YELLOW;
+            case ColorName16.Gray:
+                return Curses.COLOR_WHITE;
+            case ColorName16.DarkGray:
+                return Curses.COLOR_GRAY;
+            case ColorName16.BrightBlue:
+                return Curses.COLOR_BLUE | Curses.COLOR_GRAY;
+            case ColorName16.BrightGreen:
+                return Curses.COLOR_GREEN | Curses.COLOR_GRAY;
+            case ColorName16.BrightCyan:
+                return Curses.COLOR_CYAN | Curses.COLOR_GRAY;
+            case ColorName16.BrightRed:
+                return Curses.COLOR_RED | Curses.COLOR_GRAY;
+            case ColorName16.BrightMagenta:
+                return Curses.COLOR_MAGENTA | Curses.COLOR_GRAY;
+            case ColorName16.BrightYellow:
+                return Curses.COLOR_YELLOW | Curses.COLOR_GRAY;
+            case ColorName16.White:
+                return Curses.COLOR_WHITE | Curses.COLOR_GRAY;
+        }
+
+        throw new ArgumentException ("Invalid color code");
+    }
+
+    private static ColorName16 CursesColorNumberToColorName16 (short color)
+    {
+        switch (color)
+        {
+            case Curses.COLOR_BLACK:
+                return ColorName16.Black;
+            case Curses.COLOR_BLUE:
+                return ColorName16.Blue;
+            case Curses.COLOR_GREEN:
+                return ColorName16.Green;
+            case Curses.COLOR_CYAN:
+                return ColorName16.Cyan;
+            case Curses.COLOR_RED:
+                return ColorName16.Red;
+            case Curses.COLOR_MAGENTA:
+                return ColorName16.Magenta;
+            case Curses.COLOR_YELLOW:
+                return ColorName16.Yellow;
+            case Curses.COLOR_WHITE:
+                return ColorName16.Gray;
+            case Curses.COLOR_GRAY:
+                return ColorName16.DarkGray;
+            case Curses.COLOR_BLUE | Curses.COLOR_GRAY:
+                return ColorName16.BrightBlue;
+            case Curses.COLOR_GREEN | Curses.COLOR_GRAY:
+                return ColorName16.BrightGreen;
+            case Curses.COLOR_CYAN | Curses.COLOR_GRAY:
+                return ColorName16.BrightCyan;
+            case Curses.COLOR_RED | Curses.COLOR_GRAY:
+                return ColorName16.BrightRed;
+            case Curses.COLOR_MAGENTA | Curses.COLOR_GRAY:
+                return ColorName16.BrightMagenta;
+            case Curses.COLOR_YELLOW | Curses.COLOR_GRAY:
+                return ColorName16.BrightYellow;
+            case Curses.COLOR_WHITE | Curses.COLOR_GRAY:
+                return ColorName16.White;
+        }
+
+        throw new ArgumentException ("Invalid curses color code");
+    }
+
+    #endregion
+
+    private CursorVisibility? _currentCursorVisibility;
+    private CursorVisibility? _initialCursorVisibility;
+
+
+    private void EnsureCursorVisibility ()
+    {
+        if (!(Col >= 0 && Row >= 0 && Col < Cols && Row < Rows))
+        {
+            GetCursorVisibility (out CursorVisibility cursorVisibility);
+            _currentCursorVisibility = cursorVisibility;
+            SetCursorVisibility (CursorVisibility.Invisible);
+
+            return;
+        }
+
+        SetCursorVisibility (_currentCursorVisibility ?? CursorVisibility.Default);
+    }
+
+    /// <inheritdoc/>
+    public override bool GetCursorVisibility (out CursorVisibility visibility)
+    {
+        visibility = CursorVisibility.Invisible;
+
+        if (!_currentCursorVisibility.HasValue)
+        {
+            return false;
+        }
+
+        visibility = _currentCursorVisibility.Value;
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public override bool SetCursorVisibility (CursorVisibility visibility)
+    {
+        if (_initialCursorVisibility.HasValue == false)
+        {
+            return false;
+        }
+
+        if (!RunningUnitTests)
+        {
+            Curses.curs_set (((int)visibility >> 16) & 0x000000FF);
+        }
+
+        if (visibility != CursorVisibility.Invisible)
+        {
+            _mainLoopDriver?.WriteRaw (
+                                       EscSeqUtils.CSI_SetCursorStyle (
+                                                                       (EscSeqUtils.DECSCUSR_Style)
+                                                                       (((int)visibility >> 24)
+                                                                        & 0xFF)
+                                                                      )
+                                      );
+        }
+
+        _currentCursorVisibility = visibility;
+
+        return true;
+    }
+
     private bool SetCursorPosition (int col, int row)
     {
         // + 1 is needed because non-Windows is based on 1 instead of 0 and
@@ -457,31 +575,15 @@ internal class CursesDriver : ConsoleDriver
         return true;
     }
 
-    public override void End ()
-    {
-        StopReportingMouseMoves ();
-        SetCursorVisibility (CursorVisibility.Default);
+    #region Init/End/MainLoop
 
-        if (_mainLoopDriver is { })
-        {
-            _mainLoopDriver.RemoveWatch (_processInputToken);
-        }
-
-        if (RunningUnitTests)
-        {
-            return;
-        }
-
-        // throws away any typeahead that has been typed by
-        // the user and has not yet been read by the program.
-        Curses.flushinp ();
-
-        Curses.endwin ();
-    }
+    private Curses.Window? _window;
+    private UnixMainLoop? _mainLoopDriver;
+    private object? _processInputToken;
 
     public override MainLoop Init ()
     {
-        _mainLoopDriver = new UnixMainLoop (this);
+        _mainLoopDriver = new (this);
 
         if (!RunningUnitTests)
         {
@@ -537,19 +639,19 @@ internal class CursesDriver : ConsoleDriver
                 Curses.timeout (0);
             }
 
-            _processInputToken = _mainLoopDriver?.AddWatch (
-                                                            0,
-                                                            UnixMainLoop.Condition.PollIn,
-                                                            x =>
-                                                            {
-                                                                ProcessInput ();
+            _processInputToken = _mainLoopDriver.AddWatch (
+                                                           0,
+                                                           UnixMainLoop.Condition.PollIn,
+                                                           x =>
+                                                           {
+                                                               ProcessInput ();
 
-                                                                return true;
-                                                            }
-                                                           );
+                                                               return true;
+                                                           }
+                                                          );
         }
 
-        CurrentAttribute = new Attribute (ColorName16.White, ColorName16.Black);
+        CurrentAttribute = new (ColorName16.White, ColorName16.Black);
 
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
         {
@@ -581,13 +683,13 @@ internal class CursesDriver : ConsoleDriver
         {
             Curses.CheckWinChange ();
 
-            if (Force16Colors)
-            {
-                Curses.refresh ();
-            }
+            // On Init this call is needed no mater Force16Colors or not
+            Curses.refresh ();
+
+            EscSeqUtils.ContinuousButtonPressed += EscSeqUtils_ContinuousButtonPressed;
         }
 
-        return new MainLoop (_mainLoopDriver);
+        return new (_mainLoopDriver);
     }
 
     private readonly AnsiResponseParser _parser = new ();
@@ -626,6 +728,7 @@ internal class CursesDriver : ConsoleDriver
 
                 while (wch2 == Curses.KeyMouse)
                 {
+                    // BUGBUG: Fix this nullable issue.
                     Key kea = null;
 
                     ConsoleKeyInfo [] cki =
@@ -635,6 +738,7 @@ internal class CursesDriver : ConsoleDriver
                         new ('<', 0, false, false, false)
                     };
                     code = 0;
+                    // BUGBUG: Fix this nullable issue.
                     HandleEscSeqResponse (ref code, ref k, ref wch2, ref kea, ref cki);
                 }
 
@@ -692,6 +796,7 @@ internal class CursesDriver : ConsoleDriver
                 k = KeyCode.AltMask | MapCursesKey (wch);
             }
 
+            // BUGBUG: Fix this nullable issue.
             Key key = null;
 
             if (code == 0)
@@ -722,6 +827,7 @@ internal class CursesDriver : ConsoleDriver
                     [
                         new ((char)KeyCode.Esc, 0, false, false, false), new ((char)wch2, 0, false, false, false)
                     ];
+                    // BUGBUG: Fix this nullable issue.
                     HandleEscSeqResponse (ref code, ref k, ref wch2, ref key, ref cki);
 
                     return;
@@ -831,6 +937,15 @@ internal class CursesDriver : ConsoleDriver
             OnSizeChanged (new SizeChangedEventArgs (new (Cols, Rows)));
         }
     }
+    static string ConvertToString (ConsoleKeyInfo [] keyInfos)
+    {
+        char [] chars = new char [keyInfos.Length];
+        for (int i = 0; i < keyInfos.Length; i++)
+        {
+            chars [i] = keyInfos [i].KeyChar;
+        }
+        return new string (chars);
+    }
 
     private void HandleEscSeqResponse (
         ref int code,
@@ -850,8 +965,19 @@ internal class CursesDriver : ConsoleDriver
 
             if (wch2 == 0 || wch2 == 27 || wch2 == Curses.KeyMouse)
             {
+                // Give ansi parser a chance to deal with the escape sequence
+                if (cki != null && string.IsNullOrEmpty(_parser.ProcessInput (ConvertToString(cki))))
+                {
+                    // Parser fully consumed all keys meaning keys are processed - job done
+                    return;
+                }
+
+                // Ansi parser could not deal with it either because it is not expecting
+                // the given terminator (e.g. mouse) or did not understand format somehow.
+                // Carry on with the older code for processing curses escape codes
+
+                // BUGBUG: Fix this nullable issue.
                 EscSeqUtils.DecodeEscSeq (
-                                          null,
                                           ref consoleKeyInfo,
                                           ref ck,
                                           cki,
@@ -864,16 +990,17 @@ internal class CursesDriver : ConsoleDriver
                                           out List<MouseFlags> mouseFlags,
                                           out Point pos,
                                           out _,
-                                          ProcessMouseEvent
+                                          EscSeqUtils.ProcessMouseEvent
                                          );
 
                 if (isKeyMouse)
                 {
                     foreach (MouseFlags mf in mouseFlags)
                     {
-                        ProcessMouseEvent (mf, pos);
+                        OnMouseEvent (new () { Flags = mf, Position = pos });
                     }
 
+                    // BUGBUG: Fix this nullable issue.
                     cki = null;
 
                     if (wch2 == 27)
@@ -892,14 +1019,6 @@ internal class CursesDriver : ConsoleDriver
                 }
                 else
                 {
-                    if (cki != null)
-                    {
-                        foreach (var c in cki)
-                        {
-                            _parser.ProcessInput (c.KeyChar.ToString());
-                        }
-                    }
-
                     k = ConsoleKeyMapping.MapConsoleKeyInfoToKeyCode (consoleKeyInfo);
                     keyEventArgs = new Key (k);
                     OnKeyDown (keyEventArgs);
@@ -910,6 +1029,11 @@ internal class CursesDriver : ConsoleDriver
                 cki = EscSeqUtils.ResizeArray (consoleKeyInfo, cki);
             }
         }
+    }
+
+    private void EscSeqUtils_ContinuousButtonPressed (object? sender, MouseEventArgs e)
+    {
+        OnMouseEvent (e);
     }
 
     private static KeyCode MapCursesKey (int cursesKey)
@@ -989,181 +1113,54 @@ internal class CursesDriver : ConsoleDriver
         }
     }
 
-    private void ProcessMouseEvent (MouseFlags mouseFlag, Point pos)
+    public override void End ()
     {
-        bool WasButtonReleased (MouseFlags flag)
+        EscSeqUtils.ContinuousButtonPressed -= EscSeqUtils_ContinuousButtonPressed;
+
+        StopReportingMouseMoves ();
+        SetCursorVisibility (CursorVisibility.Default);
+
+        if (_mainLoopDriver is { } && _processInputToken != null)
         {
-            return flag.HasFlag (MouseFlags.Button1Released)
-                   || flag.HasFlag (MouseFlags.Button2Released)
-                   || flag.HasFlag (MouseFlags.Button3Released)
-                   || flag.HasFlag (MouseFlags.Button4Released);
+            _mainLoopDriver.RemoveWatch (_processInputToken);
         }
 
-        bool IsButtonNotPressed (MouseFlags flag)
-        {
-            return !flag.HasFlag (MouseFlags.Button1Pressed)
-                   && !flag.HasFlag (MouseFlags.Button2Pressed)
-                   && !flag.HasFlag (MouseFlags.Button3Pressed)
-                   && !flag.HasFlag (MouseFlags.Button4Pressed);
-        }
-
-        bool IsButtonClickedOrDoubleClicked (MouseFlags flag)
-        {
-            return flag.HasFlag (MouseFlags.Button1Clicked)
-                   || flag.HasFlag (MouseFlags.Button2Clicked)
-                   || flag.HasFlag (MouseFlags.Button3Clicked)
-                   || flag.HasFlag (MouseFlags.Button4Clicked)
-                   || flag.HasFlag (MouseFlags.Button1DoubleClicked)
-                   || flag.HasFlag (MouseFlags.Button2DoubleClicked)
-                   || flag.HasFlag (MouseFlags.Button3DoubleClicked)
-                   || flag.HasFlag (MouseFlags.Button4DoubleClicked);
-        }
-
-        Debug.WriteLine ($"CursesDriver: ({pos.X},{pos.Y}) - {mouseFlag}");
-
-
-        if ((WasButtonReleased (mouseFlag) && IsButtonNotPressed (_lastMouseFlags)) || (IsButtonClickedOrDoubleClicked (mouseFlag) && _lastMouseFlags == 0))
+        if (RunningUnitTests)
         {
             return;
         }
 
-        _lastMouseFlags = mouseFlag;
+        // throws away any typeahead that has been typed by
+        // the user and has not yet been read by the program.
+        Curses.flushinp ();
 
-        var me = new MouseEventArgs { Flags = mouseFlag, Position = pos };
-        //Debug.WriteLine ($"CursesDriver: ({me.Position}) - {me.Flags}");
-
-        OnMouseEvent (me);
+        Curses.endwin ();
     }
 
-    #region Color Handling
+    #endregion Init/End/MainLoop
 
-    /// <summary>Creates an Attribute from the provided curses-based foreground and background color numbers</summary>
-    /// <param name="foreground">Contains the curses color number for the foreground (color, plus any attributes)</param>
-    /// <param name="background">Contains the curses color number for the background (color, plus any attributes)</param>
-    /// <returns></returns>
-    private static Attribute MakeColor (short foreground, short background)
+    public static bool Is_WSL_Platform ()
     {
-        //var v = (short)((ushort)foreground | (background << 4));
-        var v = (short)(((ushort)(foreground & 0xffff) << 16) | (background & 0xffff));
+        // xclip does not work on WSL, so we need to use the Windows clipboard vis Powershell
+        //if (new CursesClipboard ().IsSupported) {
+        //	// If xclip is installed on Linux under WSL, this will return true.
+        //	return false;
+        //}
+        (int exitCode, string result) = ClipboardProcessRunner.Bash ("uname -a", waitForOutput: true);
 
-        // TODO: for TrueColor - Use InitExtendedPair
-        Curses.InitColorPair (v, foreground, background);
+        if (exitCode == 0 && result.Contains ("microsoft") && result.Contains ("WSL"))
+        {
+            return true;
+        }
 
-        return new Attribute (
-                              Curses.ColorPair (v),
-                              CursesColorNumberToColorName16 (foreground),
-                              CursesColorNumberToColorName16 (background)
-                             );
+        return false;
     }
 
     /// <inheritdoc/>
-    /// <remarks>
-    ///     In the CursesDriver, colors are encoded as an int. The foreground color is stored in the most significant 4
-    ///     bits, and the background color is stored in the least significant 4 bits. The Terminal.GUi Color values are
-    ///     converted to curses color encoding before being encoded.
-    /// </remarks>
-    public override Attribute MakeColor (in Color foreground, in Color background)
-    {
-        if (!RunningUnitTests && Force16Colors)
-        {
-            return MakeColor (
-                              ColorNameToCursesColorNumber (foreground.GetClosestNamedColor16 ()),
-                              ColorNameToCursesColorNumber (background.GetClosestNamedColor16 ())
-                             );
-        }
-
-        return new Attribute (
-                              0,
-                              foreground,
-                              background
-                             );
-    }
-
-    private static short ColorNameToCursesColorNumber (ColorName16 color)
-    {
-        switch (color)
-        {
-            case ColorName16.Black:
-                return Curses.COLOR_BLACK;
-            case ColorName16.Blue:
-                return Curses.COLOR_BLUE;
-            case ColorName16.Green:
-                return Curses.COLOR_GREEN;
-            case ColorName16.Cyan:
-                return Curses.COLOR_CYAN;
-            case ColorName16.Red:
-                return Curses.COLOR_RED;
-            case ColorName16.Magenta:
-                return Curses.COLOR_MAGENTA;
-            case ColorName16.Yellow:
-                return Curses.COLOR_YELLOW;
-            case ColorName16.Gray:
-                return Curses.COLOR_WHITE;
-            case ColorName16.DarkGray:
-                return Curses.COLOR_GRAY;
-            case ColorName16.BrightBlue:
-                return Curses.COLOR_BLUE | Curses.COLOR_GRAY;
-            case ColorName16.BrightGreen:
-                return Curses.COLOR_GREEN | Curses.COLOR_GRAY;
-            case ColorName16.BrightCyan:
-                return Curses.COLOR_CYAN | Curses.COLOR_GRAY;
-            case ColorName16.BrightRed:
-                return Curses.COLOR_RED | Curses.COLOR_GRAY;
-            case ColorName16.BrightMagenta:
-                return Curses.COLOR_MAGENTA | Curses.COLOR_GRAY;
-            case ColorName16.BrightYellow:
-                return Curses.COLOR_YELLOW | Curses.COLOR_GRAY;
-            case ColorName16.White:
-                return Curses.COLOR_WHITE | Curses.COLOR_GRAY;
-        }
-
-        throw new ArgumentException ("Invalid color code");
-    }
-
-    private static ColorName16 CursesColorNumberToColorName16 (short color)
-    {
-        switch (color)
-        {
-            case Curses.COLOR_BLACK:
-                return ColorName16.Black;
-            case Curses.COLOR_BLUE:
-                return ColorName16.Blue;
-            case Curses.COLOR_GREEN:
-                return ColorName16.Green;
-            case Curses.COLOR_CYAN:
-                return ColorName16.Cyan;
-            case Curses.COLOR_RED:
-                return ColorName16.Red;
-            case Curses.COLOR_MAGENTA:
-                return ColorName16.Magenta;
-            case Curses.COLOR_YELLOW:
-                return ColorName16.Yellow;
-            case Curses.COLOR_WHITE:
-                return ColorName16.Gray;
-            case Curses.COLOR_GRAY:
-                return ColorName16.DarkGray;
-            case Curses.COLOR_BLUE | Curses.COLOR_GRAY:
-                return ColorName16.BrightBlue;
-            case Curses.COLOR_GREEN | Curses.COLOR_GRAY:
-                return ColorName16.BrightGreen;
-            case Curses.COLOR_CYAN | Curses.COLOR_GRAY:
-                return ColorName16.BrightCyan;
-            case Curses.COLOR_RED | Curses.COLOR_GRAY:
-                return ColorName16.BrightRed;
-            case Curses.COLOR_MAGENTA | Curses.COLOR_GRAY:
-                return ColorName16.BrightMagenta;
-            case Curses.COLOR_YELLOW | Curses.COLOR_GRAY:
-                return ColorName16.BrightYellow;
-            case Curses.COLOR_WHITE | Curses.COLOR_GRAY:
-                return ColorName16.White;
-        }
-
-        throw new ArgumentException ("Invalid curses color code");
-    }
-
-    #endregion
+    public override void WriteRaw (string ansi) { _mainLoopDriver?.WriteRaw (ansi); }
 }
 
+// TODO: One type per file - move to another file
 internal static class Platform
 {
     private static int _suspendSignal;

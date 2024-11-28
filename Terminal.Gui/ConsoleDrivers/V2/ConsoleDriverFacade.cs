@@ -312,19 +312,22 @@ class ConsoleDriverFacade<T> : IConsoleDriver
     }
 
     /// <summary>
+    ///     Provide proper writing to send escape sequence recognized by the <see cref="ConsoleDriver"/>.
+    /// </summary>
+    /// <param name="ansi"></param>
+    public void WriteRaw (string ansi)
+    {
+        _output.Write (ansi);
+    }
+
+
+    /// <summary>
     /// Queues the given <paramref name="request"/> for execution
     /// </summary>
     /// <param name="request"></param>
     public void QueueAnsiRequest (AnsiEscapeSequenceRequest request) => _ansiRequestScheduler.SendOrSchedule (request);
 
     public AnsiRequestScheduler GetRequestScheduler () => _ansiRequestScheduler;
-
-    /// <summary>
-    /// Writes the given <paramref name="str"/> directly to the console (rather than the output
-    /// draw buffer).
-    /// </summary>
-    /// <param name="str"></param>
-    public void RawWrite (string str) => _output.Write (str);
 
     /// <inheritdoc />
     public void Refresh ()

@@ -416,8 +416,6 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
     [Fact]
     public void ShouldSwallowUnknownResponses_WhenDelegateSaysSo ()
     {
-        int i = 0;
-
         // Swallow all unknown escape codes
         _parser1.UnexpectedResponseHandler = _ => true;
         _parser2.UnknownResponseHandler = _ => true;

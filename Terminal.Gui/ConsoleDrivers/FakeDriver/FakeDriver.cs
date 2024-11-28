@@ -40,6 +40,12 @@ public class FakeDriver : ConsoleDriver
     public static Behaviors FakeBehaviors = new ();
     public override bool SupportsTrueColor => false;
 
+    /// <inheritdoc />
+    public override void WriteRaw (string ansi)
+    {
+
+    }
+
     public FakeDriver ()
     {
         Cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
@@ -371,7 +377,7 @@ public class FakeDriver : ConsoleDriver
     }
 
     /// <inheritdoc/>
-    public override bool EnsureCursorVisibility ()
+    private bool EnsureCursorVisibility ()
     {
         if (!(Col >= 0 && Row >= 0 && Col < Cols && Row < Rows))
         {
@@ -396,9 +402,6 @@ public class FakeDriver : ConsoleDriver
 
     /// <inheritdoc />
     public override IAnsiResponseParser GetParser () => _parser;
-
-    /// <inheritdoc />
-    public override void RawWrite (string str) { }
 
     public void SetBufferSize (int width, int height)
     {

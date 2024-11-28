@@ -14,8 +14,8 @@ public class AnsiRequestScheduler
     private readonly IAnsiResponseParser _parser;
 
     /// <summary>
-    /// Function for returning the current time. Use in unit tests to
-    /// ensure repeatable tests.
+    ///     Function for returning the current time. Use in unit tests to
+    ///     ensure repeatable tests.
     /// </summary>
     internal Func<DateTime> Now { get; set; }
 
@@ -54,6 +54,11 @@ public class AnsiRequestScheduler
 
     private readonly DateTime _lastRun;
 
+    /// <summary>
+    ///     Creates a new instance.
+    /// </summary>
+    /// <param name="parser"></param>
+    /// <param name="now"></param>
     public AnsiRequestScheduler (IAnsiResponseParser parser, Func<DateTime>? now = null)
     {
         _parser = parser;
@@ -67,11 +72,9 @@ public class AnsiRequestScheduler
     /// </summary>
     /// <param name="request"></param>
     /// <returns><see langword="true"/> if request was sent immediately. <see langword="false"/> if it was queued.</returns>
-    public bool SendOrSchedule (AnsiEscapeSequenceRequest request)
-    {
-        return SendOrSchedule (request, true);
-    }
-    private bool SendOrSchedule (AnsiEscapeSequenceRequest request,bool addToQueue)
+    public bool SendOrSchedule (AnsiEscapeSequenceRequest request) { return SendOrSchedule (request, true); }
+
+    private bool SendOrSchedule (AnsiEscapeSequenceRequest request, bool addToQueue)
     {
         if (CanSend (request, out ReasonCannotSend reason))
         {
@@ -105,13 +108,13 @@ public class AnsiRequestScheduler
 
     private void EvictStaleRequests ()
     {
-        foreach (var stale in _lastSend.Where (v => IsStale (v.Value)).Select (k => k.Key))
+        foreach (string stale in _lastSend.Where (v => IsStale (v.Value)).Select (k => k.Key))
         {
             EvictStaleRequests (stale);
         }
     }
 
-    private bool IsStale (DateTime dt) => Now () - dt > _staleTimeout;
+    private bool IsStale (DateTime dt) { return Now () - dt > _staleTimeout; }
 
     /// <summary>
     ///     Looks to see if the last time we sent <paramref name="withTerminator"/>
@@ -155,7 +158,7 @@ public class AnsiRequestScheduler
         }
 
         // Get oldest request
-        Tuple<AnsiEscapeSequenceRequest, DateTime>? opportunity = _queuedRequests.MinBy (r=>r.Item2);
+        Tuple<AnsiEscapeSequenceRequest, DateTime>? opportunity = _queuedRequests.MinBy (r => r.Item2);
 
         if (opportunity != null)
         {
@@ -163,6 +166,7 @@ public class AnsiRequestScheduler
             if (SendOrSchedule (opportunity.Item1, false))
             {
                 _queuedRequests.Remove (opportunity);
+
                 return true;
             }
         }
@@ -171,7 +175,6 @@ public class AnsiRequestScheduler
 
         return false;
     }
-
 
     private void Send (AnsiEscapeSequenceRequest r)
     {
@@ -210,23 +213,4 @@ public class AnsiRequestScheduler
 
         return false;
     }
-}
-
-internal enum ReasonCannotSend
-{
-    /// <summary>
-    ///     No reason given.
-    /// </summary>
-    None = 0,
-
-    /// <summary>
-    ///     The parser is already waiting for a request to complete with the given terminator.
-    /// </summary>
-    OutstandingRequest,
-
-    /// <summary>
-    ///     There have been too many requests sent recently, new requests will be put into
-    ///     queue to prevent console becoming unresponsive.
-    /// </summary>
-    TooManyRequests
 }

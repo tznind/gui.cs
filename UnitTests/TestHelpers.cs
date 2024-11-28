@@ -199,6 +199,8 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 
         if (Application.Driver is { })
         {
+            ((FakeDriver)Application.Driver).Rows = 25;
+            ((FakeDriver)Application.Driver).Cols = 25;
             ((FakeDriver)Application.Driver).End ();
         }
 

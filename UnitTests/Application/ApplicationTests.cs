@@ -620,6 +620,27 @@ public class ApplicationTests
         }
     }
 
+    [Fact]
+    public void Screen_Size_Changes ()
+    {
+        var driver = new FakeDriver ();
+        Application.Init (driver);
+        Assert.Equal (new (0, 0, 80, 25), driver.Screen);
+        Assert.Equal (new (0, 0, 80, 25), Application.Screen);
+
+        driver.Cols = 100;
+        driver.Rows = 30;
+        // IConsoleDriver.Screen isn't assignable
+        //driver.Screen = new (0, 0, driver.Cols, Rows);
+        Assert.Equal (new (0, 0, 100, 30), driver.Screen);
+        Assert.NotEqual (new (0, 0, 100, 30), Application.Screen);
+        Assert.Equal (new (0, 0, 80, 25), Application.Screen);
+        Application.Screen = new (0, 0, driver.Cols, driver.Rows);
+        Assert.Equal (new (0, 0, 100, 30), driver.Screen);
+
+        Application.Shutdown ();
+    }
+
     private void Init ()
     {
         Application.Init (new FakeDriver ());

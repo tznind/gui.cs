@@ -215,6 +215,8 @@ public static partial class Application
 
         Navigation = null;
 
+        ClearScreenNextIteration = false;
+
         AddApplicationKeyBindings ();
 
         // Reset synchronization context to allow the user to run async/await,

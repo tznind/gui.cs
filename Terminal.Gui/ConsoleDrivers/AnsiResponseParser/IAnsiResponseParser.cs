@@ -30,7 +30,7 @@ public interface IAnsiResponseParser
     ///     that already has one.
     ///     exists.
     /// </exception>
-    void ExpectResponse (string terminator, Action<string> response,Action? abandoned, bool persistent);
+    void ExpectResponse (string terminator, Action<string> response, Action? abandoned, bool persistent);
 
     /// <summary>
     ///     Returns true if there is an existing expectation (i.e. we are waiting a response

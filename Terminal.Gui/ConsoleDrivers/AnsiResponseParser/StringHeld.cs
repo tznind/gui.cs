@@ -6,13 +6,13 @@ namespace Terminal.Gui;
 /// </summary>
 internal class StringHeld : IHeld
 {
-    private readonly StringBuilder held = new ();
+    private readonly StringBuilder _held = new ();
 
-    public void ClearHeld () { held.Clear (); }
+    public void ClearHeld () { _held.Clear (); }
 
-    public string HeldToString () { return held.ToString (); }
+    public string HeldToString () { return _held.ToString (); }
 
-    public IEnumerable<object> HeldToObjects () { return held.ToString ().Select (c => (object)c); }
+    public IEnumerable<object> HeldToObjects () { return _held.ToString ().Select (c => (object)c); }
 
-    public void AddToHeld (object o) { held.Append ((char)o); }
+    public void AddToHeld (object o) { _held.Append ((char)o); }
 }
