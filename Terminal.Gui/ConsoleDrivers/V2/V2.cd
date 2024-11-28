@@ -16,7 +16,7 @@
     <Position X="18.458" Y="3.562" Height="0.396" Width="2.825" />
   </Comment>
   <Comment CommentText="Mouse interpretation subsystem">
-    <Position X="16.125" Y="8.833" Height="0.396" Width="2.825" />
+    <Position X="12.625" Y="9.833" Height="0.396" Width="2.825" />
   </Comment>
   <Class Name="Terminal.Gui.WindowsInput" Collapsed="true">
     <Position X="10.5" Y="3" Width="1.75" />
@@ -74,7 +74,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.AnsiResponseParser&lt;T&gt;" Collapsed="true">
-    <Position X="19.5" Y="7.75" Width="2" />
+    <Position X="18.75" Y="10" Width="2" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAACIAAAAAAAAAAAAAgAABAAAAAABAAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\AnsiResponseParser.cs</FileName>
@@ -116,8 +116,10 @@
         <Point X="18.125" Y="5.031" />
         <Point X="18.125" Y="5.5" />
         <Point X="19" Y="5.5" />
-        <Point X="19" Y="8" />
-        <Point X="19.5" Y="8" />
+        <Point X="19" Y="9.75" />
+        <Point X="18.5" Y="9.75" />
+        <Point X="18.5" Y="10.25" />
+        <Point X="18.75" Y="10.25" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
@@ -143,8 +145,8 @@
       <FileName>ConsoleDrivers\V2\WindowsInputProcessor.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Terminal.Gui.AnsiMouseParser" Collapsed="true">
-    <Position X="22.5" Y="9.25" Width="1.5" />
+  <Class Name="Terminal.Gui.AnsiMouseParser">
+    <Position X="23.5" Y="9" Width="1.75" />
     <TypeIdentifier>
       <HashCode>BAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\AnsiMouseParser.cs</FileName>
@@ -173,7 +175,7 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Terminal.Gui.AnsiResponseParserBase" Collapsed="true">
-    <Position X="19.5" Y="7" Width="2" />
+    <Position X="19.5" Y="9" Width="2" />
     <TypeIdentifier>
       <HashCode>UACASAAAEICQALAAQAAACAAAIAIAAABAAQIAJgAQACQ=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\AnsiResponseParser.cs</FileName>
@@ -185,7 +187,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.MouseInterpreter">
-    <Position X="16.25" Y="9.5" Width="1.5" />
+    <Position X="12.75" Y="10.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAABAAIAAkAAACAAICgIAAAAAABAAAAAAgA=</HashCode>
       <FileName>ConsoleDrivers\V2\MouseState.cs</FileName>
@@ -198,7 +200,7 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Terminal.Gui.ButtonNarrative">
-    <Position X="19.25" Y="11" Width="1.5" />
+    <Position X="15.75" Y="12" Width="1.5" />
     <TypeIdentifier>
       <HashCode>IAAAAAAAAAAAAAAAAgAAAAAAICAAAAQAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\MouseState.cs</FileName>
@@ -211,14 +213,14 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Terminal.Gui.ButtonState">
-    <Position X="22" Y="11" Width="1.5" />
+    <Position X="18.5" Y="12" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AEAAAAAAAAAAAAggAAAAAAAAAACJAAAAAoAAAAAEAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\MouseState.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Terminal.Gui.StringHeld" Collapsed="true">
-    <Position X="22.5" Y="8.5" Width="1.5" />
+    <Position X="21" Y="11" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAIAACAAAAAAAIAAAAAAAACAAAAAAAgAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\StringHeld.cs</FileName>
@@ -226,7 +228,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.GenericHeld&lt;T&gt;" Collapsed="true">
-    <Position X="24" Y="8.5" Width="1.5" />
+    <Position X="19.25" Y="11" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAgAIAACAAAAAAAIAAAAAAAACAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\GenericHeld.cs</FileName>
@@ -245,6 +247,13 @@
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAgAAEAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiEscapeSequence.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.AnsiResponseParser" Collapsed="true">
+    <Position X="20.75" Y="10" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAgACBAAAAAABAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\AnsiResponseParser.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Interface Name="Terminal.Gui.IConsoleInput&lt;T&gt;" Collapsed="true">
@@ -280,11 +289,11 @@
     <AssociationLine Name="MouseInterpreter" Type="Terminal.Gui.MouseInterpreter" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
         <Point X="14.5" Y="6.875" />
-        <Point X="14.62" Y="6.875" />
-        <Point X="14.62" Y="7.953" />
-        <Point X="15.807" Y="7.953" />
-        <Point X="15.807" Y="11.143" />
-        <Point X="16.25" Y="11.143" />
+        <Point X="15.5" Y="6.875" />
+        <Point X="15.5" Y="10.125" />
+        <Point X="12.375" Y="10.125" />
+        <Point X="12.375" Y="12.143" />
+        <Point X="12.75" Y="12.143" />
       </Path>
       <MemberNameLabel ManuallyPlaced="true">
         <Position X="0.123" Y="0.152" />
@@ -299,7 +308,7 @@
     </ShowAsAssociation>
   </Interface>
   <Interface Name="Terminal.Gui.ConsoleDrivers.V2.IViewFinder">
-    <Position X="19.25" Y="9.25" Width="1.5" />
+    <Position X="15.75" Y="10.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\IViewFinder.cs</FileName>
@@ -312,5 +321,22 @@
       <FileName>ConsoleDrivers\AnsiResponseParser\IHeld.cs</FileName>
     </TypeIdentifier>
   </Interface>
+  <Interface Name="Terminal.Gui.IAnsiResponseParser">
+    <Position X="19.5" Y="5.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAJAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\IAnsiResponseParser.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="State" />
+    </ShowAsAssociation>
+  </Interface>
+  <Enum Name="Terminal.Gui.AnsiResponseParserState">
+    <Position X="19.5" Y="7.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAAAAAAAAAAAAAAIAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\AnsiResponseParserState.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>
