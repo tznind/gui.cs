@@ -100,7 +100,11 @@ public static partial class Application // Initialization (Init/Shutdown)
     ///     The <see cref="InitializedChanged"/> event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
     /// </para>
     /// </remarks>
-    public static bool Initialized { get; internal set; }
+    public static bool Initialized
+    {
+        get => ApplicationImpl.Instance.Initialized;
+        set => ApplicationImpl.Instance.Initialized = value;
+    }
 
     /// <summary>
     ///     This event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.

@@ -16,6 +16,8 @@ internal class ApplicationImpl : IApplication
     // Public static property to access the instance
     public static IApplication Instance => lazyInstance.Value;
 
+    public bool Initialized { get; set; }
+
     // Private constructor to prevent external instantiation
     protected ApplicationImpl ()
     {
