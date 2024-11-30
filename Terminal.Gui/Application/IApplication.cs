@@ -10,6 +10,14 @@ public interface IApplication
     public bool Initialized { get; set; }
 
 
+    /// <summary>
+    ///     Gets the <see cref="ApplicationNavigation"/> instance for the current <see cref="Application"/>.
+    /// </summary>
+    ApplicationNavigation Navigation { get; set; }
+
+    /// <summary>Gets the Application-scoped key bindings.</summary>
+    KeyBindings KeyBindings { get; set; }
+
     public void Shutdown ();
     public void RequestStop ();
     public void Init ();

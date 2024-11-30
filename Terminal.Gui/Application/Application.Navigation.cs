@@ -6,7 +6,9 @@ public static partial class Application // Navigation stuff
     /// <summary>
     ///     Gets the <see cref="ApplicationNavigation"/> instance for the current <see cref="Application"/>.
     /// </summary>
-    public static ApplicationNavigation? Navigation { get; internal set; }
+    public static ApplicationNavigation? Navigation {
+        get=>ApplicationImpl.Instance.Navigation;
+        set => ApplicationImpl.Instance.Navigation = value;}
 
     private static Key _nextTabGroupKey = Key.F6; // Resources/config.json overrides
     private static Key _nextTabKey = Key.Tab; // Resources/config.json overrides

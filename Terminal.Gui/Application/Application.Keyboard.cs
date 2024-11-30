@@ -155,114 +155,12 @@ public static partial class Application // Keyboard handling
 
     #region Application-scoped KeyBindings
 
-    static Application () { AddApplicationKeyBindings (); }
 
     /// <summary>Gets the Application-scoped key bindings.</summary>
-    public static KeyBindings KeyBindings { get; internal set; } = new ();
-
-    internal static void AddApplicationKeyBindings ()
+    public static KeyBindings KeyBindings
     {
-        CommandImplementations = new ();
-
-        // Things this view knows how to do
-        AddCommand (
-                    Command.Quit,
-                    static () =>
-                    {
-                        RequestStop ();
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.Suspend,
-                    static () =>
-                    {
-                        Driver?.Suspend ();
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.NextTabStop,
-                    static () => Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop));
-
-        AddCommand (
-                    Command.PreviousTabStop,
-                    static () => Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop));
-
-        AddCommand (
-                    Command.NextTabGroup,
-                    static () => Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup));
-
-        AddCommand (
-                    Command.PreviousTabGroup,
-                    static () => Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup));
-
-        AddCommand (
-                    Command.Refresh,
-                    static () =>
-                    {
-                        LayoutAndDraw (true);
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.Edit,
-                    static () =>
-                    {
-                        View? viewToArrange = Navigation?.GetFocused ();
-
-                        // Go up the superview hierarchy and find the first that is not ViewArrangement.Fixed
-                        while (viewToArrange is { SuperView: { }, Arrangement: ViewArrangement.Fixed })
-                        {
-                            viewToArrange = viewToArrange.SuperView;
-                        }
-
-                        if (viewToArrange is { })
-                        {
-                            return viewToArrange.Border?.EnterArrangeMode (ViewArrangement.Fixed);
-                        }
-
-                        return false;
-                    });
-
-        KeyBindings.Clear ();
-
-        // Resources/config.json overrides
-        NextTabKey = Key.Tab;
-        PrevTabKey = Key.Tab.WithShift;
-        NextTabGroupKey = Key.F6;
-        PrevTabGroupKey = Key.F6.WithShift;
-        QuitKey = Key.Esc;
-        ArrangeKey = Key.F5.WithCtrl;
-
-        KeyBindings.Add (QuitKey, KeyBindingScope.Application, Command.Quit);
-
-        KeyBindings.Add (Key.CursorRight, KeyBindingScope.Application, Command.NextTabStop);
-        KeyBindings.Add (Key.CursorDown, KeyBindingScope.Application, Command.NextTabStop);
-        KeyBindings.Add (Key.CursorLeft, KeyBindingScope.Application, Command.PreviousTabStop);
-        KeyBindings.Add (Key.CursorUp, KeyBindingScope.Application, Command.PreviousTabStop);
-        KeyBindings.Add (NextTabKey, KeyBindingScope.Application, Command.NextTabStop);
-        KeyBindings.Add (PrevTabKey, KeyBindingScope.Application, Command.PreviousTabStop);
-
-        KeyBindings.Add (NextTabGroupKey, KeyBindingScope.Application, Command.NextTabGroup);
-        KeyBindings.Add (PrevTabGroupKey, KeyBindingScope.Application, Command.PreviousTabGroup);
-
-        KeyBindings.Add (ArrangeKey, KeyBindingScope.Application, Command.Edit);
-
-        // TODO: Refresh Key should be configurable
-        KeyBindings.Add (Key.F5, KeyBindingScope.Application, Command.Refresh);
-
-        // TODO: Suspend Key should be configurable
-        if (Environment.OSVersion.Platform == PlatformID.Unix)
-        {
-            KeyBindings.Add (Key.Z.WithCtrl, KeyBindingScope.Application, Command.Suspend);
-        }
+        get => ApplicationImpl.Instance.KeyBindings;
+        set => ApplicationImpl.Instance.KeyBindings = value;
     }
 
     /// <summary>
@@ -310,27 +208,5 @@ public static partial class Application // Keyboard handling
 
     #endregion Application-scoped KeyBindings
 
-    /// <summary>
-    ///     <para>
-    ///         Sets the function that will be invoked for a <see cref="Command"/>.
-    ///     </para>
-    ///     <para>
-    ///         If AddCommand has already been called for <paramref name="command"/> <paramref name="f"/> will
-    ///         replace the old one.
-    ///     </para>
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         This version of AddCommand is for commands that do not require a <see cref="CommandContext"/>.
-    ///     </para>
-    /// </remarks>
-    /// <param name="command">The command.</param>
-    /// <param name="f">The function.</param>
-    private static void AddCommand (Command command, Func<bool?> f) { CommandImplementations! [command] = ctx => f (); }
-
-    /// <summary>
-    ///     Commands for Application.
-    /// </summary>
-    private static Dictionary<Command, View.CommandImplementation>? CommandImplementations { get; set; }
 
 }
