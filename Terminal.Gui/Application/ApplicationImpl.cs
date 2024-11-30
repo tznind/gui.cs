@@ -7,7 +7,7 @@ internal class ApplicationImpl : IApplication
 {
 
     /// <summary>Gets the <see cref="IConsoleDriver"/> that has been selected.</summary>
-    public IConsoleDriver? Driver { get; internal set; }
+    public IConsoleDriver? Driver { get; set; }
 
     // Private static readonly Lazy instance of Application
     private static readonly Lazy<IApplication> lazyInstance =
