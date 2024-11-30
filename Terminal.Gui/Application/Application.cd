@@ -1,14 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Comment CommentText="Static forwarding methods">
+    <Position X="2.667" Y="0.792" Height="0.354" Width="1.7" />
+  </Comment>
+  <Comment CommentText="public contract">
+    <Position X="4.854" Y="0.833" Height="0.354" Width="1.7" />
+  </Comment>
+  <Comment CommentText="Instance class">
+    <Position X="6.833" Y="0.833" Height="0.354" Width="1.471" />
+  </Comment>
   <Class Name="Terminal.Gui.Application">
     <Position X="2.25" Y="1.25" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>hAIwFAgAqARIopQXBQo0gTGCACNLUAICESJKoggASg8=</HashCode>
+      <HashCode>hAI4FAgAqARIooQcBQoUgTGiACNL0AICESJKoggBSg8=</HashCode>
       <FileName>Application\Application.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Terminal.Gui.ApplicationNavigation">
-    <Position X="8.5" Y="1.25" Width="2" />
+    <Position X="9.5" Y="1.25" Width="2" />
     <TypeIdentifier>
       <HashCode>AABAAAAAAABCAAAAAAAAAAAAAAAAIgIAAAAAAAAAAAA=</HashCode>
       <FileName>Application\ApplicationNavigation.cs</FileName>
@@ -68,15 +77,18 @@
   <Class Name="Terminal.Gui.ApplicationImpl" BaseTypeListCollapsed="true">
     <Position X="6.75" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AEAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAQAAAAACAAAA=</HashCode>
+      <HashCode>AEAAEAAAAAAAABADAAAgAAAAAAAAwAAAQAAAAACAQAA=</HashCode>
       <FileName>Application\ApplicationImpl.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Navigation" />
+    </ShowAsAssociation>
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Interface Name="Terminal.Gui.IApplication">
     <Position X="5" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAgAAAAAAAQAAAAAAgAAAAAACAAAAAAA=</HashCode>
+      <HashCode>AAAAEAAAAAAAAgAAAAAAAQAAAAAAwAAAAAACAAAAQAA=</HashCode>
       <FileName>Application\IApplication.cs</FileName>
     </TypeIdentifier>
   </Interface>
