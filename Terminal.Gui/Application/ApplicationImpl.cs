@@ -6,10 +6,20 @@ namespace Terminal.Gui;
 public class ApplicationImpl : IApplication
 {
     // Private static readonly Lazy instance of Application
-    private static readonly Lazy<IApplication> lazyInstance = new (() => new ApplicationImpl ());
+    private static Lazy<IApplication> lazyInstance = new (() => new ApplicationImpl ());
 
     // Public static property to access the instance
     public static IApplication Instance => lazyInstance.Value;
+
+    /// <summary>
+    /// Change the singleton implementation, should not be called except before application
+    /// startup.
+    /// </summary>
+    /// <param name="newApplication"></param>
+    public static void ChangeInstance (IApplication newApplication)
+    {
+        lazyInstance = new Lazy<IApplication> (newApplication);
+    }
 
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
