@@ -37,7 +37,10 @@ public static partial class Application // Initialization (Init/Shutdown)
     /// </param>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public static void Init (IConsoleDriver? driver = null, string? driverName = null) { InternalInit (driver, driverName); }
+    public static void Init (IConsoleDriver? driver = null, string? driverName = null)
+    {
+        ApplicationImpl.Instance.Init (driver, driverName);
+    }
 
     internal static int MainThreadId { get; set; } = -1;
 
@@ -210,20 +213,7 @@ public static partial class Application // Initialization (Init/Shutdown)
     ///     up (Disposed)
     ///     and terminal settings are restored.
     /// </remarks>
-    public static void Shutdown ()
-    {
-        // TODO: Throw an exception if Init hasn't been called.
-
-        bool wasInitialized = Initialized;
-        ResetState ();
-        PrintJsonErrors ();
-
-        if (wasInitialized)
-        {
-            bool init = Initialized;
-            InitializedChanged?.Invoke (null, new (in init));
-        }
-    }
+    public static void Shutdown () => ApplicationImpl.Instance.Shutdown ();
 
     /// <summary>
     ///     Gets whether the application has been initialized with <see cref="Init"/> and not yet shutdown with <see cref="Shutdown"/>.
@@ -242,4 +232,12 @@ public static partial class Application // Initialization (Init/Shutdown)
     ///     Intended to support unit tests that need to know when the application has been initialized.
     /// </remarks>
     public static event EventHandler<EventArgs<bool>>? InitializedChanged;
+
+    /// <summary>
+    ///  Raises the <see cref="InitializedChanged"/> event.
+    /// </summary>
+    internal static void OnInitializedChanged (object sender, EventArgs<bool> e)
+    {
+        Application.InitializedChanged?.Invoke (sender,e);
+    }
 }
