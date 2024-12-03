@@ -21,6 +21,7 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Terminal.Gui;
+using Terminal.Gui.ConsoleDrivers.V2;
 using UICatalog.Scenarios;
 using static Terminal.Gui.ConfigurationManager;
 using Command = Terminal.Gui.Command;
@@ -327,6 +328,12 @@ public class UICatalogApp
     private static void UICatalogMain (Options options)
     {
         StartConfigFileWatcher ();
+
+        if (options.Driver == "v2")
+        {
+            ApplicationImpl.ChangeInstance (new ApplicationV2 ());
+            options.Driver = string.Empty;
+        }
 
         // By setting _forceDriver we ensure that if the user has specified a driver on the command line, it will be used
         // regardless of what's in a config file.
