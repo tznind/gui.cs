@@ -149,6 +149,10 @@ public class UICatalogApp
         benchmarkFlag.AddAlias ("-b");
         benchmarkFlag.AddAlias ("--b");
 
+        Option<uint> benchmarkTimeout = new Option<uint> ("--timeout", getDefaultValue: () => Scenario.BenchmarkTimeout, $"The maximum time in milliseconds to run a benchmark for. Default is {Scenario.BenchmarkTimeout}ms.");
+        benchmarkTimeout.AddAlias ("-t");
+        benchmarkTimeout.AddAlias ("--t");
+
         Option<string> resultsFile = new Option<string> ("--file", "The file to save benchmark results to. If not specified, the results will be displayed in a TableView.");
         resultsFile.AddAlias ("-f");
         resultsFile.AddAlias ("--f");
@@ -166,7 +170,7 @@ public class UICatalogApp
 
         var rootCommand = new RootCommand ("A comprehensive sample library for Terminal.Gui")
         {
-            scenarioArgument, benchmarkFlag, resultsFile, driverOption,
+            scenarioArgument, benchmarkFlag, benchmarkTimeout, resultsFile, driverOption,
         };
 
         rootCommand.SetHandler (
@@ -177,6 +181,7 @@ public class UICatalogApp
                                         Scenario = context.ParseResult.GetValueForArgument (scenarioArgument),
                                         Driver = context.ParseResult.GetValueForOption (driverOption) ?? string.Empty,
                                         Benchmark = context.ParseResult.GetValueForOption (benchmarkFlag),
+                                        BenchmarkTimeout = context.ParseResult.GetValueForOption (benchmarkTimeout),
                                         ResultsFile = context.ParseResult.GetValueForOption (resultsFile) ?? string.Empty,
                                         /* etc. */
                                     };
@@ -197,6 +202,8 @@ public class UICatalogApp
         {
             return 0;
         }
+
+        Scenario.BenchmarkTimeout = _options.BenchmarkTimeout;
 
         UICatalogMain (_options);
 
@@ -338,6 +345,7 @@ public class UICatalogApp
         // By setting _forceDriver we ensure that if the user has specified a driver on the command line, it will be used
         // regardless of what's in a config file.
         Application.ForceDriver = _forceDriver = options.Driver;
+
 
         // If a Scenario name has been provided on the commandline
         // run it and exit when done.
@@ -795,7 +803,8 @@ public class UICatalogApp
                                              {
                                                  if (_statusBar.NeedsLayout)
                                                  {
-                                                   //  throw new LayoutException ("DimFunc.Fn aborted because dependent View needs layout.");
+                                                       throw new LayoutException ("DimFunc.Fn aborted because dependent View needs layout.");
+                                                     //_statusBar.Layout ();
                                                  }
                                                  return _statusBar.Frame.Height;
                                              })),
@@ -824,7 +833,8 @@ public class UICatalogApp
                                              {
                                                  if (_statusBar.NeedsLayout)
                                                  {
-                                                    // throw new LayoutException ("DimFunc.Fn aborted because dependent View needs layout.");
+                                                     throw new LayoutException ("DimFunc.Fn aborted because dependent View needs layout.");
+                                                     //_statusBar.Layout ();
                                                  }
                                                  return _statusBar.Frame.Height;
                                              })),
@@ -1384,6 +1394,8 @@ public class UICatalogApp
         public string Driver;
 
         public string Scenario;
+
+        public uint BenchmarkTimeout;
 
         public bool Benchmark;
 
