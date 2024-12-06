@@ -216,4 +216,26 @@ public class ApplicationImpl : IApplication
             Application.OnInitializedChanged(this, new (in init));
         }
     }
+
+    /// <inheritdoc />
+    public void RequestStop (Toplevel top)
+    {
+        top ??= Application.Top;
+
+        if (!top!.Running)
+        {
+            return;
+        }
+
+        var ev = new ToplevelClosingEventArgs (top);
+        top.OnClosing (ev);
+
+        if (ev.Cancel)
+        {
+            return;
+        }
+
+        top.Running = false;
+        Application.OnNotifyStopRunState (top);
+    }
 }

@@ -135,4 +135,15 @@ public interface IApplication
     ///     and terminal settings are restored.
     /// </remarks>
     public void Shutdown ();
+
+    /// <summary>Stops the provided <see cref="Toplevel"/>, causing or the <paramref name="top"/> if provided.</summary>
+    /// <param name="top">The <see cref="Toplevel"/> to stop.</param>
+    /// <remarks>
+    ///     <para>This will cause <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to return.</para>
+    ///     <para>
+    ///         Calling <see cref="RequestStop(Terminal.Gui.Toplevel)"/> is equivalent to setting the <see cref="Toplevel.Running"/>
+    ///         property on the currently running <see cref="Toplevel"/> to false.
+    ///     </para>
+    /// </remarks>
+    void RequestStop (Toplevel top);
 }

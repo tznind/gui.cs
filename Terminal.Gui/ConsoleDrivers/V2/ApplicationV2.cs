@@ -82,47 +82,30 @@ public class ApplicationV2 : IApplication
     {
         ArgumentNullException.ThrowIfNull (view);
 
-
         if (!Application.Initialized)
         {
             throw new Exception ("App not Initialized");
         }
 
-        var resume = true;
+        Application.Top = view;
 
-        while (resume)
+        Application.Begin (view);
+        // TODO : how to know when we are done?
+        while (Application.Top != null)
         {
-            try
-            { 
-                resume = false;
-                RunState runState = Application.Begin (view);
-
-                // TODO : how to know when we are done?
-                while (runState.Toplevel is { })
-                {
-                    Task.Delay (100).Wait ();
-                }
-
-                runState.Dispose ();
-                Application.End (runState);
-            
-            }
-            catch (Exception error)
-            {
-                if (errorHandler is null)
-                {
-                    throw;
-                }
-
-                resume = errorHandler (error);
-            }
+            Task.Delay (100).Wait ();
         }
-
     }
 
     /// <inheritdoc />
     public void Shutdown ()
     {
         _coordinator.Stop ();
+    }
+
+    /// <inheritdoc />
+    public void RequestStop (Toplevel top)
+    {
+        Application.Top = null;
     }
 }

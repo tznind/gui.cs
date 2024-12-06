@@ -518,31 +518,8 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///         property on the currently running <see cref="Toplevel"/> to false.
     ///     </para>
     /// </remarks>
-    public static void RequestStop (Toplevel? top = null)
-    {
-        if (top is null)
-        {
-            top = Top;
-        }
-
-        if (!top!.Running)
-        {
-            return;
-        }
-
-        var ev = new ToplevelClosingEventArgs (top);
-        top.OnClosing (ev);
-
-        if (ev.Cancel)
-        {
-            return;
-        }
-
-        top.Running = false;
-        OnNotifyStopRunState (top);
-    }
-
-    private static void OnNotifyStopRunState (Toplevel top)
+    public static void RequestStop (Toplevel? top = null) => ApplicationImpl.Instance.RequestStop (top);
+    internal static void OnNotifyStopRunState (Toplevel top)
     {
         if (EndAfterFirstIteration)
         {
