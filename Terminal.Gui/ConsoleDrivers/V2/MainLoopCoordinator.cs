@@ -16,6 +16,8 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     object oLockInitialization = new ();
     private ConsoleDriverFacade<T> _facade;
 
+    public SemaphoreSlim StartupSemaphore { get; } = new (0, 1);
+
     /// <summary>
     /// Creates a new coordinator
     /// </summary>
@@ -111,6 +113,8 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
                                              {
                                                  e.View?.NewMouseEvent (e);
                                              };
+
+            StartupSemaphore.Release ();
         }
     }
 
@@ -118,12 +122,4 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     {
         tokenSource.Cancel();
     }
-}
-
-public interface IMainLoopCoordinator
-{
-    public void StartAsync ();
-    public void StartBlocking ();
-
-    public void Stop ();
 }

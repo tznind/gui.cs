@@ -163,9 +163,13 @@ public class WindowsOutput : IConsoleOutput
             Bottom = (short)buffer.Rows,
             Right = (short)buffer.Cols
         };
-
+        //size, ExtendedCharInfo [] charInfoBuffer, Coord , SmallRect window,
         if (WinConsole != null
-            && !WinConsole.WriteToConsole (new (buffer.Cols, buffer.Rows), outputBuffer, bufferCoords, damageRegion, false))
+            && !WinConsole.WriteToConsole (
+                                           size: new (buffer.Cols, buffer.Rows),
+                                           charInfoBuffer: outputBuffer,
+                                           bufferSize: bufferCoords,
+                                           window: damageRegion, false))
         {
             int err = Marshal.GetLastWin32Error ();
 
