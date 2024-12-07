@@ -1,16 +1,13 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 
 namespace Terminal.Gui;
 
 public class TimedEvents : ITimedEvents
 {
-    internal List<Func<bool>> _idleHandlers = new ();
-    internal SortedList<long, Timeout> _timeouts = new ();
+    internal ConcurrentBag<Func<bool>> _idleHandlers = new ();
+    internal ConcurrentDictionary<long, Timeout> _timeouts = new ();
 
-    /// <summary>The idle handlers and lock that must be held while manipulating them</summary>
-    private readonly object _idleHandlersLock = new ();
-
-    private readonly object _timeoutsLockToken = new ();
 
 
     /// <summary>Gets a copy of the list of all idle handlers.</summary>
@@ -18,10 +15,8 @@ public class TimedEvents : ITimedEvents
     {
         get
         {
-            lock (_idleHandlersLock)
-            {
-                return new List<Func<bool>> (_idleHandlers).AsReadOnly ();
-            }
+                return _idleHandlers.ToList ().AsReadOnly ();
+            
         }
     }
 
@@ -270,6 +265,8 @@ public interface ITimedEvents
 {
     void AddIdle (Func<bool> idleHandler);
     void LockAndRunIdles ();
+    void LockAndRunTimers ();
+
     bool CheckTimersAndIdleHandlers (out int waitTimeout);
 
     /// <summary>Adds a timeout to the application.</summary>
