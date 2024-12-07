@@ -153,4 +153,6 @@ public interface IApplication
 
     bool IsLegacy { get; }
     void AddIdle (Func<bool> func);
+    object AddTimeout (TimeSpan time, Func<bool> callback);
+    bool RemoveTimeout (object token);
 }

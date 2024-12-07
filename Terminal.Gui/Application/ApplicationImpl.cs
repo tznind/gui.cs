@@ -261,4 +261,16 @@ public class ApplicationImpl : IApplication
         Application.MainLoop.AddIdle (func);
 
     }
+
+    /// <inheritdoc />
+    public virtual object AddTimeout (TimeSpan time, Func<bool> callback)
+    {
+        return Application.MainLoop?.TimedEvents.AddTimeout (time, callback) ?? null;
+    }
+
+    /// <inheritdoc />
+    public virtual bool RemoveTimeout (object token)
+    { 
+        return Application.MainLoop?.TimedEvents.RemoveTimeout (token) ?? false; 
+    }
 }

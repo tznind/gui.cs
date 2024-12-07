@@ -366,10 +366,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///     reset, repeating the invocation. If it returns false, the timeout will stop and be removed. The returned value is a
     ///     token that can be used to stop the timeout by calling <see cref="RemoveTimeout(object)"/>.
     /// </remarks>
-    public static object? AddTimeout (TimeSpan time, Func<bool> callback)
-    {
-        return MainLoop?.AddTimeout (time, callback) ?? null;
-    }
+    public static object? AddTimeout (TimeSpan time, Func<bool> callback) => ApplicationImpl.Instance.AddTimeout (time, callback);
 
     /// <summary>Removes a previously scheduled timeout</summary>
     /// <remarks>The token parameter is the value returned by <see cref="AddTimeout"/>.</remarks>
@@ -381,7 +378,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// This method also returns
     /// <c>false</c>
     /// if the timeout is not found.
-    public static bool RemoveTimeout (object token) { return MainLoop?.RemoveTimeout (token) ?? false; }
+    public static bool RemoveTimeout (object token) => ApplicationImpl.Instance.RemoveTimeout (token);
 
     /// <summary>Runs <paramref name="action"/> on the thread that is processing events</summary>
     /// <param name="action">the action to be invoked on the main processing thread.</param>
