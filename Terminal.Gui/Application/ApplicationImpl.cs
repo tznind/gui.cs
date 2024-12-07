@@ -254,4 +254,11 @@ public class ApplicationImpl : IApplication
 
     /// <inheritdoc />
     public bool IsLegacy => true;
+
+    /// <inheritdoc />
+    public void AddIdle (Func<bool> func)
+    {
+        Application.MainLoop.AddIdle (func);
+
+    }
 }

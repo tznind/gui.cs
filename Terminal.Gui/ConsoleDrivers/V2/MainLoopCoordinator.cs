@@ -15,8 +15,11 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     private IConsoleOutput _output;
     object oLockInitialization = new ();
     private ConsoleDriverFacade<T> _facade;
+    private Task _inputTask;
+    private Task _loopTask;
 
     public SemaphoreSlim StartupSemaphore { get; } = new (0, 1);
+
 
     /// <summary>
     /// Creates a new coordinator
@@ -44,18 +47,10 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     /// </summary>
     public void StartAsync ()
     {
-        Task.Run (RunInput);
-        Task.Run (RunLoop);
+        _inputTask = Task.Run (RunInput);
+        _loopTask = Task.Run (RunLoop);
     }
-    /// <summary>
-    /// Starts the input thread and then enters the main loop in the current thread
-    /// (method only exits when application ends).
-    /// </summary>
-    public void StartBlocking ()
-    {
-        Task.Run (RunInput);
-        RunLoop();
-    }
+
     private void RunInput ()
     {
         lock (oLockInitialization)
@@ -79,7 +74,6 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
 
     private void RunLoop ()
     {
-
         lock (oLockInitialization)
         {
             // Instance must be constructed on the thread in which it is used.
@@ -121,5 +115,8 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     public void Stop ()
     {
         tokenSource.Cancel();
+
+        // Wait for both tasks to complete
+        Task.WhenAll (_inputTask, _loopTask).Wait ();
     }
 }

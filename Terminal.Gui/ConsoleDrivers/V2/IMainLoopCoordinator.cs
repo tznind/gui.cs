@@ -9,7 +9,6 @@ public interface IMainLoopCoordinator
     /// </summary>
     SemaphoreSlim StartupSemaphore { get; }
     public void StartAsync ();
-    public void StartBlocking ();
 
     public void Stop ();
 }

@@ -99,12 +99,39 @@ public class ApplicationV2 : IApplication
     public void Shutdown ()
     {
         _coordinator.Stop ();
+
+        bool wasInitialized = Application.Initialized;
+        Application.ResetState ();
+        PrintJsonErrors ();
+
+        if (wasInitialized)
+        {
+            bool init = Application.Initialized;
+
+            Application.OnInitializedChanged (this, new (in init));
+        }
     }
 
     /// <inheritdoc />
     public void RequestStop (Toplevel top)
     {
-        Application.Top = null;
+        top ??= Application.Top;
+
+        if (top == null)
+        {
+            return;
+        }
+
+        var ev = new ToplevelClosingEventArgs (top);
+        top.OnClosing (ev);
+
+        if (ev.Cancel)
+        {
+            return;
+        }
+
+        top.Running = false;
+        Application.OnNotifyStopRunState (top);
     }
 
     /// <inheritdoc />
@@ -115,4 +142,12 @@ public class ApplicationV2 : IApplication
 
     /// <inheritdoc />
     public bool IsLegacy => false;
+
+    /// <inheritdoc />
+    public void AddIdle (Func<bool> func)
+    {
+        // TODO properly
+
+        func.Invoke ();
+    }
 }

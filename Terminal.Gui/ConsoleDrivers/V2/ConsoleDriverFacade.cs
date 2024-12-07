@@ -334,5 +334,4 @@ class ConsoleDriverFacade<T> : IConsoleDriver
     {
         // No need we will always draw when dirty
     }
-
 }

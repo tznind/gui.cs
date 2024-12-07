@@ -152,4 +152,5 @@ public interface IApplication
     void Invoke (Action action);
 
     bool IsLegacy { get; }
+    void AddIdle (Func<bool> func);
 }

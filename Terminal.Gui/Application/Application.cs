@@ -226,4 +226,5 @@ public static partial class Application
     }
 
     // Only return true if the Current has changed.
+    public static void AddIdle (Func<bool> func) => ApplicationImpl.Instance.AddIdle (func);
 }
