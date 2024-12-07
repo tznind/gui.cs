@@ -22,6 +22,8 @@ public class ApplicationV2 : ApplicationImpl
         CreateDriver ();
 
         Application.Initialized = true;
+
+        Application.SubscribeDriverEvents ();
     }
 
     private void CreateDriver ()

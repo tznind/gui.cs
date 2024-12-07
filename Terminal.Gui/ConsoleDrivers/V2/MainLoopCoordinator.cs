@@ -100,14 +100,6 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
             _facade = new ConsoleDriverFacade<T> (_inputProcessor, _loop.OutputBuffer,_output,_loop.AnsiRequestScheduler);
             Application.Driver = _facade;
 
-            Application.Driver.KeyDown += (s, e) => Application.Top?.NewKeyDownEvent (e);
-            Application.Driver.KeyUp += (s, e) => Application.Top?.NewKeyUpEvent (e);
-
-            Application.Driver.MouseEvent += (s, e) =>
-                                             {
-                                                 e.View?.NewMouseEvent (e);
-                                             };
-
             StartupSemaphore.Release ();
         }
     }
