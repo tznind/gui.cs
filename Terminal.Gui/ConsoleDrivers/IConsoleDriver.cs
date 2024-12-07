@@ -256,11 +256,6 @@ public interface IConsoleDriver
     void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
 
     /// <summary>
-    ///     How long after Esc has been pressed before we give up on getting an Ansi escape sequence
-    /// </summary>
-    public TimeSpan EscTimeout { get; }
-
-    /// <summary>
     ///     Queues the given <paramref name="request"/> for execution
     /// </summary>
     /// <param name="request"></param>

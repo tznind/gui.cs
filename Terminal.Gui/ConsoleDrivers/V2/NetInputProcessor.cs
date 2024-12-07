@@ -16,9 +16,15 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
     {
         foreach (Tuple<char, ConsoleKeyInfo> released in Parser.ProcessInput (Tuple.Create (consoleKeyInfo.KeyChar, consoleKeyInfo)))
         {
-            var key = ConsoleKeyMapping.MapKey (released.Item2);
-            OnKeyDown (key);
-            OnKeyUp (key);
+            ProcessAfterParsing (released.Item2);
         }
+    }
+
+    /// <inheritdoc />
+    protected override void ProcessAfterParsing (ConsoleKeyInfo input)
+    {
+        var key = ConsoleKeyMapping.MapKey (input);
+        OnKeyDown (key);
+        OnKeyUp (key);
     }
 }

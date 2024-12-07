@@ -4,6 +4,12 @@ namespace Terminal.Gui;
 
 public abstract class InputProcessor<T> : IInputProcessor
 {
+
+    /// <summary>
+    /// How long after Esc has been pressed before we give up on getting an Ansi escape sequence
+    /// </summary>
+    TimeSpan _escTimeout = TimeSpan.FromMilliseconds (50);
+
     public AnsiResponseParser<T> Parser { get; } = new ();
     public ConcurrentQueue<T> InputBuffer { get; }
 
@@ -90,7 +96,25 @@ public abstract class InputProcessor<T> : IInputProcessor
         {
             Process (input);
         }
+
+        foreach (var input in ShouldReleaseParserHeldKeys ())
+        {
+            ProcessAfterParsing (input);
+        }
     }
 
+
+    public IEnumerable<T> ShouldReleaseParserHeldKeys ()
+    {
+        if (Parser.State == AnsiResponseParserState.ExpectingBracket &&
+            DateTime.Now - Parser.StateChangedAt > _escTimeout)
+        {
+            return Parser.Release ().Select (o => o.Item2);
+        }
+
+        return [];
+    }
     protected abstract void Process (T result);
+
+    protected abstract void ProcessAfterParsing (T input);
 }

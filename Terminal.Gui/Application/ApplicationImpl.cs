@@ -24,7 +24,7 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public void Init (IConsoleDriver? driver = null, string? driverName = null)
+    public virtual void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
         Application.InternalInit (driver, driverName);
     }
@@ -71,7 +71,7 @@ public class ApplicationImpl : IApplication
     /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
+    public virtual T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
         where T : Toplevel, new()
     {
         if (!Application.Initialized)
@@ -125,7 +125,7 @@ public class ApplicationImpl : IApplication
     ///     RELEASE builds only: Handler for any unhandled exceptions (resumes when returns true,
     ///     rethrows when null).
     /// </param>
-    public void Run (Toplevel view, Func<Exception, bool>? errorHandler = null)
+    public virtual void Run (Toplevel view, Func<Exception, bool>? errorHandler = null)
     {
         ArgumentNullException.ThrowIfNull (view);
 
@@ -201,7 +201,7 @@ public class ApplicationImpl : IApplication
     ///     up (Disposed)
     ///     and terminal settings are restored.
     /// </remarks>
-    public void Shutdown ()
+    public virtual void Shutdown ()
     {
         // TODO: Throw an exception if Init hasn't been called.
 
@@ -218,7 +218,7 @@ public class ApplicationImpl : IApplication
     }
 
     /// <inheritdoc />
-    public void RequestStop (Toplevel top)
+    public virtual void RequestStop (Toplevel top)
     {
         top ??= Application.Top;
 
@@ -240,7 +240,7 @@ public class ApplicationImpl : IApplication
     }
 
     /// <inheritdoc />
-    public void Invoke (Action action)
+    public virtual void Invoke (Action action)
     {
         Application.MainLoop?.AddIdle (
                            () =>
@@ -253,10 +253,10 @@ public class ApplicationImpl : IApplication
     }
 
     /// <inheritdoc />
-    public bool IsLegacy => true;
+    public bool IsLegacy { get; protected set; } = true;
 
     /// <inheritdoc />
-    public void AddIdle (Func<bool> func)
+    public virtual void AddIdle (Func<bool> func)
     {
         Application.MainLoop.AddIdle (func);
 

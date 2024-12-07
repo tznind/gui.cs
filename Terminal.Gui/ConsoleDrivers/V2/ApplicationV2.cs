@@ -3,12 +3,17 @@
 namespace Terminal.Gui.ConsoleDrivers.V2;
 
 
-public class ApplicationV2 : IApplication
+public class ApplicationV2 : ApplicationImpl
 {
     private IMainLoopCoordinator _coordinator;
 
+    public ApplicationV2 ()
+    {
+        IsLegacy = false;
+    }
+
     /// <inheritdoc />
-    public void Init (IConsoleDriver driver = null, string driverName = null)
+    public override void Init (IConsoleDriver driver = null, string driverName = null)
     {
         Application.Navigation = new ();
 
@@ -60,13 +65,7 @@ public class ApplicationV2 : IApplication
     }
 
     /// <inheritdoc />
-    public Toplevel Run (Func<Exception, bool> errorHandler = null, IConsoleDriver driver = null)
-    {
-        return Run<Toplevel> (errorHandler, driver);
-    }
-
-    /// <inheritdoc />
-    public T Run<T> (Func<Exception, bool> errorHandler = null, IConsoleDriver driver = null) where T : Toplevel, new ()
+    public override T Run<T> (Func<Exception, bool> errorHandler = null, IConsoleDriver driver = null)
     {
         var top = new T ();
 
@@ -76,7 +75,7 @@ public class ApplicationV2 : IApplication
     }
 
     /// <inheritdoc />
-    public void Run (Toplevel view, Func<Exception, bool> errorHandler = null)
+    public override void Run (Toplevel view, Func<Exception, bool> errorHandler = null)
     {
         ArgumentNullException.ThrowIfNull (view);
 
@@ -97,24 +96,14 @@ public class ApplicationV2 : IApplication
     }
 
     /// <inheritdoc />
-    public void Shutdown ()
+    public override void Shutdown ()
     {
         _coordinator.Stop ();
-
-        bool wasInitialized = Application.Initialized;
-        Application.ResetState ();
-        PrintJsonErrors ();
-
-        if (wasInitialized)
-        {
-            bool init = Application.Initialized;
-
-            Application.OnInitializedChanged (this, new (in init));
-        }
+        base.Shutdown ();
     }
 
     /// <inheritdoc />
-    public void RequestStop (Toplevel top)
+    public override void RequestStop (Toplevel top)
     {
         Application.TopLevels.Pop ();
 
@@ -129,16 +118,13 @@ public class ApplicationV2 : IApplication
     }
 
     /// <inheritdoc />
-    public void Invoke (Action action)
+    public override void Invoke (Action action)
     {
         // TODO
     }
 
     /// <inheritdoc />
-    public bool IsLegacy => false;
-
-    /// <inheritdoc />
-    public void AddIdle (Func<bool> func)
+    public override void AddIdle (Func<bool> func)
     {
         // TODO properly
 

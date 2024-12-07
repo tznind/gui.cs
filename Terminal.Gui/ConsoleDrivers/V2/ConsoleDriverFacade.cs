@@ -18,10 +18,6 @@ class ConsoleDriverFacade<T> : IConsoleDriver
         _inputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
         _inputProcessor.MouseEvent += (s, e) => MouseEvent?.Invoke (s, e);
     }
-    /// <summary>
-    /// How long after Esc has been pressed before we give up on getting an Ansi escape sequence
-    /// </summary>
-    public TimeSpan EscTimeout { get; } = TimeSpan.FromMilliseconds (50);
 
     /// <summary>Gets the location and size of the terminal screen.</summary>
     public Rectangle Screen => new (new (0,0),_output.GetWindowSize ());

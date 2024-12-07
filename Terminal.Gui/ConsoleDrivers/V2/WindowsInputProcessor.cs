@@ -29,9 +29,7 @@ public class WindowsInputProcessor : InputProcessor<InputRecord>
 
                 foreach (Tuple<char, InputRecord> released in Parser.ProcessInput (Tuple.Create (inputEvent.KeyEvent.UnicodeChar, inputEvent)))
                 {
-                    var key = (Key) (released.Item2.KeyEvent.UnicodeChar);
-                    OnKeyDown (key);
-                    OnKeyUp (key);
+                    ProcessAfterParsing (released.Item2);
                 }
 
                 /*
@@ -65,6 +63,14 @@ public class WindowsInputProcessor : InputProcessor<InputRecord>
 
                 break;
         }
+    }
+
+    /// <inheritdoc />
+    protected override void ProcessAfterParsing (InputRecord input)
+    {
+        var key = (Key)input.KeyEvent.UnicodeChar;
+        OnKeyDown (key);
+        OnKeyUp (key);
     }
 
     private MouseEventArgs ToDriverMouse (MouseEventRecord e)
