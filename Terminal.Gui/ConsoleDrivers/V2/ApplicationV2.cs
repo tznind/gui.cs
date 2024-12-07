@@ -7,6 +7,8 @@ public class ApplicationV2 : IApplication
 {
     private IMainLoopCoordinator _coordinator;
 
+    private Stack<View> _stack = new Stack<View> ();
+
     /// <inheritdoc />
     public void Init (IConsoleDriver driver = null, string driverName = null)
     {
@@ -88,8 +90,11 @@ public class ApplicationV2 : IApplication
         Application.Top = view;
 
         Application.Begin (view);
+
+        _stack.Push (view);
+
         // TODO : how to know when we are done?
-        while (Application.Top != null)
+        while (_stack.Any())
         {
             Task.Delay (100).Wait ();
         }
@@ -115,23 +120,7 @@ public class ApplicationV2 : IApplication
     /// <inheritdoc />
     public void RequestStop (Toplevel top)
     {
-        top ??= Application.Top;
-
-        if (top == null)
-        {
-            return;
-        }
-
-        var ev = new ToplevelClosingEventArgs (top);
-        top.OnClosing (ev);
-
-        if (ev.Cancel)
-        {
-            return;
-        }
-
-        top.Running = false;
-        Application.OnNotifyStopRunState (top);
+        _stack.Pop ();
     }
 
     /// <inheritdoc />

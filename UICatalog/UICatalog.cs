@@ -908,6 +908,11 @@ public class UICatalogApp
 
         public void ConfigChanged ()
         {
+            if (WasDisposed)
+            {
+                return;
+            }
+
             if (_topLevelColorScheme == null || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme))
             {
                 _topLevelColorScheme = "Base";
