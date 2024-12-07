@@ -7,8 +7,6 @@ public class ApplicationV2 : IApplication
 {
     private IMainLoopCoordinator _coordinator;
 
-    private Stack<View> _stack = new Stack<View> ();
-
     /// <inheritdoc />
     public void Init (IConsoleDriver driver = null, string driverName = null)
     {
@@ -91,10 +89,8 @@ public class ApplicationV2 : IApplication
 
         Application.Begin (view);
 
-        _stack.Push (view);
-
         // TODO : how to know when we are done?
-        while (_stack.Any())
+        while (Application.TopLevels.TryPeek (out var found) && found == view)
         {
             Task.Delay (100).Wait ();
         }
@@ -120,7 +116,16 @@ public class ApplicationV2 : IApplication
     /// <inheritdoc />
     public void RequestStop (Toplevel top)
     {
-        _stack.Pop ();
+        Application.TopLevels.Pop ();
+
+        if(Application.TopLevels.Count>0)
+        {
+            Application.Top = Application.TopLevels.Peek ();
+        }
+        else
+        {
+            Application.Top = null;
+        }
     }
 
     /// <inheritdoc />
