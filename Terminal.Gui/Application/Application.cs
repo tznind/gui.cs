@@ -23,6 +23,8 @@ namespace Terminal.Gui;
 /// <remarks></remarks>
 public static partial class Application
 {
+    internal static bool IsLegacy => ApplicationImpl.Instance.IsLegacy;
+
     /// <summary>Gets all cultures supported by the application without the invariant language.</summary>
     public static List<CultureInfo>? SupportedCultures { get; private set; }
 

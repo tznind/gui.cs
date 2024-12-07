@@ -238,4 +238,20 @@ public class ApplicationImpl : IApplication
         top.Running = false;
         Application.OnNotifyStopRunState (top);
     }
+
+    /// <inheritdoc />
+    public void Invoke (Action action)
+    {
+        Application.MainLoop?.AddIdle (
+                           () =>
+                           {
+                               action ();
+
+                               return false;
+                           }
+                          );
+    }
+
+    /// <inheritdoc />
+    public bool IsLegacy => true;
 }

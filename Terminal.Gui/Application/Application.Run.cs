@@ -385,17 +385,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
     /// <summary>Runs <paramref name="action"/> on the thread that is processing events</summary>
     /// <param name="action">the action to be invoked on the main processing thread.</param>
-    public static void Invoke (Action action)
-    {
-        MainLoop?.AddIdle (
-                           () =>
-                           {
-                               action ();
-
-                               return false;
-                           }
-                          );
-    }
+    public static void Invoke (Action action) => ApplicationImpl.Instance.Invoke (action);
 
     // TODO: Determine if this is really needed. The only code that calls WakeUp I can find
     // is ProgressBarStyles, and it's not clear it needs to.

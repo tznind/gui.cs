@@ -1,6 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Diagnostics;
-using static Terminal.Gui.WindowsConsole;
 
 namespace Terminal.Gui.ConsoleDrivers.V2;
 
@@ -108,4 +106,13 @@ public class ApplicationV2 : IApplication
     {
         Application.Top = null;
     }
+
+    /// <inheritdoc />
+    public void Invoke (Action action)
+    {
+        // TODO
+    }
+
+    /// <inheritdoc />
+    public bool IsLegacy => false;
 }

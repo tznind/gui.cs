@@ -146,4 +146,10 @@ public interface IApplication
     ///     </para>
     /// </remarks>
     void RequestStop (Toplevel top);
+
+    /// <summary>Runs <paramref name="action"/> on the main UI loop thread</summary>
+    /// <param name="action">the action to be invoked on the main processing thread.</param>
+    void Invoke (Action action);
+
+    bool IsLegacy { get; }
 }
