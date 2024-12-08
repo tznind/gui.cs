@@ -117,10 +117,11 @@ public class TimedEvents : ITimedEvents
         lock (_idleHandlersLock)
         {
             runIdle = _idleHandlers.Count > 0;
-            if (runIdle)
-            {
-                RunIdle ();
-            }
+        }
+
+        if (runIdle)
+        {
+            RunIdle ();
         }
     }
     private void RunTimers ()
@@ -270,6 +271,7 @@ public interface ITimedEvents
 {
     void AddIdle (Func<bool> idleHandler);
     void LockAndRunIdles ();
+    void LockAndRunTimers ();
     bool CheckTimersAndIdleHandlers (out int waitTimeout);
 
     /// <summary>Adds a timeout to the application.</summary>
