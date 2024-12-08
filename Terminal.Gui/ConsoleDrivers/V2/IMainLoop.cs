@@ -4,6 +4,7 @@ namespace Terminal.Gui;
 
 public interface IMainLoop<T> : IDisposable
 {
+    public ITimedEvents TimedEvents { get; }
     public IOutputBuffer OutputBuffer { get; }
     public IInputProcessor InputProcessor { get; }
 
@@ -12,10 +13,11 @@ public interface IMainLoop<T> : IDisposable
     /// <summary>
     /// Initializes the loop with a buffer from which data can be read
     /// </summary>
+    /// <param name="timedEvents"></param>
     /// <param name="inputBuffer"></param>
     /// <param name="inputProcessor"></param>
     /// <param name="consoleOutput"></param>
-    void Initialize (ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput);
+    void Initialize (ITimedEvents timedEvents, ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput);
 
     /// <summary>
     /// Runs <see cref="Iteration"/> in an infinite loop.

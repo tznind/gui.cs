@@ -6,7 +6,7 @@ namespace Terminal.Gui.ConsoleDrivers.V2;
 public class ApplicationV2 : ApplicationImpl
 {
     private IMainLoopCoordinator _coordinator;
-
+    public ITimedEvents TimedEvents { get; } = new TimedEvents ();
     public ApplicationV2 ()
     {
         IsLegacy = false;
@@ -46,7 +46,8 @@ public class ApplicationV2 : ApplicationImpl
         {*/
             var inputBuffer = new ConcurrentQueue<ConsoleKeyInfo> ();
             var loop = new MainLoop<ConsoleKeyInfo> ();
-            _coordinator = new MainLoopCoordinator<ConsoleKeyInfo> (() => new NetInput (),
+            _coordinator = new MainLoopCoordinator<ConsoleKeyInfo> (TimedEvents,
+                                                                    () => new NetInput (),
                                                                    inputBuffer,
                                                                    new NetInputProcessor (inputBuffer),
                                                                    () => new NetOutput (),
@@ -122,14 +123,30 @@ public class ApplicationV2 : ApplicationImpl
     /// <inheritdoc />
     public override void Invoke (Action action)
     {
-        // TODO
+        TimedEvents.AddIdle (() =>
+                               {
+                                   action ();
+
+                                   return false;
+                               }
+                              );
     }
 
     /// <inheritdoc />
     public override void AddIdle (Func<bool> func)
     {
-        // TODO properly
+        TimedEvents.AddIdle (func);
+    }
 
-        func.Invoke ();
+    /// <inheritdoc />
+    public override object AddTimeout (TimeSpan time, Func<bool> callback)
+    {
+        return TimedEvents.AddTimeout(time,callback);
+    }
+
+    /// <inheritdoc />
+    public override bool RemoveTimeout (object token)
+    {
+        return TimedEvents.RemoveTimeout (token);
     }
 }

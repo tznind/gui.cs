@@ -271,6 +271,6 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc />
     public virtual bool RemoveTimeout (object token)
     { 
-        return Application.MainLoop?.TimedEvents.RemoveTimeout (token) ?? false; 
+        return Application.MainLoop?.TimedEvents.RemoveTimeout (token) ?? false;
     }
 }

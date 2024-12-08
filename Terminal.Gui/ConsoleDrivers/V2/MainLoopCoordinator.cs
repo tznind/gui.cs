@@ -17,13 +17,14 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     private ConsoleDriverFacade<T> _facade;
     private Task _inputTask;
     private Task _loopTask;
+    private ITimedEvents _timedEvents;
 
     public SemaphoreSlim StartupSemaphore { get; } = new (0, 1);
-
 
     /// <summary>
     /// Creates a new coordinator
     /// </summary>
+    /// <param name="timedEvents"></param>
     /// <param name="inputFactory">Function to create a new input. This must call <see langword="new"/>
     ///     explicitly and cannot return an existing instance. This requirement arises because Windows
     ///     console screen buffer APIs are thread-specific for certain operations.</param>
@@ -33,8 +34,9 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     ///     explicitly and cannot return an existing instance. This requirement arises because Windows
     ///     console screen buffer APIs are thread-specific for certain operations.</param>
     /// <param name="loop"></param>
-    public MainLoopCoordinator (Func<IConsoleInput<T>> inputFactory, ConcurrentQueue<T> inputBuffer,IInputProcessor inputProcessor, Func<IConsoleOutput> outputFactory, IMainLoop<T> loop)
+    public MainLoopCoordinator (ITimedEvents timedEvents, Func<IConsoleInput<T>> inputFactory, ConcurrentQueue<T> inputBuffer,IInputProcessor inputProcessor, Func<IConsoleOutput> outputFactory, IMainLoop<T> loop)
     {
+        _timedEvents = timedEvents;
         _inputFactory = inputFactory;
         _inputBuffer = inputBuffer;
         _inputProcessor = inputProcessor;
@@ -78,7 +80,7 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
         {
             // Instance must be constructed on the thread in which it is used.
             _output = _outputFactory.Invoke ();
-            _loop.Initialize (_inputBuffer, _inputProcessor, _output);
+            _loop.Initialize (_timedEvents, _inputBuffer, _inputProcessor, _output);
 
             BuildFacadeIfPossible ();
         }

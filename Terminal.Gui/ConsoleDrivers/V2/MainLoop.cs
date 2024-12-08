@@ -4,6 +4,7 @@ namespace Terminal.Gui;
 
 public class MainLoop<T> : IMainLoop<T>
 {
+    public ITimedEvents TimedEvents { get; private set; }
     public ConcurrentQueue<T> InputBuffer { get; private set; } = new ();
 
     public IInputProcessor InputProcessor { get; private set; }
@@ -13,12 +14,13 @@ public class MainLoop<T> : IMainLoop<T>
     public IConsoleOutput Out { get;private set; }
     public AnsiRequestScheduler AnsiRequestScheduler { get; private set; }
 
-    public void Initialize (ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput)
+    public void Initialize (ITimedEvents timedEvents, ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput)
     {
         InputBuffer = inputBuffer;
         Out = consoleOutput;
         InputProcessor = inputProcessor;
 
+        TimedEvents = timedEvents;
         AnsiRequestScheduler = new AnsiRequestScheduler (InputProcessor.GetParser ());
 
     }
@@ -61,6 +63,10 @@ public class MainLoop<T> : IMainLoop<T>
         }
 
         Out.Write (OutputBuffer);
+
+        TimedEvents.LockAndRunTimers ();
+
+        TimedEvents.LockAndRunIdles ();
     }
 
     /// <inheritdoc />
