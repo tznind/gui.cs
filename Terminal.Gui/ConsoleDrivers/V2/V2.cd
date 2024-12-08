@@ -51,7 +51,7 @@
   </Class>
   <Class Name="Terminal.Gui.MainLoop&lt;T&gt;" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="11" Y="4.75" Width="1.5" />
-    <AssociationLine Name="AnsiRequestScheduler" Type="Terminal.Gui.AnsiRequestScheduler" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+    <AssociationLine Name="AnsiRequestScheduler" Type="Terminal.Gui.AnsiRequestScheduler" ManuallyRouted="true">
       <Path>
         <Point X="11.75" Y="4.75" />
         <Point X="11.75" Y="4.39" />
@@ -59,8 +59,13 @@
         <Point X="20.625" Y="4.5" />
       </Path>
     </AssociationLine>
+    <AssociationLine Name="TimedEvents" Type="Terminal.Gui.ITimedEvents">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-1.14" Y="0.123" />
+      </MemberNameLabel>
+    </AssociationLine>
     <TypeIdentifier>
-      <HashCode>QQQAAAAAACABAQQAAAAAAAAAAAAAAAACAAAAAAAAAAI=</HashCode>
+      <HashCode>QQQAAAAAACABAQQAAAAAAAAAAAAAAAACAAAAAAAAEAI=</HashCode>
       <FileName>ConsoleDrivers\V2\MainLoop.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -68,13 +73,14 @@
       <Property Name="OutputBuffer" />
       <Property Name="Out" />
       <Property Name="AnsiRequestScheduler" />
+      <Property Name="TimedEvents" />
     </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.MainLoopCoordinator&lt;T&gt;">
     <Position X="6.5" Y="2" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAJAEAAAJAAAAAABQAAAAQABAQAAQAIQAABAAACgw=</HashCode>
+      <HashCode>AAAAJAEAAAJABAAAABQAAAAQABAQAAQAIQAABAAACgw=</HashCode>
       <FileName>ConsoleDrivers\V2\MainLoopCoordinator.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -132,7 +138,7 @@
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AQCkAAAAAASAgAAAAgggAAAABAoAAAAAAAgAAAAAAAA=</HashCode>
+      <HashCode>AQCkAAAAAASAiAAAAgggAAAABAoAAAAAAAgAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\InputProcessor.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -143,14 +149,14 @@
   <Class Name="Terminal.Gui.NetInputProcessor" Collapsed="true">
     <Position X="17.75" Y="5.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAACAAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\NetInputProcessor.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Terminal.Gui.WindowsInputProcessor" Collapsed="true">
     <Position X="15.75" Y="5.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AQAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AQAAAAAAAAAACAAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\WindowsInputProcessor.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -162,7 +168,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Terminal.Gui.ConsoleDrivers.V2.ConsoleDriverFacade&lt;T&gt;">
-    <Position X="6.5" Y="7.25" Width="2" />
+    <Position X="6.5" Y="7.5" Width="2" />
     <Compartments>
       <Compartment Name="Methods" Collapsed="true" />
       <Compartment Name="Fields" Collapsed="true" />
@@ -275,7 +281,7 @@
   <Class Name="Terminal.Gui.ApplicationImpl" Collapsed="true">
     <Position X="3" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AABAAAAAAAAIAgQAAAAAAQAAAAAAAAAAQAACgACAAAI=</HashCode>
+      <HashCode>AABAAAAAAAAIAgQQAAAAAQAAAAAAAAAAQAAKgACAAAI=</HashCode>
       <FileName>Application\ApplicationImpl.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -286,7 +292,7 @@
   <Class Name="Terminal.Gui.ConsoleDrivers.V2.ApplicationV2" Collapsed="true">
     <Position X="4.5" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAIAgAAAAAAAQAAAAAAgAAAAAACgIAAAAI=</HashCode>
+      <HashCode>AAAAAAAAAAAIAgAQAAAAAQAAAAAAgAAAAAAKgIAAEAI=</HashCode>
       <FileName>ConsoleDrivers\V2\ApplicationV2.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -311,7 +317,7 @@
   <Interface Name="Terminal.Gui.IMainLoop&lt;T&gt;" Collapsed="true">
     <Position X="9.25" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAQAAAAAAAABAQQAAAAAAAAAAAAAAAACAAAAAAAAAAI=</HashCode>
+      <HashCode>AAQAAAAAAAABAQQAAAAAAAAAAAAAAAACAAAAAAAAEAI=</HashCode>
       <FileName>ConsoleDrivers\V2\IMainLoop.cs</FileName>
     </TypeIdentifier>
   </Interface>
@@ -379,7 +385,7 @@
   <Interface Name="Terminal.Gui.IApplication">
     <Position X="3.25" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAIAgQAAAAAAQAAAAAAAAAAAAACgAAAAAI=</HashCode>
+      <HashCode>AAAAAAAAAAAIAgQQAAAAAQAAAAAAAAAAAAAKgAAAAAI=</HashCode>
       <FileName>Application\IApplication.cs</FileName>
     </TypeIdentifier>
   </Interface>
@@ -388,6 +394,13 @@
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAIQAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\IMainLoopCoordinator.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.ITimedEvents" Collapsed="true">
+    <Position X="12.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAIAAAAQAAAAAQACAAAIBAAQAAAAAAAAAIgAAAAAA=</HashCode>
+      <FileName>Application\TimedEvents.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Enum Name="Terminal.Gui.AnsiResponseParserState">
