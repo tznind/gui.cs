@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Terminal.Gui.ConsoleDrivers;
 
@@ -211,11 +212,15 @@ public class WindowsConsole
 
             // TODO: requires extensive testing if we go down this route
             // If console output has changed
- //           if (s != _lastWrite)
-       //     {
+            if (s != _lastWrite)
+            {
                 // supply console with the new content
                 result = WriteConsole (_outputHandle, s, (uint)s.Length, out uint _, nint.Zero);
- //           }
+                
+                
+                // Uncomment this to see that it does render properly :/
+                // Process.GetCurrentProcess ().Kill();
+            }
 
             _lastWrite = s;
 

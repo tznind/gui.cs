@@ -60,9 +60,10 @@ public class MainLoop<T> : IMainLoop<T>
             Application.Top.NeedsDraw = true;
             Application.Top.Layout ();
             Application.Top.Draw ();
+
+            Out.Write (OutputBuffer);
         }
 
-        Out.Write (OutputBuffer);
 
         TimedEvents.LockAndRunTimers ();
 

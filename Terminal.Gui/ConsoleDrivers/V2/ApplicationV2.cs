@@ -31,19 +31,19 @@ public class ApplicationV2 : ApplicationImpl
 
         PlatformID p = Environment.OSVersion.Platform;
 
-        /*if ( p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+        if ( p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {
-            var inputBuffer = new ConcurrentQueue<InputRecord> ();
-            var loop = new MainLoop<InputRecord> ();
-            _coordinator = new MainLoopCoordinator<InputRecord> (
-                                                                () => new WindowsInput (),
-                                                                inputBuffer,
-                                                                new WindowsInputProcessor (inputBuffer),
-                                                                () => new WindowsOutput (),
-                                                                loop);
+            var inputBuffer = new ConcurrentQueue<WindowsConsole.InputRecord> ();
+            var loop = new MainLoop<WindowsConsole.InputRecord> ();
+            _coordinator = new MainLoopCoordinator<WindowsConsole.InputRecord> (TimedEvents,
+                                                                                () => new WindowsInput (),
+                                                                                inputBuffer,
+                                                                                new WindowsInputProcessor (inputBuffer),
+                                                                                () => new WindowsOutput (),
+                                                                                loop);
         }
         else
-        {*/
+        {
             var inputBuffer = new ConcurrentQueue<ConsoleKeyInfo> ();
             var loop = new MainLoop<ConsoleKeyInfo> ();
             _coordinator = new MainLoopCoordinator<ConsoleKeyInfo> (TimedEvents,
@@ -52,7 +52,7 @@ public class ApplicationV2 : ApplicationImpl
                                                                    new NetInputProcessor (inputBuffer),
                                                                    () => new NetOutput (),
                                                                    loop);
-        //}
+        }
 
         _coordinator.StartAsync ();
 
