@@ -55,8 +55,8 @@ public class MainLoopTests
         Func<bool> fnTrue = () => true;
         Func<bool> fnFalse = () => false;
 
-        ml.AddIdle (fnTrue);
-        ml.AddIdle (fnFalse);
+        ml.TimedEvents.AddIdle (fnTrue);
+        ml.TimedEvents.AddIdle (fnFalse);
 
         Assert.Equal (2, ml.TimedEvents.IdleHandlers.Count);
         Assert.Equal (fnTrue, ml.TimedEvents.IdleHandlers [0]);
@@ -78,8 +78,8 @@ public class MainLoopTests
         Assert.False (ml.TimedEvents.RemoveIdle (fnFalse));
 
         // Add again, but with dupe
-        ml.AddIdle (fnTrue);
-        ml.AddIdle (fnTrue);
+        ml.TimedEvents.AddIdle (fnTrue);
+        ml.TimedEvents.AddIdle (fnTrue);
 
         Assert.Equal (2, ml.TimedEvents.IdleHandlers.Count);
         Assert.Equal (fnTrue, ml.TimedEvents.IdleHandlers[0]);
@@ -101,8 +101,7 @@ public class MainLoopTests
         Assert.False (ml.TimedEvents.RemoveIdle (fnTrue));
     }
 
-    // TODO: Fix these tests that hang forever
-    //[Fact]
+    [Fact]
     public void AddIdle_Function_GetsCalled_OnIteration ()
     {
         var ml = new MainLoop (new FakeMainLoop ());
@@ -116,7 +115,7 @@ public class MainLoopTests
                             return true;
                         };
 
-        ml.AddIdle (fn);
+        ml.TimedEvents.AddIdle (fn);
         ml.RunIteration ();
         Assert.Equal (1, functionCalled);
     }
@@ -150,9 +149,9 @@ public class MainLoopTests
                                 return true;
                             };
 
-        ml.AddIdle (fnStop);
-        ml.AddIdle (fn1);
-        ml.AddIdle (fn1);
+        ml.TimedEvents.AddIdle (fnStop);
+        ml.TimedEvents.AddIdle (fn1);
+        ml.TimedEvents.AddIdle (fn1);
         ml.Run ();
         Assert.True (ml.TimedEvents.RemoveIdle (fnStop));
         Assert.False (ml.TimedEvents.RemoveIdle (fn1));
@@ -175,8 +174,8 @@ public class MainLoopTests
                             return true;
                         };
 
-        ml.AddIdle (fn);
-        ml.AddIdle (fn);
+        ml.TimedEvents.AddIdle (fn);
+        ml.TimedEvents.AddIdle (fn);
         ml.RunIteration ();
         Assert.Equal (2, functionCalled);
         Assert.Equal (2, ml.TimedEvents.IdleHandlers.Count);
@@ -209,7 +208,7 @@ public class MainLoopTests
                             return true;
                         };
 
-        ml.AddIdle (fn);
+        ml.TimedEvents.AddIdle (fn);
         Assert.True (ml.TimedEvents.RemoveIdle (fn));
         ml.RunIteration ();
         Assert.Equal (0, functionCalled);
@@ -306,7 +305,7 @@ public class MainLoopTests
 
         object token = ml.TimedEvents.AddTimeout (TimeSpan.FromMilliseconds (ms), callback);
 
-        Assert.Same (ml.TimedEvents, sender);
+        Assert.Same (ml, sender);
         Assert.NotNull (args.Timeout);
         Assert.True (args.Ticks - originTicks >= 100 * TimeSpan.TicksPerMillisecond);
     }
@@ -365,7 +364,7 @@ public class MainLoopTests
 
                                 return true;
                             };
-        ml.AddIdle (fnStop);
+        ml.TimedEvents.AddIdle (fnStop);
 
         var callbackCount = 0;
 
@@ -403,7 +402,7 @@ public class MainLoopTests
 
                                 return true;
                             };
-        ml.AddIdle (fnStop);
+        ml.TimedEvents.AddIdle (fnStop);
 
         var callbackCount = 0;
 
@@ -421,8 +420,7 @@ public class MainLoopTests
         Assert.False (ml.TimedEvents.RemoveTimeout (token));
     }
 
-    // TODO: Fix these tests that hang forever
-    //[Fact]
+    [Fact]
     public void AddTimer_Run_Called ()
     {
         var ml = new MainLoop (new FakeMainLoop ());
@@ -475,8 +473,7 @@ public class MainLoopTests
         Assert.Equal (1, callbackCount);
     }
 
-    // TODO: Fix these tests that hang forever
-    //[Fact]
+    [Fact]
     public void AddTimer_Run_CalledTwiceApproximatelyRightTime ()
     {
         var ml = new MainLoop (new FakeMainLoop ());
@@ -525,7 +522,7 @@ public class MainLoopTests
         var ml = new MainLoop (new FakeMainLoop ());
         Func<bool> fnTrue = () => true;
 
-        ml.AddIdle (fnTrue);
+        ml.TimedEvents.AddIdle (fnTrue);
         bool retVal = ml.TimedEvents.CheckTimersAndIdleHandlers (out int waitTimeOut);
         Assert.True (retVal);
         Assert.Equal (-1, waitTimeOut);
@@ -600,8 +597,8 @@ public class MainLoopTests
                                 return true;
                             };
 
-        ml.AddIdle (fnStop);
-        ml.AddIdle (fn1);
+        ml.TimedEvents.AddIdle (fnStop);
+        ml.TimedEvents.AddIdle (fn1);
         ml.Run ();
         Assert.True (ml.TimedEvents.RemoveIdle (fnStop));
         Assert.False (ml.TimedEvents.RemoveIdle (fn1));
@@ -737,8 +734,7 @@ public class MainLoopTests
         Application.Shutdown ();
     }
 
-    // TODO: Fix these tests that hang forever
-    //[Fact]
+    [Fact]
     public void RemoveIdle_Function_NotCalled ()
     {
         var ml = new MainLoop (new FakeMainLoop ());
@@ -776,7 +772,7 @@ public class MainLoopTests
                             return true;
                         };
 
-        ml.AddIdle (fn);
+        ml.TimedEvents.AddIdle (fn);
         ml.Run ();
         Assert.True (ml.TimedEvents.RemoveIdle (fn));
 
