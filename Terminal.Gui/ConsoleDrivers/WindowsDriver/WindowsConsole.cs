@@ -26,7 +26,7 @@ public class WindowsConsole
     private readonly StringBuilder _stringBuilder = new (256 * 1024);
     private string _lastWrite = string.Empty;
 
-    public WindowsConsole ()
+    public WindowsConsole (bool runInputThread)
     {
         _inputHandle = GetStdHandle (STD_INPUT_HANDLE);
         _outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
@@ -38,7 +38,11 @@ public class WindowsConsole
         ConsoleMode = newConsoleMode;
 
         _inputReadyCancellationTokenSource = new ();
-        Task.Run (ProcessInputQueue, _inputReadyCancellationTokenSource.Token);
+
+        if (runInputThread)
+        {
+            Task.Run (ProcessInputQueue, _inputReadyCancellationTokenSource.Token);
+        }
     }
 
     public InputRecord? DequeueInput ()

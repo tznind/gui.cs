@@ -45,7 +45,7 @@ internal class WindowsDriver : ConsoleDriver
     {
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
         {
-            WinConsole = new ();
+            WinConsole = new (true);
 
             // otherwise we're probably running in unit tests
             Clipboard = new WindowsClipboard ();
