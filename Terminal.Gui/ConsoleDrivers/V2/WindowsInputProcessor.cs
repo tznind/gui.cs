@@ -77,7 +77,10 @@ public class WindowsInputProcessor : InputProcessor<InputRecord>
     {
         var result = new MouseEventArgs
         {
-            Position = new (e.MousePosition.X, e.MousePosition.Y)
+            Position = new (e.MousePosition.X, e.MousePosition.Y),
+            //Wrong but for POC ok
+            Flags = e.ButtonState.HasFlag (WindowsConsole.ButtonState.Button1Pressed) ? MouseFlags.Button1Pressed : MouseFlags.None,
+
         };
 
         // TODO: Return keys too

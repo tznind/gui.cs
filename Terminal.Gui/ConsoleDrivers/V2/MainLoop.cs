@@ -44,16 +44,19 @@ public class MainLoop<T> : IMainLoop<T>
         while (!token.IsCancellationRequested);
     }
 
+    private bool first = true;
     /// <inheritdoc />
     public void Iteration ()
     {
         InputProcessor.ProcessQueue ();
 
-        // TODO: throttle this
-        var size = Out.GetWindowSize ();
+ 
+            // TODO: throttle this
+            var size = Out.GetWindowSize ();
 
-        OutputBuffer.SetWindowSize (size.Width, size.Height);
-        // TODO: Test only
+            OutputBuffer.SetWindowSize (size.Width, size.Height);
+            // TODO: Test only
+
 
         if (Application.Top != null)
         {

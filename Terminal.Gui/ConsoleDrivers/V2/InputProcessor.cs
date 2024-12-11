@@ -51,7 +51,7 @@ public abstract class InputProcessor<T> : IInputProcessor
     {
         // Ensure ScreenPosition is set
         a.ScreenPosition = a.Position;
-
+        
         foreach (var narrative in MouseInterpreter.Process (a))
         {
             ResolveNarrative (narrative);

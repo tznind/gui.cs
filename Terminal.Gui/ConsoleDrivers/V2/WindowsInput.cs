@@ -26,9 +26,28 @@ public class WindowsInput : ConsoleInput<InputRecord>
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern nint GetStdHandle (int nStdHandle);
 
+    [DllImport ("kernel32.dll")]
+    private static extern bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
+
+    [DllImport ("kernel32.dll")]
+    private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
+
+
+    private readonly uint _originalConsoleMode;
+
     public WindowsInput ()
     {
         _inputHandle = GetStdHandle (STD_INPUT_HANDLE);
+
+
+        GetConsoleMode (_inputHandle, out uint v);
+        _originalConsoleMode = v;
+
+        uint newConsoleMode = _originalConsoleMode;
+        newConsoleMode |= (uint)(ConsoleModes.EnableMouseInput | ConsoleModes.EnableExtendedFlags);
+        newConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
+        newConsoleMode &= ~(uint)ConsoleModes.EnableProcessedInput;
+        SetConsoleMode (_inputHandle,newConsoleMode);
     }
 
     protected override bool Peek ()
@@ -90,6 +109,6 @@ public class WindowsInput : ConsoleInput<InputRecord>
     }
     public void Dispose ()
     {
-        // TODO: Un set any settings e.g. console buffer
+        SetConsoleMode (_inputHandle, _originalConsoleMode);
     }
 }
