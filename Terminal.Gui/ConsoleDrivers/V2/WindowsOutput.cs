@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Text;
 using static Terminal.Gui.WindowsConsole;
 
 namespace Terminal.Gui;
@@ -55,8 +56,6 @@ public class WindowsOutput : IConsoleOutput
 
     private nint _screenBuffer;
 
-    public WindowsConsole WinConsole { get; private set; } = new WindowsConsole (false);
-
     public WindowsOutput ()
     {
         _screenBuffer = CreateConsoleScreenBuffer (
@@ -93,11 +92,8 @@ public class WindowsOutput : IConsoleOutput
 
     public void Write (IOutputBuffer buffer)
     {
-
         var outputBuffer = new ExtendedCharInfo [buffer.Rows * buffer.Cols];
 
-        Size windowSize = WinConsole?.GetConsoleBufferWindow (out Point _) ?? new Size (buffer.Cols, buffer.Rows);
-        
         // TODO: probably do need this right?
         /*
         if (!windowSize.IsEmpty && (windowSize.Width != buffer.Cols || windowSize.Height != buffer.Rows))
@@ -164,8 +160,7 @@ public class WindowsOutput : IConsoleOutput
             Right = (short)buffer.Cols
         };
         //size, ExtendedCharInfo [] charInfoBuffer, Coord , SmallRect window,
-        if (WinConsole != null
-            && !WinConsole.WriteToConsole (
+        if (!WriteToConsole (
                                            size: new (buffer.Cols, buffer.Rows),
                                            charInfoBuffer: outputBuffer,
                                            bufferSize: bufferCoords,
@@ -180,6 +175,101 @@ public class WindowsOutput : IConsoleOutput
         }
 
         SmallRect.MakeEmpty (ref damageRegion);
+    }
+
+    public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord bufferSize, SmallRect window, bool force16Colors)
+    {
+        var _stringBuilder = new StringBuilder ();
+
+        //Debug.WriteLine ("WriteToConsole");
+
+        //if (_screenBuffer == nint.Zero)
+        //{
+        //    ReadFromConsoleOutput (size, bufferSize, ref window);
+        //}
+
+        var result = false;
+
+        if (force16Colors)
+        {
+            var i = 0;
+            CharInfo [] ci = new CharInfo [charInfoBuffer.Length];
+
+            foreach (ExtendedCharInfo info in charInfoBuffer)
+            {
+                ci [i++] = new CharInfo
+                {
+                    Char = new CharUnion { UnicodeChar = info.Char },
+                    Attributes =
+                        (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor16 () | ((int)info.Attribute.Background.GetClosestNamedColor16 () << 4))
+                };
+            }
+
+            result = WriteConsoleOutput (_screenBuffer, ci, bufferSize, new Coord { X = window.Left, Y = window.Top }, ref window);
+        }
+        else
+        {
+            _stringBuilder.Clear ();
+
+            _stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
+            _stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (0, 0));
+
+            Attribute? prev = null;
+
+            foreach (ExtendedCharInfo info in charInfoBuffer)
+            {
+                Attribute attr = info.Attribute;
+
+                if (attr != prev)
+                {
+                    prev = attr;
+                    _stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.Foreground.R, attr.Foreground.G, attr.Foreground.B));
+                    _stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.Background.R, attr.Background.G, attr.Background.B));
+                }
+
+                if (info.Char != '\x1b')
+                {
+                    if (!info.Empty)
+                    {
+                        _stringBuilder.Append (info.Char);
+                    }
+                }
+                else
+                {
+                    _stringBuilder.Append (' ');
+                }
+            }
+
+            _stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
+            _stringBuilder.Append (EscSeqUtils.CSI_HideCursor);
+
+            var s = _stringBuilder.ToString ();
+
+            // TODO: requires extensive testing if we go down this route
+            // If console output has changed
+            //if (s != _lastWrite)
+            //{
+            // supply console with the new content
+            result = WriteConsole (_screenBuffer, s, (uint)s.Length, out uint _, nint.Zero);
+
+            foreach (var sixel in Application.Sixel)
+            {
+                SetCursorPosition ((short)sixel.ScreenPosition.X, (short)sixel.ScreenPosition.Y);
+                WriteConsole (_screenBuffer, sixel.SixelData, (uint)sixel.SixelData.Length, out uint _, nint.Zero);
+            }
+        }
+
+        if (!result)
+        {
+            int err = Marshal.GetLastWin32Error ();
+
+            if (err != 0)
+            {
+                throw new Win32Exception (err);
+            }
+        }
+
+        return result;
     }
 
     public Size GetWindowSize ()
@@ -204,7 +294,7 @@ public class WindowsOutput : IConsoleOutput
     {
         var sb = new StringBuilder ();
         sb.Append (visibility != CursorVisibility.Invisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
-        WinConsole?.WriteANSI (sb.ToString ());
+        Write (sb.ToString ());
     }
 
     /// <inheritdoc />
