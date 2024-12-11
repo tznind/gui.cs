@@ -17,7 +17,7 @@ public class ApplicationV2 : ApplicationImpl
     {
         Application.Navigation = new ();
 
-        Application.AddApplicationKeyBindings ();
+        Application.AddKeyBindings ();
 
         CreateDriver ();
 
