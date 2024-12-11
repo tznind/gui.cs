@@ -768,7 +768,7 @@ public class UICatalogApp
                     CanFocus = false
                 },
                 HelpText = "",
-                KeyBindingScope = KeyBindingScope.Application,
+                BindKeyToApplication = true,
                 Key = Key.F7
             };
 
