@@ -240,6 +240,12 @@ class ConsoleDriverFacade<T> : IConsoleDriver
     /// <summary>The event fired when the terminal is resized.</summary>
     public event EventHandler<SizeChangedEventArgs> SizeChanged;
 
+    /// <inheritdoc />
+    public void Suspend ()
+    {
+
+    }
+
     /// <summary>Sets the position of the terminal cursor to <see cref="ConsoleDriver.Col"/> and <see cref="ConsoleDriver.Row"/>.</summary>
     public void UpdateCursor ()
     {

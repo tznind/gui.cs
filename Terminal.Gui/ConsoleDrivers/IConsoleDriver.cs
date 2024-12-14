@@ -205,6 +205,10 @@ public interface IConsoleDriver
     /// <summary>The event fired when the terminal is resized.</summary>
     event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
+    /// <summary>Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.</summary>
+    /// <remarks>This is only implemented in <see cref="CursesDriver"/>.</remarks>
+    void Suspend ();
+
     /// <summary>
     ///     Sets the position of the terminal cursor to <see cref="ConsoleDriver.Col"/> and
     ///     <see cref="ConsoleDriver.Row"/>.
