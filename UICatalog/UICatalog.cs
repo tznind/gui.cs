@@ -908,6 +908,12 @@ public class UICatalogApp
 
         public void ConfigChanged ()
         {
+            if (MenuBar == null)
+            {
+                // View is probably disposed
+                return;
+            }
+
             if (_topLevelColorScheme == null || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme))
             {
                 _topLevelColorScheme = "Base";

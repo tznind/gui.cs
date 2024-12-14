@@ -110,7 +110,16 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     {
         tokenSource.Cancel();
 
-        // Wait for both tasks to complete
-        Task.WhenAll (_inputTask, _loopTask).Wait ();
+        if (_loopTask.Id == Task.CurrentId)
+        {
+            // Cannot wait for loop to finish because we are actively executing on that thread
+            Task.WhenAll (_inputTask).Wait ();
+        }
+        else
+        {
+            // Wait for both tasks to complete
+            Task.WhenAll (_inputTask, _loopTask).Wait ();
+        }
+
     }
 }
