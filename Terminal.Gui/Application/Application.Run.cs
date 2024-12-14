@@ -232,7 +232,12 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         if (mostFocused is null || !mostFocused.Visible || !mostFocused.Enabled)
         {
             CursorVisibility current = CursorVisibility.Invisible;
-            Driver?.SetCursorVisibility (CursorVisibility.Invisible);
+            Driver?.GetCursorVisibility (out current);
+
+            if (current != CursorVisibility.Invisible)
+            {
+                Driver?.SetCursorVisibility (CursorVisibility.Invisible);
+            }
 
             return false;
         }
@@ -248,6 +253,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         Point? cursor = mostFocused.PositionCursor ();
 
+        Driver!.GetCursorVisibility (out CursorVisibility currentCursorVisibility);
 
         if (cursor is { })
         {
@@ -257,18 +263,27 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             // If the cursor is not in a visible location in the SuperView, hide it
             if (!superViewViewport.Contains (cursor.Value))
             {
-                Driver.SetCursorVisibility (CursorVisibility.Invisible);
+                if (currentCursorVisibility != CursorVisibility.Invisible)
+                {
+                    Driver.SetCursorVisibility (CursorVisibility.Invisible);
+                }
 
                 return false;
             }
 
             // Show it
-            Driver.SetCursorVisibility (mostFocused.CursorVisibility);
+            if (currentCursorVisibility == CursorVisibility.Invisible)
+            {
+                Driver.SetCursorVisibility (mostFocused.CursorVisibility);
+            }
 
             return true;
         }
 
-        Driver.SetCursorVisibility (CursorVisibility.Invisible);
+        if (currentCursorVisibility != CursorVisibility.Invisible)
+        {
+            Driver.SetCursorVisibility (CursorVisibility.Invisible);
+        }
 
         return false;
     }
