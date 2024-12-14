@@ -11,9 +11,13 @@
       "commandName": "Project",
       "commandLineArgs": "--driver WindowsDriver"
     },
-    "UICatalog --driver v2": {
+    "UICatalog --driver v2win": {
       "commandName": "Project",
-      "commandLineArgs": "--driver v2"
+      "commandLineArgs": "--driver v2win"
+    },
+    "UICatalog --driver v2net": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver v2net"
     },
     "WSL: UICatalog": {
       "commandName": "Executable",
