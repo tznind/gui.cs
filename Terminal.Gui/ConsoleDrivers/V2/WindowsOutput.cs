@@ -4,7 +4,7 @@ using System.Text;
 using static Terminal.Gui.WindowsConsole;
 
 namespace Terminal.Gui;
-public class WindowsOutput : IConsoleOutput
+internal class WindowsOutput : IConsoleOutput
 {
 
     [DllImport ("kernel32.dll", EntryPoint = "WriteConsole", SetLastError = true, CharSet = CharSet.Unicode)]

@@ -5,7 +5,7 @@ namespace Terminal.Gui;
 ///     Describes a sequence of chars (and optionally T metadata) accumulated
 ///     by an <see cref="IAnsiResponseParser"/>
 /// </summary>
-public interface IHeld
+internal interface IHeld
 {
     /// <summary>
     ///     Clears all held objects

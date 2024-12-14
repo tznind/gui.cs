@@ -8,7 +8,7 @@ using InputRecord = InputRecord;
 /// <summary>
 /// Input processor for <see cref="WindowsInput"/>, deals in <see cref="WindowsConsole.InputRecord"/> stream.
 /// </summary>
-public class WindowsInputProcessor : InputProcessor<InputRecord>
+internal class WindowsInputProcessor : InputProcessor<InputRecord>
 {
     /// <inheritdoc />
     public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer) : base (inputBuffer) { }

@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-public abstract class AnsiResponseParserBase : IAnsiResponseParser
+internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 {
     private readonly AnsiMouseParser _mouseParser = new  ();
     protected object _lockExpectedResponses = new();
@@ -375,7 +375,7 @@ public abstract class AnsiResponseParserBase : IAnsiResponseParser
     }
 }
 
-public class AnsiResponseParser<T> : AnsiResponseParserBase
+internal class AnsiResponseParser<T> : AnsiResponseParserBase
 {
     public AnsiResponseParser () : base (new GenericHeld<T> ()) { }
 

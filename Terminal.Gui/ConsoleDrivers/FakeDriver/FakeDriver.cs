@@ -401,7 +401,7 @@ public class FakeDriver : ConsoleDriver
     private AnsiResponseParser _parser = new ();
 
     /// <inheritdoc />
-    public override IAnsiResponseParser GetParser () => _parser;
+    internal override IAnsiResponseParser GetParser () => _parser;
 
     public void SetBufferSize (int width, int height)
     {

@@ -10,7 +10,7 @@ public abstract class InputProcessor<T> : IInputProcessor
     /// </summary>
     TimeSpan _escTimeout = TimeSpan.FromMilliseconds (50);
 
-    public AnsiResponseParser<T> Parser { get; } = new ();
+    internal AnsiResponseParser<T> Parser { get; } = new ();
     public ConcurrentQueue<T> InputBuffer { get; }
 
     public IAnsiResponseParser GetParser () => Parser;

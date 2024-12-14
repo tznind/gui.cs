@@ -3,7 +3,7 @@ using static Terminal.Gui.WindowsConsole;
 
 namespace Terminal.Gui;
 
-public class WindowsInput : ConsoleInput<InputRecord>
+internal class WindowsInput : ConsoleInput<InputRecord>
 {
     private readonly nint _inputHandle;
 
