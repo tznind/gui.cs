@@ -5,10 +5,12 @@ namespace Terminal.Gui.ConsoleDrivers.V2;
 
 public class ApplicationV2 : ApplicationImpl
 {
+    private readonly string _driver;
     private IMainLoopCoordinator _coordinator;
     public ITimedEvents TimedEvents { get; } = new TimedEvents ();
-    public ApplicationV2 ()
+    public ApplicationV2 (string driver = null)
     {
+        _driver = driver;
         IsLegacy = false;
     }
 
@@ -19,39 +21,38 @@ public class ApplicationV2 : ApplicationImpl
 
         Application.AddKeyBindings ();
 
-        CreateDriver ();
+        CreateDriver (_driver ?? driverName);
 
         Application.Initialized = true;
 
         Application.SubscribeDriverEvents ();
     }
 
-    private void CreateDriver ()
+    private void CreateDriver (string driverName)
     {
 
         PlatformID p = Environment.OSVersion.Platform;
 
-        if ( p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+        var definetlyWin = driverName?.Contains ("win") ?? false;
+        var definetlyNet = driverName?.Contains ("net") ?? false;
+
+        if (definetlyWin)
         {
-            var inputBuffer = new ConcurrentQueue<WindowsConsole.InputRecord> ();
-            var loop = new MainLoop<WindowsConsole.InputRecord> ();
-            _coordinator = new MainLoopCoordinator<WindowsConsole.InputRecord> (TimedEvents,
-                                                                                () => new WindowsInput (),
-                                                                                inputBuffer,
-                                                                                new WindowsInputProcessor (inputBuffer),
-                                                                                () => new WindowsOutput (),
-                                                                                loop);
+            CreateWindowsSubcomponents ();
+
+        }
+        else if (definetlyNet)
+        {
+            CreateNetSubcomponents ();
+        }
+        else
+        if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+        {
+            CreateWindowsSubcomponents ();
         }
         else
         {
-            var inputBuffer = new ConcurrentQueue<ConsoleKeyInfo> ();
-            var loop = new MainLoop<ConsoleKeyInfo> ();
-            _coordinator = new MainLoopCoordinator<ConsoleKeyInfo> (TimedEvents,
-                                                                    () => new NetInput (),
-                                                                   inputBuffer,
-                                                                   new NetInputProcessor (inputBuffer),
-                                                                   () => new NetOutput (),
-                                                                   loop);
+            CreateNetSubcomponents ();
         }
 
         _coordinator.StartAsync ();
@@ -65,6 +66,30 @@ public class ApplicationV2 : ApplicationImpl
         {
             throw new Exception ("Application.Driver was null even after booting MainLoopCoordinator");
         }
+    }
+
+
+    private void CreateWindowsSubcomponents ()
+    {
+        var inputBuffer = new ConcurrentQueue<WindowsConsole.InputRecord> ();
+        var loop = new MainLoop<WindowsConsole.InputRecord> ();
+        _coordinator = new MainLoopCoordinator<WindowsConsole.InputRecord> (TimedEvents,
+                                                                            () => new WindowsInput (),
+                                                                            inputBuffer,
+                                                                            new WindowsInputProcessor (inputBuffer),
+                                                                            () => new WindowsOutput (),
+                                                                            loop);
+    }
+    private void CreateNetSubcomponents ()
+    {
+        var inputBuffer = new ConcurrentQueue<ConsoleKeyInfo> ();
+        var loop = new MainLoop<ConsoleKeyInfo> ();
+        _coordinator = new MainLoopCoordinator<ConsoleKeyInfo> (TimedEvents,
+                                                                () => new NetInput (),
+                                                                inputBuffer,
+                                                                new NetInputProcessor (inputBuffer),
+                                                                () => new NetOutput (),
+                                                                loop);
     }
 
     /// <inheritdoc />

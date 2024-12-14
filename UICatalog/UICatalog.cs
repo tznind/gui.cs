@@ -336,9 +336,9 @@ public class UICatalogApp
     {
         StartConfigFileWatcher ();
 
-        if (options.Driver == "v2")
+        if (options.Driver?.StartsWith ("v2")??false)
         {
-            ApplicationImpl.ChangeInstance (new ApplicationV2 ());
+            ApplicationImpl.ChangeInstance (new ApplicationV2 (options.Driver));
             options.Driver = string.Empty;
         }
 
