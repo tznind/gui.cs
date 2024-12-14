@@ -51,7 +51,11 @@ public abstract class InputProcessor<T> : IInputProcessor
     {
         // Ensure ScreenPosition is set
         a.ScreenPosition = a.Position;
-        
+
+        // Pass on basic state
+        MouseEvent?.Invoke (this, a);
+
+        // Pass on any interpreted states e.g. click/double click etc
         foreach (var narrative in MouseInterpreter.Process (a))
         {
             ResolveNarrative (narrative);

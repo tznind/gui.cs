@@ -64,9 +64,7 @@ public class MainLoop<T> : IMainLoop<T>
                 OutputBuffer.SetWindowSize (size.Width, size.Height);
 
                 // TODO: Test only
-
-                Application.Top.Layout ();
-                Application.Top.Draw ();
+                Application.LayoutAndDraw (true);
 
                 Out.Write (OutputBuffer);
             }
