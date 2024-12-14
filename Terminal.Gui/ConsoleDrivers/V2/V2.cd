@@ -30,7 +30,7 @@
   <Class Name="Terminal.Gui.WindowsInput" Collapsed="true">
     <Position X="11.5" Y="3" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>QAAAAAAAACAEAAAAAAAAAAAkAAAAAAAAAgAAAAAAABA=</HashCode>
+      <HashCode>QIAACAAAACAEAAAAAAAAAAAkAAAAAAAAAwAAAAAAABA=</HashCode>
       <FileName>ConsoleDrivers\V2\WindowsInput.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -51,6 +51,11 @@
   </Class>
   <Class Name="Terminal.Gui.MainLoop&lt;T&gt;" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="11" Y="4.75" Width="1.5" />
+    <AssociationLine Name="TimedEvents" Type="Terminal.Gui.ITimedEvents">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-1.14" Y="0.123" />
+      </MemberNameLabel>
+    </AssociationLine>
     <AssociationLine Name="AnsiRequestScheduler" Type="Terminal.Gui.AnsiRequestScheduler" ManuallyRouted="true">
       <Path>
         <Point X="11.75" Y="4.75" />
@@ -58,22 +63,20 @@
         <Point X="20.625" Y="4.39" />
         <Point X="20.625" Y="4.5" />
       </Path>
-    </AssociationLine>
-    <AssociationLine Name="TimedEvents" Type="Terminal.Gui.ITimedEvents">
       <MemberNameLabel ManuallyPlaced="true">
-        <Position X="-1.14" Y="0.123" />
+        <Position X="0.11" Y="0.143" />
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>QQQAAAAAACABAQQAAAAAAAAAAAAAAAACAAAAAAAAEAI=</HashCode>
+      <HashCode>QQQAAAAAACABAQQAAAEAAAAAAAAAAAACAAAAAAAAEAI=</HashCode>
       <FileName>ConsoleDrivers\V2\MainLoop.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
+      <Property Name="TimedEvents" />
       <Property Name="InputProcessor" />
       <Property Name="OutputBuffer" />
       <Property Name="Out" />
       <Property Name="AnsiRequestScheduler" />
-      <Property Name="TimedEvents" />
     </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
@@ -118,7 +121,7 @@
   <Class Name="Terminal.Gui.WindowsOutput" Collapsed="true">
     <Position X="13.25" Y="8.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAABACACAAhAAACAAAACAAAAgAQAAIMAAAAAEAAAQ=</HashCode>
+      <HashCode>AEAAABACACAAhAAAAAAAACAAAAgAQAAIMAAAAAEAAAQ=</HashCode>
       <FileName>ConsoleDrivers\V2\WindowsOutput.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -274,7 +277,7 @@
   <Class Name="Terminal.Gui.Application" Collapsed="true">
     <Position X="0.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>hEK4FAgAqARIspQfBQo0gTGiACNL0AICESJKoggBSw8=</HashCode>
+      <HashCode>hEK4FAgAqARIspQeBwoUgTGgACNL0AIAESJKoggBSw8=</HashCode>
       <FileName>Application\Application.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -302,7 +305,7 @@
   <Class Name="Terminal.Gui.View" Collapsed="true">
     <Position X="0.5" Y="3" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>3/v2dzPLvbb/5+LOGuv1x0dem3Y5zv/886afz2/e/Y8=</HashCode>
+      <HashCode>3/v2dzPLvbb/5+LOHuv1x0dem3Y57v/8c6afz2/e/Y8=</HashCode>
       <FileName>View\View.Adornments.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />

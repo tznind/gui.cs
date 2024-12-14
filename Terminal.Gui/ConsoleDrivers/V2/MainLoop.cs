@@ -60,10 +60,7 @@ public class MainLoop<T> : IMainLoop<T>
 
         if (Application.Top != null)
         {
-            Application.Top.NeedsDraw = true;
-            Application.Top.Layout ();
-            Application.Top.Draw ();
-
+            Application.LayoutAndDraw ();
             Out.Write (OutputBuffer);
         }
 
