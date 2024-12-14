@@ -50,24 +50,49 @@ public class MainLoop<T> : IMainLoop<T>
     {
         InputProcessor.ProcessQueue ();
 
- 
-            // TODO: throttle this
-            var size = Out.GetWindowSize ();
-
-            OutputBuffer.SetWindowSize (size.Width, size.Height);
-            // TODO: Test only
-
 
         if (Application.Top != null)
         {
-            Application.LayoutAndDraw ();
-            Out.Write (OutputBuffer);
-        }
 
+            bool needsDrawOrLayout = AnySubviewsNeedDrawn(Application.Top);
+
+            if (needsDrawOrLayout)
+            {
+                // TODO: throttle this
+                var size = Out.GetWindowSize ();
+
+                OutputBuffer.SetWindowSize (size.Width, size.Height);
+
+                // TODO: Test only
+
+                Application.Top.Layout ();
+                Application.Top.Draw ();
+
+                Out.Write (OutputBuffer);
+            }
+        }
 
         TimedEvents.LockAndRunTimers ();
 
         TimedEvents.LockAndRunIdles ();
+    }
+
+    private bool AnySubviewsNeedDrawn (View v)
+    {
+        if (v.NeedsDraw || v.NeedsLayout)
+        {
+            return true;
+        }
+
+        foreach(var subview in v.Subviews )
+        {
+            if (AnySubviewsNeedDrawn (subview))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <inheritdoc />

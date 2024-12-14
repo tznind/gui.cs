@@ -14,7 +14,7 @@ public class OutputBuffer : IOutputBuffer
     ///     UpdateScreen is called.
     ///     <remarks>The format of the array is rows, columns. The first index is the row, the second index is the column.</remarks>
     /// </summary>
-    public Cell [,] Contents { get; set; }
+    public Cell [,] Contents { get; set; } = new Cell[0, 0];
 
     private Attribute _currentAttribute;
     private int _cols;
