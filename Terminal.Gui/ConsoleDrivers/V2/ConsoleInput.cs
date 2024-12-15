@@ -7,6 +7,12 @@ public abstract class ConsoleInput<T> : IConsoleInput<T>
 {
     private ConcurrentQueue<T>? _inputBuffer;
 
+    /// <summary>
+    /// Determines how to get the current system type, adjust
+    /// in unit tests to simulate specific timings.
+    /// </summary>
+    public Func<DateTime> Now { get; set; } = ()=>DateTime.Now;
+
     /// <inheritdoc />
     public virtual void Dispose ()
     {
@@ -29,6 +35,8 @@ public abstract class ConsoleInput<T> : IConsoleInput<T>
 
         do
         {
+            var dt = Now ();
+
             if (Peek ())
             {
                 foreach (var r in Read ())
@@ -37,7 +45,14 @@ public abstract class ConsoleInput<T> : IConsoleInput<T>
                 }
             }
 
-            Task.Delay (TimeSpan.FromMilliseconds (20), token).Wait (token);
+            var took = Now () - dt;
+            var sleepFor = TimeSpan.FromMilliseconds (20) - took;
+
+            if (sleepFor.Milliseconds > 0)
+            {
+                Task.Delay (sleepFor, token).Wait (token);
+            }
+
             token.ThrowIfCancellationRequested ();
         }
         while (!token.IsCancellationRequested);

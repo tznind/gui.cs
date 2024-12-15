@@ -18,6 +18,12 @@ public class MainLoop<T> : IMainLoop<T>
 
     public IWindowSizeMonitor WindowSizeMonitor { get; private set; }
 
+    /// <summary>
+    /// Determines how to get the current system type, adjust
+    /// in unit tests to simulate specific timings.
+    /// </summary>
+    public Func<DateTime> Now { get; set; } = () => DateTime.Now;
+
     public void Initialize (ITimedEvents timedEvents, ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput)
     {
         InputBuffer = inputBuffer;
@@ -34,11 +40,11 @@ public class MainLoop<T> : IMainLoop<T>
     {
         do
         {
-            var dt = DateTime.Now;
+            var dt = Now();
 
             Iteration ();
 
-            var took = DateTime.Now - dt;
+            var took = Now() - dt;
             var sleepFor = TimeSpan.FromMilliseconds (50) - took;
 
             if (sleepFor.Milliseconds > 0)

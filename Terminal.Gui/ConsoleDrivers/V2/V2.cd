@@ -25,7 +25,7 @@
     <Position X="0.5" Y="1.417" Height="0.875" Width="1.7" />
   </Comment>
   <Comment CommentText="Forwarded subset of gateway functionality. These exist to allow ''subclassing' Application.  Note that most methods 'ping pong' a lot back to main gateway submethods e.g. to manipulate TopLevel etc">
-    <Position X="3.083" Y="5.292" Height="1.063" Width="2.992" />
+    <Position X="2.895" Y="5.417" Height="1.063" Width="2.992" />
   </Comment>
   <Class Name="Terminal.Gui.WindowsInput" Collapsed="true">
     <Position X="11.5" Y="3" Width="1.75" />
@@ -306,7 +306,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Terminal.Gui.ApplicationImpl" Collapsed="true">
-    <Position X="3" Y="4.5" Width="1.5" />
+    <Position X="2.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AABAAAAAAAAIAgQQAAAAAQAAAAAAAAAAQAAKgACAAAI=</HashCode>
       <FileName>Application\ApplicationImpl.cs</FileName>
@@ -317,7 +317,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.ConsoleDrivers.V2.ApplicationV2" Collapsed="true">
-    <Position X="4.5" Y="4.5" Width="1.5" />
+    <Position X="4.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAIAgAQAAAAAQAAAAAAgAEAAAAKgIAAEgI=</HashCode>
       <FileName>ConsoleDrivers\V2\ApplicationV2.cs</FileName>
@@ -410,7 +410,7 @@
     </ShowAsAssociation>
   </Interface>
   <Interface Name="Terminal.Gui.IApplication">
-    <Position X="3.25" Y="1.25" Width="1.5" />
+    <Position X="3" Y="1" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAIAgQQAAAAAQAAAAAAAAAAAAAKgAAAAAI=</HashCode>
       <FileName>Application\IApplication.cs</FileName>
