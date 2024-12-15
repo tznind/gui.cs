@@ -99,7 +99,12 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     {
         if (_input != null && _output != null)
         {
-            _facade = new ConsoleDriverFacade<T> (_inputProcessor, _loop.OutputBuffer,_output,_loop.AnsiRequestScheduler);
+            _facade = new ConsoleDriverFacade<T> (
+                                                  _inputProcessor,
+                                                  _loop.OutputBuffer,
+                                                  _output,
+                                                  _loop.AnsiRequestScheduler,
+                                                  _loop.WindowSizeMonitor);
             Application.Driver = _facade;
 
             StartupSemaphore.Release ();

@@ -168,7 +168,7 @@ public class NetOutput : IConsoleOutput
     /// <inheritdoc />
     public Size GetWindowSize ()
     {
-        return new Size (Console.BufferWidth, Console.BufferHeight);
+        return new Size (Console.WindowWidth, Console.WindowHeight);
     }
 
     void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)

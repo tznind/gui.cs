@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui.ConsoleDrivers.V2;
+﻿using System.Drawing;
+
+namespace Terminal.Gui.ConsoleDrivers.V2;
 class ConsoleDriverFacade<T> : IConsoleDriver
 {
     private readonly IInputProcessor _inputProcessor;
@@ -7,7 +9,7 @@ class ConsoleDriverFacade<T> : IConsoleDriver
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
     private CursorVisibility _lastCursor = CursorVisibility.Default;
 
-    public ConsoleDriverFacade (IInputProcessor inputProcessor, IOutputBuffer outputBuffer, IConsoleOutput output, AnsiRequestScheduler ansiRequestScheduler)
+    public ConsoleDriverFacade (IInputProcessor inputProcessor, IOutputBuffer outputBuffer, IConsoleOutput output, AnsiRequestScheduler ansiRequestScheduler,IWindowSizeMonitor windowSizeMonitor)
     {
         _inputProcessor = inputProcessor;
         _output = output;
@@ -17,6 +19,8 @@ class ConsoleDriverFacade<T> : IConsoleDriver
         _inputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
         _inputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
         _inputProcessor.MouseEvent += (s, e) => MouseEvent?.Invoke (s, e);
+
+        windowSizeMonitor.SizeChanging += (_, e) => Application.OnSizeChanging (e);
     }
 
     /// <summary>Gets the location and size of the terminal screen.</summary>

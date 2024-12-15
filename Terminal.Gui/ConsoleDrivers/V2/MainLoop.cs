@@ -1,4 +1,6 @@
 ﻿using System.Collections.Concurrent;
+using System.Drawing;
+using static Unix.Terminal.Curses;
 
 namespace Terminal.Gui;
 
@@ -14,6 +16,8 @@ public class MainLoop<T> : IMainLoop<T>
     public IConsoleOutput Out { get;private set; }
     public AnsiRequestScheduler AnsiRequestScheduler { get; private set; }
 
+    public IWindowSizeMonitor WindowSizeMonitor { get; private set; }
+
     public void Initialize (ITimedEvents timedEvents, ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput)
     {
         InputBuffer = inputBuffer;
@@ -23,6 +27,7 @@ public class MainLoop<T> : IMainLoop<T>
         TimedEvents = timedEvents;
         AnsiRequestScheduler = new AnsiRequestScheduler (InputProcessor.GetParser ());
 
+        WindowSizeMonitor = new WindowSizeMonitor (Out,OutputBuffer);
     }
 
     public void Run (CancellationToken token)
@@ -44,25 +49,21 @@ public class MainLoop<T> : IMainLoop<T>
         while (!token.IsCancellationRequested);
     }
 
-    private bool first = true;
     /// <inheritdoc />
     public void Iteration ()
     {
         InputProcessor.ProcessQueue ();
-
 
         if (Application.Top != null)
         {
 
             bool needsDrawOrLayout = AnySubviewsNeedDrawn(Application.Top);
 
+            // TODO: throttle this
+            WindowSizeMonitor.Poll ();
+
             if (needsDrawOrLayout)
             {
-                // TODO: throttle this
-                var size = Out.GetWindowSize ();
-
-                OutputBuffer.SetWindowSize (size.Width, size.Height);
-
                 // TODO: Test only
                 Application.LayoutAndDraw (true);
 
@@ -74,6 +75,7 @@ public class MainLoop<T> : IMainLoop<T>
 
         TimedEvents.LockAndRunIdles ();
     }
+
 
     private bool AnySubviewsNeedDrawn (View v)
     {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using static Unix.Terminal.Curses;
 
 namespace Terminal.Gui;
 
@@ -9,6 +10,8 @@ public interface IMainLoop<T> : IDisposable
     public IInputProcessor InputProcessor { get; }
 
     public AnsiRequestScheduler AnsiRequestScheduler { get; }
+
+    public IWindowSizeMonitor WindowSizeMonitor { get; }
 
     /// <summary>
     /// Initializes the loop with a buffer from which data can be read
@@ -31,4 +34,12 @@ public interface IMainLoop<T> : IDisposable
     /// Perform a single iteration of the main loop without blocking anywhere.
     /// </summary>
     public void Iteration ();
+}
+
+public interface IWindowSizeMonitor
+{
+    /// <summary>Invoked when the terminal's size changed. The new size of the terminal is provided.</summary>
+    event EventHandler<SizeChangedEventArgs>? SizeChanging;
+
+    void Poll ();
 }
