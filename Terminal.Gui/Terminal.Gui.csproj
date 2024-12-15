@@ -79,6 +79,7 @@
   <ItemGroup>
     <InternalsVisibleTo Include="UnitTests" />
     <InternalsVisibleTo Include="TerminalGuiDesigner" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
   </ItemGroup>
   <!-- =================================================================== -->
   <!-- API Documentation -->

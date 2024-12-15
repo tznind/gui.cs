@@ -47,10 +47,14 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     /// <summary>
     /// Starts the main and input loop threads in separate tasks (returning immediately).
     /// </summary>
-    public void StartAsync ()
+    public async Task StartAsync ()
     {
+        // TODO: if crash on boot then semaphore never finishes
         _inputTask = Task.Run (RunInput);
         _loopTask = Task.Run (RunLoop);
+
+        // Use asynchronous semaphore waiting.
+        await StartupSemaphore.WaitAsync ().ConfigureAwait (false);
     }
 
     private void RunInput ()

@@ -784,8 +784,6 @@ public class MainLoopTests
         Task.Run (
                   () =>
                   {
-                      Thread.Sleep (r.Next (2, 4));
-
                       Application.Invoke (
                                           () =>
                                           {

@@ -83,16 +83,21 @@ public class TimedEvents : ITimedEvents
     // INTENT: It looks like the general architecture here is trying to be a form of publisher/consumer pattern.
     private void RunIdle ()
     {
-        List<Func<bool>> iterate;
-
-        iterate = _idleHandlers;
-        _idleHandlers = new List<Func<bool>> ();
+        Func<bool> [] iterate;
+        lock (_idleHandlers)
+        {
+            iterate = _idleHandlers.ToArray ();
+            _idleHandlers = new List<Func<bool>> ();
+        }
 
         foreach (Func<bool> idle in iterate)
         {
             if (idle ())
             {
-                _idleHandlers.Add (idle);
+                lock (_idleHandlers)
+                {
+                    _idleHandlers.Add (idle);
+                }
             }
         }
     }

@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui;
 
-public class NetInput : ConsoleInput<ConsoleKeyInfo>
+public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
 {
     private NetWinVTConsole _adjustConsole;
 

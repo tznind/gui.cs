@@ -5,10 +5,31 @@ namespace Terminal.Gui.ConsoleDrivers.V2;
 
 public class ApplicationV2 : ApplicationImpl
 {
+    private readonly Func<INetInput> _netInputFactory;
+    private readonly Func<IConsoleOutput> _netOutputFactory;
+    private readonly Func<IWindowsInput> _winInputFactory;
+    private readonly Func<IConsoleOutput> _winOutputFactory;
     private IMainLoopCoordinator _coordinator;
     public ITimedEvents TimedEvents { get; } = new TimedEvents ();
-    public ApplicationV2 ()
+    public ApplicationV2 () : this (
+                                    ()=>new NetInput (),
+                                    ()=>new NetOutput (),
+                                    ()=>new WindowsInput (),
+                                    ()=>new WindowsOutput ()
+                                    )
     {
+    }
+    internal ApplicationV2 (
+        Func<INetInput> netInputFactory,
+        Func<IConsoleOutput> netOutputFactory,
+        Func<IWindowsInput> winInputFactory,
+        Func<IConsoleOutput> winOutputFactory
+        )
+    {
+        _netInputFactory = netInputFactory;
+        _netOutputFactory = netOutputFactory;
+        _winInputFactory = winInputFactory;
+        _winOutputFactory = winOutputFactory;
         IsLegacy = false;
     }
 
@@ -53,12 +74,7 @@ public class ApplicationV2 : ApplicationImpl
             CreateNetSubcomponents ();
         }
 
-        _coordinator.StartAsync ();
-
-        if (!_coordinator.StartupSemaphore.WaitAsync (TimeSpan.FromSeconds (3)).Result)
-        {
-            throw new Exception ("Failed to boot MainLoopCoordinator in sensible timeframe");
-        }
+        _coordinator.StartAsync().Wait();
 
         if (Application.Driver == null)
         {
@@ -72,10 +88,10 @@ public class ApplicationV2 : ApplicationImpl
         var inputBuffer = new ConcurrentQueue<WindowsConsole.InputRecord> ();
         var loop = new MainLoop<WindowsConsole.InputRecord> ();
         _coordinator = new MainLoopCoordinator<WindowsConsole.InputRecord> (TimedEvents,
-                                                                            () => new WindowsInput (),
+                                                                            _winInputFactory,
                                                                             inputBuffer,
                                                                             new WindowsInputProcessor (inputBuffer),
-                                                                            () => new WindowsOutput (),
+                                                                            _winOutputFactory,
                                                                             loop);
     }
     private void CreateNetSubcomponents ()
@@ -83,10 +99,10 @@ public class ApplicationV2 : ApplicationImpl
         var inputBuffer = new ConcurrentQueue<ConsoleKeyInfo> ();
         var loop = new MainLoop<ConsoleKeyInfo> ();
         _coordinator = new MainLoopCoordinator<ConsoleKeyInfo> (TimedEvents,
-                                                                () => new NetInput (),
+                                                                _netInputFactory,
                                                                 inputBuffer,
                                                                 new NetInputProcessor (inputBuffer),
-                                                                () => new NetOutput (),
+                                                                _netOutputFactory,
                                                                 loop);
     }
 
@@ -126,6 +142,7 @@ public class ApplicationV2 : ApplicationImpl
     {
         _coordinator.Stop ();
         base.Shutdown ();
+        Application.Driver = null;
     }
 
     /// <inheritdoc />
