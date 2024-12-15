@@ -84,7 +84,7 @@ public class TimedEvents : ITimedEvents
     private void RunIdle ()
     {
         Func<bool> [] iterate;
-        lock (_idleHandlers)
+        lock (_idleHandlersLock)
         {
             iterate = _idleHandlers.ToArray ();
             _idleHandlers = new List<Func<bool>> ();
@@ -94,7 +94,7 @@ public class TimedEvents : ITimedEvents
         {
             if (idle ())
             {
-                lock (_idleHandlers)
+                lock (_idleHandlersLock)
                 {
                     _idleHandlers.Add (idle);
                 }
@@ -265,7 +265,7 @@ public class TimedEvents : ITimedEvents
 
         // There are no timers set, check if there are any idle handlers
 
-        lock (_idleHandlers)
+        lock (_idleHandlersLock)
         {
             return _idleHandlers.Count > 0;
         }
