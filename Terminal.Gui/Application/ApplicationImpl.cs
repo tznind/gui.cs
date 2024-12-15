@@ -26,7 +26,7 @@ public class ApplicationImpl : IApplication
     [RequiresDynamicCode ("AOT")]
     public virtual void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
-        Application.InternalInit (driver, driverName);
+            Application.InternalInit (driver, driverName);
     }
 
     /// <summary>

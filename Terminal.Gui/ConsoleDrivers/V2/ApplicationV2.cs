@@ -5,12 +5,10 @@ namespace Terminal.Gui.ConsoleDrivers.V2;
 
 public class ApplicationV2 : ApplicationImpl
 {
-    private readonly string _driver;
     private IMainLoopCoordinator _coordinator;
     public ITimedEvents TimedEvents { get; } = new TimedEvents ();
-    public ApplicationV2 (string driver = null)
+    public ApplicationV2 ()
     {
-        _driver = driver;
         IsLegacy = false;
     }
 
@@ -21,7 +19,7 @@ public class ApplicationV2 : ApplicationImpl
 
         Application.AddKeyBindings ();
 
-        CreateDriver (_driver ?? driverName);
+        CreateDriver (driverName);
 
         Application.Initialized = true;
 

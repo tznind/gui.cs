@@ -336,12 +336,6 @@ public class UICatalogApp
     {
         StartConfigFileWatcher ();
 
-        if (options.Driver?.StartsWith ("v2")??false)
-        {
-            ApplicationImpl.ChangeInstance (new ApplicationV2 (options.Driver));
-            options.Driver = string.Empty;
-        }
-
         // By setting _forceDriver we ensure that if the user has specified a driver on the command line, it will be used
         // regardless of what's in a config file.
         Application.ForceDriver = _forceDriver = options.Driver;

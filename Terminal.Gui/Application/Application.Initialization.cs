@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Terminal.Gui.ConsoleDrivers.V2;
 
 namespace Terminal.Gui;
 
@@ -39,6 +40,11 @@ public static partial class Application // Initialization (Init/Shutdown)
     [RequiresDynamicCode ("AOT")]
     public static void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
+        if (driverName?.StartsWith ("v2") ?? false)
+        {
+            ApplicationImpl.ChangeInstance (new ApplicationV2 ());
+        }
+
         ApplicationImpl.Instance.Init (driver, driverName);
     }
 
