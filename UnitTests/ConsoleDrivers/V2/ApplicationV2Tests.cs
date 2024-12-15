@@ -15,5 +15,7 @@ public class ApplicationV2Tests
         v2.Init ();
 
         Assert.NotEmpty (Application.KeyBindings.GetBindings ());
+
+        v2.Shutdown ();
     }
 }
