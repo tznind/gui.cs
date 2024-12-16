@@ -474,6 +474,45 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         Assert.Equal (expectedUnknownResponses, unknownResponses);
     }
 
+    [Fact]
+    public void ParserDetectsMouse ()
+    {
+        // ANSI escape sequence for mouse down (using a generic format example)
+        const string MOUSE_DOWN = "\u001B[<0;12;32M";
+
+        // ANSI escape sequence for Device Attribute Response (e.g., Terminal identifying itself)
+        const string DEVICE_ATTRIBUTE_RESPONSE = "\u001B[?1;2c";
+
+        // ANSI escape sequence for mouse up (using a generic format example)
+        const string MOUSE_UP = "\u001B[<0;25;50m";
+
+        var parser = new AnsiResponseParser ();
+
+        parser.HandleMouse = true;
+        string? foundDar = null;
+        List<MouseEventArgs> mouseEventArgs = new ();
+
+        parser.Mouse += (s, e) => mouseEventArgs.Add (e);
+        parser.ExpectResponse ("c", (dar) => foundDar = dar, null, false);
+        var released = parser.ProcessInput ("a" + MOUSE_DOWN + "asdf" + DEVICE_ATTRIBUTE_RESPONSE + "bbcc" + MOUSE_UP + "sss");
+
+        Assert.Equal ("aasdfbbccsss", released);
+
+        Assert.Equal (2, mouseEventArgs.Count);
+
+        Assert.NotNull (foundDar);
+        Assert.Equal (DEVICE_ATTRIBUTE_RESPONSE,foundDar);
+
+        Assert.True (mouseEventArgs [0].IsPressed);
+        // Mouse positions in ANSI are 1 based so actual Terminal.Gui Screen positions are x-1,y-1
+        Assert.Equal (11,mouseEventArgs [0].Position.X);
+        Assert.Equal (31, mouseEventArgs [0].Position.Y);
+
+        Assert.True (mouseEventArgs [1].IsReleased);
+        Assert.Equal (24, mouseEventArgs [1].Position.X);
+        Assert.Equal (49, mouseEventArgs [1].Position.Y);
+    }
+
     private Tuple<char, int> [] StringToBatch (string batch)
     {
         return batch.Select ((k) => Tuple.Create (k, tIndex++)).ToArray ();
