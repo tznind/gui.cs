@@ -28,34 +28,40 @@ public abstract class ConsoleInput<T> : IConsoleInput<T>
     /// <inheritdoc />
     public void Run (CancellationToken token)
     {
-        if (_inputBuffer == null)
+        try
         {
-            throw new ("Cannot run input before Initialization");
-        }
-
-        do
-        {
-            var dt = Now ();
-
-            if (Peek ())
+            if (_inputBuffer == null)
             {
-                foreach (var r in Read ())
+                throw new ("Cannot run input before Initialization");
+            }
+
+            do
+            {
+                var dt = Now ();
+
+                if (Peek ())
                 {
-                    _inputBuffer.Enqueue (r);
+                    foreach (var r in Read ())
+                    {
+                        _inputBuffer.Enqueue (r);
+                    }
                 }
+
+                var took = Now () - dt;
+                var sleepFor = TimeSpan.FromMilliseconds (20) - took;
+
+                if (sleepFor.Milliseconds > 0)
+                {
+                    Task.Delay (sleepFor, token).Wait (token);
+                }
+
+                token.ThrowIfCancellationRequested ();
             }
-
-            var took = Now () - dt;
-            var sleepFor = TimeSpan.FromMilliseconds (20) - took;
-
-            if (sleepFor.Milliseconds > 0)
-            {
-                Task.Delay (sleepFor, token).Wait (token);
-            }
-
-            token.ThrowIfCancellationRequested ();
+            while (!token.IsCancellationRequested);
         }
-        while (!token.IsCancellationRequested);
+        catch (OperationCanceledException)
+        {
+        }
     }
 
     /// <summary>
