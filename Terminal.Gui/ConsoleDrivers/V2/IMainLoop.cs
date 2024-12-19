@@ -5,6 +5,7 @@ namespace Terminal.Gui;
 
 public interface IMainLoop<T> : IDisposable
 {
+
     public ITimedEvents TimedEvents { get; }
     public IOutputBuffer OutputBuffer { get; }
     public IInputProcessor InputProcessor { get; }

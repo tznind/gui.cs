@@ -4,9 +4,12 @@ using static Unix.Terminal.Curses;
 
 namespace Terminal.Gui;
 
+/// <inheritdoc/>
 public class MainLoop<T> : IMainLoop<T>
 {
+    /// <inheritdoc/>
     public ITimedEvents TimedEvents { get; private set; }
+
     public ConcurrentQueue<T> InputBuffer { get; private set; } = new ();
 
     public IInputProcessor InputProcessor { get; private set; }
@@ -36,6 +39,7 @@ public class MainLoop<T> : IMainLoop<T>
         WindowSizeMonitor = new WindowSizeMonitor (Out,OutputBuffer);
     }
 
+    /// <inheritdoc/>
     public void Run (CancellationToken token)
     {
         do

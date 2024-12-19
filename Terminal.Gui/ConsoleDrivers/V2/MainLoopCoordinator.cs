@@ -19,6 +19,9 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     private Task _loopTask;
     private ITimedEvents _timedEvents;
 
+    public Exception InputCrashedException { get; private set; }
+    public Exception LoopCrashedException { get; private set; }
+
     public SemaphoreSlim StartupSemaphore { get; } = new (0, 1);
 
     /// <summary>
@@ -59,44 +62,58 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
 
     private void RunInput ()
     {
-        lock (oLockInitialization)
-        {
-            // Instance must be constructed on the thread in which it is used.
-            _input = _inputFactory.Invoke ();
-            _input.Initialize (_inputBuffer);
-
-            BuildFacadeIfPossible ();
-        }
-
         try
         {
-            _input.Run (tokenSource.Token);
+            lock (oLockInitialization)
+            {
+                // Instance must be constructed on the thread in which it is used.
+                _input = _inputFactory.Invoke ();
+                _input.Initialize (_inputBuffer);
+
+                BuildFacadeIfPossible ();
+            }
+
+            try
+            {
+                _input.Run (tokenSource.Token);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            _input.Dispose ();
         }
-        catch (OperationCanceledException)
+        catch (Exception e)
         {
+            InputCrashedException = e;
         }
-        _input.Dispose ();
     }
 
     private void RunLoop ()
     {
-        lock (oLockInitialization)
-        {
-            // Instance must be constructed on the thread in which it is used.
-            _output = _outputFactory.Invoke ();
-            _loop.Initialize (_timedEvents, _inputBuffer, _inputProcessor, _output);
-
-            BuildFacadeIfPossible ();
-        }
-
         try
         {
-            _loop.Run (tokenSource.Token);
+            lock (oLockInitialization)
+            {
+                // Instance must be constructed on the thread in which it is used.
+                _output = _outputFactory.Invoke ();
+                _loop.Initialize (_timedEvents, _inputBuffer, _inputProcessor, _output);
+
+                BuildFacadeIfPossible ();
+            }
+
+            try
+            {
+                _loop.Run (tokenSource.Token);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            _loop.Dispose ();
         }
-        catch (OperationCanceledException)
+        catch (Exception e)
         {
+            LoopCrashedException = e;
         }
-        _loop.Dispose ();
     }
 
     private void BuildFacadeIfPossible ()
