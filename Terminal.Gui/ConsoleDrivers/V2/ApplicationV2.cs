@@ -133,12 +133,7 @@ public class ApplicationV2 : ApplicationImpl
         // TODO : how to know when we are done?
         while (Application.TopLevels.TryPeek (out var found) && found == view)
         {
-            var ex = _coordinator.InputCrashedException ?? _coordinator.LoopCrashedException;
-            if(ex != null)
-            {
-                throw ex;
-            }
-            Task.Delay (100).Wait ();
+            _coordinator.RunIteration ();
         }
     }
 

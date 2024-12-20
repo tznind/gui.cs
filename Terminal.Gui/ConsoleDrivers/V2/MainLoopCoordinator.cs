@@ -16,13 +16,12 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     object oLockInitialization = new ();
     private ConsoleDriverFacade<T> _facade;
     private Task _inputTask;
-    private Task _loopTask;
     private ITimedEvents _timedEvents;
 
     public Exception InputCrashedException { get; private set; }
-    public Exception LoopCrashedException { get; private set; }
 
     public SemaphoreSlim StartupSemaphore { get; } = new (0, 1);
+
 
     /// <summary>
     /// Creates a new coordinator
@@ -48,13 +47,15 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     }
 
     /// <summary>
-    /// Starts the main and input loop threads in separate tasks (returning immediately).
+    /// Starts the input loop thread in separate task (returning immediately).
     /// </summary>
     public async Task StartAsync ()
     {
         // TODO: if crash on boot then semaphore never finishes
         _inputTask = Task.Run (RunInput);
-        _loopTask = Task.Run (RunLoop);
+
+        // Main loop is now booted on same thread as rest of users application
+        BootMainLoop ();
 
         // Use asynchronous semaphore waiting.
         await StartupSemaphore.WaitAsync ().ConfigureAwait (false);
@@ -88,31 +89,23 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
         }
     }
 
-    private void RunLoop ()
+    /// <inheritdoc />
+    public void RunIteration ()
     {
-        try
-        {
-            lock (oLockInitialization)
-            {
-                // Instance must be constructed on the thread in which it is used.
-                _output = _outputFactory.Invoke ();
-                _loop.Initialize (_timedEvents, _inputBuffer, _inputProcessor, _output);
 
-                BuildFacadeIfPossible ();
-            }
+        _loop.Iteration ();
+    }
 
-            try
-            {
-                _loop.Run (tokenSource.Token);
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            _loop.Dispose ();
-        }
-        catch (Exception e)
+
+    private void BootMainLoop ()
+    {
+        lock (oLockInitialization)
         {
-            LoopCrashedException = e;
+            // Instance must be constructed on the thread in which it is used.
+            _output = _outputFactory.Invoke ();
+            _loop.Initialize (_timedEvents, _inputBuffer, _inputProcessor, _output);
+
+            BuildFacadeIfPossible ();
         }
     }
 
@@ -136,16 +129,7 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     {
         tokenSource.Cancel();
 
-        if (_loopTask.Id == Task.CurrentId)
-        {
-            // Cannot wait for loop to finish because we are actively executing on that thread
-            Task.WhenAll (_inputTask).Wait ();
-        }
-        else
-        {
-            // Wait for both tasks to complete
-            Task.WhenAll (_inputTask, _loopTask).Wait ();
-        }
-
+        // Wait for input infinite loop to exit
+        Task.WhenAll (_inputTask).Wait ();
     }
 }

@@ -7,5 +7,5 @@ public interface IMainLoopCoordinator
     public void Stop ();
 
     public Exception InputCrashedException { get; }
-    public Exception LoopCrashedException { get; }
+    void RunIteration ();
 }

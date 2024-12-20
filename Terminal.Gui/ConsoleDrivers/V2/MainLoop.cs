@@ -40,27 +40,22 @@ public class MainLoop<T> : IMainLoop<T>
     }
 
     /// <inheritdoc/>
-    public void Run (CancellationToken token)
+    public void Iteration ()
     {
-        do
-        {
             var dt = Now();
 
-            Iteration ();
+            IterationImpl ();
 
             var took = Now() - dt;
             var sleepFor = TimeSpan.FromMilliseconds (50) - took;
 
             if (sleepFor.Milliseconds > 0)
             {
-                Task.Delay (sleepFor, token).Wait (token);
+                Task.Delay (sleepFor).Wait ();
             }
-        }
-        while (!token.IsCancellationRequested);
     }
 
-    /// <inheritdoc />
-    public void Iteration ()
+    public void IterationImpl ()
     {
         InputProcessor.ProcessQueue ();
 
