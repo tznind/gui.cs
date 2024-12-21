@@ -38,16 +38,13 @@ class ConsoleDriverFacade<T> : IConsoleDriver
         {
             Clipboard = new MacOSXClipboard ();
         }
+        else if (CursesDriver.Is_WSL_Platform ())
+        {
+            Clipboard = new WSLClipboard ();
+        }
         else
         {
-            if (CursesDriver.Is_WSL_Platform ())
-            {
-                Clipboard = new WSLClipboard ();
-            }
-            else
-            {
-                Clipboard = new FakeDriver.FakeClipboard ();
-            }
+            Clipboard = new FakeDriver.FakeClipboard ();
         }
     }
 
