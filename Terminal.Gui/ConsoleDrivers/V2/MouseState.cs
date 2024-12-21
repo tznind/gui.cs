@@ -56,22 +56,28 @@ public class MouseInterpreter
 
     public IEnumerable<ButtonNarrative> Process (MouseEventArgs e)
     {
-        // Update narratives
-       if (e.Flags.HasFlag (MouseFlags.Button1Pressed))
-       {
-           if (_ongoingNarratives [0] == null)
-           {
-               _ongoingNarratives [0] = BeginPressedNarrative (0,e);
-           }
-           else
-           {
-               _ongoingNarratives [0]?.Process (0,e.Position,true);
-           }
-       }
-       else
-       {
-           _ongoingNarratives [0]?.Process (0,e.Position,false);
-       }
+        // For each mouse button
+        for (int i = 0; i < 4; i++)
+        {
+            bool isPressed = IsPressed (i, e.Flags);
+
+            // Update narratives
+            if (isPressed)
+            {
+                if (_ongoingNarratives [i] == null)
+                {
+                    _ongoingNarratives [i] = BeginPressedNarrative (i, e);
+                }
+                else
+                {
+                    _ongoingNarratives [i]?.Process (i, e.Position, true);
+                }
+            }
+            else
+            {
+                _ongoingNarratives [i]?.Process (i, e.Position, false);
+            }
+        }
 
        for (var i = 0; i < _ongoingNarratives.Length; i++)
        {
@@ -86,6 +92,18 @@ public class MouseInterpreter
                }
            }
        }
+    }
+
+    private bool IsPressed (int btn, MouseFlags eFlags)
+    {
+        return btn switch
+               {
+                   0=>eFlags.HasFlag (MouseFlags.Button1Pressed),
+                   1 => eFlags.HasFlag (MouseFlags.Button2Pressed),
+                   2 => eFlags.HasFlag (MouseFlags.Button3Pressed),
+                   3 => eFlags.HasFlag (MouseFlags.Button4Pressed),
+                   _ => throw new ArgumentOutOfRangeException(nameof(btn))
+               };
     }
 
     private bool ShouldRelease (ButtonNarrative narrative)
