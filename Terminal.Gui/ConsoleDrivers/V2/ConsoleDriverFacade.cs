@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.ConsoleDrivers.V2;
 class ConsoleDriverFacade<T> : IConsoleDriver
@@ -21,6 +22,33 @@ class ConsoleDriverFacade<T> : IConsoleDriver
         _inputProcessor.MouseEvent += (s, e) => MouseEvent?.Invoke (s, e);
 
         windowSizeMonitor.SizeChanging += (_, e) => Application.OnSizeChanging (e);
+
+        CreateClipboard ();
+    }
+
+    private void CreateClipboard ()
+    {
+        PlatformID p = Environment.OSVersion.Platform;
+
+        if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+        {
+            Clipboard = new WindowsClipboard ();
+        }
+        else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX))
+        {
+            Clipboard = new MacOSXClipboard ();
+        }
+        else
+        {
+            if (CursesDriver.Is_WSL_Platform ())
+            {
+                Clipboard = new WSLClipboard ();
+            }
+            else
+            {
+                Clipboard = new FakeDriver.FakeClipboard ();
+            }
+        }
     }
 
     /// <summary>Gets the location and size of the terminal screen.</summary>
@@ -36,9 +64,8 @@ class ConsoleDriverFacade<T> : IConsoleDriver
         set => _outputBuffer.Clip = value;
     }
 
-    // TODO: Clipboard support
     /// <summary>Get the operating system clipboard.</summary>
-    public IClipboard Clipboard { get; } = new FakeDriver.FakeClipboard ();
+    public IClipboard Clipboard { get; private set; } = new FakeDriver.FakeClipboard ();
 
     /// <summary>
     ///     Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
