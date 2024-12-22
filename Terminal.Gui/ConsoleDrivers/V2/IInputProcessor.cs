@@ -15,11 +15,6 @@ public interface IInputProcessor
 
     /// <summary>Event fired when a mouse event occurs.</summary>
     event EventHandler<MouseEventArgs>? MouseEvent;
-    
-    /// <summary>
-    /// Process low level mouse events into atomic operations / sequences
-    /// </summary>
-    MouseInterpreter MouseInterpreter { get; }
 
     /// <summary>
     ///     Called when a key is pressed down. Fires the <see cref="KeyDown"/> event. This is a precursor to

@@ -16,7 +16,7 @@
     <Position X="19.458" Y="3.562" Height="0.396" Width="2.825" />
   </Comment>
   <Comment CommentText="Mouse interpretation subsystem">
-    <Position X="13.625" Y="9.833" Height="0.396" Width="2.825" />
+    <Position X="13.271" Y="9.896" Height="0.396" Width="2.075" />
   </Comment>
   <Comment CommentText="In Terminal.Gui views get things done almost exclusively by calling static methods on Application e.g. RequestStop, Run, Refresh etc">
     <Position X="0.5" Y="3.75" Height="1.146" Width="1.7" />
@@ -33,6 +33,7 @@
       <HashCode>QIAACAAAACAEAAAAAAAAAAAkAAAAAAAAAwAAAAAAABA=</HashCode>
       <FileName>ConsoleDrivers\V2\WindowsInput.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.NetInput" Collapsed="true">
     <Position X="13.25" Y="3" Width="2" />
@@ -40,11 +41,12 @@
       <HashCode>AAAAAAAAACAEAAAAQAAAAAAgAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\NetInput.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.ConsoleInput&lt;T&gt;" Collapsed="true">
     <Position X="12.5" Y="2" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAACAEAQAAAAAAAAAgAAAAAAAAAAAAAAAAAAo=</HashCode>
+      <HashCode>AAAAAAAAACAEAQAAAAAAAAAgACAAAAAAAAAAAAAAAAo=</HashCode>
       <FileName>ConsoleDrivers\V2\ConsoleInput.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -62,7 +64,7 @@
         <Point X="11.852" Y="7.146" />
         <Point X="12.75" Y="7.146" />
         <Point X="12.75" Y="7.596" />
-        <Point X="12.76" Y="7.596" Type="JumpStart" />
+        <Point X="12.761" Y="7.596" Type="JumpStart" />
         <Point X="12.927" Y="7.596" Type="JumpEnd" />
         <Point X="14" Y="7.596" />
       </Path>
@@ -83,15 +85,15 @@
         <Point X="12.125" Y="5.312" />
         <Point X="12.125" Y="7" />
         <Point X="12.844" Y="7" />
-        <Point X="12.844" Y="14.281" />
-        <Point X="13.75" Y="14.281" />
+        <Point X="12.844" Y="14.531" />
+        <Point X="13.25" Y="14.531" />
       </Path>
       <MemberNameLabel ManuallyPlaced="true">
         <Position X="0.047" Y="-0.336" />
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>QQQAAAAAACABIQQAAAAAAAAAAAAAAAACAAAAAACAEAI=</HashCode>
+      <HashCode>QQQAAAAQACABIQQAAAAAAAAAACAAAAACAAAAAACAEAA=</HashCode>
       <FileName>ConsoleDrivers\V2\MainLoop.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -107,7 +109,7 @@
   <Class Name="Terminal.Gui.MainLoopCoordinator&lt;T&gt;">
     <Position X="6.5" Y="2" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAJAEAAAJABAAAABQAAAAQABAQAAQAIQAABAAACgw=</HashCode>
+      <HashCode>AAAAIAEACAIABAAAABQAAAAQABAQAAQAIQIABAAASgw=</HashCode>
       <FileName>ConsoleDrivers\V2\MainLoopCoordinator.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -151,37 +153,35 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.InputProcessor&lt;T&gt;" Collapsed="true">
-    <Position X="16.5" Y="4.75" Width="2" />
-    <AssociationLine Name="Parser" Type="Terminal.Gui.AnsiResponseParser&lt;T&gt;" FixedFromPoint="true" FixedToPoint="true">
+    <Position X="16.75" Y="4.75" Width="2" />
+    <AssociationLine Name="_mouseInterpreter" Type="Terminal.Gui.MouseInterpreter" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="18.5" Y="5.031" />
-        <Point X="19.125" Y="5.031" />
-        <Point X="19.125" Y="5.5" />
-        <Point X="20" Y="5.5" />
-        <Point X="20" Y="9.75" />
-        <Point X="19.5" Y="9.75" />
-        <Point X="19.5" Y="10.25" />
-        <Point X="19.75" Y="10.25" />
+        <Point X="18" Y="5.312" />
+        <Point X="18" Y="10.031" />
+        <Point X="15.99" Y="10.031" />
+        <Point X="15.99" Y="10.625" />
+        <Point X="15" Y="10.625" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AQCkAAAAAASAiAAAAgggAAAABAoAAAAAAAgAAAAAAAA=</HashCode>
+      <HashCode>AQCkEAAAAASAiAAAAgggAAAABAIAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\InputProcessor.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Property Name="Parser" />
+      <Property Name="_mouseInterpreter" />
     </ShowAsAssociation>
     <Lollipop Position="0.1" />
   </Class>
   <Class Name="Terminal.Gui.NetInputProcessor" Collapsed="true">
-    <Position X="17.75" Y="5.75" Width="2" />
+    <Position X="18" Y="5.75" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAACAAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\NetInputProcessor.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Terminal.Gui.WindowsInputProcessor" Collapsed="true">
-    <Position X="15.75" Y="5.75" Width="2" />
+    <Position X="16" Y="5.75" Width="2" />
     <TypeIdentifier>
       <HashCode>AQAAAAAAAAAACAAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\WindowsInputProcessor.cs</FileName>
@@ -195,7 +195,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Terminal.Gui.ConsoleDrivers.V2.ConsoleDriverFacade&lt;T&gt;">
-    <Position X="6.5" Y="7.5" Width="2" />
+    <Position X="6.5" Y="7.75" Width="2" />
     <Compartments>
       <Compartment Name="Methods" Collapsed="true" />
       <Compartment Name="Fields" Collapsed="true" />
@@ -229,23 +229,23 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.MouseInterpreter">
-    <Position X="13.75" Y="10.5" Width="1.5" />
+    <Position X="13.25" Y="10.5" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAQAAAAAAAABAAIAAkAAACAAICgIAAAAAABAAAAAAgA=</HashCode>
-      <FileName>ConsoleDrivers\V2\MouseState.cs</FileName>
+      <HashCode>AAAAAAAAAAABAAIAAkAAACAAICgIAAAAAAAAABAAAhg=</HashCode>
+      <FileName>ConsoleDrivers\V2\MouseInterpreter.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Field Name="_viewFinder" />
     </ShowAsAssociation>
     <ShowAsCollectionAssociation>
-      <Field Name="_ongoingNarratives" />
+      <Field Name="_ongoingSequences" />
     </ShowAsCollectionAssociation>
   </Class>
-  <Class Name="Terminal.Gui.ButtonNarrative">
+  <Class Name="Terminal.Gui.MouseButtonSequence">
     <Position X="16.75" Y="12" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>IAAAAAAAAAAAAAAAAgAAAAAAICAAAAQAAAAAAAAAAAA=</HashCode>
-      <FileName>ConsoleDrivers\V2\MouseState.cs</FileName>
+      <HashCode>IAAABAAAAACAAAAAAgAAAAAAICAAAEQAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\MouseButtonSequence.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Field Name="_viewFinder" />
@@ -254,11 +254,11 @@
       <Property Name="MouseStates" />
     </ShowAsCollectionAssociation>
   </Class>
-  <Class Name="Terminal.Gui.ButtonState">
-    <Position X="19.5" Y="12" Width="1.5" />
+  <Class Name="Terminal.Gui.MouseButtonStateEx">
+    <Position X="19.5" Y="12" Width="2" />
     <TypeIdentifier>
       <HashCode>AEAAAAAAAAAAAAggAAAAAAAAAACJAAAAAoAAAAAEAAA=</HashCode>
-      <FileName>ConsoleDrivers\V2\MouseState.cs</FileName>
+      <FileName>ConsoleDrivers\V2\MouseButtonState.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Terminal.Gui.StringHeld" Collapsed="true">
@@ -319,7 +319,7 @@
   <Class Name="Terminal.Gui.ConsoleDrivers.V2.ApplicationV2" Collapsed="true">
     <Position X="4.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAIAgAQAAAAAQAAAAAAgAEAAAAKgIAAEgI=</HashCode>
+      <HashCode>QAAAAAgABAAIAgAQAAAAAQAAAAAAgAEAAAAKgIAAEgI=</HashCode>
       <FileName>ConsoleDrivers\V2\ApplicationV2.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -344,7 +344,7 @@
   <Interface Name="Terminal.Gui.IMainLoop&lt;T&gt;" Collapsed="true">
     <Position X="9.25" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAQAAAAAAAABIQQAAAAAAAAAAAAAAAACAAAAAAAAEAI=</HashCode>
+      <HashCode>AAQAAAAAAAABIQQAAAAAAAAAAAAAAAACAAAAAAAAEAA=</HashCode>
       <FileName>ConsoleDrivers\V2\IMainLoop.cs</FileName>
     </TypeIdentifier>
   </Interface>
@@ -364,26 +364,10 @@
   </Interface>
   <Interface Name="Terminal.Gui.IInputProcessor">
     <Position X="14" Y="4.5" Width="1.5" />
-    <AssociationLine Name="MouseInterpreter" Type="Terminal.Gui.MouseInterpreter" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="15.5" Y="6.875" />
-        <Point X="16.5" Y="6.875" />
-        <Point X="16.5" Y="10.125" />
-        <Point X="13.375" Y="10.125" />
-        <Point X="13.375" Y="12.143" />
-        <Point X="13.75" Y="12.143" />
-      </Path>
-      <MemberNameLabel ManuallyPlaced="true">
-        <Position X="0.123" Y="0.152" />
-      </MemberNameLabel>
-    </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAAkAAAAAACAgAAAAAggAAAABAIAAAAAAAgAAAAAAAA=</HashCode>
+      <HashCode>AAAkAAAAAACAgAAAAAggAAAABAIAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\IInputProcessor.cs</FileName>
     </TypeIdentifier>
-    <ShowAsAssociation>
-      <Property Name="MouseInterpreter" />
-    </ShowAsAssociation>
   </Interface>
   <Interface Name="Terminal.Gui.ConsoleDrivers.V2.IViewFinder">
     <Position X="16.75" Y="10.25" Width="1.5" />
@@ -419,7 +403,7 @@
   <Interface Name="Terminal.Gui.IMainLoopCoordinator" Collapsed="true">
     <Position X="6.5" Y="0.5" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAIQAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIQIAAAAAQAA=</HashCode>
       <FileName>ConsoleDrivers\V2\IMainLoopCoordinator.cs</FileName>
     </TypeIdentifier>
   </Interface>
@@ -431,7 +415,7 @@
     </TypeIdentifier>
   </Interface>
   <Interface Name="Terminal.Gui.IWindowSizeMonitor" Collapsed="true">
-    <Position X="13.75" Y="14" Width="1.75" />
+    <Position X="13.25" Y="14.25" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAACAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\IMainLoop.cs</FileName>
