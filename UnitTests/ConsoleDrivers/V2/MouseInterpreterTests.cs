@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Moq;
-using Terminal.Gui.ConsoleDrivers.V2;
+﻿using Moq;
 
 namespace UnitTests.ConsoleDrivers.V2;
 public class MouseInterpreterTests

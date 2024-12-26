@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Drawing;
+using Microsoft.Extensions.Logging;
 using static Unix.Terminal.Curses;
 
 namespace Terminal.Gui;
@@ -48,6 +49,8 @@ public class MainLoop<T> : IMainLoop<T>
 
             var took = Now() - dt;
             var sleepFor = TimeSpan.FromMilliseconds (50) - took;
+
+            Logging.Logger.LogTrace ($"MainLoop iteration took {took.Milliseconds}ms, sleeping for {Math.Max(0,sleepFor.Milliseconds)}ms");
 
             if (sleepFor.Milliseconds > 0)
             {

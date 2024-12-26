@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Terminal.Gui.ConsoleDrivers.V2;
+namespace Terminal.Gui;
 
 public interface IViewFinder
 {

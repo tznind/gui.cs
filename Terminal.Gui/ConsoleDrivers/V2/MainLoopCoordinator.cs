@@ -1,5 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using Terminal.Gui.ConsoleDrivers.V2;
+using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui;
 
@@ -18,9 +18,7 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     private Task _inputTask;
     private ITimedEvents _timedEvents;
 
-    public Exception InputCrashedException { get; private set; }
-
-    public SemaphoreSlim StartupSemaphore { get; } = new (0, 1);
+    private SemaphoreSlim _startupSemaphore = new (0, 1);
 
 
     /// <summary>
@@ -51,6 +49,8 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     /// </summary>
     public async Task StartAsync ()
     {
+        Logging.Logger.LogInformation ("Main Loop Coordinator booting...");
+
         // TODO: if crash on boot then semaphore never finishes
         _inputTask = Task.Run (RunInput);
 
@@ -58,7 +58,9 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
         BootMainLoop ();
 
         // Use asynchronous semaphore waiting.
-        await StartupSemaphore.WaitAsync ().ConfigureAwait (false);
+        await _startupSemaphore.WaitAsync ().ConfigureAwait (false);
+
+        Logging.Logger.LogInformation ("Main Loop Coordinator booting complete");
     }
 
     private void RunInput ()
@@ -85,7 +87,7 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
         }
         catch (Exception e)
         {
-            InputCrashedException = e;
+            Logging.Logger.LogCritical (e,"Input loop crashed");
         }
     }
 
@@ -121,7 +123,7 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
                                                   _loop.WindowSizeMonitor);
             Application.Driver = _facade;
 
-            StartupSemaphore.Release ();
+            _startupSemaphore.Release ();
         }
     }
 

@@ -6,6 +6,5 @@ public interface IMainLoopCoordinator
 
     public void Stop ();
 
-    public Exception InputCrashedException { get; }
     void RunIteration ();
 }

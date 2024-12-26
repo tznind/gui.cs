@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace Terminal.Gui.ConsoleDrivers.V2;
+namespace Terminal.Gui;
 class ConsoleDriverFacade<T> : IConsoleDriver
 {
     private readonly IInputProcessor _inputProcessor;

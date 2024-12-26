@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace Terminal.Gui.ConsoleDrivers.V2;
+namespace Terminal.Gui;
 
 
 public class ApplicationV2 : ApplicationImpl

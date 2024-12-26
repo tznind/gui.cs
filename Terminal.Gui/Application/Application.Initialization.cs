@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Terminal.Gui.ConsoleDrivers.V2;
 
 namespace Terminal.Gui;
 

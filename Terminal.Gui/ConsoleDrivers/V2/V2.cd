@@ -242,7 +242,7 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Terminal.Gui.MouseButtonSequence">
-    <Position X="16.75" Y="12" Width="1.5" />
+    <Position X="16.75" Y="12" Width="2" />
     <TypeIdentifier>
       <HashCode>IAAABAAAAACAAAAAAgAAAAAAICAAAEQAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\MouseButtonSequence.cs</FileName>
@@ -255,7 +255,7 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Terminal.Gui.MouseButtonStateEx">
-    <Position X="19.5" Y="12" Width="2" />
+    <Position X="20" Y="12" Width="2" />
     <TypeIdentifier>
       <HashCode>AEAAAAAAAAAAAAggAAAAAAAAAACJAAAAAoAAAAAEAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\MouseButtonState.cs</FileName>

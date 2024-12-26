@@ -1,5 +1,4 @@
 ﻿using Moq;
-using Terminal.Gui.ConsoleDrivers.V2;
 
 namespace UnitTests.ConsoleDrivers.V2;
 public class ApplicationV2Tests

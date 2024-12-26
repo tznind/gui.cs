@@ -20,11 +20,13 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Serilog;
 using Terminal.Gui;
-using Terminal.Gui.ConsoleDrivers.V2;
 using UICatalog.Scenarios;
 using static Terminal.Gui.ConfigurationManager;
 using Command = Terminal.Gui.Command;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 
 #nullable enable
@@ -124,6 +126,8 @@ public class UICatalogApp
 
     private static int Main (string [] args)
     {
+        Logging.Logger = CreateLogger ();
+
         Console.OutputEncoding = Encoding.Default;
 
         if (Debugger.IsAttached)
@@ -208,6 +212,25 @@ public class UICatalogApp
         UICatalogMain (_options);
 
         return 0;
+    }
+
+    private static ILogger CreateLogger ()
+    {
+        // Configure Serilog to write logs to a file
+        Log.Logger = new LoggerConfiguration ()
+                     .WriteTo.File ("logs/logfile.txt", rollingInterval: RollingInterval.Day)
+                     .CreateLogger ();
+
+        // Create a logger factory compatible with Microsoft.Extensions.Logging
+        using var loggerFactory = LoggerFactory.Create (builder =>
+                                                        {
+                                                            builder
+                                                                .AddSerilog (dispose: true) // Integrate Serilog with ILogger
+                                                                .SetMinimumLevel (LogLevel.Trace); // Set minimum log level
+                                                        });
+
+        // Get an ILogger instance
+        return loggerFactory.CreateLogger ("Global Logger");
     }
 
     private static void OpenUrl (string url)
