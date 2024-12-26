@@ -1,7 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using System.Drawing;
-using Microsoft.Extensions.Logging;
-using static Unix.Terminal.Curses;
+using System.Diagnostics;
 
 namespace Terminal.Gui;
 
@@ -28,6 +26,9 @@ public class MainLoop<T> : IMainLoop<T>
     /// </summary>
     public Func<DateTime> Now { get; set; } = () => DateTime.Now;
 
+    private static readonly DiagnosticSource _diagnosticSource = new DiagnosticListener ("MainLoop");
+
+
     public void Initialize (ITimedEvents timedEvents, ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput)
     {
         InputBuffer = inputBuffer;
@@ -50,7 +51,15 @@ public class MainLoop<T> : IMainLoop<T>
             var took = Now() - dt;
             var sleepFor = TimeSpan.FromMilliseconds (50) - took;
 
-            Logging.Logger.LogTrace ($"MainLoop iteration took {took.Milliseconds}ms, sleeping for {Math.Max(0,sleepFor.Milliseconds)}ms");
+            if (_diagnosticSource.IsEnabled ("MainLoop.Iteration"))
+            {
+                _diagnosticSource.Write (
+                                         "MainLoop.Iteration",
+                                         new
+                                         {
+                                             Duration = took.Milliseconds
+                                         });
+            }
 
             if (sleepFor.Milliseconds > 0)
             {
