@@ -27,7 +27,7 @@ public class MainLoop<T> : IMainLoop<T>
     /// </summary>
     public Func<DateTime> Now { get; set; } = () => DateTime.Now;
 
-    static readonly Histogram<int> totalIterationMetric = Logging.Meter.CreateHistogram<int> ("Total Iteration Time");
+    static readonly Histogram<int> totalIterationMetric = Logging.Meter.CreateHistogram<int> ("Iteration (ms)");
 
     public void Initialize (ITimedEvents timedEvents, ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput)
     {

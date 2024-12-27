@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
+using System.Diagnostics.Metrics;
 
 namespace Terminal.Gui;
 
@@ -12,6 +13,9 @@ public abstract class ConsoleInput<T> : IConsoleInput<T>
     /// in unit tests to simulate specific timings.
     /// </summary>
     public Func<DateTime> Now { get; set; } = ()=>DateTime.Now;
+
+    private Histogram<int> drainInputStream = Logging.Meter.CreateHistogram<int> ("Drain Input (ms)");
+
 
     /// <inheritdoc />
     public virtual void Dispose ()
@@ -39,7 +43,7 @@ public abstract class ConsoleInput<T> : IConsoleInput<T>
             {
                 var dt = Now ();
 
-                if (Peek ())
+                while (Peek ())
                 {
                     foreach (var r in Read ())
                     {
@@ -49,6 +53,8 @@ public abstract class ConsoleInput<T> : IConsoleInput<T>
 
                 var took = Now () - dt;
                 var sleepFor = TimeSpan.FromMilliseconds (20) - took;
+
+                drainInputStream.Record (took.Milliseconds);
 
                 if (sleepFor.Milliseconds > 0)
                 {

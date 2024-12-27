@@ -183,8 +183,6 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
     private void ReleaseHeld (Action<object> appendOutput, AnsiResponseParserState newState = AnsiResponseParserState.Normal)
     {
-        Logging.Logger.LogTrace ($"AnsiResponseParser releasing '{_heldContent.HeldToString ()}'");
-
         foreach (object o in _heldContent.HeldToObjects ())
         {
             appendOutput (o);
@@ -399,10 +397,18 @@ internal class AnsiResponseParser<T> : AnsiResponseParserBase
         ProcessInputBase (
                           i => input [i].Item1,
                           i => input [i],
-                          c => output.Add ((Tuple<char, T>)c),
+                          c => AppendOutput(output,c),
                           input.Length);
 
         return output;
+    }
+
+    private void AppendOutput (List<Tuple<char, T>> output, object c)
+    {
+        var tuple = (Tuple<char, T>)c;
+
+        Logging.Logger.LogTrace ($"AnsiResponseParser releasing '{tuple.Item1}'");
+        output.Add (tuple);
     }
 
     public Tuple<char, T> [] Release ()
@@ -469,10 +475,16 @@ internal class AnsiResponseParser () : AnsiResponseParserBase (new StringHeld ()
         ProcessInputBase (
                           i => input [i],
                           i => input [i], // For string there is no T so object is same as char
-                          c => output.Append ((char)c),
+                          c => AppendOutput(output,(char)c),
                           input.Length);
 
         return output.ToString ();
+    }
+
+    private void AppendOutput (StringBuilder output, char c)
+    {
+        Logging.Logger.LogTrace ($"AnsiResponseParser releasing '{c}'");
+        output.Append (c);
     }
 
     public string Release ()
