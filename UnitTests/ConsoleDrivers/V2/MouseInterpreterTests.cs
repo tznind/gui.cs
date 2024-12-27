@@ -3,26 +3,46 @@
 namespace UnitTests.ConsoleDrivers.V2;
 public class MouseInterpreterTests
 {
-    [Fact]
-    public void Mouse1Click ()
+    [Theory]
+    [MemberData (nameof (SequenceTests))]
+    public void TestMouseEventSequences_InterpretedOnlyAsFlag (List<MouseEventArgs> events, MouseFlags expected)
     {
-        var v = Mock.Of<IViewFinder> ();
-        var interpreter = new MouseInterpreter (null, v);
+        // Arrange: Mock dependencies and set up the interpreter
+        var viewFinder = Mock.Of<IViewFinder> ();
+        var interpreter = new MouseInterpreter (null, viewFinder);
 
-        Assert.Empty (interpreter.Process (
-                             new MouseEventArgs ()
-                             {
-                                 Flags = MouseFlags.Button1Pressed
-                             }));
+        // Act and Assert: Process all but the last event and ensure they yield no results
+        for (int i = 0; i < events.Count - 1; i++)
+        {
+            var intermediateResult = interpreter.Process (events [i]);
+            Assert.Empty (intermediateResult);
+        }
 
-        var result = interpreter.Process (
-                             new MouseEventArgs ()
-                             {
-                                 Flags = MouseFlags.Button1Released
-                             }).ToArray ();
-        var e = Assert.Single (result);
-
-        // TODO: Ultimately will not be the case as we will be dealing with double click and triple
-        Assert.Equal (MouseFlags.Button1Clicked,e.Flags);
+        // Process the final event and verify the expected result
+        var finalResult = interpreter.Process (events [^1]).ToArray (); // ^1 is the last item in the list
+        var singleResult = Assert.Single (finalResult); // Ensure only one result is produced
+        Assert.Equal (expected, singleResult.Flags);
     }
+
+
+    public static IEnumerable<object []> SequenceTests ()
+    {
+        yield return new object []
+        {
+            new List<MouseEventArgs> ()
+            {
+                // Mouse was down
+                new ()
+                {
+                    Flags = MouseFlags.Button1Pressed
+                },
+
+                // Then it wasn't
+                new()
+            },
+            // Means click
+            MouseFlags.Button1Clicked
+        };
+    }
+
 }
