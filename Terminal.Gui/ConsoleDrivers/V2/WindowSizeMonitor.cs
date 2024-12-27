@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using Microsoft.Extensions.Logging;
+
+namespace Terminal.Gui;
 
 internal class WindowSizeMonitor : IWindowSizeMonitor
 {
@@ -20,10 +22,11 @@ internal class WindowSizeMonitor : IWindowSizeMonitor
     {
         var size = _consoleOut.GetWindowSize ();
 
-        _outputBuffer.SetWindowSize (size.Width, size.Height);
 
         if (size != _lastSize)
         {
+            Logging.Logger.LogInformation ($"Console size changes from '{_lastSize}' to {size}");
+            _outputBuffer.SetWindowSize (size.Width, size.Height);
             _lastSize = size;
             SizeChanging?.Invoke (this,new (size));
         }
