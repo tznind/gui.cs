@@ -29,6 +29,8 @@ public class MainLoop<T> : IMainLoop<T>
 
     static readonly Histogram<int> totalIterationMetric = Logging.Meter.CreateHistogram<int> ("Iteration (ms)");
 
+    static readonly Histogram<int> iterationInvokesAndTimeouts = Logging.Meter.CreateHistogram<int> ("Invokes & Timers (ms)");
+
     public void Initialize (ITimedEvents timedEvents, ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput)
     {
         InputBuffer = inputBuffer;
@@ -79,9 +81,13 @@ public class MainLoop<T> : IMainLoop<T>
             }
         }
 
+        var swCallbacks = Stopwatch.StartNew ();
+
         TimedEvents.LockAndRunTimers ();
 
         TimedEvents.LockAndRunIdles ();
+
+        iterationInvokesAndTimeouts.Record (swCallbacks.Elapsed.Milliseconds);
     }
 
 
