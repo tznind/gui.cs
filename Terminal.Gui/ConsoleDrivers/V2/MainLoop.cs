@@ -27,10 +27,7 @@ public class MainLoop<T> : IMainLoop<T>
     /// </summary>
     public Func<DateTime> Now { get; set; } = () => DateTime.Now;
 
-    static Meter s_meter = new Meter ("Terminal.Gui");
-
-
-    static Histogram<int> s_iterations = s_meter.CreateHistogram<int> ("Terminal.Gui.iteration");
+    static readonly Histogram<int> totalIterationMetric = Logging.Meter.CreateHistogram<int> ("Total Iteration Time");
 
     public void Initialize (ITimedEvents timedEvents, ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput)
     {
@@ -54,7 +51,7 @@ public class MainLoop<T> : IMainLoop<T>
             var took = Now() - dt;
             var sleepFor = TimeSpan.FromMilliseconds (50) - took;
 
-            s_iterations.Record (took.Milliseconds);
+            totalIterationMetric.Record (took.Milliseconds);
 
             if (sleepFor.Milliseconds > 0)
             {

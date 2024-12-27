@@ -218,6 +218,7 @@ public class UICatalogApp
     {
         // Configure Serilog to write logs to a file
         Log.Logger = new LoggerConfiguration ()
+                     .MinimumLevel.Verbose () // Verbose includes Trace and Debug
                      .WriteTo.File ("logs/logfile.txt", rollingInterval: RollingInterval.Day)
                      .CreateLogger ();
 

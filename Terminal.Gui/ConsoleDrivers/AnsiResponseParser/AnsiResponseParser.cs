@@ -1,5 +1,7 @@
 ﻿#nullable enable
 
+using Microsoft.Extensions.Logging;
+
 namespace Terminal.Gui;
 
 internal abstract class AnsiResponseParserBase : IAnsiResponseParser
@@ -181,6 +183,8 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
     private void ReleaseHeld (Action<object> appendOutput, AnsiResponseParserState newState = AnsiResponseParserState.Normal)
     {
+        Logging.Logger.LogTrace ($"AnsiResponseParser releasing '{_heldContent.HeldToString ()}'");
+
         foreach (object o in _heldContent.HeldToObjects ())
         {
             appendOutput (o);
@@ -201,6 +205,8 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
             {
                 RaiseMouseEvent(cur);
                 ResetState();
+
+                Logging.Logger.LogTrace ($"AnsiResponseParser handled as mouse '{cur}'");
                 return false;
             }
 
@@ -250,6 +256,8 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                 if (swallow)
                 {
                     _heldContent.ClearHeld ();
+
+                    Logging.Logger.LogTrace ($"AnsiResponseParser bespoke processed '{cur}'");
 
                     // Do not send back to input stream
                     return false;
@@ -301,6 +309,8 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
         if (matchingResponse?.Response != null)
         {
+            Logging.Logger.LogTrace ($"AnsiResponseParser processed '{cur}'");
+
             if (invokeCallback)
             {
                 matchingResponse.Response.Invoke (_heldContent);

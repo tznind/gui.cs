@@ -1,4 +1,6 @@
 ﻿using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
+using System.Runtime.ConstrainedExecution;
 
 namespace Terminal.Gui;
 
@@ -119,6 +121,7 @@ public class ApplicationV2 : ApplicationImpl
     /// <inheritdoc />
     public override void Run (Toplevel view, Func<Exception, bool> errorHandler = null)
     {
+        Logging.Logger.LogInformation ($"Run '{view}'");
         ArgumentNullException.ThrowIfNull (view);
 
         if (!Application.Initialized)
@@ -148,6 +151,8 @@ public class ApplicationV2 : ApplicationImpl
     /// <inheritdoc />
     public override void RequestStop (Toplevel top)
     {
+        Logging.Logger.LogInformation ($"RequestStop '{top}'");
+
         // TODO: This definition of stop seems sketchy
         Application.TopLevels.TryPop (out _);
 
