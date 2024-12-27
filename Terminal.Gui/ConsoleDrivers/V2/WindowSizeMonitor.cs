@@ -18,7 +18,7 @@ internal class WindowSizeMonitor : IWindowSizeMonitor
     }
 
     /// <inheritdoc />
-    public void Poll ()
+    public bool Poll ()
     {
         var size = _consoleOut.GetWindowSize ();
 
@@ -29,6 +29,8 @@ internal class WindowSizeMonitor : IWindowSizeMonitor
             _outputBuffer.SetWindowSize (size.Width, size.Height);
             _lastSize = size;
             SizeChanging?.Invoke (this,new (size));
+            return true;
         }
+        return false;
     }
 }

@@ -68,10 +68,9 @@ public class MainLoop<T> : IMainLoop<T>
 
             bool needsDrawOrLayout = AnySubviewsNeedDrawn(Application.Top);
 
-            // TODO: throttle this
-            WindowSizeMonitor.Poll ();
+            bool sizeChanged = WindowSizeMonitor.Poll ();
 
-            if (needsDrawOrLayout)
+            if (needsDrawOrLayout || sizeChanged)
             {
                 // TODO: Test only
                 Application.LayoutAndDraw (true);
