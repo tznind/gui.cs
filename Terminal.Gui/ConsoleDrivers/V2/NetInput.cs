@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using Microsoft.Extensions.Logging;
+
+namespace Terminal.Gui;
 
 public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
 {
@@ -13,9 +15,10 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
             {
                 _adjustConsole = new NetWinVTConsole ();
             }
-            catch (ApplicationException)
+            catch (ApplicationException ex)
             {
                 // Likely running as a unit test, or in a non-interactive session.
+                Logging.Logger.LogCritical (ex,"NetWinVTConsole could not be constructed i.e. could not configure terminal modes. May indicate running in non-interactive session e.g. unit testing CI");
             }
         }
 
