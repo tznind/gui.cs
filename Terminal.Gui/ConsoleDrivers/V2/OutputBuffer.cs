@@ -84,7 +84,7 @@ public class OutputBuffer : IOutputBuffer
 
     // As performance is a concern, we keep track of the dirty lines and only refresh those.
     // This is in addition to the dirty flag on each cell.
-    public bool []? DirtyLines { get; set; }
+    public bool [] DirtyLines { get; set; } = [];
 
     // QUESTION: When non-full screen apps are supported, will this represent the app size, or will that be in Application?
     /// <summary>Gets the location and size of the terminal screen.</summary>
@@ -268,7 +268,7 @@ public class OutputBuffer : IOutputBuffer
                         Contents [Row, Col].IsDirty = false;
                     }
 
-                    DirtyLines! [Row] = true;
+                    DirtyLines [Row] = true;
                 }
             }
         }

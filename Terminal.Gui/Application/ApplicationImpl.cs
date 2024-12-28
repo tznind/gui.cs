@@ -226,7 +226,7 @@ public class ApplicationImpl : IApplication
     }
 
     /// <inheritdoc />
-    public virtual void RequestStop (Toplevel top)
+    public virtual void RequestStop (Toplevel? top)
     {
         top ??= Application.Top;
 
