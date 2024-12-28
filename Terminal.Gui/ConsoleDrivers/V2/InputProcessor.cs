@@ -52,14 +52,10 @@ public abstract class InputProcessor<T> : IInputProcessor
         // Ensure ScreenPosition is set
         a.ScreenPosition = a.Position;
 
-        // Pass on basic state
-        MouseEvent?.Invoke (this, a);
+        _mouseInterpreter.Process (a);
 
-        // Pass on any interpreted states e.g. click/double click etc
-        foreach (var e in _mouseInterpreter.Process (a))
-        {
-            MouseEvent?.Invoke (this, e);
-        }
+        // Pass on
+        MouseEvent?.Invoke (this, a);
     }
 
     public InputProcessor (ConcurrentQueue<T> inputBuffer)

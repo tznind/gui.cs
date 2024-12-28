@@ -6,7 +6,11 @@ namespace Terminal.Gui;
 /// </summary>
 internal class MouseButtonStateEx
 {
-    public required int Button { get; set; }
+    private readonly Func<DateTime> _now;
+    private readonly TimeSpan _repeatClickThreshold;
+    private readonly int _buttonIdx;
+    private int _consecutiveClicks = 0;
+
     /// <summary>
     ///     When the button entered its current state.
     /// </summary>
@@ -17,38 +21,65 @@ internal class MouseButtonStateEx
     /// </summary>
     public bool Pressed { get; set; }
 
-    /// <summary>
-    /// The screen location when the mouse button entered its current state
-    /// (became pressed or was released)
-    /// </summary>
-    public Point Position { get; set; }
+    public MouseButtonStateEx (Func<DateTime> now,TimeSpan repeatClickThreshold, int buttonIdx)
+    {
+        _now = now;
+        _repeatClickThreshold = repeatClickThreshold;
+        _buttonIdx = buttonIdx;
+    }
 
-    /// <summary>
-    /// The <see cref="View"/> (if any) that was at the <see cref="Position"/>
-    /// when the button entered its current state.
-    /// </summary>
-    public View? View { get; set; }
+    public void UpdateState (MouseEventArgs e, out int? numClicks)
+    {
+        bool isPressedNow = IsPressed (_buttonIdx, e.Flags);
 
-    /// <summary>
-    /// Viewport relative position within <see cref="View"/> (if there is one)
-    /// </summary>
-    public Point ViewportPosition { get; set; }
+        var elapsed =_now() - At;
 
-    /// <summary>
-    /// True if shift was provided by the console at the time the mouse
-    ///  button entered its current state.
-    /// </summary>
-    public bool Shift { get; set; }
+        if (elapsed > _repeatClickThreshold)
+        {
+            // Expired
+            OverwriteState (e);
+            _consecutiveClicks = 0;
+            numClicks = null;
+        }
+        else
+        {
+            if (isPressedNow == Pressed)
+            {
+                // No change in button state so do nothing
+                numClicks = null;
+                return;
+            }
 
-    /// <summary>
-    /// True if control was provided by the console at the time the mouse
-    /// button entered its current state.
-    /// </summary>
-    public bool Ctrl { get; set; }
+            if (Pressed)
+            {
+                // Click released
+                numClicks = ++_consecutiveClicks;
+            }
+            else
+            {
+                numClicks = null;
+            }
 
-    /// <summary>
-    /// True if alt was held down at the time the mouse
-    /// button entered its current state.
-    /// </summary>
-    public bool Alt { get; set; }
+            // Record new state
+            OverwriteState (e);
+        }
+    }
+
+    private void OverwriteState (MouseEventArgs e)
+    {
+        Pressed = IsPressed (_buttonIdx, e.Flags);
+        At = _now ();
+    }
+
+    private bool IsPressed (int btn, MouseFlags eFlags)
+    {
+        return btn switch
+               {
+                   0 => eFlags.HasFlag (MouseFlags.Button1Pressed),
+                   1 => eFlags.HasFlag (MouseFlags.Button2Pressed),
+                   2 => eFlags.HasFlag (MouseFlags.Button3Pressed),
+                   3 => eFlags.HasFlag (MouseFlags.Button4Pressed),
+                   _ => throw new ArgumentOutOfRangeException (nameof (btn))
+               };
+    }
 }
