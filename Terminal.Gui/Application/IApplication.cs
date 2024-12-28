@@ -152,7 +152,30 @@ public interface IApplication
     void Invoke (Action action);
 
     bool IsLegacy { get; }
+
+    /// <summary>
+    ///     Adds specified idle handler function to main iteration processing. The handler function will be called
+    ///     once per iteration of the main loop after other events have been handled.
+    /// </summary>
     void AddIdle (Func<bool> func);
+
+    /// <summary>Adds a timeout to the application.</summary>
+    /// <remarks>
+    ///     When time specified passes, the callback will be invoked. If the callback returns true, the timeout will be
+    ///     reset, repeating the invocation. If it returns false, the timeout will stop and be removed. The returned value is a
+    ///     token that can be used to stop the timeout by calling <see cref="RemoveTimeout(object)"/>.
+    /// </remarks>
     object AddTimeout (TimeSpan time, Func<bool> callback);
+
+    /// <summary>Removes a previously scheduled timeout</summary>
+    /// <remarks>The token parameter is the value returned by <see cref="AddTimeout"/>.</remarks>
+    /// <returns>
+    /// <c>true</c>
+    /// if the timeout is successfully removed; otherwise,
+    /// <c>false</c>
+    /// .
+    /// This method also returns
+    /// <c>false</c>
+    /// if the timeout is not found.</returns>
     bool RemoveTimeout (object token);
 }

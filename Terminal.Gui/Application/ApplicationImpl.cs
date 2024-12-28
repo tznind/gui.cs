@@ -3,22 +3,29 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui;
 
+/// <summary>
+/// Original Terminal.Gui implementation of core <see cref="Application"/> methods.
+/// </summary>
 public class ApplicationImpl : IApplication
 {
     // Private static readonly Lazy instance of Application
-    private static Lazy<IApplication> lazyInstance = new (() => new ApplicationImpl ());
+    private static Lazy<IApplication> _lazyInstance = new (() => new ApplicationImpl ());
 
-    // Public static property to access the instance
-    public static IApplication Instance => lazyInstance.Value;
+    /// <summary>
+    /// Gets the currently configured backend implementation of <see cref="Application"/> gateway methods.
+    /// Change to your own implementation by using <see cref="ChangeInstance"/> (before init).
+    /// </summary>
+    public static IApplication Instance => _lazyInstance.Value;
 
     /// <summary>
     /// Change the singleton implementation, should not be called except before application
-    /// startup.
+    /// startup. This method lets you provide alternative implementations of core static gateway
+    /// methods of <see cref="Application"/>.
     /// </summary>
     /// <param name="newApplication"></param>
     public static void ChangeInstance (IApplication newApplication)
     {
-        lazyInstance = new Lazy<IApplication> (newApplication);
+        _lazyInstance = new Lazy<IApplication> (newApplication);
     }
 
     /// <inheritdoc/>

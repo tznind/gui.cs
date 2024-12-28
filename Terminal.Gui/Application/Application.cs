@@ -226,6 +226,10 @@ public static partial class Application
         SynchronizationContext.SetSynchronizationContext (null);
     }
 
-    // Only return true if the Current has changed.
+
+    /// <summary>
+    ///     Adds specified idle handler function to main iteration processing. The handler function will be called
+    ///     once per iteration of the main loop after other events have been handled.
+    /// </summary>
     public static void AddIdle (Func<bool> func) => ApplicationImpl.Instance.AddIdle (func);
 }

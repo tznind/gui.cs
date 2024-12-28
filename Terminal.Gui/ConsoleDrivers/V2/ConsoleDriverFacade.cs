@@ -80,8 +80,7 @@ class ConsoleDriverFacade<T> : IConsoleDriver
     }
 
     /// <summary>
-    ///     The contents of the application output. The driver outputs this buffer to the terminal when
-    ///     <see cref="UpdateScreen"/> is called.
+    ///     The contents of the application output. The driver outputs this buffer to the terminal.
     ///     <remarks>The format of the array is rows, columns. The first index is the row, the second index is the column.</remarks>
     /// </summary>
     public Cell [,] Contents

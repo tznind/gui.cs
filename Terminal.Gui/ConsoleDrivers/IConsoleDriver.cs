@@ -34,8 +34,7 @@ public interface IConsoleDriver
 
     // BUGBUG: This should not be publicly settable.
     /// <summary>
-    ///     Gets or sets the contents of the application output. The driver outputs this buffer to the terminal when
-    ///     <see cref="UpdateScreen"/> is called.
+    ///     Gets or sets the contents of the application output. The driver outputs this buffer to the terminal.
     ///     <remarks>The format of the array is rows, columns. The first index is the row, the second index is the column.</remarks>
     /// </summary>
     Cell [,]? Contents { get; set; }
