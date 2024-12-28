@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#nullable enable
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Terminal.Gui;
 
+/// <summary>
+/// Interface for instances that provide backing functionality to static
+/// gateway class <see cref="Application"/>.
+/// </summary>
 public interface IApplication
 {
     /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
     /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
     /// <para>
     ///     This function loads the right <see cref="IConsoleDriver"/> for the platform, Creates a <see cref="Toplevel"/>. and
-    ///     assigns it to <see cref="Top"/>
+    ///     assigns it to <see cref="Application.Top"/>
     /// </para>
     /// <para>
     ///     <see cref="Shutdown"/> must be called when the application is closing (typically after
@@ -99,14 +99,14 @@ public interface IApplication
     ///     </para>
     ///     <para>
     ///         Calling <see cref="Run(Terminal.Gui.Toplevel,System.Func{System.Exception,bool})"/> is equivalent to calling
-    ///         <see cref="Begin(Toplevel)"/>, followed by <see cref="RunLoop(RunState)"/>, and then calling
-    ///         <see cref="End(RunState)"/>.
+    ///         <see cref="Application.Begin(Toplevel)"/>, followed by <see cref="Application.RunLoop(RunState)"/>, and then calling
+    ///         <see cref="Application.End(RunState)"/>.
     ///     </para>
     ///     <para>
     ///         Alternatively, to have a program control the main loop and process events manually, call
-    ///         <see cref="Begin(Toplevel)"/> to set things up manually and then repeatedly call
-    ///         <see cref="RunLoop(RunState)"/> with the wait parameter set to false. By doing this the
-    ///         <see cref="RunLoop(RunState)"/> method will only process any pending events, timers, idle handlers and then
+    ///         <see cref="Application.Begin(Toplevel)"/> to set things up manually and then repeatedly call
+    ///         <see cref="Application.RunLoop(RunState)"/> with the wait parameter set to false. By doing this the
+    ///         <see cref="Application.RunLoop(RunState)"/> method will only process any pending events, timers, idle handlers and then
     ///         return control immediately.
     ///     </para>
     ///     <para>When using <see cref="Run{T}"/> or
@@ -116,7 +116,7 @@ public interface IApplication
     ///     <para>
     ///         RELEASE builds only: When <paramref name="errorHandler"/> is <see langword="null"/> any exceptions will be
     ///         rethrown. Otherwise, if <paramref name="errorHandler"/> will be called. If <paramref name="errorHandler"/>
-    ///         returns <see langword="true"/> the <see cref="RunLoop(RunState)"/> will resume; otherwise this method will
+    ///         returns <see langword="true"/> the <see cref="Application.RunLoop(RunState)"/> will resume; otherwise this method will
     ///         exit.
     ///     </para>
     /// </remarks>

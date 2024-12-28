@@ -27,7 +27,6 @@ public class NetOutput : IConsoleOutput
     /// <inheritdoc />
     public void Write (IOutputBuffer buffer)
     {
-        bool updated = false;
         if ( Console.WindowHeight < 1
             || buffer.Contents.Length != buffer.Rows * buffer.Cols
             || buffer.Rows != Console.WindowHeight)

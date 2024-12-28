@@ -108,7 +108,7 @@ internal class WindowsInput : ConsoleInput<InputRecord>, IWindowsInput
             Marshal.FreeHGlobal (pRecord);
         }
     }
-    public void Dispose ()
+    public override void Dispose ()
     {
         SetConsoleMode (_inputHandle, _originalConsoleMode);
     }

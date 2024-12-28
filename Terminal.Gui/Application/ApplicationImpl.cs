@@ -99,14 +99,14 @@ public class ApplicationImpl : IApplication
     ///     </para>
     ///     <para>
     ///         Calling <see cref="Run(Terminal.Gui.Toplevel,System.Func{System.Exception,bool})"/> is equivalent to calling
-    ///         <see cref="Begin(Toplevel)"/>, followed by <see cref="RunLoop(RunState)"/>, and then calling
-    ///         <see cref="End(RunState)"/>.
+    ///         <see cref="Application.Begin(Toplevel)"/>, followed by <see cref="Application.RunLoop(RunState)"/>, and then calling
+    ///         <see cref="Application.End(RunState)"/>.
     ///     </para>
     ///     <para>
     ///         Alternatively, to have a program control the main loop and process events manually, call
-    ///         <see cref="Begin(Toplevel)"/> to set things up manually and then repeatedly call
-    ///         <see cref="RunLoop(RunState)"/> with the wait parameter set to false. By doing this the
-    ///         <see cref="RunLoop(RunState)"/> method will only process any pending events, timers, idle handlers and then
+    ///         <see cref="Application.Begin(Toplevel)"/> to set things up manually and then repeatedly call
+    ///         <see cref="Application.RunLoop(RunState)"/> with the wait parameter set to false. By doing this the
+    ///         <see cref="Application.RunLoop(RunState)"/> method will only process any pending events, timers, idle handlers and then
     ///         return control immediately.
     ///     </para>
     ///     <para>When using <see cref="Run{T}"/> or
@@ -116,7 +116,7 @@ public class ApplicationImpl : IApplication
     ///     <para>
     ///         RELEASE builds only: When <paramref name="errorHandler"/> is <see langword="null"/> any exceptions will be
     ///         rethrown. Otherwise, if <paramref name="errorHandler"/> will be called. If <paramref name="errorHandler"/>
-    ///         returns <see langword="true"/> the <see cref="RunLoop(RunState)"/> will resume; otherwise this method will
+    ///         returns <see langword="true"/> the <see cref="Application.RunLoop(RunState)"/> will resume; otherwise this method will
     ///         exit.
     ///     </para>
     /// </remarks>

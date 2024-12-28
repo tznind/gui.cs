@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace Terminal.Gui;
 class ConsoleDriverFacade<T> : IConsoleDriver
@@ -9,6 +8,9 @@ class ConsoleDriverFacade<T> : IConsoleDriver
     private readonly IOutputBuffer _outputBuffer;
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
     private CursorVisibility _lastCursor = CursorVisibility.Default;
+
+    /// <summary>The event fired when the terminal is resized.</summary>
+    public event EventHandler<SizeChangedEventArgs> SizeChanged;
 
     public ConsoleDriverFacade (IInputProcessor inputProcessor, IOutputBuffer outputBuffer, IConsoleOutput output, AnsiRequestScheduler ansiRequestScheduler,IWindowSizeMonitor windowSizeMonitor)
     {
@@ -21,7 +23,7 @@ class ConsoleDriverFacade<T> : IConsoleDriver
         _inputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
         _inputProcessor.MouseEvent += (s, e) => MouseEvent?.Invoke (s, e);
 
-        windowSizeMonitor.SizeChanging += (_, e) => Application.OnSizeChanging (e);
+        windowSizeMonitor.SizeChanging += (_, e) => SizeChanged?.Invoke (this,e);
 
         CreateClipboard ();
     }
@@ -265,8 +267,6 @@ class ConsoleDriverFacade<T> : IConsoleDriver
 
         return true;
     }
-    /// <summary>The event fired when the terminal is resized.</summary>
-    public event EventHandler<SizeChangedEventArgs> SizeChanged;
 
     /// <inheritdoc />
     public void Suspend ()
