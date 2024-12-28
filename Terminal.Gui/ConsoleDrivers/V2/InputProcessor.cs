@@ -63,6 +63,14 @@ public abstract class InputProcessor<T> : IInputProcessor
         InputBuffer = inputBuffer;
         Parser.HandleMouse = true;
         Parser.Mouse += (s, e) => OnMouseEvent (e);
+
+        Parser.HandleKeyboard = true;
+        Parser.Keyboard += (s,k)=>
+                          {
+                              OnKeyDown (k);
+                              OnKeyUp (k);
+                          };
+
         // TODO: For now handle all other escape codes with ignore
         Parser.UnexpectedResponseHandler = str => { return true; };
     }

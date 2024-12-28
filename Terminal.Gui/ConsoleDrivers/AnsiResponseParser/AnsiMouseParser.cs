@@ -14,6 +14,18 @@ public class AnsiMouseParser
     private readonly Regex _mouseEventPattern = new (@"\u001b\[<(\d+);(\d+);(\d+)(M|m)", RegexOptions.Compiled);
 
     /// <summary>
+    /// Returns true if it is a mouse event
+    /// </summary>
+    /// <param name="cur"></param>
+    /// <returns></returns>
+    public bool IsMouse (string cur)
+    {
+        // Typically in this format
+        // ESC [ < {button_code};{x_pos};{y_pos}{final_byte}
+        return cur.EndsWith ('M') || cur.EndsWith ('m');
+    }
+
+    /// <summary>
     ///     Parses a mouse ansi escape sequence into a mouse event. Returns null if input
     ///     is not a mouse event or its syntax is not understood.
     /// </summary>
