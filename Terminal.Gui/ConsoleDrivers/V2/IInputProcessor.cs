@@ -1,7 +1,5 @@
-﻿
-#nullable enable
+﻿#nullable enable
 namespace Terminal.Gui;
-
 
 public interface IInputProcessor
 {
@@ -10,7 +8,8 @@ public interface IInputProcessor
 
     /// <summary>Event fired when a key is released.</summary>
     /// <remarks>
-    ///     Drivers that do not support key release events will fire this event after <see cref="KeyDown"/> processing is complete.
+    ///     Drivers that do not support key release events will fire this event after <see cref="KeyDown"/> processing is
+    ///     complete.
     /// </remarks>
     event EventHandler<Key>? KeyUp;
 
@@ -41,9 +40,9 @@ public interface IInputProcessor
     void OnMouseEvent (MouseEventArgs mouseEventArgs);
 
     /// <summary>
-    /// Drains the input buffer, processing all available keystrokes
+    ///     Drains the input buffer, processing all available keystrokes
     /// </summary>
     void ProcessQueue ();
-    public IAnsiResponseParser GetParser ();
 
+    public IAnsiResponseParser GetParser ();
 }

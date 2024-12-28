@@ -6,30 +6,31 @@ namespace Terminal.Gui;
 
 internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 {
-    private readonly AnsiMouseParser _mouseParser = new  ();
+    private readonly AnsiMouseParser _mouseParser = new ();
     private readonly AnsiKeyboardParser _keyboardParser = new ();
-    protected object _lockExpectedResponses = new();
+    protected object _lockExpectedResponses = new ();
 
     protected object _lockState = new ();
 
     /// <summary>
-    /// Event raised when mouse events are detected - requires setting <see cref="HandleMouse"/> to true
+    ///     Event raised when mouse events are detected - requires setting <see cref="HandleMouse"/> to true
     /// </summary>
     public event EventHandler<MouseEventArgs> Mouse;
 
     /// <summary>
-    /// Event raised when keyboard event is detected (e.g. cursors) - requires setting <see cref="HandleKeyboard"/>
+    ///     Event raised when keyboard event is detected (e.g. cursors) - requires setting <see cref="HandleKeyboard"/>
     /// </summary>
     public event Action<object, Key> Keyboard;
 
     /// <summary>
-    /// True to explicitly handle mouse escape sequences by passing them to <see cref="Mouse"/> event.
-    /// Defaults to <see langword="false"/>
+    ///     True to explicitly handle mouse escape sequences by passing them to <see cref="Mouse"/> event.
+    ///     Defaults to <see langword="false"/>
     /// </summary>
     public bool HandleMouse { get; set; } = false;
 
     /// <summary>
-    /// True to explicitly handle keyboard escape sequences (such as cursor keys) by passing them to <see cref="Keyboard"/> event
+    ///     True to explicitly handle keyboard escape sequences (such as cursor keys) by passing them to <see cref="Keyboard"/>
+    ///     event
     /// </summary>
     public bool HandleKeyboard { get; set; } = false;
 
@@ -210,12 +211,13 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
         {
             string cur = _heldContent.HeldToString ();
 
-            if (HandleMouse && IsMouse(cur))
+            if (HandleMouse && IsMouse (cur))
             {
-                RaiseMouseEvent(cur);
-                ResetState();
+                RaiseMouseEvent (cur);
+                ResetState ();
 
                 Logging.Logger.LogTrace ($"AnsiResponseParser handled as mouse '{cur}'");
+
                 return false;
             }
 
@@ -225,6 +227,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                 ResetState ();
 
                 Logging.Logger.LogTrace ($"AnsiResponseParser handled as keyboard '{cur}'");
+
                 return false;
             }
 
@@ -291,29 +294,23 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
     private void RaiseMouseEvent (string cur)
     {
-        var ev = _mouseParser.ProcessMouseInput (cur);
+        MouseEventArgs? ev = _mouseParser.ProcessMouseInput (cur);
 
         if (ev != null)
         {
-            Mouse?.Invoke (this,ev);
+            Mouse?.Invoke (this, ev);
         }
     }
 
-    private bool IsMouse (string cur)
-    {
-        return _mouseParser.IsMouse (cur);
-    }
+    private bool IsMouse (string cur) { return _mouseParser.IsMouse (cur); }
+
     private void RaiseKeyboardEvent (string cur)
     {
-        var k = _keyboardParser.ProcessKeyboardInput (cur);
+        Key? k = _keyboardParser.ProcessKeyboardInput (cur);
         Keyboard?.Invoke (this, k);
     }
-    private bool IsKeyboard (string cur)
-    {
-        return _keyboardParser.IsKeyboard (cur);
-    }
 
-
+    private bool IsKeyboard (string cur) { return _keyboardParser.IsKeyboard (cur); }
 
     /// <summary>
     ///     <para>
@@ -419,7 +416,6 @@ internal class AnsiResponseParser<T> : AnsiResponseParserBase
     /// <inheritdoc cref="AnsiResponseParser.UnknownResponseHandler"/>
     public Func<IEnumerable<Tuple<char, T>>, bool> UnexpectedResponseHandler { get; set; } = _ => false;
 
-
     public IEnumerable<Tuple<char, T>> ProcessInput (params Tuple<char, T> [] input)
     {
         List<Tuple<char, T>> output = new ();
@@ -427,7 +423,7 @@ internal class AnsiResponseParser<T> : AnsiResponseParserBase
         ProcessInputBase (
                           i => input [i].Item1,
                           i => input [i],
-                          c => AppendOutput(output,c),
+                          c => AppendOutput (output, c),
                           input.Length);
 
         return output;
@@ -435,7 +431,7 @@ internal class AnsiResponseParser<T> : AnsiResponseParserBase
 
     private void AppendOutput (List<Tuple<char, T>> output, object c)
     {
-        var tuple = (Tuple<char, T>)c;
+        Tuple<char, T> tuple = (Tuple<char, T>)c;
 
         Logging.Logger.LogTrace ($"AnsiResponseParser releasing '{tuple.Item1}'");
         output.Add (tuple);
@@ -481,7 +477,6 @@ internal class AnsiResponseParser<T> : AnsiResponseParserBase
 
     /// <inheritdoc/>
     protected override bool ShouldSwallowUnexpectedResponse () { return UnexpectedResponseHandler.Invoke (HeldToEnumerable ()); }
-
 }
 
 internal class AnsiResponseParser () : AnsiResponseParserBase (new StringHeld ())
@@ -506,7 +501,7 @@ internal class AnsiResponseParser () : AnsiResponseParserBase (new StringHeld ()
         ProcessInputBase (
                           i => input [i],
                           i => input [i], // For string there is no T so object is same as char
-                          c => AppendOutput(output,(char)c),
+                          c => AppendOutput (output, (char)c),
                           input.Length);
 
         return output.ToString ();

@@ -1,17 +1,16 @@
 ﻿using System.Collections.Concurrent;
-using Terminal.Gui.ConsoleDrivers;
 
 namespace Terminal.Gui;
 
 /// <summary>
-/// Input processor for <see cref="NetInput"/>, deals in <see cref="ConsoleKeyInfo"/> stream
+///     Input processor for <see cref="NetInput"/>, deals in <see cref="ConsoleKeyInfo"/> stream
 /// </summary>
 public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
 {
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public NetInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer) : base (inputBuffer) { }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void Process (ConsoleKeyInfo consoleKeyInfo)
     {
         foreach (Tuple<char, ConsoleKeyInfo> released in Parser.ProcessInput (Tuple.Create (consoleKeyInfo.KeyChar, consoleKeyInfo)))
@@ -20,10 +19,10 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void ProcessAfterParsing (ConsoleKeyInfo input)
     {
-        var key = EscSeqUtils.MapKey (input);
+        KeyCode key = EscSeqUtils.MapKey (input);
         OnKeyDown (key);
         OnKeyUp (key);
     }

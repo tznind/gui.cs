@@ -174,12 +174,12 @@ public interface IApplication
     /// <summary>Removes a previously scheduled timeout</summary>
     /// <remarks>The token parameter is the value returned by <see cref="AddTimeout"/>.</remarks>
     /// <returns>
-    /// <c>true</c>
+    /// <see langword="true"/>
     /// if the timeout is successfully removed; otherwise,
-    /// <c>false</c>
+    /// <see langword="false"/>
     /// .
     /// This method also returns
-    /// <c>false</c>
+    /// <see langword="false"/>
     /// if the timeout is not found.</returns>
     bool RemoveTimeout (object token);
 }

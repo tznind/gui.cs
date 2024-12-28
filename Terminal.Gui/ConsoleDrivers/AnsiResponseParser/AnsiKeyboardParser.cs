@@ -28,17 +28,13 @@ public class AnsiKeyboardParser
                        'B' => Key.CursorDown,
                        'C' => Key.CursorRight,
                        'D' => Key.CursorDown,
-                       _ => default(Key)
+                       _ => default (Key)
                    };
-
         }
 
         // It's an unrecognized keyboard event
         return null;
     }
 
-    public bool IsKeyboard (string cur)
-    {
-        return _arrowKeyPattern.IsMatch (cur);
-    }
+    public bool IsKeyboard (string cur) { return _arrowKeyPattern.IsMatch (cur); }
 }

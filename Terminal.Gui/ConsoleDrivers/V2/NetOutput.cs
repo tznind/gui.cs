@@ -1,14 +1,16 @@
 ﻿using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui;
+
 public class NetOutput : IConsoleOutput
 {
     public bool IsWinPlatform { get; }
 
     private CursorVisibility? _cachedCursorVisibility;
+
     public NetOutput ()
     {
-        Logging.Logger.LogInformation ($"Creating {nameof(NetOutput)}");
+        Logging.Logger.LogInformation ($"Creating {nameof (NetOutput)}");
 
         PlatformID p = Environment.OSVersion.Platform;
 
@@ -18,20 +20,17 @@ public class NetOutput : IConsoleOutput
         }
     }
 
-    /// <inheritdoc />
-    public void Write (string text)
-    {
-        Console.Write (text);
-    }
+    /// <inheritdoc/>
+    public void Write (string text) { Console.Write (text); }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void Write (IOutputBuffer buffer)
     {
-        if ( Console.WindowHeight < 1
+        if (Console.WindowHeight < 1
             || buffer.Contents.Length != buffer.Rows * buffer.Cols
             || buffer.Rows != Console.WindowHeight)
         {
-       //     return;
+            //     return;
         }
 
         var top = 0;
@@ -154,7 +153,7 @@ public class NetOutput : IConsoleOutput
             }
         }
 
-        foreach (var s in Application.Sixel)
+        foreach (SixelToRender s in Application.Sixel)
         {
             if (!string.IsNullOrWhiteSpace (s.SixelData))
             {
@@ -168,13 +167,10 @@ public class NetOutput : IConsoleOutput
         _cachedCursorVisibility = savedVisibility;
     }
 
-    /// <inheritdoc />
-    public Size GetWindowSize ()
-    {
-        return new Size (Console.WindowWidth, Console.WindowHeight);
-    }
+    /// <inheritdoc/>
+    public Size GetWindowSize () { return new (Console.WindowWidth, Console.WindowHeight); }
 
-    void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
+    private void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
     {
         SetCursorPositionImpl (lastCol, row);
         Console.Write (output);
@@ -182,6 +178,7 @@ public class NetOutput : IConsoleOutput
         lastCol += outputWidth;
         outputWidth = 0;
     }
+
     public bool SetCursorVisibility (CursorVisibility visibility)
     {
         _cachedCursorVisibility = visibility;
@@ -191,11 +188,8 @@ public class NetOutput : IConsoleOutput
         return visibility == CursorVisibility.Default;
     }
 
-    /// <inheritdoc />
-    public void SetCursorPosition (int col, int row)
-    {
-        SetCursorPositionImpl (col, row);
-    }
+    /// <inheritdoc/>
+    public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
 
     private bool SetCursorPositionImpl (int col, int row)
     {
@@ -221,15 +215,11 @@ public class NetOutput : IConsoleOutput
         return true;
     }
 
-    /// <inheritdoc />
-    public void Dispose ()
-    {
-        Console.Clear ();
-    }
+    /// <inheritdoc/>
+    public void Dispose () { Console.Clear (); }
 
     void IConsoleOutput.SetCursorVisibility (CursorVisibility visibility)
     {
         Console.Out.Write (visibility == CursorVisibility.Default ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
     }
-
 }

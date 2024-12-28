@@ -1,13 +1,12 @@
 ﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
-using System.Text;
 using Microsoft.Extensions.Logging;
 using static Terminal.Gui.WindowsConsole;
 
 namespace Terminal.Gui;
+
 internal class WindowsOutput : IConsoleOutput
 {
-
     [DllImport ("kernel32.dll", EntryPoint = "WriteConsole", SetLastError = true, CharSet = CharSet.Unicode)]
     private static extern bool WriteConsole (
         nint hConsoleOutput,
@@ -29,7 +28,6 @@ internal class WindowsOutput : IConsoleOutput
         nint screenBufferData
     );
 
-
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool GetConsoleScreenBufferInfoEx (nint hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFOEX csbi);
 
@@ -48,18 +46,19 @@ internal class WindowsOutput : IConsoleOutput
     }
 
     internal static nint INVALID_HANDLE_VALUE = new (-1);
-    
+
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool SetConsoleActiveScreenBuffer (nint Handle);
 
     [DllImport ("kernel32.dll")]
     private static extern bool SetConsoleCursorPosition (nint hConsoleOutput, Coord dwCursorPosition);
 
-    private nint _screenBuffer;
+    private readonly nint _screenBuffer;
 
     public WindowsOutput ()
     {
         Logging.Logger.LogInformation ($"Creating {nameof (WindowsOutput)}");
+
         _screenBuffer = CreateConsoleScreenBuffer (
                                                    DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
                                                    ShareMode.FileShareRead | ShareMode.FileShareWrite,
@@ -83,6 +82,7 @@ internal class WindowsOutput : IConsoleOutput
             throw new Win32Exception (Marshal.GetLastWin32Error ());
         }
     }
+
     public void Write (string str)
     {
         if (!WriteConsole (_screenBuffer, str, (uint)str.Length, out uint _, nint.Zero))
@@ -91,10 +91,9 @@ internal class WindowsOutput : IConsoleOutput
         }
     }
 
-
     public void Write (IOutputBuffer buffer)
     {
-        var outputBuffer = new ExtendedCharInfo [buffer.Rows * buffer.Cols];
+        ExtendedCharInfo [] outputBuffer = new ExtendedCharInfo [buffer.Rows * buffer.Cols];
 
         // TODO: probably do need this right?
         /*
@@ -106,7 +105,7 @@ internal class WindowsOutput : IConsoleOutput
         var bufferCoords = new Coord
         {
             X = (short)buffer.Cols, //Clip.Width,
-            Y = (short)buffer.Rows, //Clip.Height
+            Y = (short)buffer.Rows //Clip.Height
         };
 
         for (var row = 0; row < buffer.Rows; row++)
@@ -161,12 +160,14 @@ internal class WindowsOutput : IConsoleOutput
             Bottom = (short)buffer.Rows,
             Right = (short)buffer.Cols
         };
+
         //size, ExtendedCharInfo [] charInfoBuffer, Coord , SmallRect window,
         if (!WriteToConsole (
-                                           size: new (buffer.Cols, buffer.Rows),
-                                           charInfoBuffer: outputBuffer,
-                                           bufferSize: bufferCoords,
-                                           window: damageRegion, false))
+                             new (buffer.Cols, buffer.Rows),
+                             outputBuffer,
+                             bufferCoords,
+                             damageRegion,
+                             false))
         {
             int err = Marshal.GetLastWin32Error ();
 
@@ -199,15 +200,15 @@ internal class WindowsOutput : IConsoleOutput
 
             foreach (ExtendedCharInfo info in charInfoBuffer)
             {
-                ci [i++] = new CharInfo
+                ci [i++] = new()
                 {
-                    Char = new CharUnion { UnicodeChar = info.Char },
+                    Char = new() { UnicodeChar = info.Char },
                     Attributes =
                         (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor16 () | ((int)info.Attribute.Background.GetClosestNamedColor16 () << 4))
                 };
             }
 
-            result = WriteConsoleOutput (_screenBuffer, ci, bufferSize, new Coord { X = window.Left, Y = window.Top }, ref window);
+            result = WriteConsoleOutput (_screenBuffer, ci, bufferSize, new() { X = window.Left, Y = window.Top }, ref window);
         }
         else
         {
@@ -254,7 +255,7 @@ internal class WindowsOutput : IConsoleOutput
             // supply console with the new content
             result = WriteConsole (_screenBuffer, s, (uint)s.Length, out uint _, nint.Zero);
 
-            foreach (var sixel in Application.Sixel)
+            foreach (SixelToRender sixel in Application.Sixel)
             {
                 SetCursorPosition ((short)sixel.ScreenPosition.X, (short)sixel.ScreenPosition.Y);
                 WriteConsole (_screenBuffer, sixel.SixelData, (uint)sixel.SixelData.Length, out uint _, nint.Zero);
@@ -288,10 +289,11 @@ internal class WindowsOutput : IConsoleOutput
         Size sz = new (
                        csbi.srWindow.Right - csbi.srWindow.Left + 1,
                        csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
+
         return sz;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void SetCursorVisibility (CursorVisibility visibility)
     {
         var sb = new StringBuilder ();
@@ -299,13 +301,10 @@ internal class WindowsOutput : IConsoleOutput
         Write (sb.ToString ());
     }
 
-    /// <inheritdoc />
-    public void SetCursorPosition (int col, int row)
-    {
-        SetConsoleCursorPosition (_screenBuffer, new Coord ((short)col, (short)row));
-    }
+    /// <inheritdoc/>
+    public void SetCursorPosition (int col, int row) { SetConsoleCursorPosition (_screenBuffer, new ((short)col, (short)row)); }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void Dispose ()
     {
         if (_screenBuffer != nint.Zero)

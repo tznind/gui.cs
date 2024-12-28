@@ -2,14 +2,14 @@
 namespace Terminal.Gui;
 
 /// <summary>
-/// Not to be confused with <see cref="NetEvents.MouseButtonState"/>
+///     Not to be confused with <see cref="NetEvents.MouseButtonState"/>
 /// </summary>
 internal class MouseButtonStateEx
 {
     private readonly Func<DateTime> _now;
     private readonly TimeSpan _repeatClickThreshold;
     private readonly int _buttonIdx;
-    private int _consecutiveClicks = 0;
+    private int _consecutiveClicks;
 
     /// <summary>
     ///     When the button entered its current state.
@@ -17,11 +17,11 @@ internal class MouseButtonStateEx
     public DateTime At { get; set; }
 
     /// <summary>
-    /// <see langword="true"/> if the button is currently down
+    ///     <see langword="true"/> if the button is currently down
     /// </summary>
     public bool Pressed { get; set; }
 
-    public MouseButtonStateEx (Func<DateTime> now,TimeSpan repeatClickThreshold, int buttonIdx)
+    public MouseButtonStateEx (Func<DateTime> now, TimeSpan repeatClickThreshold, int buttonIdx)
     {
         _now = now;
         _repeatClickThreshold = repeatClickThreshold;
@@ -32,7 +32,7 @@ internal class MouseButtonStateEx
     {
         bool isPressedNow = IsPressed (_buttonIdx, e.Flags);
 
-        var elapsed =_now() - At;
+        TimeSpan elapsed = _now () - At;
 
         if (elapsed > _repeatClickThreshold)
         {
@@ -47,6 +47,7 @@ internal class MouseButtonStateEx
             {
                 // No change in button state so do nothing
                 numClicks = null;
+
                 return;
             }
 

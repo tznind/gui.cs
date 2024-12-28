@@ -3,22 +3,22 @@ using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 using static Terminal.Gui.WindowsConsole;
 
 namespace Terminal.Gui;
+
 using InputRecord = InputRecord;
 
 /// <summary>
-/// Input processor for <see cref="WindowsInput"/>, deals in <see cref="WindowsConsole.InputRecord"/> stream.
+///     Input processor for <see cref="WindowsInput"/>, deals in <see cref="WindowsConsole.InputRecord"/> stream.
 /// </summary>
 internal class WindowsInputProcessor : InputProcessor<InputRecord>
 {
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer) : base (inputBuffer) { }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void Process (InputRecord inputEvent)
     {
         switch (inputEvent.EventType)
         {
-
             case EventType.Key:
 
                 // TODO: For now ignore keyup because ANSI comes in as down+up which is confusing to try and parse/pair these things up
@@ -65,10 +65,11 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void ProcessAfterParsing (InputRecord input)
     {
         Key key;
+
         if (input.KeyEvent.UnicodeChar == '\0')
         {
             key = input.KeyEvent.wVirtualKeyCode switch
@@ -103,7 +104,7 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
                       VK.F22 => Key.F22,
                       VK.F23 => Key.F23,
                       VK.F24 => Key.F24,
-                      _ => (Key)'\0'
+                      _ => '\0'
                   };
         }
         else
@@ -120,9 +121,9 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
         var result = new MouseEventArgs
         {
             Position = new (e.MousePosition.X, e.MousePosition.Y),
-            //Wrong but for POC ok
-            Flags = e.ButtonState.HasFlag (WindowsConsole.ButtonState.Button1Pressed) ? MouseFlags.Button1Pressed : MouseFlags.None,
 
+            //Wrong but for POC ok
+            Flags = e.ButtonState.HasFlag (ButtonState.Button1Pressed) ? MouseFlags.Button1Pressed : MouseFlags.None
         };
 
         // TODO: Return keys too

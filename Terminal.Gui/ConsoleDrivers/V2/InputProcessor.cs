@@ -5,16 +5,15 @@ namespace Terminal.Gui;
 
 public abstract class InputProcessor<T> : IInputProcessor
 {
-
     /// <summary>
-    /// How long after Esc has been pressed before we give up on getting an Ansi escape sequence
+    ///     How long after Esc has been pressed before we give up on getting an Ansi escape sequence
     /// </summary>
-    TimeSpan _escTimeout = TimeSpan.FromMilliseconds (50);
+    private readonly TimeSpan _escTimeout = TimeSpan.FromMilliseconds (50);
 
     internal AnsiResponseParser<T> Parser { get; } = new ();
     public ConcurrentQueue<T> InputBuffer { get; }
 
-    public IAnsiResponseParser GetParser () => Parser;
+    public IAnsiResponseParser GetParser () { return Parser; }
 
     private MouseInterpreter _mouseInterpreter { get; } = new ();
 
@@ -66,11 +65,12 @@ public abstract class InputProcessor<T> : IInputProcessor
         Parser.Mouse += (s, e) => OnMouseEvent (e);
 
         Parser.HandleKeyboard = true;
-        Parser.Keyboard += (s,k)=>
-                          {
-                              OnKeyDown (k);
-                              OnKeyUp (k);
-                          };
+
+        Parser.Keyboard += (s, k) =>
+                           {
+                               OnKeyDown (k);
+                               OnKeyUp (k);
+                           };
 
         // TODO: For now handle all other escape codes with ignore
         Parser.UnexpectedResponseHandler = str => { return true; };
@@ -88,23 +88,22 @@ public abstract class InputProcessor<T> : IInputProcessor
             Process (input);
         }
 
-        foreach (var input in ShouldReleaseParserHeldKeys ())
+        foreach (T input in ShouldReleaseParserHeldKeys ())
         {
             ProcessAfterParsing (input);
         }
     }
 
-
     public IEnumerable<T> ShouldReleaseParserHeldKeys ()
     {
-        if (Parser.State == AnsiResponseParserState.ExpectingBracket &&
-            DateTime.Now - Parser.StateChangedAt > _escTimeout)
+        if (Parser.State == AnsiResponseParserState.ExpectingBracket && DateTime.Now - Parser.StateChangedAt > _escTimeout)
         {
             return Parser.Release ().Select (o => o.Item2);
         }
 
         return [];
     }
+
     protected abstract void Process (T result);
 
     protected abstract void ProcessAfterParsing (T input);

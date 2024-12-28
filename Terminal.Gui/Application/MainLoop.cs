@@ -14,7 +14,7 @@ namespace Terminal.Gui;
 internal interface IMainLoopDriver
 {
     /// <summary>Must report whether there are any events pending, or even block waiting for events.</summary>
-    /// <returns><c>true</c>, if there were pending events, <c>false</c> otherwise.</returns>
+    /// <returns><see langword="true"/>, if there were pending events, <see langword="false"/> otherwise.</returns>
     bool EventsPending ();
 
     /// <summary>The iteration function.</summary>

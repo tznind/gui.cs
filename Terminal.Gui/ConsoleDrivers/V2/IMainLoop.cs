@@ -1,12 +1,10 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
-using static Unix.Terminal.Curses;
 
 namespace Terminal.Gui;
 
 public interface IMainLoop<T> : IDisposable
 {
-
     public ITimedEvents TimedEvents { get; }
     public IOutputBuffer OutputBuffer { get; }
     public IInputProcessor InputProcessor { get; }
@@ -16,7 +14,7 @@ public interface IMainLoop<T> : IDisposable
     public IWindowSizeMonitor WindowSizeMonitor { get; }
 
     /// <summary>
-    /// Initializes the loop with a buffer from which data can be read
+    ///     Initializes the loop with a buffer from which data can be read
     /// </summary>
     /// <param name="timedEvents"></param>
     /// <param name="inputBuffer"></param>
@@ -25,7 +23,7 @@ public interface IMainLoop<T> : IDisposable
     void Initialize (ITimedEvents timedEvents, ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput);
 
     /// <summary>
-    /// Perform a single iteration of the main loop without blocking anywhere.
+    ///     Perform a single iteration of the main loop without blocking anywhere.
     /// </summary>
     public void Iteration ();
 }

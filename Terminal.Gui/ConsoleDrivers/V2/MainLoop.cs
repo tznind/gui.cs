@@ -14,22 +14,22 @@ public class MainLoop<T> : IMainLoop<T>
 
     public IInputProcessor InputProcessor { get; private set; }
 
-    public IOutputBuffer OutputBuffer { get; private set; } = new OutputBuffer();
+    public IOutputBuffer OutputBuffer { get; } = new OutputBuffer ();
 
-    public IConsoleOutput Out { get;private set; }
+    public IConsoleOutput Out { get; private set; }
     public AnsiRequestScheduler AnsiRequestScheduler { get; private set; }
 
     public IWindowSizeMonitor WindowSizeMonitor { get; private set; }
 
     /// <summary>
-    /// Determines how to get the current system type, adjust
-    /// in unit tests to simulate specific timings.
+    ///     Determines how to get the current system type, adjust
+    ///     in unit tests to simulate specific timings.
     /// </summary>
     public Func<DateTime> Now { get; set; } = () => DateTime.Now;
 
-    static readonly Histogram<int> totalIterationMetric = Logging.Meter.CreateHistogram<int> ("Iteration (ms)");
+    private static readonly Histogram<int> totalIterationMetric = Logging.Meter.CreateHistogram<int> ("Iteration (ms)");
 
-    static readonly Histogram<int> iterationInvokesAndTimeouts = Logging.Meter.CreateHistogram<int> ("Invokes & Timers (ms)");
+    private static readonly Histogram<int> iterationInvokesAndTimeouts = Logging.Meter.CreateHistogram<int> ("Invokes & Timers (ms)");
 
     public void Initialize (ITimedEvents timedEvents, ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput)
     {
@@ -38,27 +38,27 @@ public class MainLoop<T> : IMainLoop<T>
         InputProcessor = inputProcessor;
 
         TimedEvents = timedEvents;
-        AnsiRequestScheduler = new AnsiRequestScheduler (InputProcessor.GetParser ());
+        AnsiRequestScheduler = new (InputProcessor.GetParser ());
 
-        WindowSizeMonitor = new WindowSizeMonitor (Out,OutputBuffer);
+        WindowSizeMonitor = new WindowSizeMonitor (Out, OutputBuffer);
     }
 
     /// <inheritdoc/>
     public void Iteration ()
     {
-            var dt = Now();
+        DateTime dt = Now ();
 
-            IterationImpl ();
+        IterationImpl ();
 
-            var took = Now() - dt;
-            var sleepFor = TimeSpan.FromMilliseconds (50) - took;
+        TimeSpan took = Now () - dt;
+        TimeSpan sleepFor = TimeSpan.FromMilliseconds (50) - took;
 
-            totalIterationMetric.Record (took.Milliseconds);
+        totalIterationMetric.Record (took.Milliseconds);
 
-            if (sleepFor.Milliseconds > 0)
-            {
-                Task.Delay (sleepFor).Wait ();
-            }
+        if (sleepFor.Milliseconds > 0)
+        {
+            Task.Delay (sleepFor).Wait ();
+        }
     }
 
     public void IterationImpl ()
@@ -67,8 +67,7 @@ public class MainLoop<T> : IMainLoop<T>
 
         if (Application.Top != null)
         {
-
-            bool needsDrawOrLayout = AnySubviewsNeedDrawn(Application.Top);
+            bool needsDrawOrLayout = AnySubviewsNeedDrawn (Application.Top);
 
             bool sizeChanged = WindowSizeMonitor.Poll ();
 
@@ -90,7 +89,6 @@ public class MainLoop<T> : IMainLoop<T>
         iterationInvokesAndTimeouts.Record (swCallbacks.Elapsed.Milliseconds);
     }
 
-
     private bool AnySubviewsNeedDrawn (View v)
     {
         if (v.NeedsDraw || v.NeedsLayout)
@@ -98,7 +96,7 @@ public class MainLoop<T> : IMainLoop<T>
             return true;
         }
 
-        foreach(var subview in v.Subviews )
+        foreach (View subview in v.Subviews)
         {
             if (AnySubviewsNeedDrawn (subview))
             {
@@ -109,7 +107,7 @@ public class MainLoop<T> : IMainLoop<T>
         return false;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void Dispose ()
     { // TODO release managed resources here
     }

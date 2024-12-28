@@ -1,26 +1,22 @@
 ﻿#nullable enable
 
-using static Terminal.Gui.SpinnerStyle;
-
 namespace Terminal.Gui;
 
 internal class MouseInterpreter
 {
-
     /// <summary>
-    /// Function for returning the current time. Use in unit tests to
-    /// ensure repeatable tests.
+    ///     Function for returning the current time. Use in unit tests to
+    ///     ensure repeatable tests.
     /// </summary>
     public Func<DateTime> Now { get; set; }
 
     /// <summary>
-    /// How long to wait for a second, third, fourth click after the first before giving up and
-    /// releasing event as a 'click'
+    ///     How long to wait for a second, third, fourth click after the first before giving up and
+    ///     releasing event as a 'click'
     /// </summary>
     public TimeSpan RepeatedClickThreshold { get; set; }
 
-    private MouseButtonStateEx [] _buttonStates ;
-
+    private readonly MouseButtonStateEx [] _buttonStates;
 
     public MouseInterpreter (
         Func<DateTime>? now = null,
@@ -32,24 +28,23 @@ internal class MouseInterpreter
 
         _buttonStates = new []
         {
-            new MouseButtonStateEx (this.Now,this.RepeatedClickThreshold,0),
-            new MouseButtonStateEx (this.Now,this.RepeatedClickThreshold,1),
-            new MouseButtonStateEx (this.Now,this.RepeatedClickThreshold,2),
-            new MouseButtonStateEx (this.Now,this.RepeatedClickThreshold,3),
+            new MouseButtonStateEx (Now, RepeatedClickThreshold, 0),
+            new MouseButtonStateEx (Now, RepeatedClickThreshold, 1),
+            new MouseButtonStateEx (Now, RepeatedClickThreshold, 2),
+            new MouseButtonStateEx (Now, RepeatedClickThreshold, 3)
         };
     }
 
     public MouseEventArgs Process (MouseEventArgs e)
     {
         // For each mouse button
-        for (int i = 0; i < 4; i++)
+        for (var i = 0; i < 4; i++)
         {
-
-            _buttonStates [i].UpdateState (e, out var numClicks);
+            _buttonStates [i].UpdateState (e, out int? numClicks);
 
             if (numClicks.HasValue)
             {
-                return RaiseClick (i,numClicks.Value, e);
+                return RaiseClick (i, numClicks.Value, e);
             }
         }
 
@@ -62,7 +57,6 @@ internal class MouseInterpreter
 
         return mouseEventArgs;
     }
-
 
     private MouseFlags ToClicks (int buttonIdx, int numberOfClicks)
     {

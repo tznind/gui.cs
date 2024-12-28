@@ -6,7 +6,7 @@ internal class WindowSizeMonitor : IWindowSizeMonitor
 {
     private readonly IConsoleOutput _consoleOut;
     private readonly IOutputBuffer _outputBuffer;
-    private Size _lastSize = new Size (0,0);
+    private Size _lastSize = new (0, 0);
 
     /// <summary>Invoked when the terminal's size changed. The new size of the terminal is provided.</summary>
     public event EventHandler<SizeChangedEventArgs> SizeChanging;
@@ -17,20 +17,21 @@ internal class WindowSizeMonitor : IWindowSizeMonitor
         _outputBuffer = outputBuffer;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool Poll ()
     {
-        var size = _consoleOut.GetWindowSize ();
-
+        Size size = _consoleOut.GetWindowSize ();
 
         if (size != _lastSize)
         {
             Logging.Logger.LogInformation ($"Console size changes from '{_lastSize}' to {size}");
             _outputBuffer.SetWindowSize (size.Width, size.Height);
             _lastSize = size;
-            SizeChanging?.Invoke (this,new (size));
+            SizeChanging?.Invoke (this, new (size));
+
             return true;
         }
+
         return false;
     }
 }

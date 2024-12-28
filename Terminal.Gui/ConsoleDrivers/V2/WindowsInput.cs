@@ -33,7 +33,6 @@ internal class WindowsInput : ConsoleInput<InputRecord>, IWindowsInput
     [DllImport ("kernel32.dll")]
     private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
 
-
     private readonly uint _originalConsoleMode;
 
     public WindowsInput ()
@@ -48,7 +47,7 @@ internal class WindowsInput : ConsoleInput<InputRecord>, IWindowsInput
         newConsoleMode |= (uint)(ConsoleModes.EnableMouseInput | ConsoleModes.EnableExtendedFlags);
         newConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
         newConsoleMode &= ~(uint)ConsoleModes.EnableProcessedInput;
-        SetConsoleMode (_inputHandle,newConsoleMode);
+        SetConsoleMode (_inputHandle, newConsoleMode);
     }
 
     protected override bool Peek ()
@@ -74,6 +73,7 @@ internal class WindowsInput : ConsoleInput<InputRecord>, IWindowsInput
         {
             // Optionally log the exception
             Console.WriteLine ($"Error in Peek: {ex.Message}");
+
             return false;
         }
         finally
@@ -82,6 +82,7 @@ internal class WindowsInput : ConsoleInput<InputRecord>, IWindowsInput
             Marshal.FreeHGlobal (pRecord);
         }
     }
+
     protected override IEnumerable<InputRecord> Read ()
     {
         const int bufferSize = 1;
@@ -108,8 +109,6 @@ internal class WindowsInput : ConsoleInput<InputRecord>, IWindowsInput
             Marshal.FreeHGlobal (pRecord);
         }
     }
-    public override void Dispose ()
-    {
-        SetConsoleMode (_inputHandle, _originalConsoleMode);
-    }
+
+    public override void Dispose () { SetConsoleMode (_inputHandle, _originalConsoleMode); }
 }

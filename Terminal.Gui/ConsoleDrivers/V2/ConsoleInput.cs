@@ -9,27 +9,20 @@ public abstract class ConsoleInput<T> : IConsoleInput<T>
     private ConcurrentQueue<T>? _inputBuffer;
 
     /// <summary>
-    /// Determines how to get the current system type, adjust
-    /// in unit tests to simulate specific timings.
+    ///     Determines how to get the current system type, adjust
+    ///     in unit tests to simulate specific timings.
     /// </summary>
-    public Func<DateTime> Now { get; set; } = ()=>DateTime.Now;
+    public Func<DateTime> Now { get; set; } = () => DateTime.Now;
 
-    private Histogram<int> drainInputStream = Logging.Meter.CreateHistogram<int> ("Drain Input (ms)");
+    private readonly Histogram<int> drainInputStream = Logging.Meter.CreateHistogram<int> ("Drain Input (ms)");
 
+    /// <inheritdoc/>
+    public virtual void Dispose () { }
 
-    /// <inheritdoc />
-    public virtual void Dispose ()
-    {
+    /// <inheritdoc/>
+    public void Initialize (ConcurrentQueue<T> inputBuffer) { _inputBuffer = inputBuffer; }
 
-    }
-
-    /// <inheritdoc />
-    public void Initialize (ConcurrentQueue<T> inputBuffer)
-    {
-        _inputBuffer = inputBuffer;
-    }
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void Run (CancellationToken token)
     {
         try
@@ -41,18 +34,18 @@ public abstract class ConsoleInput<T> : IConsoleInput<T>
 
             do
             {
-                var dt = Now ();
+                DateTime dt = Now ();
 
                 while (Peek ())
                 {
-                    foreach (var r in Read ())
+                    foreach (T r in Read ())
                     {
                         _inputBuffer.Enqueue (r);
                     }
                 }
 
-                var took = Now () - dt;
-                var sleepFor = TimeSpan.FromMilliseconds (20) - took;
+                TimeSpan took = Now () - dt;
+                TimeSpan sleepFor = TimeSpan.FromMilliseconds (20) - took;
 
                 drainInputStream.Record (took.Milliseconds);
 
@@ -66,20 +59,19 @@ public abstract class ConsoleInput<T> : IConsoleInput<T>
             while (!token.IsCancellationRequested);
         }
         catch (OperationCanceledException)
-        {
-        }
+        { }
     }
 
     /// <summary>
-    /// When implemented in a derived class, returns true if there is data available
-    /// to read from console.
+    ///     When implemented in a derived class, returns true if there is data available
+    ///     to read from console.
     /// </summary>
     /// <returns></returns>
     protected abstract bool Peek ();
 
     /// <summary>
-    /// Returns the available data without blocking, called when <see cref="Peek"/>
-    /// returns <see langword="true"/>.
+    ///     Returns the available data without blocking, called when <see cref="Peek"/>
+    ///     returns <see langword="true"/>.
     /// </summary>
     /// <returns></returns>
     protected abstract IEnumerable<T> Read ();

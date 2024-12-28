@@ -4,9 +4,9 @@ using System.Diagnostics;
 namespace Terminal.Gui;
 
 /// <summary>
-/// Stores the desired output state for the whole application. This is updated during
-/// draw operations before being flushed to the console as part of <see cref="MainLoop{T}"/>
-/// operation
+///     Stores the desired output state for the whole application. This is updated during
+///     draw operations before being flushed to the console as part of <see cref="MainLoop{T}"/>
+///     operation
 /// </summary>
 public class OutputBuffer : IOutputBuffer
 {
@@ -33,7 +33,7 @@ public class OutputBuffer : IOutputBuffer
             // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. Once Attribute.PlatformColor is removed, this can be fixed.
             if (Application.Driver is { })
             {
-                _currentAttribute = new Attribute (value.Foreground, value.Background);
+                _currentAttribute = new (value.Foreground, value.Background);
 
                 return;
             }
@@ -50,7 +50,6 @@ public class OutputBuffer : IOutputBuffer
     ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
     /// </summary>
     public int Row { get; private set; }
-
 
     /// <summary>
     ///     Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
@@ -80,10 +79,8 @@ public class OutputBuffer : IOutputBuffer
         }
     }
 
-
     /// <summary>The topmost row in the terminal.</summary>
     public virtual int Top { get; set; } = 0;
-
 
     // As performance is a concern, we keep track of the dirty lines and only refresh those.
     // This is in addition to the dirty flag on each cell.
@@ -348,13 +345,14 @@ public class OutputBuffer : IOutputBuffer
             {
                 for (var c = 0; c < Cols; c++)
                 {
-                    Contents [row, c] = new Cell
+                    Contents [row, c] = new()
                     {
                         Rune = (Rune)' ',
                         Attribute = new Attribute (Color.White, Color.Black),
                         IsDirty = true
                     };
                 }
+
                 DirtyLines [row] = true;
             }
         }
@@ -362,6 +360,7 @@ public class OutputBuffer : IOutputBuffer
         // TODO: Who uses this and why? I am removing for now - this class is a state class not an events class
         //ClearedContents?.Invoke (this, EventArgs.Empty);
     }
+
     /// <summary>Tests whether the specified coordinate are valid for drawing the specified Rune.</summary>
     /// <param name="rune">Used to determine if one or two columns are required.</param>
     /// <param name="col">The column.</param>
@@ -380,7 +379,7 @@ public class OutputBuffer : IOutputBuffer
         return Clip!.Contains (col, row) || Clip!.Contains (col + 1, row);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void SetWindowSize (int cols, int rows)
     {
         Cols = cols;
@@ -388,11 +387,12 @@ public class OutputBuffer : IOutputBuffer
         ClearContents ();
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void FillRect (Rectangle rect, Rune rune)
     {
         // BUGBUG: This should be a method on Region
         rect = Rectangle.Intersect (rect, Clip?.GetBounds () ?? Screen);
+
         lock (Contents!)
         {
             for (int r = rect.Y; r < rect.Y + rect.Height; r++)
@@ -403,9 +403,10 @@ public class OutputBuffer : IOutputBuffer
                     {
                         continue;
                     }
-                    Contents [r, c] = new Cell
+
+                    Contents [r, c] = new()
                     {
-                        Rune = (rune != default ? rune : (Rune)' '),
+                        Rune = rune != default (Rune) ? rune : (Rune)' ',
                         Attribute = CurrentAttribute, IsDirty = true
                     };
                 }
@@ -413,7 +414,7 @@ public class OutputBuffer : IOutputBuffer
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void FillRect (Rectangle rect, char rune)
     {
         for (int y = rect.Top; y < rect.Top + rect.Height; y++)
@@ -425,7 +426,6 @@ public class OutputBuffer : IOutputBuffer
             }
         }
     }
-
 
     // TODO: Make internal once Menu is upgraded
     /// <summary>

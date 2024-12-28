@@ -1,14 +1,12 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
-using System.Runtime.ConstrainedExecution;
 
 namespace Terminal.Gui;
 
-
 /// <summary>
-/// Implementation of <see cref="IApplication"/> that boots the new 'v2'
-/// main loop architecture.
+///     Implementation of <see cref="IApplication"/> that boots the new 'v2'
+///     main loop architecture.
 /// </summary>
 public class ApplicationV2 : ApplicationImpl
 {
@@ -19,20 +17,21 @@ public class ApplicationV2 : ApplicationImpl
     private IMainLoopCoordinator _coordinator;
     private string? _driverName;
     public ITimedEvents TimedEvents { get; } = new TimedEvents ();
+
     public ApplicationV2 () : this (
-                                    ()=>new NetInput (),
-                                    ()=>new NetOutput (),
-                                    ()=>new WindowsInput (),
-                                    ()=>new WindowsOutput ()
-                                    )
-    {
-    }
+                                    () => new NetInput (),
+                                    () => new NetOutput (),
+                                    () => new WindowsInput (),
+                                    () => new WindowsOutput ()
+                                   )
+    { }
+
     internal ApplicationV2 (
         Func<INetInput> netInputFactory,
         Func<IConsoleOutput> netOutputFactory,
         Func<IWindowsInput> winInputFactory,
         Func<IConsoleOutput> winOutputFactory
-        )
+    )
     {
         _netInputFactory = netInputFactory;
         _netOutputFactory = netOutputFactory;
@@ -41,13 +40,14 @@ public class ApplicationV2 : ApplicationImpl
         IsLegacy = false;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
         if (!string.IsNullOrWhiteSpace (driverName))
         {
             _driverName = driverName;
         }
+
         Application.Navigation = new ();
 
         Application.AddKeyBindings ();
@@ -63,23 +63,20 @@ public class ApplicationV2 : ApplicationImpl
 
     private void CreateDriver (string? driverName)
     {
-
         PlatformID p = Environment.OSVersion.Platform;
 
-        var definetlyWin = driverName?.Contains ("win") ?? false;
-        var definetlyNet = driverName?.Contains ("net") ?? false;
+        bool definetlyWin = driverName?.Contains ("win") ?? false;
+        bool definetlyNet = driverName?.Contains ("net") ?? false;
 
         if (definetlyWin)
         {
             CreateWindowsSubcomponents ();
-
         }
         else if (definetlyNet)
         {
             CreateNetSubcomponents ();
         }
-        else
-        if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+        else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {
             CreateWindowsSubcomponents ();
         }
@@ -88,31 +85,35 @@ public class ApplicationV2 : ApplicationImpl
             CreateNetSubcomponents ();
         }
 
-        _coordinator.StartAsync().Wait();
+        _coordinator.StartAsync ().Wait ();
 
         if (Application.Driver == null)
         {
-            throw new Exception ("Application.Driver was null even after booting MainLoopCoordinator");
+            throw new ("Application.Driver was null even after booting MainLoopCoordinator");
         }
     }
 
-
     private void CreateWindowsSubcomponents ()
     {
-        var inputBuffer = new ConcurrentQueue<WindowsConsole.InputRecord> ();
-        var loop = new MainLoop<WindowsConsole.InputRecord> ();
-        _coordinator = new MainLoopCoordinator<WindowsConsole.InputRecord> (TimedEvents,
+        ConcurrentQueue<WindowsConsole.InputRecord> inputBuffer = new ConcurrentQueue<WindowsConsole.InputRecord> ();
+        MainLoop<WindowsConsole.InputRecord> loop = new MainLoop<WindowsConsole.InputRecord> ();
+
+        _coordinator = new MainLoopCoordinator<WindowsConsole.InputRecord> (
+                                                                            TimedEvents,
                                                                             _winInputFactory,
                                                                             inputBuffer,
                                                                             new WindowsInputProcessor (inputBuffer),
                                                                             _winOutputFactory,
                                                                             loop);
     }
+
     private void CreateNetSubcomponents ()
     {
-        var inputBuffer = new ConcurrentQueue<ConsoleKeyInfo> ();
-        var loop = new MainLoop<ConsoleKeyInfo> ();
-        _coordinator = new MainLoopCoordinator<ConsoleKeyInfo> (TimedEvents,
+        ConcurrentQueue<ConsoleKeyInfo> inputBuffer = new ConcurrentQueue<ConsoleKeyInfo> ();
+        MainLoop<ConsoleKeyInfo> loop = new MainLoop<ConsoleKeyInfo> ();
+
+        _coordinator = new MainLoopCoordinator<ConsoleKeyInfo> (
+                                                                TimedEvents,
                                                                 _netInputFactory,
                                                                 inputBuffer,
                                                                 new NetInputProcessor (inputBuffer),
@@ -120,7 +121,7 @@ public class ApplicationV2 : ApplicationImpl
                                                                 loop);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
     {
         var top = new T ();
@@ -130,7 +131,7 @@ public class ApplicationV2 : ApplicationImpl
         return top;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void Run (Toplevel view, Func<Exception, bool>? errorHandler = null)
     {
         Logging.Logger.LogInformation ($"Run '{view}'");
@@ -138,7 +139,7 @@ public class ApplicationV2 : ApplicationImpl
 
         if (!Application.Initialized)
         {
-            throw new Exception ("App not Initialized");
+            throw new ("App not Initialized");
         }
 
         Application.Top = view;
@@ -146,13 +147,13 @@ public class ApplicationV2 : ApplicationImpl
         Application.Begin (view);
 
         // TODO : how to know when we are done?
-        while (Application.TopLevels.TryPeek (out var found) && found == view)
+        while (Application.TopLevels.TryPeek (out Toplevel? found) && found == view)
         {
             _coordinator.RunIteration ();
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void Shutdown ()
     {
         _coordinator.Stop ();
@@ -160,7 +161,7 @@ public class ApplicationV2 : ApplicationImpl
         Application.Driver = null;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void RequestStop (Toplevel top)
     {
         Logging.Logger.LogInformation ($"RequestStop '{top}'");
@@ -168,7 +169,7 @@ public class ApplicationV2 : ApplicationImpl
         // TODO: This definition of stop seems sketchy
         Application.TopLevels.TryPop (out _);
 
-        if(Application.TopLevels.Count>0)
+        if (Application.TopLevels.Count > 0)
         {
             Application.Top = Application.TopLevels.Peek ();
         }
@@ -178,33 +179,25 @@ public class ApplicationV2 : ApplicationImpl
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void Invoke (Action action)
     {
-        TimedEvents.AddIdle (() =>
-                               {
-                                   action ();
+        TimedEvents.AddIdle (
+                             () =>
+                             {
+                                 action ();
 
-                                   return false;
-                               }
-                              );
+                                 return false;
+                             }
+                            );
     }
 
-    /// <inheritdoc />
-    public override void AddIdle (Func<bool> func)
-    {
-        TimedEvents.AddIdle (func);
-    }
+    /// <inheritdoc/>
+    public override void AddIdle (Func<bool> func) { TimedEvents.AddIdle (func); }
 
-    /// <inheritdoc />
-    public override object AddTimeout (TimeSpan time, Func<bool> callback)
-    {
-        return TimedEvents.AddTimeout(time,callback);
-    }
+    /// <inheritdoc/>
+    public override object AddTimeout (TimeSpan time, Func<bool> callback) { return TimedEvents.AddTimeout (time, callback); }
 
-    /// <inheritdoc />
-    public override bool RemoveTimeout (object token)
-    {
-        return TimedEvents.RemoveTimeout (token);
-    }
+    /// <inheritdoc/>
+    public override bool RemoveTimeout (object token) { return TimedEvents.RemoveTimeout (token); }
 }

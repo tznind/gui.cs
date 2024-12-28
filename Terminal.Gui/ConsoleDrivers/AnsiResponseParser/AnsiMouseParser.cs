@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System.Buffers.Text;
 using System.Text.RegularExpressions;
 
 namespace Terminal.Gui;
@@ -14,7 +13,7 @@ public class AnsiMouseParser
     private readonly Regex _mouseEventPattern = new (@"\u001b\[<(\d+);(\d+);(\d+)(M|m)", RegexOptions.Compiled);
 
     /// <summary>
-    /// Returns true if it is a mouse event
+    ///     Returns true if it is a mouse event
     /// </summary>
     /// <param name="cur"></param>
     /// <returns></returns>
@@ -47,7 +46,7 @@ public class AnsiMouseParser
             int y = int.Parse (match.Groups [3].Value) - 1;
             char terminator = match.Groups [4].Value.Single ();
 
-            return new()
+            return new ()
             {
                 Position = new (x, y),
                 Flags = GetFlags (buttonCode, terminator)

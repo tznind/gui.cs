@@ -9,32 +9,42 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     private readonly ConcurrentQueue<T> _inputBuffer;
     private readonly IInputProcessor _inputProcessor;
     private readonly IMainLoop<T> _loop;
-    private CancellationTokenSource tokenSource = new ();
+    private readonly CancellationTokenSource tokenSource = new ();
     private readonly Func<IConsoleOutput> _outputFactory;
     private IConsoleInput<T> _input;
     private IConsoleOutput _output;
-    object oLockInitialization = new ();
+    private readonly object oLockInitialization = new ();
     private ConsoleDriverFacade<T> _facade;
     private Task _inputTask;
-    private ITimedEvents _timedEvents;
+    private readonly ITimedEvents _timedEvents;
 
-    private SemaphoreSlim _startupSemaphore = new (0, 1);
-
+    private readonly SemaphoreSlim _startupSemaphore = new (0, 1);
 
     /// <summary>
-    /// Creates a new coordinator
+    ///     Creates a new coordinator
     /// </summary>
     /// <param name="timedEvents"></param>
-    /// <param name="inputFactory">Function to create a new input. This must call <see langword="new"/>
+    /// <param name="inputFactory">
+    ///     Function to create a new input. This must call <see langword="new"/>
     ///     explicitly and cannot return an existing instance. This requirement arises because Windows
-    ///     console screen buffer APIs are thread-specific for certain operations.</param>
+    ///     console screen buffer APIs are thread-specific for certain operations.
+    /// </param>
     /// <param name="inputBuffer"></param>
     /// <param name="inputProcessor"></param>
-    /// <param name="outputFactory">Function to create a new output. This must call <see langword="new"/>
+    /// <param name="outputFactory">
+    ///     Function to create a new output. This must call <see langword="new"/>
     ///     explicitly and cannot return an existing instance. This requirement arises because Windows
-    ///     console screen buffer APIs are thread-specific for certain operations.</param>
+    ///     console screen buffer APIs are thread-specific for certain operations.
+    /// </param>
     /// <param name="loop"></param>
-    public MainLoopCoordinator (ITimedEvents timedEvents, Func<IConsoleInput<T>> inputFactory, ConcurrentQueue<T> inputBuffer,IInputProcessor inputProcessor, Func<IConsoleOutput> outputFactory, IMainLoop<T> loop)
+    public MainLoopCoordinator (
+        ITimedEvents timedEvents,
+        Func<IConsoleInput<T>> inputFactory,
+        ConcurrentQueue<T> inputBuffer,
+        IInputProcessor inputProcessor,
+        Func<IConsoleOutput> outputFactory,
+        IMainLoop<T> loop
+    )
     {
         _timedEvents = timedEvents;
         _inputFactory = inputFactory;
@@ -45,7 +55,7 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     }
 
     /// <summary>
-    /// Starts the input loop thread in separate task (returning immediately).
+    ///     Starts the input loop thread in separate task (returning immediately).
     /// </summary>
     public async Task StartAsync ()
     {
@@ -81,23 +91,18 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
                 _input.Run (tokenSource.Token);
             }
             catch (OperationCanceledException)
-            {
-            }
+            { }
+
             _input.Dispose ();
         }
         catch (Exception e)
         {
-            Logging.Logger.LogCritical (e,"Input loop crashed");
+            Logging.Logger.LogCritical (e, "Input loop crashed");
         }
     }
 
-    /// <inheritdoc />
-    public void RunIteration ()
-    {
-
-        _loop.Iteration ();
-    }
-
+    /// <inheritdoc/>
+    public void RunIteration () { _loop.Iteration (); }
 
     private void BootMainLoop ()
     {
@@ -115,12 +120,12 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     {
         if (_input != null && _output != null)
         {
-            _facade = new ConsoleDriverFacade<T> (
-                                                  _inputProcessor,
-                                                  _loop.OutputBuffer,
-                                                  _output,
-                                                  _loop.AnsiRequestScheduler,
-                                                  _loop.WindowSizeMonitor);
+            _facade = new (
+                           _inputProcessor,
+                           _loop.OutputBuffer,
+                           _output,
+                           _loop.AnsiRequestScheduler,
+                           _loop.WindowSizeMonitor);
             Application.Driver = _facade;
 
             _startupSemaphore.Release ();
@@ -129,7 +134,7 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
 
     public void Stop ()
     {
-        tokenSource.Cancel();
+        tokenSource.Cancel ();
 
         // Wait for input infinite loop to exit
         Task.WhenAll (_inputTask).Wait ();

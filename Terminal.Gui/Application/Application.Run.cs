@@ -386,12 +386,12 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <summary>Removes a previously scheduled timeout</summary>
     /// <remarks>The token parameter is the value returned by <see cref="AddTimeout"/>.</remarks>
     /// Returns
-    /// <c>true</c>
+    /// <see langword="true"/>
     /// if the timeout is successfully removed; otherwise,
-    /// <c>false</c>
+    /// <see langword="false"/>
     /// .
     /// This method also returns
-    /// <c>false</c>
+    /// <see langword="false"/>
     /// if the timeout is not found.
     public static bool RemoveTimeout (object token) => ApplicationImpl.Instance.RemoveTimeout (token);
 
