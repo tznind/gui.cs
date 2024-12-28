@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿#nullable enable
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using System.Runtime.ConstrainedExecution;
 
@@ -12,6 +13,7 @@ public class ApplicationV2 : ApplicationImpl
     private readonly Func<IWindowsInput> _winInputFactory;
     private readonly Func<IConsoleOutput> _winOutputFactory;
     private IMainLoopCoordinator _coordinator;
+    private string? _driverName;
     public ITimedEvents TimedEvents { get; } = new TimedEvents ();
     public ApplicationV2 () : this (
                                     ()=>new NetInput (),
@@ -36,20 +38,26 @@ public class ApplicationV2 : ApplicationImpl
     }
 
     /// <inheritdoc />
-    public override void Init (IConsoleDriver driver = null, string driverName = null)
+    public override void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
+        if (!string.IsNullOrWhiteSpace (driverName))
+        {
+            _driverName = driverName;
+        }
         Application.Navigation = new ();
 
         Application.AddKeyBindings ();
 
-        CreateDriver (driverName);
+        // This is consistent with Application.ForceDriver which magnetically picks up driverName
+        // making it use custom driver in future shutdown/init calls where no driver is specified
+        CreateDriver (driverName ?? _driverName);
 
         Application.Initialized = true;
 
         Application.SubscribeDriverEvents ();
     }
 
-    private void CreateDriver (string driverName)
+    private void CreateDriver (string? driverName)
     {
 
         PlatformID p = Environment.OSVersion.Platform;

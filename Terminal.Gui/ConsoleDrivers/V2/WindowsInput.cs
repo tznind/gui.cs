@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using Microsoft.Extensions.Logging;
 using static Terminal.Gui.WindowsConsole;
 
 namespace Terminal.Gui;
@@ -37,8 +38,8 @@ internal class WindowsInput : ConsoleInput<InputRecord>, IWindowsInput
 
     public WindowsInput ()
     {
+        Logging.Logger.LogInformation ($"Creating {nameof (WindowsInput)}");
         _inputHandle = GetStdHandle (STD_INPUT_HANDLE);
-
 
         GetConsoleMode (_inputHandle, out uint v);
         _originalConsoleMode = v;

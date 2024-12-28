@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using static Terminal.Gui.WindowsConsole;
 
 namespace Terminal.Gui;
@@ -58,6 +59,7 @@ internal class WindowsOutput : IConsoleOutput
 
     public WindowsOutput ()
     {
+        Logging.Logger.LogInformation ($"Creating {nameof (WindowsOutput)}");
         _screenBuffer = CreateConsoleScreenBuffer (
                                                    DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
                                                    ShareMode.FileShareRead | ShareMode.FileShareWrite,

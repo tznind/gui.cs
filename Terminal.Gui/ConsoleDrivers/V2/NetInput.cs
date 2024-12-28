@@ -8,6 +8,8 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
 
     public NetInput ()
     {
+
+        Logging.Logger.LogInformation ($"Creating {nameof (NetInput)}");
         var p = Environment.OSVersion.Platform;
         if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {

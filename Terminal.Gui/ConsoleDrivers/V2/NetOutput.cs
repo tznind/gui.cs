@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using Microsoft.Extensions.Logging;
+
+namespace Terminal.Gui;
 public class NetOutput : IConsoleOutput
 {
     public bool IsWinPlatform { get; }
@@ -6,6 +8,8 @@ public class NetOutput : IConsoleOutput
     private CursorVisibility? _cachedCursorVisibility;
     public NetOutput ()
     {
+        Logging.Logger.LogInformation ($"Creating {nameof(NetOutput)}");
+
         PlatformID p = Environment.OSVersion.Platform;
 
         if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
@@ -54,7 +58,7 @@ public class NetOutput : IConsoleOutput
                 continue;
             }
 
-            if (!SetCursorPosition (0, row))
+            if (!SetCursorPositionImpl (0, row))
             {
                 return;
             }
@@ -137,7 +141,7 @@ public class NetOutput : IConsoleOutput
                     else if (rune.IsSurrogatePair () && rune.GetColumns () < 2)
                     {
                         WriteToConsole (output, ref lastCol, row, ref outputWidth);
-                        SetCursorPosition (col - 1, row);
+                        SetCursorPositionImpl (col - 1, row);
                     }
 
                     buffer.Contents [row, col].IsDirty = false;
@@ -146,21 +150,21 @@ public class NetOutput : IConsoleOutput
 
             if (output.Length > 0)
             {
-                SetCursorPosition (lastCol, row);
+                SetCursorPositionImpl (lastCol, row);
                 Console.Write (output);
-            }
-
-            foreach (var s in Application.Sixel)
-            {
-                if (!string.IsNullOrWhiteSpace (s.SixelData))
-                {
-                    SetCursorPosition (s.ScreenPosition.X, s.ScreenPosition.Y);
-                    Console.Write (s.SixelData);
-                }
             }
         }
 
-        SetCursorPosition (0, 0);
+        foreach (var s in Application.Sixel)
+        {
+            if (!string.IsNullOrWhiteSpace (s.SixelData))
+            {
+                SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
+                Console.Write (s.SixelData);
+            }
+        }
+
+        SetCursorPositionImpl (0, 0);
 
         _cachedCursorVisibility = savedVisibility;
     }
@@ -173,7 +177,7 @@ public class NetOutput : IConsoleOutput
 
     void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
     {
-        SetCursorPosition (lastCol, row);
+        SetCursorPositionImpl (lastCol, row);
         Console.Write (output);
         output.Clear ();
         lastCol += outputWidth;
@@ -187,7 +191,14 @@ public class NetOutput : IConsoleOutput
 
         return visibility == CursorVisibility.Default;
     }
-    private bool SetCursorPosition (int col, int row)
+
+    /// <inheritdoc />
+    public void SetCursorPosition (int col, int row)
+    {
+        SetCursorPositionImpl (col, row);
+    }
+
+    private bool SetCursorPositionImpl (int col, int row)
     {
         if (IsWinPlatform)
         {
@@ -222,8 +233,4 @@ public class NetOutput : IConsoleOutput
         Console.Out.Write (visibility == CursorVisibility.Default ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
     }
 
-    void IConsoleOutput.SetCursorPosition (int col, int row)
-    {
-        Console.SetCursorPosition (col, row);
-    }
 }
