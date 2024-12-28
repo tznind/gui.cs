@@ -10,6 +10,7 @@ namespace Terminal.Gui;
 /// user clicked then user double-clicked then user triple clicked</remarks>
 internal class MouseButtonSequence
 {
+    private readonly MouseInterpreter _parent;
     private readonly IViewFinder _viewFinder;
     public int NumberOfClicks { get; set; }
 
@@ -22,23 +23,34 @@ internal class MouseButtonSequence
     public int ButtonIdx { get; }
 
     /// <summary>
-    /// Function for returning the current time. Use in unit tests to
-    /// ensure repeatable tests.
+    /// True if <see cref="Resolve"/> has happened. After this,
+    /// new state changes are forbidden
     /// </summary>
-    public Func<DateTime> Now { get; set; }
+    public bool IsResolved { get; private set; }
 
-    public MouseButtonSequence (int buttonIdx, Func<DateTime> now, IViewFinder viewFinder)
+    public MouseButtonSequence (MouseInterpreter parent, int buttonIdx,  IViewFinder viewFinder)
     {
         ButtonIdx = buttonIdx;
-        Now = now;
+        _parent = parent;
         _viewFinder = viewFinder;
     }
 
     public MouseEventArgs? Process (Point position, bool pressed)
     {
-        var last = MouseStates.Last ();
+        if (IsResolved)
+        {
+            throw new AlreadyResolvedException ();
+        }
 
-        // Still pressed
+        var last = MouseStates.LastOrDefault ()
+                   ?? throw new Exception("Can only process new positions after baseline is established");
+
+        if (IsExpired ())
+        {
+            return Resolve ();
+        }
+
+        // Still pressed/released
         if (last.Pressed && pressed)
         {
             // No change
@@ -47,11 +59,10 @@ internal class MouseButtonSequence
 
         var view = _viewFinder.GetViewAt (position, out var viewport);
 
-        NumberOfClicks++;
-        MouseStates.Add (new MouseButtonStateEx
+        var nextState = new MouseButtonStateEx
         {
             Button = ButtonIdx,
-            At = Now(),
+            At = _parent.Now (),
             Pressed = false,
             Position = position,
 
@@ -63,8 +74,10 @@ internal class MouseButtonSequence
             Ctrl = false,
             Alt = false,
 
-        });
+        };
 
+        NumberOfClicks++;
+        MouseStates.Add (nextState);
 
         if (IsResolveable ())
         {
@@ -74,9 +87,25 @@ internal class MouseButtonSequence
         return null;
     }
 
+    private bool IsExpired ()
+    {
+        var last = MouseStates.LastOrDefault ();
+
+        if (last == null || NumberOfClicks == 0)
+        {
+            return false;
+        }
+
+        return _parent.Now() - last.At > _parent.RepeatedClickThreshold;
+    }
+
     public bool IsResolveable ()
     {
+        // TODO: ultimately allow for more
         return NumberOfClicks > 0;
+
+        // Once we hit triple click we have to stop (no quad click event in MouseFlags)
+        return NumberOfClicks >= 3;
     }
     /// <summary>
     /// Resolves the narrative completely with immediate effect.
@@ -85,10 +114,12 @@ internal class MouseButtonSequence
     /// <returns></returns>
     public MouseEventArgs? Resolve ()
     {
-        if (!IsResolveable ())
+        if (IsResolved)
         {
-            return null;
+            throw new AlreadyResolvedException ();
         }
+
+        IsResolved = true;
 
         if (NumberOfClicks == 1)
         {

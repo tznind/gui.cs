@@ -10,19 +10,13 @@ internal class MouseInterpreter
     /// Function for returning the current time. Use in unit tests to
     /// ensure repeatable tests.
     /// </summary>
-    private Func<DateTime> Now { get; set; }
+    public Func<DateTime> Now { get; set; }
 
     /// <summary>
-    /// How long to wait for a second click after the first before giving up and
+    /// How long to wait for a second, third, fourth click after the first before giving up and
     /// releasing event as a 'click'
     /// </summary>
-    public TimeSpan DoubleClickThreshold { get; set; }
-
-    /// <summary>
-    /// How long to wait for a third click after the second before giving up and
-    /// releasing event as a 'double click'
-    /// </summary>
-    public TimeSpan TripleClickThreshold { get; set; }
+    public TimeSpan RepeatedClickThreshold { get; set; }
 
     /// <summary>
     /// How far between a mouse down and mouse up before it is considered a 'drag' rather
@@ -34,6 +28,7 @@ internal class MouseInterpreter
     public MouseState CurrentState { get; private set; }
 
     private MouseButtonSequence? [] _ongoingSequences = new MouseButtonSequence? [4];
+    private readonly bool[] _lastPressed = new bool [4];
 
     public Action<MouseButtonSequence> Click { get; set; }
 
@@ -41,14 +36,12 @@ internal class MouseInterpreter
         Func<DateTime>? now = null,
         IViewFinder viewFinder = null,
         TimeSpan? doubleClickThreshold = null,
-        TimeSpan? tripleClickThreshold = null,
         int dragThreshold = 5
     )
     {
         _viewFinder = viewFinder ?? new StaticViewFinder ();
         Now = now ?? (() => DateTime.Now);
-        DoubleClickThreshold = doubleClickThreshold ?? TimeSpan.FromMilliseconds (500);
-        TripleClickThreshold = tripleClickThreshold ?? TimeSpan.FromMilliseconds (1000);
+        RepeatedClickThreshold = doubleClickThreshold ?? TimeSpan.FromMilliseconds (500);
         DragThreshold = dragThreshold;
     }
 
@@ -58,36 +51,34 @@ internal class MouseInterpreter
         for (int i = 0; i < 4; i++)
         {
             bool isPressed = IsPressed (i, e.Flags);
+            var sequence = _ongoingSequences [i];
 
-            // Update narratives
-            if (isPressed)
+            // If we have no ongoing narratives
+            if (sequence == null)
             {
-                if (_ongoingSequences [i] == null)
+                // Changing from not pressed to pressed
+                if (isPressed && isPressed != _lastPressed [i])
                 {
+                    // Begin sequence that leads to click/double click/triple click etc
                     _ongoingSequences [i] = BeginPressedNarrative (i, e);
-                }
-                else
-                {
-                    var resolve = _ongoingSequences [i]?.Process (e.Position, true);
-
-                    if (resolve != null)
-                    {
-                        _ongoingSequences [i] = null;
-                        yield return resolve;
-                    }
                 }
             }
             else
             {
-                var resolve = _ongoingSequences [i]?.Process (e.Position, false);
+                var resolve = sequence.Process (e.Position, isPressed);
+
+                if (sequence.IsResolved)
+                {
+                    _ongoingSequences [i] = null;
+                }
 
                 if (resolve != null)
                 {
-
-                    _ongoingSequences [i] = null;
                     yield return resolve;
                 }
             }
+
+            _lastPressed [i] = isPressed;
         }
     }
 
@@ -129,7 +120,7 @@ internal class MouseInterpreter
     {
         var view = _viewFinder.GetViewAt (e.Position, out var viewport);
 
-        return new MouseButtonSequence(buttonIdx, Now,_viewFinder)
+        return new MouseButtonSequence(this,buttonIdx,_viewFinder)
         {
             NumberOfClicks = 0,
             MouseStates =
