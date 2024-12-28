@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+namespace Terminal.Gui;
 
 public interface IOutputBuffer
 {

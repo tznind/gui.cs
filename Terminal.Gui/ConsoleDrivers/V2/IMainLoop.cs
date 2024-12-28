@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿#nullable enable
+using System.Collections.Concurrent;
 using static Unix.Terminal.Curses;
 
 namespace Terminal.Gui;

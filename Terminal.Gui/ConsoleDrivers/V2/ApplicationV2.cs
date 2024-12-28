@@ -6,6 +6,10 @@ using System.Runtime.ConstrainedExecution;
 namespace Terminal.Gui;
 
 
+/// <summary>
+/// Implementation of <see cref="IApplication"/> that boots the new 'v2'
+/// main loop architecture.
+/// </summary>
 public class ApplicationV2 : ApplicationImpl
 {
     private readonly Func<INetInput> _netInputFactory;
@@ -117,7 +121,7 @@ public class ApplicationV2 : ApplicationImpl
     }
 
     /// <inheritdoc />
-    public override T Run<T> (Func<Exception, bool> errorHandler = null, IConsoleDriver driver = null)
+    public override T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
     {
         var top = new T ();
 
@@ -127,7 +131,7 @@ public class ApplicationV2 : ApplicationImpl
     }
 
     /// <inheritdoc />
-    public override void Run (Toplevel view, Func<Exception, bool> errorHandler = null)
+    public override void Run (Toplevel view, Func<Exception, bool>? errorHandler = null)
     {
         Logging.Logger.LogInformation ($"Run '{view}'");
         ArgumentNullException.ThrowIfNull (view);

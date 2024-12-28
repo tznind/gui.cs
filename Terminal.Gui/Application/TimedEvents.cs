@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿#nullable enable
+using System.Collections.ObjectModel;
 
 namespace Terminal.Gui;
 
@@ -102,7 +103,7 @@ public class TimedEvents : ITimedEvents
         }
     }
 
-
+    /// <inheritdoc/>
     public void LockAndRunTimers ()
     {
         lock (_timeoutsLockToken)

@@ -151,6 +151,10 @@ public interface IApplication
     /// <param name="action">the action to be invoked on the main processing thread.</param>
     void Invoke (Action action);
 
+    /// <summary>
+    /// <see langword="true"/> if implementation is 'old'. <see langword="false"/> if implementation
+    /// is cutting edge.
+    /// </summary>
     bool IsLegacy { get; }
 
     /// <summary>
