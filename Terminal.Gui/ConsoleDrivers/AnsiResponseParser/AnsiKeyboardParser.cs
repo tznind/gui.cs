@@ -9,7 +9,7 @@ namespace Terminal.Gui;
 public class AnsiKeyboardParser
 {
     // Regex patterns for ANSI arrow keys (Up, Down, Left, Right)
-    private readonly Regex _arrowKeyPattern = new (@"\u001b\[(A|B|C|D)", RegexOptions.Compiled);
+    private readonly Regex _arrowKeyPattern = new (@"^\u001b\[(1;(\d+))?([A-D])$", RegexOptions.Compiled);
 
     /// <summary>
     ///     Parses an ANSI escape sequence into a keyboard event. Returns null if input
@@ -24,16 +24,40 @@ public class AnsiKeyboardParser
 
         if (match.Success)
         {
-            char direction = match.Groups [1].Value [0];
+            // Group 2 captures the modifier number, if present
+            string modifierGroup = match.Groups [2].Value;
+            char direction = match.Groups [3].Value [0];
 
-            return direction switch
+            Key key = direction switch
                    {
                        'A' => Key.CursorUp,
                        'B' => Key.CursorDown,
                        'C' => Key.CursorRight,
-                       'D' => Key.CursorDown,
+                       'D' => Key.CursorLeft,
                        _ => default (Key)
                    };
+
+            if(key == null)
+            {
+                return null;
+            }
+
+            // TODO: these are wrong I think
+            // Apply modifiers based on the modifier number
+            if (modifierGroup == "3") // Ctrl
+            {
+                key = key.WithCtrl;
+            }
+            else if (modifierGroup == "4") // Alt
+            {
+                key = key.WithAlt;
+            }
+            else if (modifierGroup == "5") // Shift
+            {
+                key = key.WithShift;
+            }
+
+            return key;
         }
 
         // It's an unrecognized keyboard event

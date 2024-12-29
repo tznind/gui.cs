@@ -34,8 +34,8 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
             }
         }
 
-        // Doesn't seem to work
         Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
+        Console.TreatControlCAsInput = true;
     }
 
     /// <inheritdoc/>
@@ -55,5 +55,7 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
     {
         base.Dispose ();
         _adjustConsole?.Cleanup ();
+
+        Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
     }
 }

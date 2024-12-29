@@ -92,7 +92,7 @@ public abstract class InputProcessor<T> : IInputProcessor
         // TODO: For now handle all other escape codes with ignore
         Parser.UnexpectedResponseHandler = str =>
                                            {
-                                               Logging.Logger.LogInformation ($"{nameof(InputProcessor<T>)} ignored unrecognized response '{str}'");
+                                               Logging.Logger.LogInformation ($"{nameof(InputProcessor<T>)} ignored unrecognized response '{new string(str.Select (k=>k.Item1).ToArray ())}'");
                                                return true;
                                            };
     }

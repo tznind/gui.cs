@@ -25,6 +25,12 @@ public class NetOutput : IConsoleOutput
         {
             _isWinPlatform = true;
         }
+
+        //Enable alternative screen buffer.
+        Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+
+        //Set cursor key to application.
+        Console.Out.Write (EscSeqUtils.CSI_HideCursor);
     }
 
     /// <inheritdoc/>
@@ -215,7 +221,17 @@ public class NetOutput : IConsoleOutput
     }
 
     /// <inheritdoc/>
-    public void Dispose () { Console.Clear (); }
+    public void Dispose ()
+    {
+        Console.ResetColor ();
+
+        //Disable alternative screen buffer.
+        Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+
+        //Set cursor key to cursor.
+        Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+        Console.Out.Close ();
+    }
 
     /// <inheritdoc/>
     public void SetCursorVisibility (CursorVisibility visibility)
