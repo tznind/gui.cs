@@ -266,6 +266,13 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc />
     public virtual void AddIdle (Func<bool> func)
     {
+        if(Application.MainLoop is null)
+        {
+            throw new Exception ("Cannot add idle before main loop is initialized");
+        }
+
+        // Yes in this case we cannot go direct via TimedEvents because legacy main loop
+        // has established behaviour to do other stuff too e.g. 'wake up'.
         Application.MainLoop.AddIdle (func);
 
     }
@@ -273,7 +280,12 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc />
     public virtual object AddTimeout (TimeSpan time, Func<bool> callback)
     {
-        return Application.MainLoop?.TimedEvents.AddTimeout (time, callback) ?? null;
+        if (Application.MainLoop is null)
+        {
+            throw new Exception ("Cannot add timeout before main loop is initialized");
+        }
+
+        return Application.MainLoop.TimedEvents.AddTimeout (time, callback);
     }
 
     /// <inheritdoc />

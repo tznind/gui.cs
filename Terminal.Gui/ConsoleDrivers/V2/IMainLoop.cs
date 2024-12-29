@@ -3,14 +3,37 @@ using System.Collections.Concurrent;
 
 namespace Terminal.Gui;
 
+/// <summary>
+/// Interface for main loop that runs the core Terminal.Gui UI loop.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public interface IMainLoop<T> : IDisposable
 {
+    /// <summary>
+    /// Gets the class responsible for servicing user timeouts and idles
+    /// </summary>
     public ITimedEvents TimedEvents { get; }
+
+    /// <summary>
+    /// Gets the class responsible for writing final rendered output to the console
+    /// </summary>
     public IOutputBuffer OutputBuffer { get; }
+
+    /// <summary>
+    /// Gets the class responsible for processing buffered console input and translating
+    /// it into events on the UI thread.
+    /// </summary>
     public IInputProcessor InputProcessor { get; }
 
+    /// <summary>
+    /// Gets the class responsible for sending ANSI escape requests which expect a response
+    /// from the remote terminal e.g. Device Attribute Request
+    /// </summary>
     public AnsiRequestScheduler AnsiRequestScheduler { get; }
 
+    /// <summary>
+    /// Gets the class responsible for determining the current console size
+    /// </summary>
     public IWindowSizeMonitor WindowSizeMonitor { get; }
 
     /// <summary>
@@ -23,15 +46,7 @@ public interface IMainLoop<T> : IDisposable
     void Initialize (ITimedEvents timedEvents, ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput);
 
     /// <summary>
-    ///     Perform a single iteration of the main loop without blocking anywhere.
+    ///     Perform a single iteration of the main loop without blocking/sleeping anywhere.
     /// </summary>
     public void Iteration ();
-}
-
-public interface IWindowSizeMonitor
-{
-    /// <summary>Invoked when the terminal's size changed. The new size of the terminal is provided.</summary>
-    event EventHandler<SizeChangedEventArgs>? SizeChanging;
-
-    bool Poll ();
 }

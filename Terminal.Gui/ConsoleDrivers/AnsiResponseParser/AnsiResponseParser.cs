@@ -15,12 +15,12 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
     /// <summary>
     ///     Event raised when mouse events are detected - requires setting <see cref="HandleMouse"/> to true
     /// </summary>
-    public event EventHandler<MouseEventArgs> Mouse;
+    public event EventHandler<MouseEventArgs>? Mouse;
 
     /// <summary>
     ///     Event raised when keyboard event is detected (e.g. cursors) - requires setting <see cref="HandleKeyboard"/>
     /// </summary>
-    public event Action<object, Key> Keyboard;
+    public event Action<object, Key>? Keyboard;
 
     /// <summary>
     ///     True to explicitly handle mouse escape sequences by passing them to <see cref="Mouse"/> event.
@@ -84,7 +84,6 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                                                                   'l', 'm', 'n',
                                                                   'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
                                                               ]);
-
     protected AnsiResponseParserBase (IHeld heldContent) { _heldContent = heldContent; }
 
     protected void ResetState ()

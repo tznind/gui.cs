@@ -4,6 +4,10 @@ using System.Diagnostics.Metrics;
 
 namespace Terminal.Gui;
 
+/// <summary>
+/// Base class for reading console input in perpetual loop
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public abstract class ConsoleInput<T> : IConsoleInput<T>
 {
     private ConcurrentQueue<T>? _inputBuffer;

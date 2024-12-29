@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui;
@@ -14,10 +15,14 @@ public class ApplicationV2 : ApplicationImpl
     private readonly Func<IConsoleOutput> _netOutputFactory;
     private readonly Func<IWindowsInput> _winInputFactory;
     private readonly Func<IConsoleOutput> _winOutputFactory;
-    private IMainLoopCoordinator _coordinator;
+    private IMainLoopCoordinator? _coordinator;
     private string? _driverName;
     public ITimedEvents TimedEvents { get; } = new TimedEvents ();
 
+    /// <summary>
+    /// Creates anew instance of the Application backend. The provided
+    /// factory methods will be used on Init calls to get things booted.
+    /// </summary>
     public ApplicationV2 () : this (
                                     () => new NetInput (),
                                     () => new NetOutput (),
@@ -70,19 +75,19 @@ public class ApplicationV2 : ApplicationImpl
 
         if (definetlyWin)
         {
-            CreateWindowsSubcomponents ();
+            _coordinator = CreateWindowsSubcomponents ();
         }
         else if (definetlyNet)
         {
-            CreateNetSubcomponents ();
+            _coordinator = CreateNetSubcomponents ();
         }
         else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {
-            CreateWindowsSubcomponents ();
+            _coordinator = CreateWindowsSubcomponents();
         }
         else
         {
-            CreateNetSubcomponents ();
+            _coordinator = CreateNetSubcomponents ();
         }
 
         _coordinator.StartAsync ().Wait ();
@@ -93,12 +98,12 @@ public class ApplicationV2 : ApplicationImpl
         }
     }
 
-    private void CreateWindowsSubcomponents ()
+    private IMainLoopCoordinator CreateWindowsSubcomponents ()
     {
         ConcurrentQueue<WindowsConsole.InputRecord> inputBuffer = new ConcurrentQueue<WindowsConsole.InputRecord> ();
         MainLoop<WindowsConsole.InputRecord> loop = new MainLoop<WindowsConsole.InputRecord> ();
 
-        _coordinator = new MainLoopCoordinator<WindowsConsole.InputRecord> (
+        return new MainLoopCoordinator<WindowsConsole.InputRecord> (
                                                                             TimedEvents,
                                                                             _winInputFactory,
                                                                             inputBuffer,
@@ -107,12 +112,12 @@ public class ApplicationV2 : ApplicationImpl
                                                                             loop);
     }
 
-    private void CreateNetSubcomponents ()
+    private IMainLoopCoordinator CreateNetSubcomponents ()
     {
         ConcurrentQueue<ConsoleKeyInfo> inputBuffer = new ConcurrentQueue<ConsoleKeyInfo> ();
         MainLoop<ConsoleKeyInfo> loop = new MainLoop<ConsoleKeyInfo> ();
 
-        _coordinator = new MainLoopCoordinator<ConsoleKeyInfo> (
+        return new MainLoopCoordinator<ConsoleKeyInfo> (
                                                                 TimedEvents,
                                                                 _netInputFactory,
                                                                 inputBuffer,
@@ -149,6 +154,10 @@ public class ApplicationV2 : ApplicationImpl
         // TODO : how to know when we are done?
         while (Application.TopLevels.TryPeek (out Toplevel? found) && found == view)
         {
+            if (_coordinator is null)
+            {
+                throw new Exception ($"{nameof (IMainLoopCoordinator)}inexplicably became null during Run");
+            }
             _coordinator.RunIteration ();
         }
     }
@@ -156,13 +165,13 @@ public class ApplicationV2 : ApplicationImpl
     /// <inheritdoc/>
     public override void Shutdown ()
     {
-        _coordinator.Stop ();
+        _coordinator?.Stop ();
         base.Shutdown ();
         Application.Driver = null;
     }
 
     /// <inheritdoc/>
-    public override void RequestStop (Toplevel top)
+    public override void RequestStop (Toplevel? top)
     {
         Logging.Logger.LogInformation ($"RequestStop '{top}'");
 

@@ -3,6 +3,9 @@ using System.Collections.ObjectModel;
 
 namespace Terminal.Gui;
 
+/// <summary>
+/// Handles timeouts and idles
+/// </summary>
 public class TimedEvents : ITimedEvents
 {
     internal List<Func<bool>> _idleHandlers = new ();

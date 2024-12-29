@@ -13,6 +13,7 @@ public abstract class InputProcessor<T> : IInputProcessor
     internal AnsiResponseParser<T> Parser { get; } = new ();
     public ConcurrentQueue<T> InputBuffer { get; }
 
+    /// <inheritdoc/>
     public IAnsiResponseParser GetParser () { return Parser; }
 
     private MouseInterpreter _mouseInterpreter { get; } = new ();

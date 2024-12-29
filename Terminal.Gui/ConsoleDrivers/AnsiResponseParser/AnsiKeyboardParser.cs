@@ -2,6 +2,10 @@
 
 namespace Terminal.Gui;
 
+/// <summary>
+/// Parses ansi escape sequence strings that describe keyboard activity e.g. cursor keys
+/// into <see cref="Key"/>.
+/// </summary>
 public class AnsiKeyboardParser
 {
     // Regex patterns for ANSI arrow keys (Up, Down, Left, Right)
@@ -36,5 +40,11 @@ public class AnsiKeyboardParser
         return null;
     }
 
+    /// <summary>
+    /// Returns <see langword="true"/> if the given escape code
+    /// is a keyboard escape code (e.g. cursor key)
+    /// </summary>
+    /// <param name="cur">escape code</param>
+    /// <returns></returns>
     public bool IsKeyboard (string cur) { return _arrowKeyPattern.IsMatch (cur); }
 }

@@ -3,10 +3,26 @@ using System.Collections.ObjectModel;
 
 namespace Terminal.Gui;
 
+/// <summary>
+/// Manages timers and idles
+/// </summary>
 public interface ITimedEvents
 {
+    /// <summary>
+    ///     Adds specified idle handler function to main iteration processing. The handler function will be called
+    ///     once per iteration of the main loop after other events have been handled.
+    /// </summary>
+    /// <param name="idleHandler"></param>
     void AddIdle (Func<bool> idleHandler);
+
+    /// <summary>
+    /// Runs all idle hooks
+    /// </summary>
     void LockAndRunIdles ();
+
+    /// <summary>
+    /// Runs all timeouts that are due
+    /// </summary>
     void LockAndRunTimers ();
 
     /// <summary>
@@ -42,8 +58,16 @@ public interface ITimedEvents
     /// </returns>
     bool RemoveTimeout (object token);
 
+    /// <summary>
+    /// Returns all currently registered idles. May not include
+    /// actively executing idles.
+    /// </summary>
     ReadOnlyCollection<Func<bool>> IdleHandlers { get;}
 
+    /// <summary>
+    /// Returns the next planned execution time (key - UTC ticks)
+    /// for each timeout that is not actively executing.
+    /// </summary>
     SortedList<long, Timeout> Timeouts { get; }
 
 
