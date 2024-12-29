@@ -18,8 +18,7 @@ public abstract class ConsoleInput<T> : IConsoleInput<T>
     /// </summary>
     public Func<DateTime> Now { get; set; } = () => DateTime.Now;
 
-    private readonly Histogram<int> drainInputStream = Logging.Meter.CreateHistogram<int> ("Drain Input (ms)");
-
+    
     /// <inheritdoc/>
     public virtual void Dispose () { }
 
@@ -51,7 +50,7 @@ public abstract class ConsoleInput<T> : IConsoleInput<T>
                 TimeSpan took = Now () - dt;
                 TimeSpan sleepFor = TimeSpan.FromMilliseconds (20) - took;
 
-                drainInputStream.Record (took.Milliseconds);
+                Logging.DrainInputStream.Record (took.Milliseconds);
 
                 if (sleepFor.Milliseconds > 0)
                 {

@@ -27,4 +27,21 @@ public static class Logging
     ///     create your own static instrument e.g. CreateCounter, CreateHistogram etc
     /// </summary>
     internal static readonly Meter Meter = new ("Terminal.Gui");
+
+    /// <summary>
+    /// Metric for how long it takes each full iteration of the main loop to occur
+    /// </summary>
+    public static readonly Histogram<int> TotalIterationMetric = Logging.Meter.CreateHistogram<int> ("Iteration (ms)");
+
+    /// <summary>
+    /// Metric for how long it took to do the 'timeouts and invokes' section of main loop.
+    /// </summary>
+    public static readonly Histogram<int> IterationInvokesAndTimeouts = Logging.Meter.CreateHistogram<int> ("Invokes & Timers (ms)");
+
+    /// <summary>
+    /// Metric for how long it takes to read all available input from the input stream - at which
+    /// point input loop will sleep.
+    /// </summary>
+    public static readonly Histogram<int> DrainInputStream = Logging.Meter.CreateHistogram<int> ("Drain Input (ms)");
+
 }

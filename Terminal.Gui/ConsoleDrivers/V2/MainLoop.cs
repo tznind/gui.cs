@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Diagnostics.Metrics;
 
 namespace Terminal.Gui;
 
@@ -9,6 +8,11 @@ namespace Terminal.Gui;
 public class MainLoop<T> : IMainLoop<T>
 {
     private ITimedEvents? _timedEvents;
+    private ConcurrentQueue<T>? _inputBuffer;
+    private IInputProcessor? _inputProcessor;
+    private IConsoleOutput? _out;
+    private AnsiRequestScheduler? _ansiRequestScheduler;
+    private IWindowSizeMonitor? _windowSizeMonitor;
 
     /// <inheritdoc/>
     public ITimedEvents TimedEvents
@@ -24,26 +28,48 @@ public class MainLoop<T> : IMainLoop<T>
     /// thread by a <see cref="IConsoleInput{T}"/>. Is drained as part of each
     /// <see cref="Iteration"/>
     /// </summary>
-    public ConcurrentQueue<T> InputBuffer { get; private set; }
+    public ConcurrentQueue<T> InputBuffer
+    {
+        get => _inputBuffer ?? throw new NotInitializedException (nameof (InputBuffer));
+        private set => _inputBuffer = value;
+    }
 
-    public IInputProcessor InputProcessor { get; private set; }
+    /// <inheritdoc/>
+    public IInputProcessor InputProcessor
+    {
+        get => _inputProcessor ?? throw new NotInitializedException (nameof (InputProcessor));
+        private set => _inputProcessor = value;
+    }
 
+    /// <inheritdoc/>
     public IOutputBuffer OutputBuffer { get; } = new OutputBuffer ();
 
-    public IConsoleOutput Out { get; private set; }
-    public AnsiRequestScheduler AnsiRequestScheduler { get; private set; }
+    /// <inheritdoc/>
+    public IConsoleOutput Out
+    {
+        get => _out ?? throw new NotInitializedException (nameof (Out));
+        private set => _out = value;
+    }
 
-    public IWindowSizeMonitor WindowSizeMonitor { get; private set; }
+    /// <inheritdoc/>
+    public AnsiRequestScheduler AnsiRequestScheduler
+    {
+        get => _ansiRequestScheduler ?? throw new NotInitializedException (nameof (AnsiRequestScheduler));
+        private set => _ansiRequestScheduler = value;
+    }
+
+    /// <inheritdoc/>
+    public IWindowSizeMonitor WindowSizeMonitor
+    {
+        get => _windowSizeMonitor ?? throw new NotInitializedException (nameof (WindowSizeMonitor));
+        private set => _windowSizeMonitor = value;
+    }
 
     /// <summary>
     ///     Determines how to get the current system type, adjust
     ///     in unit tests to simulate specific timings.
     /// </summary>
     public Func<DateTime> Now { get; set; } = () => DateTime.Now;
-
-    private static readonly Histogram<int> totalIterationMetric = Logging.Meter.CreateHistogram<int> ("Iteration (ms)");
-
-    private static readonly Histogram<int> iterationInvokesAndTimeouts = Logging.Meter.CreateHistogram<int> ("Invokes & Timers (ms)");
 
     public void Initialize (ITimedEvents timedEvents, ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput)
     {
@@ -67,7 +93,7 @@ public class MainLoop<T> : IMainLoop<T>
         TimeSpan took = Now () - dt;
         TimeSpan sleepFor = TimeSpan.FromMilliseconds (50) - took;
 
-        totalIterationMetric.Record (took.Milliseconds);
+        Logging.TotalIterationMetric.Record (took.Milliseconds);
 
         if (sleepFor.Milliseconds > 0)
         {
@@ -75,7 +101,7 @@ public class MainLoop<T> : IMainLoop<T>
         }
     }
 
-    public void IterationImpl ()
+    internal void IterationImpl ()
     {
         InputProcessor.ProcessQueue ();
 
@@ -100,7 +126,7 @@ public class MainLoop<T> : IMainLoop<T>
 
         TimedEvents.LockAndRunIdles ();
 
-        iterationInvokesAndTimeouts.Record (swCallbacks.Elapsed.Milliseconds);
+        Logging.IterationInvokesAndTimeouts.Record (swCallbacks.Elapsed.Milliseconds);
     }
 
     private bool AnySubviewsNeedDrawn (View v)
