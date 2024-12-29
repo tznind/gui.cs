@@ -2,12 +2,19 @@
 
 namespace Terminal.Gui;
 
+/// <summary>
+/// Implementation of <see cref="IConsoleOutput"/> that uses native dotnet
+/// methods e.g. <see cref="System.Console"/>
+/// </summary>
 public class NetOutput : IConsoleOutput
 {
-    public bool IsWinPlatform { get; }
+    private readonly bool _isWinPlatform;
 
     private CursorVisibility? _cachedCursorVisibility;
 
+    /// <summary>
+    /// Creates a new instance of the <see cref="NetOutput"/> class.
+    /// </summary>
     public NetOutput ()
     {
         Logging.Logger.LogInformation ($"Creating {nameof (NetOutput)}");
@@ -16,7 +23,7 @@ public class NetOutput : IConsoleOutput
 
         if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {
-            IsWinPlatform = true;
+            _isWinPlatform = true;
         }
     }
 
@@ -179,21 +186,13 @@ public class NetOutput : IConsoleOutput
         outputWidth = 0;
     }
 
-    public bool SetCursorVisibility (CursorVisibility visibility)
-    {
-        _cachedCursorVisibility = visibility;
-
-        Console.Out.Write (visibility == CursorVisibility.Default ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
-
-        return visibility == CursorVisibility.Default;
-    }
 
     /// <inheritdoc/>
     public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
 
     private bool SetCursorPositionImpl (int col, int row)
     {
-        if (IsWinPlatform)
+        if (_isWinPlatform)
         {
             // Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
             try
@@ -218,7 +217,8 @@ public class NetOutput : IConsoleOutput
     /// <inheritdoc/>
     public void Dispose () { Console.Clear (); }
 
-    void IConsoleOutput.SetCursorVisibility (CursorVisibility visibility)
+    /// <inheritdoc/>
+    public void SetCursorVisibility (CursorVisibility visibility)
     {
         Console.Out.Write (visibility == CursorVisibility.Default ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
     }

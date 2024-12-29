@@ -71,6 +71,13 @@ public class MainLoop<T> : IMainLoop<T>
     /// </summary>
     public Func<DateTime> Now { get; set; } = () => DateTime.Now;
 
+    /// <summary>
+    /// Initializes the class with the provided subcomponents
+    /// </summary>
+    /// <param name="timedEvents"></param>
+    /// <param name="inputBuffer"></param>
+    /// <param name="inputProcessor"></param>
+    /// <param name="consoleOutput"></param>
     public void Initialize (ITimedEvents timedEvents, ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput)
     {
         InputBuffer = inputBuffer;

@@ -3,17 +3,25 @@ using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui;
 
-public class MainLoopCoordinator<T> : IMainLoopCoordinator
+/// <summary>
+///<para>
+/// Handles creating the input loop thread and bootstrapping the
+/// <see cref="MainLoop{T}"/> that handles layout/drawing/events etc.
+/// </para>
+/// <para>This class is designed to be managed by <see cref="ApplicationV2"/></para>
+/// </summary>
+/// <typeparam name="T"></typeparam>
+internal class MainLoopCoordinator<T> : IMainLoopCoordinator
 {
     private readonly Func<IConsoleInput<T>> _inputFactory;
     private readonly ConcurrentQueue<T> _inputBuffer;
     private readonly IInputProcessor _inputProcessor;
     private readonly IMainLoop<T> _loop;
-    private readonly CancellationTokenSource tokenSource = new ();
+    private readonly CancellationTokenSource _tokenSource = new ();
     private readonly Func<IConsoleOutput> _outputFactory;
     private IConsoleInput<T> _input;
     private IConsoleOutput _output;
-    private readonly object oLockInitialization = new ();
+    private readonly object _oLockInitialization = new ();
     private ConsoleDriverFacade<T> _facade;
     private Task _inputTask;
     private readonly ITimedEvents _timedEvents;
@@ -77,7 +85,7 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
     {
         try
         {
-            lock (oLockInitialization)
+            lock (_oLockInitialization)
             {
                 // Instance must be constructed on the thread in which it is used.
                 _input = _inputFactory.Invoke ();
@@ -88,7 +96,7 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
 
             try
             {
-                _input.Run (tokenSource.Token);
+                _input.Run (_tokenSource.Token);
             }
             catch (OperationCanceledException)
             { }
@@ -106,7 +114,7 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
 
     private void BootMainLoop ()
     {
-        lock (oLockInitialization)
+        lock (_oLockInitialization)
         {
             // Instance must be constructed on the thread in which it is used.
             _output = _outputFactory.Invoke ();
@@ -132,9 +140,10 @@ public class MainLoopCoordinator<T> : IMainLoopCoordinator
         }
     }
 
+    /// <inheritdoc/>
     public void Stop ()
     {
-        tokenSource.Cancel ();
+        _tokenSource.Cancel ();
 
         // Wait for input infinite loop to exit
         Task.WhenAll (_inputTask).Wait ();

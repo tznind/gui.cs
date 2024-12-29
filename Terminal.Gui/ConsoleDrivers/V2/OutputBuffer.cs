@@ -82,8 +82,7 @@ public class OutputBuffer : IOutputBuffer
     /// <summary>The topmost row in the terminal.</summary>
     public virtual int Top { get; set; } = 0;
 
-    // As performance is a concern, we keep track of the dirty lines and only refresh those.
-    // This is in addition to the dirty flag on each cell.
+    /// <inheritdoc/>
     public bool [] DirtyLines { get; set; } = [];
 
     // QUESTION: When non-full screen apps are supported, will this represent the app size, or will that be in Application?

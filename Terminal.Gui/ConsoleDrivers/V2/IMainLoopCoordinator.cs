@@ -11,8 +11,10 @@ public interface IMainLoopCoordinator
     /// <returns></returns>
     public Task StartAsync ();
 
+
     /// <summary>
-    /// Stop and dispose all subcomponents
+    /// Stops the input thread, blocking till it exits.
+    /// Call this method only from the main UI loop.
     /// </summary>
     public void Stop ();
 

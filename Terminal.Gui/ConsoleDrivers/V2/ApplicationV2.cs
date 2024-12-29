@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui;
@@ -47,6 +48,8 @@ public class ApplicationV2 : ApplicationImpl
     }
 
     /// <inheritdoc/>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     public override void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
         if (!string.IsNullOrWhiteSpace (driverName))
@@ -128,6 +131,8 @@ public class ApplicationV2 : ApplicationImpl
     }
 
     /// <inheritdoc/>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     public override T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
     {
         var top = new T ();

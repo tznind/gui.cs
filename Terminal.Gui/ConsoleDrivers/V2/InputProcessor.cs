@@ -102,9 +102,7 @@ public abstract class InputProcessor<T> : IInputProcessor
     /// </summary>
     public void ProcessQueue ()
     {
-        // TODO: Esc timeout etc
-
-        while (InputBuffer.TryDequeue (out T input))
+        while (InputBuffer.TryDequeue (out T? input))
         {
             Process (input);
         }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿#nullable enable
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using static Terminal.Gui.WindowsConsole;
@@ -11,7 +12,7 @@ internal class WindowsOutput : IConsoleOutput
     private static extern bool WriteConsole (
         nint hConsoleOutput,
         string lpbufer,
-        uint NumberOfCharsToWriten,
+        uint numberOfCharsToWriten,
         out uint lpNumberOfCharsWritten,
         nint lpReserved
     );
@@ -48,7 +49,7 @@ internal class WindowsOutput : IConsoleOutput
     internal static nint INVALID_HANDLE_VALUE = new (-1);
 
     [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool SetConsoleActiveScreenBuffer (nint Handle);
+    private static extern bool SetConsoleActiveScreenBuffer (nint handle);
 
     [DllImport ("kernel32.dll")]
     private static extern bool SetConsoleCursorPosition (nint hConsoleOutput, Coord dwCursorPosition);
@@ -182,7 +183,7 @@ internal class WindowsOutput : IConsoleOutput
 
     public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord bufferSize, SmallRect window, bool force16Colors)
     {
-        var _stringBuilder = new StringBuilder ();
+        var stringBuilder = new StringBuilder ();
 
         //Debug.WriteLine ("WriteToConsole");
 
@@ -212,10 +213,10 @@ internal class WindowsOutput : IConsoleOutput
         }
         else
         {
-            _stringBuilder.Clear ();
+            stringBuilder.Clear ();
 
-            _stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
-            _stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (0, 0));
+            stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
+            stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (0, 0));
 
             Attribute? prev = null;
 
@@ -226,27 +227,27 @@ internal class WindowsOutput : IConsoleOutput
                 if (attr != prev)
                 {
                     prev = attr;
-                    _stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.Foreground.R, attr.Foreground.G, attr.Foreground.B));
-                    _stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.Background.R, attr.Background.G, attr.Background.B));
+                    stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.Foreground.R, attr.Foreground.G, attr.Foreground.B));
+                    stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.Background.R, attr.Background.G, attr.Background.B));
                 }
 
                 if (info.Char != '\x1b')
                 {
                     if (!info.Empty)
                     {
-                        _stringBuilder.Append (info.Char);
+                        stringBuilder.Append (info.Char);
                     }
                 }
                 else
                 {
-                    _stringBuilder.Append (' ');
+                    stringBuilder.Append (' ');
                 }
             }
 
-            _stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
-            _stringBuilder.Append (EscSeqUtils.CSI_HideCursor);
+            stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
+            stringBuilder.Append (EscSeqUtils.CSI_HideCursor);
 
-            var s = _stringBuilder.ToString ();
+            var s = stringBuilder.ToString ();
 
             // TODO: requires extensive testing if we go down this route
             // If console output has changed
