@@ -9,6 +9,10 @@ public class LayoutTests (ITestOutputHelper _output) : TestsAllViews
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Layout_Does_Not_Draw (Type viewType)
     {
+
+        // Required for spinner view that wants to register timeouts
+        Application.MainLoop = new MainLoop (new FakeMainLoop (Application.Driver));
+
         var view = (View)CreateInstanceIfNotGeneric (viewType);
 
         if (view == null)

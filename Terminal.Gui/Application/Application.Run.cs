@@ -436,7 +436,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
     /// <summary>The <see cref="MainLoop"/> driver for the application</summary>
     /// <value>The main loop.</value>
-    internal static MainLoop? MainLoop { get; private set; }
+    internal static MainLoop? MainLoop { get; set; }
 
     /// <summary>
     ///     Set to true to cause <see cref="End"/> to be called after the first iteration. Set to false (the default) to

@@ -10,6 +10,8 @@ public class AllViewsDrawTests (ITestOutputHelper _output) : TestsAllViews
     public void AllViews_Draw_Does_Not_Layout (Type viewType)
     {
         Application.ResetState (true);
+        // Required for spinner view that wants to register timeouts
+        Application.MainLoop = new MainLoop (new FakeMainLoop (Application.Driver));
 
         var view = (View)CreateInstanceIfNotGeneric (viewType);
 
