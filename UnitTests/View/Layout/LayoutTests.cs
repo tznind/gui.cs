@@ -5,7 +5,7 @@ namespace Terminal.Gui.LayoutTests;
 public class LayoutTests (ITestOutputHelper _output) : TestsAllViews
 {
     [Theory]
-    [AutoInitShutdown] // Required for spinner view that wants to register timeouts
+    [SetupFakeDriver] // Required for spinner view that wants to register timeouts
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Layout_Does_Not_Draw (Type viewType)
     {

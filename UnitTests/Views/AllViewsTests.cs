@@ -12,6 +12,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
+    [SetupFakeDriver] // Required for spinner view that wants to register timeouts
     public void AllViews_Center_Properly (Type viewType)
     {
         var view = (View)CreateInstanceIfNotGeneric (viewType);
@@ -62,6 +63,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
+    [SetupFakeDriver] // Required for spinner view that wants to register timeouts
     public void AllViews_Tests_All_Constructors (Type viewType)
     {
         Assert.True (Test_All_Constructors_Of_Type (viewType));
@@ -97,6 +99,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
+    [SetupFakeDriver] // Required for spinner view that wants to register timeouts
     public void AllViews_Command_Select_Raises_Selecting (Type viewType)
     {
         var view = (View)CreateInstanceIfNotGeneric (viewType);
@@ -131,6 +134,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     }
 
     [Theory]
+    [SetupFakeDriver] // Required for spinner view that wants to register timeouts
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Command_Accept_Raises_Accepted (Type viewType)
     {
@@ -168,6 +172,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
+    [SetupFakeDriver] // Required for spinner view that wants to register timeouts
     public void AllViews_Command_HotKey_Raises_HandlingHotKey (Type viewType)
     {
         var view = (View)CreateInstanceIfNotGeneric (viewType);
