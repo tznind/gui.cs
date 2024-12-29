@@ -17,7 +17,8 @@ public class ApplicationV2 : ApplicationImpl
     private readonly Func<IConsoleOutput> _winOutputFactory;
     private IMainLoopCoordinator? _coordinator;
     private string? _driverName;
-    public ITimedEvents TimedEvents { get; } = new TimedEvents ();
+
+    private readonly ITimedEvents _timedEvents = new TimedEvents ();
 
     /// <summary>
     /// Creates anew instance of the Application backend. The provided
@@ -104,7 +105,7 @@ public class ApplicationV2 : ApplicationImpl
         MainLoop<WindowsConsole.InputRecord> loop = new MainLoop<WindowsConsole.InputRecord> ();
 
         return new MainLoopCoordinator<WindowsConsole.InputRecord> (
-                                                                            TimedEvents,
+                                                                            _timedEvents,
                                                                             _winInputFactory,
                                                                             inputBuffer,
                                                                             new WindowsInputProcessor (inputBuffer),
@@ -118,7 +119,7 @@ public class ApplicationV2 : ApplicationImpl
         MainLoop<ConsoleKeyInfo> loop = new MainLoop<ConsoleKeyInfo> ();
 
         return new MainLoopCoordinator<ConsoleKeyInfo> (
-                                                                TimedEvents,
+                                                                _timedEvents,
                                                                 _netInputFactory,
                                                                 inputBuffer,
                                                                 new NetInputProcessor (inputBuffer),
@@ -191,7 +192,7 @@ public class ApplicationV2 : ApplicationImpl
     /// <inheritdoc/>
     public override void Invoke (Action action)
     {
-        TimedEvents.AddIdle (
+        _timedEvents.AddIdle (
                              () =>
                              {
                                  action ();
@@ -202,11 +203,11 @@ public class ApplicationV2 : ApplicationImpl
     }
 
     /// <inheritdoc/>
-    public override void AddIdle (Func<bool> func) { TimedEvents.AddIdle (func); }
+    public override void AddIdle (Func<bool> func) { _timedEvents.AddIdle (func); }
 
     /// <inheritdoc/>
-    public override object AddTimeout (TimeSpan time, Func<bool> callback) { return TimedEvents.AddTimeout (time, callback); }
+    public override object AddTimeout (TimeSpan time, Func<bool> callback) { return _timedEvents.AddTimeout (time, callback); }
 
     /// <inheritdoc/>
-    public override bool RemoveTimeout (object token) { return TimedEvents.RemoveTimeout (token); }
+    public override bool RemoveTimeout (object token) { return _timedEvents.RemoveTimeout (token); }
 }

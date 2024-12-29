@@ -49,7 +49,16 @@ public interface IOutputBuffer
     /// </summary>
     public int Col { get; }
 
+    /// <summary>
+    /// The first cell index on left of screen - basically always 0.
+    /// Changing this may have unexpected consequences.
+    /// </summary>
     int Left { get; set; }
+
+    /// <summary>
+    /// The first cell index on top of screen - basically always 0.
+    /// Changing this may have unexpected consequences.
+    /// </summary>
     int Top { get; set; }
 
     /// <summary>
@@ -95,6 +104,19 @@ public interface IOutputBuffer
     /// <param name="rows"></param>
     void SetWindowSize (int cols, int rows);
 
+    /// <summary>
+    /// Fills the given <paramref name="rect"/> with the given
+    /// symbol using the currently selected attribute.
+    /// </summary>
+    /// <param name="rect"></param>
+    /// <param name="rune"></param>
     void FillRect (Rectangle rect, Rune rune);
+
+    /// <summary>
+    /// Fills the given <paramref name="rect"/> with the given
+    /// symbol using the currently selected attribute.
+    /// </summary>
+    /// <param name="rect"></param>
+    /// <param name="rune"></param>
     void FillRect (Rectangle rect, char rune);
 }

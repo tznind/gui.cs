@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿#nullable enable
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 
@@ -7,9 +8,20 @@ namespace Terminal.Gui;
 /// <inheritdoc/>
 public class MainLoop<T> : IMainLoop<T>
 {
-    /// <inheritdoc/>
-    public ITimedEvents TimedEvents { get; private set; }
+    private ITimedEvents? _timedEvents;
 
+    /// <inheritdoc/>
+    public ITimedEvents TimedEvents
+    {
+        get => _timedEvents ?? throw new NotInitializedException(nameof(TimedEvents));
+        private set => _timedEvents = value;
+    }
+
+    /// <summary>
+    /// The input events thread-safe collection. This is populated on separate
+    /// thread by a <see cref="IConsoleInput{T}"/>. Is drained as part of each
+    /// <see cref="Iteration"/>
+    /// </summary>
     public ConcurrentQueue<T> InputBuffer { get; private set; } = new ();
 
     public IInputProcessor InputProcessor { get; private set; }
