@@ -17,12 +17,14 @@ public class MainLoop<T> : IMainLoop<T>
         private set => _timedEvents = value;
     }
 
+    // TODO: follow above pattern for others too
+
     /// <summary>
     /// The input events thread-safe collection. This is populated on separate
     /// thread by a <see cref="IConsoleInput{T}"/>. Is drained as part of each
     /// <see cref="Iteration"/>
     /// </summary>
-    public ConcurrentQueue<T> InputBuffer { get; private set; } = new ();
+    public ConcurrentQueue<T> InputBuffer { get; private set; }
 
     public IInputProcessor InputProcessor { get; private set; }
 
