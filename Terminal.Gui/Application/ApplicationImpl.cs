@@ -268,7 +268,7 @@ public class ApplicationImpl : IApplication
     {
         if(Application.MainLoop is null)
         {
-            throw new Exception ("Cannot add idle before main loop is initialized");
+            throw new NotInitializedException ("Cannot add idle before main loop is initialized");
         }
 
         // Yes in this case we cannot go direct via TimedEvents because legacy main loop
@@ -282,7 +282,7 @@ public class ApplicationImpl : IApplication
     {
         if (Application.MainLoop is null)
         {
-            throw new Exception ("Cannot add timeout before main loop is initialized");
+            throw new NotInitializedException ("Cannot add timeout before main loop is initialized", null);
         }
 
         return Application.MainLoop.TimedEvents.AddTimeout (time, callback);

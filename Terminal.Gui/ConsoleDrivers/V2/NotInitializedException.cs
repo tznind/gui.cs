@@ -14,4 +14,11 @@ public class NotInitializedException : Exception
     public NotInitializedException (string memberName):base($"{memberName} cannot be accessed before Initialization")
     {
     }
+
+    /// <summary>
+    /// Creates a new instance of the exception with the full message/inner exception.
+    /// </summary>
+    /// <param name="msg"></param>
+    /// <param name="innerException"></param>
+    public NotInitializedException (string msg, Exception innerException) :base(msg,innerException){}
 }
