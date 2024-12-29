@@ -1,8 +1,14 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui;
 
+/// <summary>
+/// Processes the queued input buffer contents - which must be of Type <typeparamref name="T"/>.
+/// Is responsible for <see cref="ProcessQueue"/> and translating into common Terminal.Gui
+/// events and data models.
+/// </summary>
 public abstract class InputProcessor<T> : IInputProcessor
 {
     /// <summary>
@@ -11,12 +17,16 @@ public abstract class InputProcessor<T> : IInputProcessor
     private readonly TimeSpan _escTimeout = TimeSpan.FromMilliseconds (50);
 
     internal AnsiResponseParser<T> Parser { get; } = new ();
+
+    /// <summary>
+    /// Input buffer which will be drained from by this class.
+    /// </summary>
     public ConcurrentQueue<T> InputBuffer { get; }
 
     /// <inheritdoc/>
     public IAnsiResponseParser GetParser () { return Parser; }
 
-    private MouseInterpreter _mouseInterpreter { get; } = new ();
+    private readonly MouseInterpreter _mouseInterpreter = new ();
 
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="KeyUp"/>.</summary>
     public event EventHandler<Key>? KeyDown;
@@ -59,7 +69,13 @@ public abstract class InputProcessor<T> : IInputProcessor
         MouseEvent?.Invoke (this, a);
     }
 
-    public InputProcessor (ConcurrentQueue<T> inputBuffer)
+    /// <summary>
+    /// Constructs base instance including wiring all relevant
+    /// parser events and setting <see cref="InputBuffer"/> to
+    /// the provided thread safe input collection.
+    /// </summary>
+    /// <param name="inputBuffer"></param>
+    protected InputProcessor (ConcurrentQueue<T> inputBuffer)
     {
         InputBuffer = inputBuffer;
         Parser.HandleMouse = true;
@@ -74,7 +90,11 @@ public abstract class InputProcessor<T> : IInputProcessor
                            };
 
         // TODO: For now handle all other escape codes with ignore
-        Parser.UnexpectedResponseHandler = str => { return true; };
+        Parser.UnexpectedResponseHandler = str =>
+                                           {
+                                               Logging.Logger.LogInformation ($"{nameof(InputProcessor<T>)} ignored unrecognized response '{str}'");
+                                               return true;
+                                           };
     }
 
     /// <summary>
@@ -89,13 +109,13 @@ public abstract class InputProcessor<T> : IInputProcessor
             Process (input);
         }
 
-        foreach (T input in ShouldReleaseParserHeldKeys ())
+        foreach (T input in ReleaseParserHeldKeysIfStale ())
         {
             ProcessAfterParsing (input);
         }
     }
 
-    public IEnumerable<T> ShouldReleaseParserHeldKeys ()
+    private IEnumerable<T> ReleaseParserHeldKeysIfStale ()
     {
         if (Parser.State == AnsiResponseParserState.ExpectingBracket && DateTime.Now - Parser.StateChangedAt > _escTimeout)
         {
@@ -105,7 +125,17 @@ public abstract class InputProcessor<T> : IInputProcessor
         return [];
     }
 
-    protected abstract void Process (T result);
+    /// <summary>
+    /// Process the provided single input element <paramref name="input"/>. This method
+    /// is called sequentially for each value read from <see cref="InputBuffer"/>.
+    /// </summary>
+    /// <param name="input"></param>
+    protected abstract void Process (T input);
 
+    /// <summary>
+    /// Process the provided single input element - short-circuiting the <see cref="Parser"/>
+    /// stage of the processing.
+    /// </summary>
+    /// <param name="input"></param>
     protected abstract void ProcessAfterParsing (T input);
 }

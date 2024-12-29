@@ -1,6 +1,11 @@
 ﻿#nullable enable
 namespace Terminal.Gui;
 
+/// <summary>
+/// Describes the screen state that you want the console to be in.
+/// Is designed to be drawn to repeatedly then manifest into the console
+/// once at the end of iteration after all drawing is finalized.
+/// </summary>
 public interface IOutputBuffer
 {
     /// <summary>

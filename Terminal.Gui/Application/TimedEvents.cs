@@ -116,6 +116,7 @@ public class TimedEvents : ITimedEvents
 
     }
 
+    /// <inheritdoc/>
     public void LockAndRunIdles ()
     {
         bool runIdle;
