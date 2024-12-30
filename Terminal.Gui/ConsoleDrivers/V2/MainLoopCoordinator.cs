@@ -69,14 +69,27 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
     {
         Logging.Logger.LogInformation ("Main Loop Coordinator booting...");
 
-        // TODO: if crash on boot then semaphore never finishes
         _inputTask = Task.Run (RunInput);
 
         // Main loop is now booted on same thread as rest of users application
         BootMainLoop ();
 
-        // Use asynchronous semaphore waiting.
-        await _startupSemaphore.WaitAsync ().ConfigureAwait (false);
+        // Wait asynchronously for the semaphore or task failure.
+        var waitForSemaphore = _startupSemaphore.WaitAsync ();
+
+        // Wait for either the semaphore to be released or the input task to crash.
+        var completedTask = await Task.WhenAny (waitForSemaphore, _inputTask).ConfigureAwait (false);
+
+        // Check if the task was the input task and if it has failed.
+        if (completedTask == _inputTask)
+        {
+            if (_inputTask.IsFaulted)
+            {
+                throw _inputTask.Exception;
+            }
+
+            throw new Exception ("Input loop exited during startup instead of entering read loop properly (i.e. and blocking)");
+        }
 
         Logging.Logger.LogInformation ("Main Loop Coordinator booting complete");
     }
@@ -106,6 +119,8 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
         catch (Exception e)
         {
             Logging.Logger.LogCritical (e, "Input loop crashed");
+
+            throw;
         }
     }
 

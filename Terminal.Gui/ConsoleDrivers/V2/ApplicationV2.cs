@@ -150,7 +150,7 @@ public class ApplicationV2 : ApplicationImpl
 
         if (!Application.Initialized)
         {
-            throw new ("App not Initialized");
+            throw new NotInitializedException (nameof(Run));
         }
 
         Application.Top = view;

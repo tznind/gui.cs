@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using System.Collections.Concurrent;
+using Moq;
 
 namespace UnitTests.ConsoleDrivers.V2;
 public class ApplicationV2Tests
@@ -6,10 +7,15 @@ public class ApplicationV2Tests
 
     private ApplicationV2 NewApplicationV2 ()
     {
+        var netInput = new Mock<INetInput> ();
+        SetupRunInputMockMethodToBlock (netInput);
+        var winInput = new Mock<IWindowsInput> ();
+        SetupRunInputMockMethodToBlock (winInput);
+
         return new (
-                    Mock.Of<INetInput>,
+                    ()=>netInput.Object,
                     Mock.Of<IConsoleOutput>,
-                    Mock.Of<IWindowsInput>,
+                    () => winInput.Object,
                     Mock.Of<IConsoleOutput>);
     }
 
@@ -47,12 +53,75 @@ public class ApplicationV2Tests
     }
 
     [Fact]
+    public void TestInit_ExplicitlyRequestWin ()
+    {
+        var netInput = new Mock<INetInput> (MockBehavior.Strict);
+        var netOutput = new Mock<IConsoleOutput> (MockBehavior.Strict);
+        var winInput = new Mock<IWindowsInput> (MockBehavior.Strict);
+        var winOutput = new Mock<IConsoleOutput> (MockBehavior.Strict);
+
+        winInput.Setup (i => i.Initialize (It.IsAny<ConcurrentQueue<WindowsConsole.InputRecord>> ()))
+                .Verifiable(Times.Once);
+        SetupRunInputMockMethodToBlock (winInput);
+        winInput.Setup (i=>i.Dispose ())
+                .Verifiable(Times.Once);
+
+        var v2 = new ApplicationV2 (
+                                    ()=> netInput.Object,
+                                    () => netOutput.Object,
+                                    () => winInput.Object,
+                                    () => winOutput.Object);
+
+        Assert.Null (Application.Driver);
+        v2.Init (null,"v2win");
+        Assert.NotNull (Application.Driver);
+
+        var type = Application.Driver.GetType ();
+        Assert.True (type.IsGenericType);
+        Assert.True (type.GetGenericTypeDefinition () == typeof (ConsoleDriverFacade<>));
+        v2.Shutdown ();
+
+        Assert.Null (Application.Driver);
+
+        winInput.VerifyAll();
+    }
+
+    private void SetupRunInputMockMethodToBlock (Mock<IWindowsInput> winInput)
+    {
+        winInput.Setup (r => r.Run (It.IsAny<CancellationToken> ()))
+                .Callback<CancellationToken> (token =>
+                                              {
+                                                  // Simulate an infinite loop that checks for cancellation
+                                                  while (!token.IsCancellationRequested)
+                                                  {
+                                                      // Perform the action that should repeat in the loop
+                                                      // This could be some mock behavior or just an empty loop depending on the context
+                                                  }
+                                              })
+                .Verifiable (Times.Once);
+    }
+    private void SetupRunInputMockMethodToBlock (Mock<INetInput> netInput)
+    {
+        netInput.Setup (r => r.Run (It.IsAny<CancellationToken> ()))
+                .Callback<CancellationToken> (token =>
+                                              {
+                                                  // Simulate an infinite loop that checks for cancellation
+                                                  while (!token.IsCancellationRequested)
+                                                  {
+                                                      // Perform the action that should repeat in the loop
+                                                      // This could be some mock behavior or just an empty loop depending on the context
+                                                  }
+                                              })
+                .Verifiable (Times.Once);
+    }
+
+    [Fact]
     public void Test_NoInitThrowOnRun ()
     {
         var app = NewApplicationV2();
 
-        var ex = Assert.Throws<Exception> (() => app.Run (new Window ()));
-        Assert.Equal ("App not Initialized",ex.Message);
+        var ex = Assert.Throws<NotInitializedException> (() => app.Run (new Window ()));
+        Assert.Equal ("Run cannot be accessed before Initialization", ex.Message);
     }
 
     [Fact]
