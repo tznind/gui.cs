@@ -54,11 +54,14 @@ public class ApplicationV2Tests
         var ex = Assert.Throws<Exception> (() => app.Run (new Window ()));
         Assert.Equal ("App not Initialized",ex.Message);
     }
-    /* TODO : Infinite loops
+
     [Fact]
     public void Test_InitRunShutdown ()
     {
+        var orig = ApplicationImpl.Instance;
+
         var v2 = NewApplicationV2();
+        ApplicationImpl.ChangeInstance (v2);
 
         v2.Init ();
 
@@ -75,8 +78,14 @@ public class ApplicationV2Tests
                        }
                        );
         Assert.Null (Application.Top);
+
+        // Blocks until the timeout call is hit
+
         v2.Run (new Window ());
+
         Assert.Null (Application.Top);
         v2.Shutdown ();
-    }*/
+
+        ApplicationImpl.ChangeInstance (orig);
+    }
 }
