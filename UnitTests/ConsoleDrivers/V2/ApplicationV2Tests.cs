@@ -86,6 +86,40 @@ public class ApplicationV2Tests
         winInput.VerifyAll();
     }
 
+    [Fact]
+    public void TestInit_ExplicitlyRequestNet ()
+    {
+        var netInput = new Mock<INetInput> (MockBehavior.Strict);
+        var netOutput = new Mock<IConsoleOutput> (MockBehavior.Strict);
+        var winInput = new Mock<IWindowsInput> (MockBehavior.Strict);
+        var winOutput = new Mock<IConsoleOutput> (MockBehavior.Strict);
+
+        netInput.Setup (i => i.Initialize (It.IsAny<ConcurrentQueue<ConsoleKeyInfo>> ()))
+                .Verifiable (Times.Once);
+        SetupRunInputMockMethodToBlock (netInput);
+        netInput.Setup (i => i.Dispose ())
+                .Verifiable (Times.Once);
+
+        var v2 = new ApplicationV2 (
+                                    () => netInput.Object,
+                                    () => netOutput.Object,
+                                    () => winInput.Object,
+                                    () => winOutput.Object);
+
+        Assert.Null (Application.Driver);
+        v2.Init (null, "v2net");
+        Assert.NotNull (Application.Driver);
+
+        var type = Application.Driver.GetType ();
+        Assert.True (type.IsGenericType);
+        Assert.True (type.GetGenericTypeDefinition () == typeof (ConsoleDriverFacade<>));
+        v2.Shutdown ();
+
+        Assert.Null (Application.Driver);
+
+        netInput.VerifyAll ();
+    }
+
     private void SetupRunInputMockMethodToBlock (Mock<IWindowsInput> winInput)
     {
         winInput.Setup (r => r.Run (It.IsAny<CancellationToken> ()))
