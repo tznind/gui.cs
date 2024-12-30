@@ -513,6 +513,41 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         Assert.Equal (49, mouseEventArgs [1].Position.Y);
     }
 
+
+    [Fact]
+    public void ParserDetectsKeyboard ()
+    {
+
+        // ANSI escape sequence for cursor left
+        const string LEFT = "\u001b[D";
+
+        // ANSI escape sequence for Device Attribute Response (e.g., Terminal identifying itself)
+        const string DEVICE_ATTRIBUTE_RESPONSE = "\u001B[?1;2c";
+
+        // ANSI escape sequence for cursor up (while shift held down)
+        const string SHIFT_UP = "\u001b[1;2A";
+
+        var parser = new AnsiResponseParser ();
+
+        parser.HandleKeyboard = true;
+        string? foundDar = null;
+        List<Key> keys = new ();
+
+        parser.Keyboard += (s, e) => keys.Add (e);
+        parser.ExpectResponse ("c", (dar) => foundDar = dar, null, false);
+        var released = parser.ProcessInput ("a" + LEFT + "asdf" + DEVICE_ATTRIBUTE_RESPONSE + "bbcc" + SHIFT_UP + "sss");
+
+        Assert.Equal ("aasdfbbccsss", released);
+
+        Assert.Equal (2, keys.Count);
+
+        Assert.NotNull (foundDar);
+        Assert.Equal (DEVICE_ATTRIBUTE_RESPONSE, foundDar);
+
+        Assert.Equal (Key.CursorLeft,keys [0]);
+        Assert.Equal (Key.CursorUp.WithShift, keys [1]);
+    }
+
     private Tuple<char, int> [] StringToBatch (string batch)
     {
         return batch.Select ((k) => Tuple.Create (k, tIndex++)).ToArray ();
