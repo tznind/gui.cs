@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace Terminal.Gui;
 
@@ -42,19 +43,24 @@ public class AnsiKeyboardParser
                 return null;
             }
 
-            // TODO: these are wrong I think
-            // Apply modifiers based on the modifier number
-            if (modifierGroup == "3") // Ctrl
+            // Examples:
+            // without modifiers:
+            //   \u001b\[B
+            // with modifiers:
+            //   \u001b\[1; 2B
+
+            if (!string.IsNullOrWhiteSpace (modifierGroup) && int.TryParse (modifierGroup, out var modifier))
             {
-                key = key.WithCtrl;
-            }
-            else if (modifierGroup == "4") // Alt
-            {
-                key = key.WithAlt;
-            }
-            else if (modifierGroup == "5") // Shift
-            {
-                key = key.WithShift;
+                key = modifier switch
+                      {
+                          2=>key.WithShift,
+                          3=>key.WithAlt,
+                          4=>key.WithAlt.WithShift,
+                          5=>key.WithCtrl,
+                          6=>key.WithCtrl.WithShift,
+                          7=>key.WithCtrl.WithAlt,
+                          8=>key.WithCtrl.WithAlt.WithShift
+                      };
             }
 
             return key;
