@@ -63,10 +63,11 @@ public abstract class InputProcessor<T> : IInputProcessor
         // Ensure ScreenPosition is set
         a.ScreenPosition = a.Position;
 
-        _mouseInterpreter.Process (a);
-
-        // Pass on
-        MouseEvent?.Invoke (this, a);
+        foreach (var e in _mouseInterpreter.Process (a))
+        {
+            // Pass on
+            MouseEvent?.Invoke (this, e);
+        }
     }
 
     /// <summary>

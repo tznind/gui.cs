@@ -35,8 +35,10 @@ internal class MouseInterpreter
         };
     }
 
-    public MouseEventArgs Process (MouseEventArgs e)
+    public IEnumerable<MouseEventArgs> Process (MouseEventArgs e)
     {
+        yield return e;
+
         // For each mouse button
         for (var i = 0; i < 4; i++)
         {
@@ -44,18 +46,23 @@ internal class MouseInterpreter
 
             if (numClicks.HasValue)
             {
-                return RaiseClick (i, numClicks.Value, e);
+                yield return RaiseClick (i, numClicks.Value, e);
             }
         }
-
-        return e;
     }
 
     private MouseEventArgs RaiseClick (int button, int numberOfClicks, MouseEventArgs mouseEventArgs)
     {
-        mouseEventArgs.Flags |= ToClicks (button, numberOfClicks);
+        var newClick = new MouseEventArgs
+        {
+            Handled = false,
+            Flags = ToClicks (button, numberOfClicks),
+            ScreenPosition = mouseEventArgs.ScreenPosition,
+            View = mouseEventArgs.View,
+            Position = mouseEventArgs.Position
+        };
 
-        return mouseEventArgs;
+        return newClick;
     }
 
     private MouseFlags ToClicks (int buttonIdx, int numberOfClicks)
