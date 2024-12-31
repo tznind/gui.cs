@@ -13,13 +13,13 @@ public class MouseInterpreterTests
         // Act and Assert: Process all but the last event and ensure they yield no results
         for (int i = 0; i < events.Count - 1; i++)
         {
-            var intermediateResult = interpreter.Process (events [i]);
+            var intermediateResult = interpreter.Process (events [i]).Single();
             Assert.Equal (events [i].Flags,intermediateResult.Flags);
         }
 
         // Process the final event and verify the expected result
-        var finalResult = interpreter.Process (events [^1]); // ^1 is the last item in the list
-        Assert.Equal (expected, finalResult.Flags);
+        var finalResult = interpreter.Process (events [^1]).ToArray (); // ^1 is the last item in the list
+        Assert.Equal (expected, finalResult [1].Flags);
     }
 
 
