@@ -230,6 +230,7 @@ public class NetOutput : IConsoleOutput
 
         //Set cursor key to cursor.
         Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+
         Console.Out.Close ();
     }
 

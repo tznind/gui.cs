@@ -65,6 +65,8 @@ public class ApplicationV2Tests
         SetupRunInputMockMethodToBlock (winInput);
         winInput.Setup (i=>i.Dispose ())
                 .Verifiable(Times.Once);
+        winOutput.Setup (i => i.Dispose ())
+                 .Verifiable (Times.Once);
 
         var v2 = new ApplicationV2 (
                                     ()=> netInput.Object,
@@ -99,7 +101,8 @@ public class ApplicationV2Tests
         SetupRunInputMockMethodToBlock (netInput);
         netInput.Setup (i => i.Dispose ())
                 .Verifiable (Times.Once);
-
+        netOutput.Setup (i => i.Dispose ())
+                 .Verifiable (Times.Once);
         var v2 = new ApplicationV2 (
                                     () => netInput.Object,
                                     () => netOutput.Object,

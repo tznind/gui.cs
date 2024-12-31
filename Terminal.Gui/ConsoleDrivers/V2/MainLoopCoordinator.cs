@@ -159,8 +159,9 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
     public void Stop ()
     {
         _tokenSource.Cancel ();
+        _output.Dispose ();
 
         // Wait for input infinite loop to exit
-        Task.WhenAll (_inputTask).Wait ();
+        _inputTask.Wait ();
     }
 }
