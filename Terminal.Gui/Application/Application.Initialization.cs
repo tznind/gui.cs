@@ -174,7 +174,6 @@ public static partial class Application // Initialization (Init/Shutdown)
 
         SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
 
-        SupportedCultures = GetSupportedCultures ();
         MainThreadId = Thread.CurrentThread.ManagedThreadId;
         bool init = Initialized = true;
         InitializedChanged?.Invoke (null, new (init));
