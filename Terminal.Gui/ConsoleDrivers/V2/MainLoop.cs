@@ -124,6 +124,10 @@ public class MainLoop<T> : IMainLoop<T>
                 Application.LayoutAndDraw (true);
 
                 Out.Write (OutputBuffer);
+
+                Application.Top.MostFocused?.PositionCursor ();
+                Out.SetCursorPosition (OutputBuffer.Col, OutputBuffer.Row);
+                Out.SetCursorVisibility (CursorVisibility.Default);
             }
         }
 
