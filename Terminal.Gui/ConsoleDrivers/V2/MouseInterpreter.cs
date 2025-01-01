@@ -1,5 +1,7 @@
 ﻿#nullable enable
 
+using Microsoft.Extensions.Logging;
+
 namespace Terminal.Gui;
 
 internal class MouseInterpreter
@@ -61,7 +63,7 @@ internal class MouseInterpreter
             View = mouseEventArgs.View,
             Position = mouseEventArgs.Position
         };
-
+        Logging.Logger.LogTrace ($"Raising click event:{newClick.Flags}");
         return newClick;
     }
 
