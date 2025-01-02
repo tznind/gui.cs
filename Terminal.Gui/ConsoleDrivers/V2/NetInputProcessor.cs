@@ -22,7 +22,8 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
     /// <inheritdoc/>
     protected override void ProcessAfterParsing (ConsoleKeyInfo input)
     {
-        KeyCode key = EscSeqUtils.MapKey (input);
+        ConsoleKeyInfo adjustedInput = EscSeqUtils.MapConsoleKeyInfo (input);
+        KeyCode key = EscSeqUtils.MapKey (adjustedInput);
         OnKeyDown (key);
         OnKeyUp (key);
     }
