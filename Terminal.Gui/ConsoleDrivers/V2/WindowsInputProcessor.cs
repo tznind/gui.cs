@@ -122,8 +122,16 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
         {
             Position = new (e.MousePosition.X, e.MousePosition.Y),
 
-            //Wrong but for POC ok
-            Flags = e.ButtonState.HasFlag (ButtonState.Button1Pressed) ? MouseFlags.Button1Pressed : MouseFlags.None
+            Flags = e.ButtonState switch
+                    {
+                        ButtonState.NoButtonPressed => MouseFlags.None,
+                        ButtonState.Button1Pressed => MouseFlags.Button1Pressed,
+                        ButtonState.Button2Pressed => MouseFlags.Button2Pressed,
+                        ButtonState.Button3Pressed => MouseFlags.Button3Pressed,
+                        ButtonState.Button4Pressed => MouseFlags.Button4Pressed,
+                        ButtonState.RightmostButtonPressed => MouseFlags.Button3Pressed,
+
+                    } 
         };
 
         // TODO: Return keys too
