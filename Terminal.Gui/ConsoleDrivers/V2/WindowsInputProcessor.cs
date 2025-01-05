@@ -130,8 +130,8 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
                         ButtonState.Button3Pressed => MouseFlags.Button3Pressed,
                         ButtonState.Button4Pressed => MouseFlags.Button4Pressed,
                         ButtonState.RightmostButtonPressed => MouseFlags.Button3Pressed,
-
-                    } 
+                        _=> MouseFlags.None
+                    }
         };
 
         // TODO: Return keys too
