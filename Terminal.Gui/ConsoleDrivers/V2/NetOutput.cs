@@ -175,8 +175,7 @@ public class NetOutput : IConsoleOutput
             }
         }
 
-        SetCursorPositionImpl (0, 0);
-
+        SetCursorVisibility (savedVisibility ?? CursorVisibility.Default);
         _cachedCursorVisibility = savedVisibility;
     }
 

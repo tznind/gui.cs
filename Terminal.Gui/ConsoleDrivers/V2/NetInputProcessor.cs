@@ -23,7 +23,19 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
     protected override void ProcessAfterParsing (ConsoleKeyInfo input)
     {
         ConsoleKeyInfo adjustedInput = EscSeqUtils.MapConsoleKeyInfo (input);
-        KeyCode key = EscSeqUtils.MapKey (adjustedInput);
+        
+        KeyCode key;
+
+        // TODO : EscSeqUtils.MapConsoleKeyInfo is wrong for e.g. '{' - it winds up clearing the Key
+        //        So if the method nuked it then we should just work with the original.
+        if (adjustedInput.Key == ConsoleKey.None && input.Key != ConsoleKey.None)
+        {
+            key = EscSeqUtils.MapKey (input);
+        }
+        else
+        {
+            key = EscSeqUtils.MapKey (adjustedInput);
+        }
         OnKeyDown (key);
         OnKeyUp (key);
     }
