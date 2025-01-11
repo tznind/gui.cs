@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui;
 
@@ -124,9 +125,8 @@ public class MainLoop<T> : IMainLoop<T>
                 Application.LayoutAndDraw (true);
 
                 Out.Write (OutputBuffer);
+                this.SetCursor ();
 
-                Application.Top.MostFocused?.PositionCursor ();
-                Out.SetCursorPosition (OutputBuffer.Col, OutputBuffer.Row);
                 Out.SetCursorVisibility (CursorVisibility.Default);
             }
         }
@@ -140,10 +140,25 @@ public class MainLoop<T> : IMainLoop<T>
         Logging.IterationInvokesAndTimeouts.Record (swCallbacks.Elapsed.Milliseconds);
     }
 
+    private void SetCursor ()
+    {
+        var mostFocused = Application.Top.MostFocused;
+
+        if (mostFocused == null)
+        {
+            return;
+        }
+
+        mostFocused.PositionCursor ();
+        Out.SetCursorPosition (OutputBuffer.Col, OutputBuffer.Row);
+        Out.SetCursorVisibility (mostFocused.CursorVisibility);
+    }
+
     private bool AnySubviewsNeedDrawn (View v)
     {
         if (v.NeedsDraw || v.NeedsLayout)
         {
+            Logging.Logger.LogTrace ( $"{v.GetType ().Name} triggered redraw (NeedsDraw={v.NeedsDraw} NeedsLayout={v.NeedsLayout}) ");
             return true;
         }
 
