@@ -121,6 +121,7 @@ public class MainLoop<T> : IMainLoop<T>
 
             if (needsDrawOrLayout || sizeChanged)
             {
+                Logging.Redraws.Add (1);
                 // TODO: Test only
                 Application.LayoutAndDraw (true);
 
