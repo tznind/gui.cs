@@ -302,15 +302,45 @@ internal class WindowsOutput : IConsoleOutput
         Write (sb.ToString ());
     }
 
+    private Point _lastCursorPosition = new Point ();
+
     /// <inheritdoc/>
-    public void SetCursorPosition (int col, int row) { SetConsoleCursorPosition (_screenBuffer, new ((short)col, (short)row)); }
+    public void SetCursorPosition (int col, int row)
+    {
+
+        if (_lastCursorPosition.X == col && _lastCursorPosition.Y == row)
+        {
+            return;
+        }
+
+        _lastCursorPosition = new Point (col, row);
+
+        SetConsoleCursorPosition (_screenBuffer, new ((short)col, (short)row));
+    }
+
+    private bool _isDisposed = false;
 
     /// <inheritdoc/>
     public void Dispose ()
     {
+        //TODO: find why double disposed
+
+        if (_isDisposed)
+        {
+            return;
+        }
+
         if (_screenBuffer != nint.Zero)
         {
-            CloseHandle (_screenBuffer);
+            try
+            {
+                CloseHandle (_screenBuffer);
+            }
+            catch (Exception e)
+            {
+                Logging.Logger.LogError (e,"Error trying to close screen buffer handle in WindowsOutput via interop method");
+            }
         }
+        _isDisposed=true;
     }
 }

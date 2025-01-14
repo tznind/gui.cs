@@ -195,8 +195,16 @@ public class NetOutput : IConsoleOutput
     /// <inheritdoc/>
     public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
 
+    private Point _lastCursorPosition = new Point ();
     private bool SetCursorPositionImpl (int col, int row)
     {
+        if (_lastCursorPosition.X == col && _lastCursorPosition.Y == row)
+        {
+            return true;
+        }
+
+        _lastCursorPosition = new Point (col, row);
+
         if (_isWinPlatform)
         {
             // Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.

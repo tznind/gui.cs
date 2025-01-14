@@ -126,10 +126,11 @@ public class MainLoop<T> : IMainLoop<T>
                 Application.LayoutAndDraw (true);
 
                 Out.Write (OutputBuffer);
-                this.SetCursor ();
 
                 Out.SetCursorVisibility (CursorVisibility.Default);
             }
+
+            this.SetCursor ();
         }
 
         var swCallbacks = Stopwatch.StartNew ();
