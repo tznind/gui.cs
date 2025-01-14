@@ -155,9 +155,18 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
         }
     }
 
+    private bool _stopCalled = false;
+
     /// <inheritdoc/>
     public void Stop ()
     {
+        // Ignore repeated calls to Stop - happens if user spams Application.Shutdown().
+        if (_stopCalled)
+        {
+            return;
+        }
+        _stopCalled = true;
+
         _tokenSource.Cancel ();
         _output.Dispose ();
 

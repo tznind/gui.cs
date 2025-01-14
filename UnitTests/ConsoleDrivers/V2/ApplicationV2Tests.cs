@@ -194,4 +194,28 @@ public class ApplicationV2Tests
 
         ApplicationImpl.ChangeInstance (orig);
     }
+
+
+    [Fact]
+    public void TestRepeatedShutdownCalls_DoNotDuplicateDisposeOutput ()
+    {
+        var netInput = new Mock<INetInput> ();
+        SetupRunInputMockMethodToBlock (netInput);
+        Mock<IConsoleOutput>? outputMock = null;
+
+
+        var v2 = new ApplicationV2(
+                                   () => netInput.Object,
+                                   ()=> (outputMock = new Mock<IConsoleOutput>()).Object,
+                                   Mock.Of<IWindowsInput>,
+                                   Mock.Of<IConsoleOutput>);
+
+        v2.Init (null,"v2net");
+
+
+        v2.Shutdown ();
+        v2.Shutdown ();
+        outputMock.Verify(o=>o.Dispose (),Times.Once);
+    }
+
 }

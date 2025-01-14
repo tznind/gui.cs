@@ -323,8 +323,6 @@ internal class WindowsOutput : IConsoleOutput
     /// <inheritdoc/>
     public void Dispose ()
     {
-        //TODO: find why double disposed
-
         if (_isDisposed)
         {
             return;
