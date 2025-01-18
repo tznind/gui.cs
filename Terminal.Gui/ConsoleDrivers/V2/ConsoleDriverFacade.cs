@@ -223,9 +223,22 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver
     /// <param name="c"></param>
     public void FillRect (Rectangle rect, char c) { _outputBuffer.FillRect (rect, c); }
 
-    /// <summary>Returns the name of the driver and relevant library version information.</summary>
-    /// <returns></returns>
-    public string GetVersionInfo () { return GetType ().Name; }
+    /// <inheritdoc/>
+    public virtual string GetVersionInfo ()
+    {
+        string type = "";
+
+        if (_inputProcessor is WindowsInputProcessor)
+        {
+            type = "(win)";
+        }
+        else if (_inputProcessor is NetInputProcessor)
+        {
+            type = "(net)";
+        }
+
+        return GetType().Name.TrimEnd('`','1') + type;
+    }
 
     /// <summary>Tests if the specified rune is supported by the driver.</summary>
     /// <param name="rune"></param>
