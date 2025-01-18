@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui;
 
@@ -22,6 +23,9 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
     /// <inheritdoc/>
     protected override void ProcessAfterParsing (ConsoleKeyInfo input)
     {
+        // For building test cases
+        //Logging.Logger.LogTrace (FormatConsoleKeyInfoForTestCase (input));
+
         Key key = ConsoleKeyInfoToKey (input);
         OnKeyDown (key);
         OnKeyUp (key);
@@ -46,4 +50,16 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
 
         return EscSeqUtils.MapKey (adjustedInput);
     }
+
+    /* For building test cases
+    public static string FormatConsoleKeyInfoForTestCase (ConsoleKeyInfo input)
+    {
+        string charLiteral = input.KeyChar == '\0' ? @"'\0'" : $"'{input.KeyChar}'";
+        string expectedLiteral = $"new Rune('todo')";
+
+        return $"yield return new object[] {{ new ConsoleKeyInfo({charLiteral}, ConsoleKey.{input.Key}, " +
+               $"{input.Modifiers.HasFlag (ConsoleModifiers.Shift).ToString ().ToLower ()}, " +
+               $"{input.Modifiers.HasFlag (ConsoleModifiers.Alt).ToString ().ToLower ()}, " +
+               $"{input.Modifiers.HasFlag (ConsoleModifiers.Control).ToString ().ToLower ()}), {expectedLiteral} }};";
+    }*/
 }
