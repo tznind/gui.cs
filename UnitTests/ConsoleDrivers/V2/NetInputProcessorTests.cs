@@ -65,11 +65,12 @@ public class NetInputProcessorTests
     public static IEnumerable<object []> GetConsoleKeyInfoToKeyTestCases_Key ()
     {
         yield return new object [] { new ConsoleKeyInfo ('\t', ConsoleKey.None, false, false, false), Key.Tab};
+        yield return new object [] { new ConsoleKeyInfo ('\u005C', ConsoleKey.None, false, false, false), Key.Esc };
+        yield return new object [] { new ConsoleKeyInfo ('\u007f', ConsoleKey.None, false, false, false), Key.Backspace };
 
         // TODO: Terminal.Gui does not have a Key for this mapped
         // TODO: null and default(Key) are both not same as Null.  Why user has to do (Key)0 to get a null key?!
         yield return new object [] { new ConsoleKeyInfo ('\0', ConsoleKey.LeftWindows, false, false, false), (Key)0 };
-
 
     }
 

@@ -8,6 +8,16 @@ namespace Terminal.Gui;
 /// </summary>
 public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
 {
+    #pragma warning disable CA2211
+    /// <summary>
+    /// Set to true to generate code in <see cref="Logging"/> (verbose only) for test cases in NetInputProcessorTests.
+    /// <remarks>This makes the task of capturing user/language/terminal specific keyboard issues easier to
+    /// diagnose. By turning this on and searching logs user can send us exactly the input codes that are released
+    /// to input stream.</remarks>
+    /// </summary>
+    public static bool GenerateTestCasesForKeyPresses = false;
+    #pragma warning enable CA2211
+
     /// <inheritdoc/>
     public NetInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer) : base (inputBuffer) { }
 
@@ -24,7 +34,10 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
     protected override void ProcessAfterParsing (ConsoleKeyInfo input)
     {
         // For building test cases
-        //Logging.Logger.LogTrace (FormatConsoleKeyInfoForTestCase (input));
+        if (GenerateTestCasesForKeyPresses)
+        {
+            Logging.Logger.LogTrace (FormatConsoleKeyInfoForTestCase (input));
+        }
 
         Key key = ConsoleKeyInfoToKey (input);
         OnKeyDown (key);
@@ -51,8 +64,8 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
         return EscSeqUtils.MapKey (adjustedInput);
     }
 
-    /* For building test cases
-    public static string FormatConsoleKeyInfoForTestCase (ConsoleKeyInfo input)
+    /* For building test cases */
+    private static string FormatConsoleKeyInfoForTestCase (ConsoleKeyInfo input)
     {
         string charLiteral = input.KeyChar == '\0' ? @"'\0'" : $"'{input.KeyChar}'";
         string expectedLiteral = $"new Rune('todo')";
@@ -61,5 +74,5 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
                $"{input.Modifiers.HasFlag (ConsoleModifiers.Shift).ToString ().ToLower ()}, " +
                $"{input.Modifiers.HasFlag (ConsoleModifiers.Alt).ToString ().ToLower ()}, " +
                $"{input.Modifiers.HasFlag (ConsoleModifiers.Control).ToString ().ToLower ()}), {expectedLiteral} }};";
-    }*/
+    }
 }
