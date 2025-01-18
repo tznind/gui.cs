@@ -65,7 +65,7 @@ public class NetInputProcessorTests
     public static IEnumerable<object []> GetConsoleKeyInfoToKeyTestCases_Key ()
     {
         yield return new object [] { new ConsoleKeyInfo ('\t', ConsoleKey.None, false, false, false), Key.Tab};
-        yield return new object [] { new ConsoleKeyInfo ('\u005C', ConsoleKey.None, false, false, false), Key.Esc };
+        yield return new object [] { new ConsoleKeyInfo ('\u001B', ConsoleKey.None, false, false, false), Key.Esc };
         yield return new object [] { new ConsoleKeyInfo ('\u007f', ConsoleKey.None, false, false, false), Key.Backspace };
 
         // TODO: Terminal.Gui does not have a Key for this mapped
