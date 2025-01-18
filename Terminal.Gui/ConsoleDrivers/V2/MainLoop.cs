@@ -144,16 +144,27 @@ public class MainLoop<T> : IMainLoop<T>
 
     private void SetCursor ()
     {
-        var mostFocused = Application.Top.MostFocused;
+        View? mostFocused = Application.Top.MostFocused;
 
         if (mostFocused == null)
         {
             return;
         }
 
-        mostFocused.PositionCursor ();
-        Out.SetCursorPosition (OutputBuffer.Col, OutputBuffer.Row);
-        Out.SetCursorVisibility (mostFocused.CursorVisibility);
+        Point? to = mostFocused.PositionCursor ();
+
+        if (to.HasValue)
+        {
+            // Translate to screen coordinates
+            to = mostFocused.ViewportToScreen (to.Value);
+
+            Out.SetCursorPosition (to.Value.X, to.Value.Y);
+            Out.SetCursorVisibility (mostFocused.CursorVisibility);
+        }
+        else
+        {
+            Out.SetCursorVisibility (CursorVisibility.Invisible);
+        }
     }
 
     private bool AnySubviewsNeedDrawn (View v)
