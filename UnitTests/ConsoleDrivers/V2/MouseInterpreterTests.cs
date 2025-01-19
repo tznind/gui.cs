@@ -5,21 +5,29 @@ public class MouseInterpreterTests
 {
     [Theory]
     [MemberData (nameof (SequenceTests))]
-    public void TestMouseEventSequences_InterpretedOnlyAsFlag (List<MouseEventArgs> events, MouseFlags expected)
+    public void TestMouseEventSequences_InterpretedOnlyAsFlag (List<MouseEventArgs> events, params MouseFlags?[] expected)
     {
         // Arrange: Mock dependencies and set up the interpreter
         var interpreter = new MouseInterpreter (null);
 
-        // Act and Assert: Process all but the last event and ensure they yield no results
-        for (int i = 0; i < events.Count - 1; i++)
+        // Act and Assert
+        for (int i = 0; i < events.Count; i++)
         {
-            var intermediateResult = interpreter.Process (events [i]).Single();
-            Assert.Equal (events [i].Flags,intermediateResult.Flags);
-        }
+            var results = interpreter.Process (events [i]).ToArray();
 
-        // Process the final event and verify the expected result
-        var finalResult = interpreter.Process (events [^1]).ToArray (); // ^1 is the last item in the list
-        Assert.Equal (expected, finalResult [1].Flags);
+            // Raw input event should be there
+            Assert.Equal (events [i].Flags, results [0].Flags);
+
+            // also any expected should be there
+            if (expected [i] != null)
+            {
+                Assert.Equal (expected [i], results [1].Flags);
+            }
+            else
+            {
+                Assert.Single (results);
+            }
+        }
     }
 
 
@@ -38,8 +46,38 @@ public class MouseInterpreterTests
                 // Then it wasn't
                 new()
             },
-            // Means click
+            // No extra then click
+            null,
             MouseFlags.Button1Clicked
+        };
+
+        yield return new object []
+        {
+            new List<MouseEventArgs> ()
+            {
+                // Mouse was down
+                new ()
+                {
+                    Flags = MouseFlags.Button1Pressed
+                },
+
+                // Then it wasn't
+                new(),
+
+                // Then it was again
+                new ()
+                {
+                    Flags = MouseFlags.Button1Pressed
+                },
+
+                // Then it wasn't
+                new()
+            },
+            // No extra then click, then into none/double click
+            null,
+            MouseFlags.Button1Clicked,
+            null,
+            MouseFlags.Button1DoubleClicked
         };
     }
 
