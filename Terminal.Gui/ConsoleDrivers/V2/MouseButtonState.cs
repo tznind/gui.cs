@@ -10,6 +10,7 @@ internal class MouseButtonStateEx
     private readonly TimeSpan _repeatClickThreshold;
     private readonly int _buttonIdx;
     private int _consecutiveClicks;
+    private Point _lastPosition = new Point ();
 
     /// <summary>
     ///     When the button entered its current state.
@@ -31,10 +32,11 @@ internal class MouseButtonStateEx
     public void UpdateState (MouseEventArgs e, out int? numClicks)
     {
         bool isPressedNow = IsPressed (_buttonIdx, e.Flags);
+        bool isSamePosition = _lastPosition == e.Position;
 
         TimeSpan elapsed = _now () - At;
 
-        if (elapsed > _repeatClickThreshold)
+        if (elapsed > _repeatClickThreshold || !isSamePosition)
         {
             // Expired
             OverwriteState (e);
@@ -70,6 +72,7 @@ internal class MouseButtonStateEx
     {
         Pressed = IsPressed (_buttonIdx, e.Flags);
         At = _now ();
+        _lastPosition = e.Position;
     }
 
     private bool IsPressed (int btn, MouseFlags eFlags)

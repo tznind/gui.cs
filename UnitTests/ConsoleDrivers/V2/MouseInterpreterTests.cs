@@ -35,49 +35,46 @@ public class MouseInterpreterTests
     {
         yield return new object []
         {
-            new List<MouseEventArgs> ()
+            new List<MouseEventArgs>
             {
-                // Mouse was down
-                new ()
-                {
-                    Flags = MouseFlags.Button1Pressed
-                },
-
-                // Then it wasn't
+                new() { Flags = MouseFlags.Button1Pressed },
                 new()
             },
-            // No extra then click
             null,
             MouseFlags.Button1Clicked
         };
 
         yield return new object []
         {
-            new List<MouseEventArgs> ()
+            new List<MouseEventArgs>
             {
-                // Mouse was down
-                new ()
-                {
-                    Flags = MouseFlags.Button1Pressed
-                },
-
-                // Then it wasn't
+                new() { Flags = MouseFlags.Button1Pressed },
                 new(),
-
-                // Then it was again
-                new ()
-                {
-                    Flags = MouseFlags.Button1Pressed
-                },
-
-                // Then it wasn't
+                new() { Flags = MouseFlags.Button1Pressed },
                 new()
             },
-            // No extra then click, then into none/double click
             null,
             MouseFlags.Button1Clicked,
             null,
             MouseFlags.Button1DoubleClicked
+        };
+
+
+        yield return new object []
+        {
+            new List<MouseEventArgs>
+            {
+                new() { Flags = MouseFlags.Button1Pressed ,Position = new Point (10,11)},
+                new(){Position = new Point (10,11)},
+
+                // Clicking the line below means no double click because it's a different location
+                new() { Flags = MouseFlags.Button1Pressed,Position = new Point (10,12) },
+                new(){Position = new Point (10,12)}
+            },
+            null,
+            MouseFlags.Button1Clicked,
+            null,
+            MouseFlags.Button1Clicked //release is click because new position
         };
     }
 
