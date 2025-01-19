@@ -10,10 +10,10 @@
     <Position X="6.5" Y="1.25" Height="0.291" Width="2.929" />
   </Comment>
   <Comment CommentText="Allows Views to work with new architecture without having to be rewritten.">
-    <Position X="8.604" Y="6.771" Height="0.75" Width="1.7" />
+    <Position X="4.666" Y="7.834" Height="0.75" Width="1.7" />
   </Comment>
   <Comment CommentText="Ansi Escape Sequence - Request / Response">
-    <Position X="19.458" Y="3.562" Height="0.396" Width="2.825" />
+    <Position X="19.208" Y="3.562" Height="0.396" Width="2.825" />
   </Comment>
   <Comment CommentText="Mouse interpretation subsystem">
     <Position X="13.271" Y="9.896" Height="0.396" Width="2.075" />
@@ -46,21 +46,41 @@
   <Class Name="Terminal.Gui.ConsoleInput&lt;T&gt;" Collapsed="true">
     <Position X="12.5" Y="2" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAACAEAQAAAAAAAQAgACAAAAAAAAAAAAAAAAo=</HashCode>
+      <HashCode>AAAAAAAAACAEAQAAAAAAAAAgACAAAAAAAAAAAAAAAAo=</HashCode>
       <FileName>ConsoleDrivers\V2\ConsoleInput.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.MainLoop&lt;T&gt;" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="11" Y="4.75" Width="1.5" />
-    <AssociationLine Name="Out" Type="Terminal.Gui.IConsoleOutput" ManuallyRouted="true">
+    <AssociationLine Name="TimedEvents" Type="Terminal.Gui.ITimedEvents" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="11.852" Y="5.312" />
-        <Point X="11.852" Y="7.146" />
-        <Point X="12.75" Y="7.146" />
-        <Point X="12.75" Y="7.596" />
-        <Point X="12.761" Y="7.596" Type="JumpStart" />
-        <Point X="12.927" Y="7.596" Type="JumpEnd" />
+        <Point X="11.312" Y="5.312" />
+        <Point X="11.312" Y="6.292" />
+        <Point X="10" Y="6.292" />
+        <Point X="10" Y="7.25" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-1.015" Y="1.019" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="OutputBuffer" Type="Terminal.Gui.IOutputBuffer" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="11.875" Y="5.312" />
+        <Point X="11.875" Y="5.687" />
+        <Point X="11.812" Y="5.687" />
+        <Point X="11.812" Y="7.25" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.027" Y="0.102" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="Out" Type="Terminal.Gui.IConsoleOutput" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="12.5" Y="5.125" />
+        <Point X="12.5" Y="5.792" />
+        <Point X="13.031" Y="5.792" />
+        <Point X="13.031" Y="7.596" />
         <Point X="14" Y="7.596" />
       </Path>
     </AssociationLine>
@@ -68,12 +88,8 @@
       <Path>
         <Point X="11.75" Y="4.75" />
         <Point X="11.75" Y="4.39" />
-        <Point X="13.667" Y="4.39" Type="JumpStart" />
-        <Point X="13.833" Y="4.39" Type="JumpEnd" />
-        <Point X="15.698" Y="4.39" Type="JumpStart" />
-        <Point X="15.865" Y="4.39" Type="JumpEnd" />
-        <Point X="20.625" Y="4.39" />
-        <Point X="20.625" Y="4.5" />
+        <Point X="20.375" Y="4.39" />
+        <Point X="20.375" Y="4.5" />
       </Path>
       <MemberNameLabel ManuallyPlaced="true">
         <Position X="0.11" Y="0.143" />
@@ -84,36 +100,31 @@
         <Point X="12.125" Y="5.312" />
         <Point X="12.125" Y="7" />
         <Point X="12.844" Y="7" />
-        <Point X="12.844" Y="14.531" />
-        <Point X="13.25" Y="14.531" />
+        <Point X="12.844" Y="13.281" />
+        <Point X="13.25" Y="13.281" />
       </Path>
       <MemberNameLabel ManuallyPlaced="true">
         <Position X="0.047" Y="-0.336" />
       </MemberNameLabel>
     </AssociationLine>
-    <AssociationLine Name="TimedEvents" Type="Terminal.Gui.ITimedEvents">
-      <MemberNameLabel ManuallyPlaced="true">
-        <Position X="-1.14" Y="0.123" />
-      </MemberNameLabel>
-    </AssociationLine>
     <TypeIdentifier>
-      <HashCode>QQQQAAAQACABIQQAAAAAAAAAACAAAAACAAAAAACAEAA=</HashCode>
+      <HashCode>QQQAAAAQACABJQQAABAAAAAAACAAAAACAAEAAACAEgg=</HashCode>
       <FileName>ConsoleDrivers\V2\MainLoop.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
+      <Property Name="TimedEvents" />
       <Property Name="InputProcessor" />
       <Property Name="OutputBuffer" />
       <Property Name="Out" />
       <Property Name="AnsiRequestScheduler" />
       <Property Name="WindowSizeMonitor" />
-      <Property Name="TimedEvents" />
     </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.MainLoopCoordinator&lt;T&gt;">
     <Position X="6.5" Y="2" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAIAEgCAIABAAAABQAAAAAABAQAAQAIQIABAAACgw=</HashCode>
+      <HashCode>IAAAIAEiCAIABAAAABQAAAAAABAAAQQAIQIABAAACgg=</HashCode>
       <FileName>ConsoleDrivers\V2\MainLoopCoordinator.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -122,7 +133,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.AnsiResponseParser&lt;T&gt;" Collapsed="true">
-    <Position X="19.75" Y="10" Width="2" />
+    <Position X="19.5" Y="10" Width="2" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAACIAAAAAAAAAAAAAgAABAAAAACBAAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\AnsiResponseParser.cs</FileName>
@@ -143,7 +154,7 @@
   <Class Name="Terminal.Gui.NetOutput" Collapsed="true">
     <Position X="14.75" Y="8.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AEAAAAAAACEAAAAAAAAAAAAAAQAAQAAAMACAAAEAAAE=</HashCode>
+      <HashCode>AEAAAAAAACAAAAAAAAAAAAAAAAAAQAAAMACAAAEAgAk=</HashCode>
       <FileName>ConsoleDrivers\V2\NetOutput.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -151,48 +162,48 @@
   <Class Name="Terminal.Gui.WindowsOutput" Collapsed="true">
     <Position X="13.25" Y="8.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AEAAABACACAAhAAAAAAAACAAAAgAQAAIMAAAAAEAAAQ=</HashCode>
+      <HashCode>AEAAABACACAAhAAAAAAAACCAAAgAQAAIMAAAAAEAgAQ=</HashCode>
       <FileName>ConsoleDrivers\V2\WindowsOutput.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.InputProcessor&lt;T&gt;" Collapsed="true">
-    <Position X="16.75" Y="4.75" Width="2" />
+    <Position X="16.5" Y="4.75" Width="2" />
     <AssociationLine Name="_mouseInterpreter" Type="Terminal.Gui.MouseInterpreter" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="18" Y="5.312" />
-        <Point X="18" Y="10.031" />
+        <Point X="17.75" Y="5.312" />
+        <Point X="17.75" Y="10.031" />
         <Point X="15.99" Y="10.031" />
         <Point X="15.99" Y="10.605" />
         <Point X="15" Y="10.605" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AQCkEAAAAASAiAAAAgggAAAABAIAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AQAkEAAAAASAiAAAAgwgAAAABAIAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\InputProcessor.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
+      <Field Name="_mouseInterpreter" />
       <Property Name="Parser" />
-      <Property Name="_mouseInterpreter" />
     </ShowAsAssociation>
     <Lollipop Position="0.1" />
   </Class>
   <Class Name="Terminal.Gui.NetInputProcessor" Collapsed="true">
-    <Position X="18" Y="5.75" Width="2" />
+    <Position X="17.75" Y="5.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAACAAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAEAAAAAAAAACBAAAgAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\NetInputProcessor.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Terminal.Gui.WindowsInputProcessor" Collapsed="true">
-    <Position X="16" Y="5.75" Width="2" />
+    <Position X="15.75" Y="5.75" Width="2" />
     <TypeIdentifier>
       <HashCode>AQAAAAAAAAAACAAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\WindowsInputProcessor.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Terminal.Gui.AnsiMouseParser">
-    <Position X="24.25" Y="9.5" Width="1.75" />
+    <Position X="24" Y="9.5" Width="1.75" />
     <TypeIdentifier>
       <HashCode>BAAAAAAAAAgAAAAAAAAAAAAAIAAAAAAAQAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\AnsiMouseParser.cs</FileName>
@@ -211,7 +222,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.AnsiRequestScheduler" Collapsed="true">
-    <Position X="19.75" Y="4.5" Width="2" />
+    <Position X="19.5" Y="4.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAQAACAAIAAAIAACAESQAAQAACGAAAAAAAAAAAAAQQA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\AnsiRequestScheduler.cs</FileName>
@@ -221,7 +232,7 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Terminal.Gui.AnsiResponseParserBase" Collapsed="true">
-    <Position X="20.5" Y="9" Width="2" />
+    <Position X="20.25" Y="9" Width="2" />
     <TypeIdentifier>
       <HashCode>UAiASAAAEICQALAAQAAAKAAAoAIAAABAAQIAJgAQASU=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\AnsiResponseParser.cs</FileName>
@@ -243,14 +254,14 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Terminal.Gui.MouseButtonStateEx">
-    <Position X="16.5" Y="11.75" Width="2" />
+    <Position X="16.5" Y="10.25" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAEwAIAAAAAAAAAAAABCAAAAAAAAABAAEAAg=</HashCode>
       <FileName>ConsoleDrivers\V2\MouseButtonState.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Terminal.Gui.StringHeld" Collapsed="true">
-    <Position X="22" Y="11" Width="1.5" />
+    <Position X="21.75" Y="11" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAIAACAAAAAAAIAAAAAAAACAAAAAAAgAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\StringHeld.cs</FileName>
@@ -258,7 +269,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.GenericHeld&lt;T&gt;" Collapsed="true">
-    <Position X="20.25" Y="11" Width="1.5" />
+    <Position X="20" Y="11" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAgAIAACAAAAAAAIAAAAAAAACAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\GenericHeld.cs</FileName>
@@ -266,21 +277,21 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.AnsiEscapeSequenceRequest">
-    <Position X="23.25" Y="4.5" Width="2.5" />
+    <Position X="23" Y="4.5" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAEAAAAAAAEAAAAACAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiEscapeSequenceRequest.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Terminal.Gui.AnsiEscapeSequence" Collapsed="true">
-    <Position X="23.25" Y="3.75" Width="2.5" />
+    <Position X="23" Y="3.75" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAgAAEAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiEscapeSequence.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Terminal.Gui.AnsiResponseParser" Collapsed="true">
-    <Position X="21.75" Y="10" Width="1.75" />
+    <Position X="21.5" Y="10" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAgACBAAAAACBAAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\AnsiResponseParser.cs</FileName>
@@ -307,7 +318,7 @@
   <Class Name="Terminal.Gui.ApplicationV2" Collapsed="true">
     <Position X="4.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>QAAAAAgABAEIAgAQAAAAAQAAAAAAgAEAAAAKgIAAEgI=</HashCode>
+      <HashCode>QAAAAAgABAEIBgAQAAAAAQAAAAAAgAEAAAAKgIAAAgI=</HashCode>
       <FileName>ConsoleDrivers\V2\ApplicationV2.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -332,7 +343,7 @@
   <Interface Name="Terminal.Gui.IMainLoop&lt;T&gt;" Collapsed="true">
     <Position X="9.25" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAQAAAAAAAABIQQAAAAAAAAAAAAAAAACAAAAAAAAEAA=</HashCode>
+      <HashCode>QAQAAAAAAAABIQQAAAAAAAAAAAAAAAACAAAAAAAAEAA=</HashCode>
       <FileName>ConsoleDrivers\V2\IMainLoop.cs</FileName>
     </TypeIdentifier>
   </Interface>
@@ -357,22 +368,15 @@
       <FileName>ConsoleDrivers\V2\IInputProcessor.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="Terminal.Gui.IViewFinder">
-    <Position X="16.75" Y="10.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>ConsoleDrivers\V2\IViewFinder.cs</FileName>
-    </TypeIdentifier>
-  </Interface>
   <Interface Name="Terminal.Gui.IHeld">
-    <Position X="24" Y="6.5" Width="1.5" />
+    <Position X="23.75" Y="6.5" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAIAACAAAAAAAIAAAAAAAACAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\IHeld.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Terminal.Gui.IAnsiResponseParser">
-    <Position X="20.5" Y="5.25" Width="2" />
+    <Position X="20.25" Y="5.25" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAQAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAJAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\IAnsiResponseParser.cs</FileName>
@@ -396,21 +400,24 @@
     </TypeIdentifier>
   </Interface>
   <Interface Name="Terminal.Gui.IWindowSizeMonitor" Collapsed="true">
-    <Position X="13.25" Y="14.25" Width="1.75" />
+    <Position X="13.25" Y="13" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAACAAAAAAAAAAAAAA=</HashCode>
-      <FileName>ConsoleDrivers\V2\IMainLoop.cs</FileName>
+      <FileName>ConsoleDrivers\V2\IWindowSizeMonitor.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="Terminal.Gui.ITimedEvents" Collapsed="true">
-    <Position X="14.5" Y="4.75" Width="1.5" />
+  <Interface Name="Terminal.Gui.ITimedEvents">
+    <Position X="9.25" Y="7.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
       <HashCode>BAAAIAAAAQAAAAAQACAAAIBAAQAAAAAAAAAIgAAAAAA=</HashCode>
       <FileName>Application\ITimedEvents.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Enum Name="Terminal.Gui.AnsiResponseParserState">
-    <Position X="20.5" Y="7.25" Width="2" />
+    <Position X="20.25" Y="7.25" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAEAAAAAAAAAAAAAAAAAAAAAIAAIAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\AnsiResponseParserState.cs</FileName>
