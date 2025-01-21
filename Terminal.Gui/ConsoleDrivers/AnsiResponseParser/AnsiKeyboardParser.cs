@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+﻿#nullable enable
 using System.Text.RegularExpressions;
 
 namespace Terminal.Gui;
@@ -9,6 +9,11 @@ namespace Terminal.Gui;
 /// </summary>
 public class AnsiKeyboardParser
 {
+    /*
+     * 11 to 24 are 
+     */
+    private readonly Regex _functionKey = new (@"^\u001b\[(\d+)~$");
+
     // Regex patterns for ANSI arrow keys (Up, Down, Left, Right)
     private readonly Regex _arrowKeyPattern = new (@"^\u001b\[(1;(\d+))?([A-D])$", RegexOptions.Compiled);
 
@@ -20,6 +25,15 @@ public class AnsiKeyboardParser
     /// <returns></returns>
     public Key ProcessKeyboardInput (string input)
     {
+        return
+            MapAsFunctionKey (input) ?? MapAsArrowKey (input);
+            
+    }
+
+    private Key? MapAsArrowKey (string input)
+    {
+
+
         // Match arrow key events
         Match match = _arrowKeyPattern.Match (input);
 
@@ -29,16 +43,16 @@ public class AnsiKeyboardParser
             string modifierGroup = match.Groups [2].Value;
             char direction = match.Groups [3].Value [0];
 
-            Key key = direction switch
-                   {
-                       'A' => Key.CursorUp,
-                       'B' => Key.CursorDown,
-                       'C' => Key.CursorRight,
-                       'D' => Key.CursorLeft,
-                       _ => default (Key)
-                   };
+            Key? key = direction switch
+                      {
+                          'A' => Key.CursorUp,
+                          'B' => Key.CursorDown,
+                          'C' => Key.CursorRight,
+                          'D' => Key.CursorLeft,
+                          _ => null
+                      };
 
-            if(key == null)
+            if (key is null)
             {
                 return null;
             }
@@ -53,13 +67,13 @@ public class AnsiKeyboardParser
             {
                 key = modifier switch
                       {
-                          2=>key.WithShift,
-                          3=>key.WithAlt,
-                          4=>key.WithAlt.WithShift,
-                          5=>key.WithCtrl,
-                          6=>key.WithCtrl.WithShift,
-                          7=>key.WithCtrl.WithAlt,
-                          8=>key.WithCtrl.WithAlt.WithShift
+                          2 => key.WithShift,
+                          3 => key.WithAlt,
+                          4 => key.WithAlt.WithShift,
+                          5 => key.WithCtrl,
+                          6 => key.WithCtrl.WithShift,
+                          7 => key.WithCtrl.WithAlt,
+                          8 => key.WithCtrl.WithAlt.WithShift
                       };
             }
 
@@ -67,6 +81,40 @@ public class AnsiKeyboardParser
         }
 
         // It's an unrecognized keyboard event
+        return null;
+
+    }
+
+    private Key? MapAsFunctionKey (string input)
+    {
+        // Match arrow key events
+        Match match = _functionKey.Match (input);
+
+        if (match.Success)
+        {
+            string functionDigit = match.Groups [1].Value;
+
+            int digit = int.Parse (functionDigit);
+
+            return digit switch
+                   {
+                       24 => Key.F12,
+                       23 => Key.F11,
+                       21 => Key.F10,
+                       20 => Key.F9,
+                       29 => Key.F8,
+                       18 => Key.F7,
+                       17 => Key.F6,
+                       15 => Key.F5,
+                       14 => Key.F4,
+                       13 => Key.F3,
+                       12 => Key.F2,
+                       11 => Key.F1,
+                       _ => null,
+                   };
+
+        }
+
         return null;
     }
 
@@ -76,5 +124,7 @@ public class AnsiKeyboardParser
     /// </summary>
     /// <param name="cur">escape code</param>
     /// <returns></returns>
-    public bool IsKeyboard (string cur) { return _arrowKeyPattern.IsMatch (cur); }
+    public bool IsKeyboard (string cur) {
+        return _functionKey.IsMatch (cur) || _arrowKeyPattern.IsMatch (cur);
+    }
 }
