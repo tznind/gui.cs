@@ -575,7 +575,7 @@ internal class WindowsDriver : ConsoleDriver
 
     public IEnumerable<WindowsConsole.InputRecord> ShouldReleaseParserHeldKeys ()
     {
-        if (_parser.State == AnsiResponseParserState.ExpectingBracket &&
+        if (_parser.State == AnsiResponseParserState.ExpectingEscapeSequence &&
             DateTime.Now - _parser.StateChangedAt > EscTimeout)
         {
             return _parser.Release ().Select (o => o.Item2);

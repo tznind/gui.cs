@@ -96,7 +96,7 @@ internal class NetEvents : IDisposable
 
     public IEnumerable<ConsoleKeyInfo> ShouldReleaseParserHeldKeys ()
     {
-        if (Parser.State == AnsiResponseParserState.ExpectingBracket &&
+        if (Parser.State == AnsiResponseParserState.ExpectingEscapeSequence &&
             DateTime.Now - Parser.StateChangedAt > ((NetDriver)_consoleDriver).EscTimeout)
         {
             return Parser.Release ().Select (o => o.Item2);

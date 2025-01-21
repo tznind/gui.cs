@@ -143,7 +143,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                     if (isEscape)
                     {
                         // Escape character detected, move to ExpectingBracket state
-                        State = AnsiResponseParserState.ExpectingBracket;
+                        State = AnsiResponseParserState.ExpectingEscapeSequence;
                         _heldContent.AddToHeld (currentObj); // Hold the escape character
                     }
                     else
@@ -154,16 +154,18 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
                     break;
 
-                case AnsiResponseParserState.ExpectingBracket:
+                case AnsiResponseParserState.ExpectingEscapeSequence:
                     if (isEscape)
                     {
                         // Second escape so we must release first
-                        ReleaseHeld (appendOutput, AnsiResponseParserState.ExpectingBracket);
+                        ReleaseHeld (appendOutput, AnsiResponseParserState.ExpectingEscapeSequence);
                         _heldContent.AddToHeld (currentObj); // Hold the new escape
                     }
-                    else if (currentChar == '[')
+                    else if (currentChar == '[' || currentChar == 'O')
                     {
-                        // Detected '[', transition to InResponse state
+                        //We need O for SS3 mode F1-F4 e.g. "<esc>OP" => F1
+
+                        // Detected '[' or 'O', transition to InResponse state
                         State = AnsiResponseParserState.InResponse;
                         _heldContent.AddToHeld (currentObj); // Hold the '['
                     }
@@ -306,7 +308,15 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
     private void RaiseKeyboardEvent (string cur)
     {
         Key? k = _keyboardParser.ProcessKeyboardInput (cur);
-        Keyboard?.Invoke (this, k);
+
+        if (k is null)
+        {
+            Logging.Logger.LogError ($"Failed to determine a Key for given Keyboard escape sequence '{cur}'");
+        }
+        else
+        {
+            Keyboard?.Invoke (this, k);
+        }
     }
 
     private bool IsKeyboard (string cur) { return _keyboardParser.IsKeyboard (cur); }

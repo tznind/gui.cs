@@ -10,7 +10,20 @@ namespace Terminal.Gui;
 public class AnsiKeyboardParser
 {
     /*
-     * 11 to 24 are 
+     *F1	\u001bOP
+       F2	\u001bOQ
+       F3	\u001bOR
+       F4	\u001bOS
+       F5 (sometimes)	\u001bOt
+       Left Arrow	\u001bOD
+       Right Arrow	\u001bOC
+       Up Arrow	\u001bOA
+       Down Arrow	\u001bOB
+     */
+    private readonly Regex _ss3Pattern = new (@"^\u001bO([PQRStDCAB])$");
+
+    /*
+     * F1 - F12
      */
     private readonly Regex _functionKey = new (@"^\u001b\[(\d+)~$");
 
@@ -23,17 +36,43 @@ public class AnsiKeyboardParser
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public Key ProcessKeyboardInput (string input)
+    public Key? ProcessKeyboardInput (string input)
     {
-        return
-            MapAsFunctionKey (input) ?? MapAsArrowKey (input);
-            
+        return MapAsSs3Key(input) ??
+            MapAsFunctionKey (input) ??
+            MapAsArrowKey (input);
+    }
+
+    private Key? MapAsSs3Key (string input)
+    {
+        // Match arrow key events
+        Match match = _ss3Pattern.Match (input);
+
+        if (match.Success)
+        {
+            char finalLetter = match.Groups [1].Value.Single();
+
+            return finalLetter switch
+                   {
+                       'P' => Key.F1,
+                       'Q' => Key.F2,
+                       'R' => Key.F3,
+                       'S' => Key.F4,
+                       't' => Key.F5,
+                       'D' => Key.CursorLeft,
+                       'C' => Key.CursorRight,
+                       'A' => Key.CursorUp,
+                       'B' => Key.CursorDown,
+
+                       _ => null
+                   };
+        }
+
+        return null;
     }
 
     private Key? MapAsArrowKey (string input)
     {
-
-
         // Match arrow key events
         Match match = _arrowKeyPattern.Match (input);
 
@@ -102,7 +141,7 @@ public class AnsiKeyboardParser
                        23 => Key.F11,
                        21 => Key.F10,
                        20 => Key.F9,
-                       29 => Key.F8,
+                       19 => Key.F8,
                        18 => Key.F7,
                        17 => Key.F6,
                        15 => Key.F5,
@@ -112,7 +151,6 @@ public class AnsiKeyboardParser
                        11 => Key.F1,
                        _ => null,
                    };
-
         }
 
         return null;
@@ -125,6 +163,6 @@ public class AnsiKeyboardParser
     /// <param name="cur">escape code</param>
     /// <returns></returns>
     public bool IsKeyboard (string cur) {
-        return _functionKey.IsMatch (cur) || _arrowKeyPattern.IsMatch (cur);
+        return _ss3Pattern.IsMatch(cur) || _functionKey.IsMatch (cur) || _arrowKeyPattern.IsMatch (cur);
     }
 }

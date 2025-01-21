@@ -153,7 +153,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
             null,
             new []
             {
-                new StepExpectation ('\u001b',AnsiResponseParserState.ExpectingBracket,string.Empty)
+                new StepExpectation ('\u001b',AnsiResponseParserState.ExpectingEscapeSequence,string.Empty)
             }
         ];
 
@@ -163,13 +163,13 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
             'c',
             new []
             {
-                new StepExpectation ('\u001b',AnsiResponseParserState.ExpectingBracket,string.Empty),
+                new StepExpectation ('\u001b',AnsiResponseParserState.ExpectingEscapeSequence,string.Empty),
                 new StepExpectation ('H',AnsiResponseParserState.Normal,"\u001bH"), // H is known terminator and not expected one so here we release both chars
-                new StepExpectation ('\u001b',AnsiResponseParserState.ExpectingBracket,string.Empty),
+                new StepExpectation ('\u001b',AnsiResponseParserState.ExpectingEscapeSequence,string.Empty),
                 new StepExpectation ('[',AnsiResponseParserState.InResponse,string.Empty),
                 new StepExpectation ('0',AnsiResponseParserState.InResponse,string.Empty),
                 new StepExpectation ('c',AnsiResponseParserState.Normal,string.Empty,"\u001b[0c"), // c is expected terminator so here we swallow input and populate expected response
-                new StepExpectation ('\u001b',AnsiResponseParserState.ExpectingBracket,string.Empty),
+                new StepExpectation ('\u001b',AnsiResponseParserState.ExpectingEscapeSequence,string.Empty),
             }
         ];
     }
@@ -260,8 +260,8 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         AssertConsumed (input,ref i);
 
         // We should know when the state changed
-        Assert.Equal (AnsiResponseParserState.ExpectingBracket, _parser1.State);
-        Assert.Equal (AnsiResponseParserState.ExpectingBracket, _parser2.State);
+        Assert.Equal (AnsiResponseParserState.ExpectingEscapeSequence, _parser1.State);
+        Assert.Equal (AnsiResponseParserState.ExpectingEscapeSequence, _parser2.State);
 
         Assert.Equal (DateTime.Now.Date, _parser1.StateChangedAt.Date);
         Assert.Equal (DateTime.Now.Date, _parser2.StateChangedAt.Date);
@@ -299,8 +299,8 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
 
         // First Esc gets grabbed
         AssertConsumed (input, ref i); // Esc
-        Assert.Equal (AnsiResponseParserState.ExpectingBracket,_parser1.State);
-        Assert.Equal (AnsiResponseParserState.ExpectingBracket, _parser2.State);
+        Assert.Equal (AnsiResponseParserState.ExpectingEscapeSequence,_parser1.State);
+        Assert.Equal (AnsiResponseParserState.ExpectingEscapeSequence, _parser2.State);
 
         // Because next char is 'f' we do not see a bracket so release both
         AssertReleased (input, ref i, "\u001bf", 0,1); // f
@@ -546,6 +546,117 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
 
         Assert.Equal (Key.CursorLeft,keys [0]);
         Assert.Equal (Key.CursorUp.WithShift, keys [1]);
+    }
+
+    public static IEnumerable<object []> ParserDetects_FunctionKeys_Cases ()
+    {
+        // These are VT100 escape codes for F1-4
+        yield return
+        [
+            "\u001bOP",
+            Key.F1
+        ];
+
+        yield return
+        [
+            "\u001bOQ",
+            Key.F2
+        ];
+
+        yield return
+        [
+            "\u001bOR",
+            Key.F3
+        ];
+
+        yield return
+        [
+            "\u001bOS",
+            Key.F4
+        ];
+
+
+        // These are also F keys
+        yield return [
+                         "\u001b[11~",
+                         Key.F1
+                     ];
+
+        yield return [
+                         "\u001b[12~",
+                         Key.F2
+                     ];
+
+        yield return [
+                         "\u001b[13~",
+                         Key.F3
+                     ];
+
+        yield return [
+                         "\u001b[14~",
+                         Key.F4
+                     ];
+
+        yield return [
+                         "\u001b[15~",
+                         Key.F5
+                     ];
+
+        yield return [
+                         "\u001b[17~",
+                         Key.F6
+                     ];
+
+        yield return [
+                         "\u001b[18~",
+                         Key.F7
+                     ];
+
+        yield return [
+                         "\u001b[19~",
+                         Key.F8
+                     ];
+
+        yield return [
+                         "\u001b[20~",
+                         Key.F9
+                     ];
+
+        yield return [
+                         "\u001b[21~",
+                         Key.F10
+                     ];
+
+        yield return [
+                         "\u001b[23~",
+                         Key.F11
+                     ];
+
+        yield return [
+                         "\u001b[24~",
+                         Key.F12
+                     ];
+    }
+
+    [MemberData (nameof (ParserDetects_FunctionKeys_Cases))]
+
+    [Theory]
+    public void ParserDetects_FunctionKeys (string input, Key expectedKey)
+    {
+        var parser = new AnsiResponseParser ();
+
+        parser.HandleKeyboard = true;
+        List<Key> keys = new ();
+
+        parser.Keyboard += (s, e) => keys.Add (e);
+
+        foreach (var ch in input.ToCharArray ())
+        {
+            parser.ProcessInput (new (ch,1));
+        }
+        var k = Assert.Single (keys);
+
+        Assert.Equal (k,expectedKey);
     }
 
     private Tuple<char, int> [] StringToBatch (string batch)
