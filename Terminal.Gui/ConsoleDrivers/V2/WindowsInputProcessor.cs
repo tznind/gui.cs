@@ -134,6 +134,22 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
                     }
         };
 
+        if (e.EventFlags == WindowsConsole.EventFlags.MouseWheeled)
+        {
+            switch ((int)e.ButtonState)
+            {
+                case int v when v > 0:
+                    result.Flags = MouseFlags.WheeledUp;
+
+                    break;
+
+                case int v when v < 0:
+                    result.Flags = MouseFlags.WheeledDown;
+
+                    break;
+            }
+        }
+
         // TODO: Return keys too
 
         return result;
