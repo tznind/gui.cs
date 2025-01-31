@@ -52,6 +52,13 @@ public class ApplicationV2 : ApplicationImpl
     [RequiresDynamicCode ("AOT")]
     public override void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
+
+        if (Application.Initialized)
+        {
+            Logging.Logger.LogError ("Init called multiple times without shutdown, ignoring.");
+            return;
+        }
+
         if (!string.IsNullOrWhiteSpace (driverName))
         {
             _driverName = driverName;
@@ -67,6 +74,7 @@ public class ApplicationV2 : ApplicationImpl
 
         Application.Initialized = true;
 
+        Application.OnInitializedChanged (this, new (true));
         Application.SubscribeDriverEvents ();
     }
 
