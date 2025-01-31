@@ -102,19 +102,7 @@ public static partial class Application // Initialization (Init/Shutdown)
 
         AddKeyBindings ();
 
-        // Start the process of configuration management.
-        // Note that we end up calling LoadConfigurationFromAllSources
-        // multiple times. We need to do this because some settings are only
-        // valid after a Driver is loaded. In this case we need just
-        // `Settings` so we can determine which driver to use.
-        // Don't reset, so we can inherit the theme from the previous run.
-        string previousTheme = Themes?.Theme ?? string.Empty;
-        Load ();
-        if (Themes is { } && !string.IsNullOrEmpty (previousTheme) && previousTheme != "Default")
-        {
-            ThemeManager.SelectedTheme = previousTheme;
-        }
-        Apply ();
+        InitializeConfigurationManagement ();
 
         // Ignore Configuration for ForceDriver if driverName is specified
         if (!string.IsNullOrEmpty (driverName))
@@ -177,6 +165,23 @@ public static partial class Application // Initialization (Init/Shutdown)
         MainThreadId = Thread.CurrentThread.ManagedThreadId;
         bool init = Initialized = true;
         InitializedChanged?.Invoke (null, new (init));
+    }
+
+    internal static void InitializeConfigurationManagement ()
+    {
+        // Start the process of configuration management.
+        // Note that we end up calling LoadConfigurationFromAllSources
+        // multiple times. We need to do this because some settings are only
+        // valid after a Driver is loaded. In this case we need just
+        // `Settings` so we can determine which driver to use.
+        // Don't reset, so we can inherit the theme from the previous run.
+        string previousTheme = Themes?.Theme ?? string.Empty;
+        Load ();
+        if (Themes is { } && !string.IsNullOrEmpty (previousTheme) && previousTheme != "Default")
+        {
+            ThemeManager.SelectedTheme = previousTheme;
+        }
+        Apply ();
     }
 
     internal static void SubscribeDriverEvents ()

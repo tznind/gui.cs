@@ -72,11 +72,14 @@ public class ApplicationV2 : ApplicationImpl
         // making it use custom driver in future shutdown/init calls where no driver is specified
         CreateDriver (driverName ?? _driverName);
 
+        Application.InitializeConfigurationManagement ();
+
         Application.Initialized = true;
 
         Application.OnInitializedChanged (this, new (true));
         Application.SubscribeDriverEvents ();
     }
+
 
     private void CreateDriver (string? driverName)
     {
