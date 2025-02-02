@@ -113,6 +113,8 @@ public class MainLoop<T> : IMainLoop<T>
     {
         InputProcessor.ProcessQueue ();
 
+        HackLayoutDrawIfTopChanged ();
+
         if (Application.Top != null)
         {
             bool needsDrawOrLayout = AnySubviewsNeedDrawn (Application.Top);
@@ -140,6 +142,21 @@ public class MainLoop<T> : IMainLoop<T>
         TimedEvents.LockAndRunIdles ();
 
         Logging.IterationInvokesAndTimeouts.Record (swCallbacks.Elapsed.Milliseconds);
+    }
+
+    private View? _lastTop;
+    private void HackLayoutDrawIfTopChanged ()
+    {
+        // TODO: This fixes closing a modal not making its host (below) refresh
+        //       until you click.  This should not be the job of the main loop!
+        var newTop = Application.Top;
+        if (_lastTop != null && _lastTop != newTop && newTop != null)
+        {
+            newTop.SetNeedsDraw();
+            newTop.SetNeedsLayout ();
+        }
+        
+        _lastTop = Application.Top;
     }
 
     private void SetCursor ()
