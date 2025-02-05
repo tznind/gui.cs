@@ -108,7 +108,7 @@
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>QQQAAAAQACABJQQAABAAAAAAACAAAAACAAEAAACAEgg=</HashCode>
+      <HashCode>QQQAAAAQACABJQQAABAAAAAAACIAAAACIAEAAACAEgg=</HashCode>
       <FileName>ConsoleDrivers\V2\MainLoop.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -169,7 +169,7 @@
   </Class>
   <Class Name="Terminal.Gui.InputProcessor&lt;T&gt;" Collapsed="true">
     <Position X="16.5" Y="4.75" Width="2" />
-    <AssociationLine Name="_mouseInterpreter" Type="Terminal.Gui.MouseInterpreter" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+    <AssociationLine Name="_mouseInterpreter" Type="Terminal.Gui.MouseInterpreter" ManuallyRouted="true">
       <Path>
         <Point X="17.75" Y="5.312" />
         <Point X="17.75" Y="10.031" />
@@ -179,19 +179,20 @@
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AQAkEAAAAASAiAAAAgwgAAAABAIAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AQAkEAAAAASAiAAEAgwgAAAABAIAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\InputProcessor.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Field Name="_mouseInterpreter" />
       <Property Name="Parser" />
+      <Property Name="KeyConverter" />
     </ShowAsAssociation>
     <Lollipop Position="0.1" />
   </Class>
   <Class Name="Terminal.Gui.NetInputProcessor" Collapsed="true">
     <Position X="17.75" Y="5.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAEAAAAAAAAACBAAAgAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAACBAAAgAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\NetInputProcessor.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -203,7 +204,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Terminal.Gui.AnsiMouseParser">
-    <Position X="24" Y="9.5" Width="1.75" />
+    <Position X="23.5" Y="9.5" Width="1.75" />
     <TypeIdentifier>
       <HashCode>BAAAAAAAAAgAAAAAAAAAAAAAIAAAAAAAQAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\AnsiMouseParser.cs</FileName>
@@ -240,6 +241,7 @@
     <ShowAsAssociation>
       <Field Name="_mouseParser" />
       <Field Name="_heldContent" />
+      <Field Name="_keyboardParser" />
     </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
@@ -256,12 +258,12 @@
   <Class Name="Terminal.Gui.MouseButtonStateEx">
     <Position X="16.5" Y="10.25" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAEwAIAAAAAAAAAAAABCAAAAAAAAABAAEAAg=</HashCode>
+      <HashCode>AAAAAAAAAMwAIAAAAAAAAAAAABCAAAAAAAAABAAEAAg=</HashCode>
       <FileName>ConsoleDrivers\V2\MouseButtonState.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Terminal.Gui.StringHeld" Collapsed="true">
-    <Position X="21.75" Y="11" Width="1.75" />
+    <Position X="21.5" Y="11" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAIAACAAAAAAAIAAAAAAAACAAAAAAAgAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\StringHeld.cs</FileName>
@@ -269,7 +271,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.GenericHeld&lt;T&gt;" Collapsed="true">
-    <Position X="20" Y="11" Width="1.75" />
+    <Position X="19.75" Y="11" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAgAIAACAAAAAAAIAAAAAAAACAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\GenericHeld.cs</FileName>
@@ -300,7 +302,7 @@
   <Class Name="Terminal.Gui.Application" Collapsed="true">
     <Position X="0.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>hEK4FAgAqARIspQeBwoUgTGgACNL0AIAESJKoggBSw8=</HashCode>
+      <HashCode>hEK4FAgAqARIspQeBwoUgTGgACNL0AIAESLKoggBSw8=</HashCode>
       <FileName>Application\Application.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -332,6 +334,29 @@
       <FileName>View\View.Adornments.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.WindowsKeyConverter" Collapsed="true">
+    <Position X="16" Y="7.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\WindowsKeyConverter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.NetKeyConverter" Collapsed="true">
+    <Position X="17.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\NetKeyConverter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.AnsiKeyboardParser">
+    <Position X="25.5" Y="9.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQEAAAAAAAAAAAAAAAAAAAQgAAAAAAABCAAAAAE=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\AnsiKeyboardParser.cs</FileName>
+    </TypeIdentifier>
   </Class>
   <Interface Name="Terminal.Gui.IConsoleInput&lt;T&gt;" Collapsed="true">
     <Position X="12.5" Y="1" Width="1.5" />
@@ -416,10 +441,17 @@
       <FileName>Application\ITimedEvents.cs</FileName>
     </TypeIdentifier>
   </Interface>
+  <Interface Name="Terminal.Gui.IKeyConverter&lt;T&gt;" Collapsed="true">
+    <Position X="17" Y="6.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\IKeyConverter.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
   <Enum Name="Terminal.Gui.AnsiResponseParserState">
     <Position X="20.25" Y="7.25" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAEAAAAAAAAAAAAAAAAAAAAAIAAIAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAACAAAAAAIAAIAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\AnsiResponseParserState.cs</FileName>
     </TypeIdentifier>
   </Enum>
