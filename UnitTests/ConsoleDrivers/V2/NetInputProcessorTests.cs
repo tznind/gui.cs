@@ -55,8 +55,10 @@ public class NetInputProcessorTests
     [MemberData (nameof (GetConsoleKeyInfoToKeyTestCases_Rune))]
     public void ConsoleKeyInfoToKey_ValidInput_AsRune (ConsoleKeyInfo input, Rune expected)
     {
+        var converter = new NetKeyConverter ();
+
         // Act
-        var result = NetInputProcessor.ConsoleKeyInfoToKey (input);
+        var result = converter.ToKey (input);
 
         // Assert
         Assert.Equal (expected, result.AsRune);
@@ -80,8 +82,9 @@ public class NetInputProcessorTests
     [MemberData (nameof (GetConsoleKeyInfoToKeyTestCases_Key))]
     public void ConsoleKeyInfoToKey_ValidInput_AsKey (ConsoleKeyInfo input, Key expected)
     {
+        var converter = new NetKeyConverter ();
         // Act
-        var result = NetInputProcessor.ConsoleKeyInfoToKey (input);
+        var result = converter.ToKey (input);
 
         // Assert
         Assert.Equal (expected, result);

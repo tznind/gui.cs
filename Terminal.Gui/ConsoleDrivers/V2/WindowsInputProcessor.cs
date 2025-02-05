@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
-using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 using static Terminal.Gui.WindowsConsole;
 
 namespace Terminal.Gui;
@@ -13,7 +12,7 @@ using InputRecord = InputRecord;
 internal class WindowsInputProcessor : InputProcessor<InputRecord>
 {
     /// <inheritdoc/>
-    public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer) : base (inputBuffer) { }
+    public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer) : base (inputBuffer, new WindowsKeyConverter()) { }
 
     /// <inheritdoc/>
     protected override void Process (InputRecord inputEvent)
@@ -69,38 +68,13 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
     /// <inheritdoc/>
     protected override void ProcessAfterParsing (InputRecord input)
     {
-        // TODO: This should be in a shared helper method not calling statics in WindowsDriver
-        if(InputRecordToKey (input, out var key))
+        var key = KeyConverter.ToKey (input);
+
+        if(key != (Key)0)
         {
             OnKeyDown (key!);
             OnKeyUp (key!);
         }
-    }
-
-    private bool InputRecordToKey (InputRecord inputEvent, out Key? key)
-    {
-        if (inputEvent.KeyEvent.wVirtualKeyCode == (VK)ConsoleKey.Packet)
-        {
-            // Used to pass Unicode characters as if they were keystrokes.
-            // The VK_PACKET key is the low word of a 32-bit
-            // Virtual Key value used for non-keyboard input methods.
-            inputEvent.KeyEvent = WindowsDriver.FromVKPacketToKeyEventRecord (inputEvent.KeyEvent);
-        }
-
-        WindowsConsole.ConsoleKeyInfoEx keyInfo = WindowsDriver.ToConsoleKeyInfoEx (inputEvent.KeyEvent);
-
-        //Debug.WriteLine ($"event: KBD: {GetKeyboardLayoutName()} {inputEvent.ToString ()} {keyInfo.ToString (keyInfo)}");
-
-        KeyCode map = WindowsDriver.MapKey (keyInfo);
-
-        if (map == KeyCode.Null)
-        {
-            key = null;
-            return false;
-        }
-
-        key = new Key (map);
-        return true;
     }
 
     private MouseEventArgs ToDriverMouse (MouseEventRecord e)

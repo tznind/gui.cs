@@ -19,7 +19,7 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
     #pragma warning enable CA2211
 
     /// <inheritdoc/>
-    public NetInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer) : base (inputBuffer) { }
+    public NetInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer) : base (inputBuffer, new NetKeyConverter()) { }
 
     /// <inheritdoc/>
     protected override void Process (ConsoleKeyInfo consoleKeyInfo)
@@ -39,30 +39,11 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
             Logging.Logger.LogTrace (FormatConsoleKeyInfoForTestCase (input));
         }
 
-        Key key = ConsoleKeyInfoToKey (input);
+        Key key = KeyConverter.ToKey (input);
         OnKeyDown (key);
         OnKeyUp (key);
     }
 
-    /// <summary>
-    /// Converts terminal raw input class <see cref="ConsoleKeyInfo"/> into
-    /// common Terminal.Gui event model for keypresses (<see cref="Key"/>)
-    /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
-    public static Key ConsoleKeyInfoToKey (ConsoleKeyInfo input)
-    {
-        ConsoleKeyInfo adjustedInput = EscSeqUtils.MapConsoleKeyInfo (input);
-
-        // TODO : EscSeqUtils.MapConsoleKeyInfo is wrong for e.g. '{' - it winds up clearing the Key
-        //        So if the method nuked it then we should just work with the original.
-        if (adjustedInput.Key == ConsoleKey.None && input.Key != ConsoleKey.None)
-        {
-            return EscSeqUtils.MapKey (input);
-        }
-
-        return EscSeqUtils.MapKey (adjustedInput);
-    }
 
     /* For building test cases */
     private static string FormatConsoleKeyInfoForTestCase (ConsoleKeyInfo input)

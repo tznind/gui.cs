@@ -18,6 +18,8 @@ public abstract class InputProcessor<T> : IInputProcessor
 
     internal AnsiResponseParser<T> Parser { get; } = new ();
 
+    public IKeyConverter<T> KeyConverter { get; }
+
     /// <summary>
     /// Input buffer which will be drained from by this class.
     /// </summary>
@@ -76,7 +78,7 @@ public abstract class InputProcessor<T> : IInputProcessor
     /// the provided thread safe input collection.
     /// </summary>
     /// <param name="inputBuffer"></param>
-    protected InputProcessor (ConcurrentQueue<T> inputBuffer)
+    protected InputProcessor (ConcurrentQueue<T> inputBuffer, IKeyConverter<T> keyConverter)
     {
         InputBuffer = inputBuffer;
         Parser.HandleMouse = true;
@@ -93,9 +95,10 @@ public abstract class InputProcessor<T> : IInputProcessor
         // TODO: For now handle all other escape codes with ignore
         Parser.UnexpectedResponseHandler = str =>
                                            {
-                                               Logging.Logger.LogInformation ($"{nameof(InputProcessor<T>)} ignored unrecognized response '{new string(str.Select (k=>k.Item1).ToArray ())}'");
+                                               Logging.Logger.LogInformation ($"{nameof (InputProcessor<T>)} ignored unrecognized response '{new string (str.Select (k => k.Item1).ToArray ())}'");
                                                return true;
                                            };
+        KeyConverter = keyConverter;
     }
 
     /// <summary>
