@@ -153,7 +153,6 @@ public class MainLoop<T> : IMainLoop<T>
         if (_lastTop != null && _lastTop != newTop && newTop != null)
         {
             newTop.SetNeedsDraw();
-            newTop.SetNeedsLayout ();
         }
         
         _lastTop = Application.Top;
