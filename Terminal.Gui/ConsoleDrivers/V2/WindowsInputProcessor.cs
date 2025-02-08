@@ -85,12 +85,12 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
 
             Flags = e.ButtonState switch
                     {
-                        ButtonState.NoButtonPressed => MouseFlags.None,
-                        ButtonState.Button1Pressed => MouseFlags.Button1Pressed,
-                        ButtonState.Button2Pressed => MouseFlags.Button2Pressed,
-                        ButtonState.Button3Pressed => MouseFlags.Button3Pressed,
-                        ButtonState.Button4Pressed => MouseFlags.Button4Pressed,
-                        ButtonState.RightmostButtonPressed => MouseFlags.Button3Pressed,
+                        ButtonState.NoButtonPressed => MouseFlags.ReportMousePosition,
+                        ButtonState.Button1Pressed => MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition,
+                        ButtonState.Button2Pressed => MouseFlags.Button2Pressed | MouseFlags.ReportMousePosition,
+                        ButtonState.Button3Pressed => MouseFlags.Button3Pressed | MouseFlags.ReportMousePosition,
+                        ButtonState.Button4Pressed => MouseFlags.Button4Pressed | MouseFlags.ReportMousePosition,
+                        ButtonState.RightmostButtonPressed => MouseFlags.Button3Pressed | MouseFlags.ReportMousePosition,
                         _=> MouseFlags.None
                     }
         };

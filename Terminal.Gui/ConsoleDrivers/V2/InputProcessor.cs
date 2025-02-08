@@ -67,6 +67,7 @@ public abstract class InputProcessor<T> : IInputProcessor
 
         foreach (var e in _mouseInterpreter.Process (a))
         {
+            Logging.Logger.LogTrace ($"Mouse Interpreter raising {e.Flags}");
             // Pass on
             MouseEvent?.Invoke (this, e);
         }
