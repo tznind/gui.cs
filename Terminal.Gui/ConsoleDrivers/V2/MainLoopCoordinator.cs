@@ -122,6 +122,15 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
 
             throw;
         }
+
+        if (_stopCalled)
+        {
+            Logging.Logger.LogInformation ("Input loop exited cleanly");
+        }
+        else
+        {
+            Logging.Logger.LogCritical ("Input loop exited early (stop not called)");
+        }
     }
 
     /// <inheritdoc/>
