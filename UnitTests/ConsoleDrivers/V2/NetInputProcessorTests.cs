@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Concurrent;
+using System.Text;
 
 namespace UnitTests.ConsoleDrivers.V2;
 public class NetInputProcessorTests
@@ -88,5 +89,32 @@ public class NetInputProcessorTests
 
         // Assert
         Assert.Equal (expected, result);
+    }
+
+    [Fact]
+    public void Test_ProcessQueue_CapitalHLowerE ()
+    {
+        var queue = new ConcurrentQueue<ConsoleKeyInfo> ();
+
+        queue.Enqueue (new ConsoleKeyInfo ('H', ConsoleKey.None, true, false, false));
+        queue.Enqueue (new ConsoleKeyInfo ('e', ConsoleKey.None, false, false, false));
+
+        var processor = new NetInputProcessor (queue);
+
+        List<Key> ups = new List<Key> ();
+        List<Key> downs = new List<Key> ();
+
+        processor.KeyUp += (s, e) => { ups.Add (e); };
+        processor.KeyDown += (s, e) => { downs.Add (e); };
+
+        Assert.Empty (ups);
+        Assert.Empty (downs);
+
+        processor.ProcessQueue ();
+
+        Assert.Equal (Key.H.WithShift, ups [0]);
+        Assert.Equal (Key.H.WithShift, downs [0]);
+        Assert.Equal (Key.E, ups [1]);
+        Assert.Equal (Key.E, downs [1]);
     }
 }
