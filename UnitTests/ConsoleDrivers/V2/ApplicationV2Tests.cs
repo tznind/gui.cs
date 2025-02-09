@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace UnitTests.ConsoleDrivers.V2;
@@ -197,6 +198,40 @@ public class ApplicationV2Tests
 
 
     [Fact]
+    public void Test_InitRunShutdown_Generic ()
+    {
+        var orig = ApplicationImpl.Instance;
+
+        var v2 = NewApplicationV2 ();
+        ApplicationImpl.ChangeInstance (v2);
+
+        v2.Init ();
+
+        v2.AddTimeout (TimeSpan.FromMilliseconds (150),
+                       () =>
+                       {
+                           if (Application.Top != null)
+                           {
+                               Application.RequestStop ();
+                               return true;
+                           }
+
+                           return true;
+                       }
+                      );
+        Assert.Null (Application.Top);
+
+        // Blocks until the timeout call is hit
+
+        v2.Run<Window> ();
+
+        Assert.Null (Application.Top);
+        v2.Shutdown ();
+
+        ApplicationImpl.ChangeInstance (orig);
+    }
+
+    [Fact]
     public void TestRepeatedShutdownCalls_DoNotDuplicateDisposeOutput ()
     {
         var netInput = new Mock<INetInput> ();
@@ -216,6 +251,36 @@ public class ApplicationV2Tests
         v2.Shutdown ();
         v2.Shutdown ();
         outputMock.Verify(o=>o.Dispose (),Times.Once);
+    }
+    [Fact]
+    public void TestRepeatedInitCalls_WarnsAndIgnores ()
+    {
+        var v2 = NewApplicationV2 ();
+
+        Assert.Null (Application.Driver);
+        v2.Init ();
+        Assert.NotNull (Application.Driver);
+
+        var mockLogger = new Mock<ILogger> ();
+
+        var beforeLogger = Logging.Logger;
+        Logging.Logger = mockLogger.Object;
+
+        v2.Init ();
+        v2.Init ();
+
+        mockLogger.Verify(
+                          l=>l.Log (LogLevel.Error,
+                                    It.IsAny<EventId> (),
+                                    It.Is<It.IsAnyType> ((v, t) => v.ToString () == "Init called multiple times without shutdown, ignoring."),
+                                    It.IsAny<Exception> (),
+                                    It.IsAny<Func<It.IsAnyType, Exception, string>> ())
+                          ,Times.Exactly (2));
+
+        v2.Shutdown ();
+
+        // Restore the original null logger to be polite to other tests
+        Logging.Logger = beforeLogger;
     }
 
 }
