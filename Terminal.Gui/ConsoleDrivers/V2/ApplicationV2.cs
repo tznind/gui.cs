@@ -221,6 +221,16 @@ public class ApplicationV2 : ApplicationImpl
     /// <inheritdoc/>
     public override void AddIdle (Func<bool> func) { _timedEvents.AddIdle (func); }
 
+    /// <summary>
+    /// Removes an idle function added by <see cref="AddIdle"/>
+    /// </summary>
+    /// <param name="fnTrue">Function to remove</param>
+    /// <returns>True if it was found and removed</returns>
+    public bool RemoveIdle (Func<bool> fnTrue)
+    {
+        return _timedEvents.RemoveIdle (fnTrue);
+    }
+
     /// <inheritdoc/>
     public override object AddTimeout (TimeSpan time, Func<bool> callback) { return _timedEvents.AddTimeout (time, callback); }
 

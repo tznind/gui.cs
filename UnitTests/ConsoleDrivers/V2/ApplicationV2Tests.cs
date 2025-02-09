@@ -172,7 +172,7 @@ public class ApplicationV2Tests
 
         v2.Init ();
 
-        v2.AddTimeout (TimeSpan.FromMilliseconds (150),
+        var timeoutToken = v2.AddTimeout (TimeSpan.FromMilliseconds (150),
                        () =>
                        {
                            if (Application.Top != null)
@@ -190,6 +190,8 @@ public class ApplicationV2Tests
 
         v2.Run (new Window ());
 
+        Assert.True(v2.RemoveTimeout (timeoutToken));
+
         Assert.Null (Application.Top);
         v2.Shutdown ();
 
@@ -198,7 +200,7 @@ public class ApplicationV2Tests
 
 
     [Fact]
-    public void Test_InitRunShutdown_Generic ()
+    public void Test_InitRunShutdown_Generic_IdleForExit ()
     {
         var orig = ApplicationImpl.Instance;
 
@@ -207,18 +209,7 @@ public class ApplicationV2Tests
 
         v2.Init ();
 
-        v2.AddTimeout (TimeSpan.FromMilliseconds (150),
-                       () =>
-                       {
-                           if (Application.Top != null)
-                           {
-                               Application.RequestStop ();
-                               return true;
-                           }
-
-                           return true;
-                       }
-                      );
+        v2.AddIdle (IdleExit);
         Assert.Null (Application.Top);
 
         // Blocks until the timeout call is hit
@@ -229,6 +220,16 @@ public class ApplicationV2Tests
         v2.Shutdown ();
 
         ApplicationImpl.ChangeInstance (orig);
+    }
+    private bool IdleExit ()
+    {
+        if (Application.Top != null)
+        {
+            Application.RequestStop ();
+            return true;
+        }
+
+        return true;
     }
 
     [Fact]
