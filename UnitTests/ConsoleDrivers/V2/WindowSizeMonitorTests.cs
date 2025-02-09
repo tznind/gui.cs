@@ -34,7 +34,7 @@ public class WindowSizeMonitorTests
 
         Assert.Equal (2,result.Count);
         Assert.Equal (new Size (30, 20), result [0].Size);
-        Assert.Equal (new Size (20, 20), result [0].Size);
+        Assert.Equal (new Size (20, 20), result [1].Size);
     }
 
     [Fact]
