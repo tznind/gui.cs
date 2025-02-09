@@ -30,7 +30,6 @@ public class MouseInterpreterTests
         }
     }
 
-
     public static IEnumerable<object []> SequenceTests ()
     {
         yield return new object []
@@ -59,6 +58,81 @@ public class MouseInterpreterTests
             MouseFlags.Button1DoubleClicked
         };
 
+        yield return new object []
+        {
+            new List<MouseEventArgs>
+            {
+                new() { Flags = MouseFlags.Button1Pressed },
+                new(),
+                new() { Flags = MouseFlags.Button1Pressed },
+                new(),
+                new() { Flags = MouseFlags.Button1Pressed },
+                new()
+            },
+            null,
+            MouseFlags.Button1Clicked,
+            null,
+            MouseFlags.Button1DoubleClicked,
+            null,
+            MouseFlags.Button1TripleClicked
+        };
+
+        yield return new object []
+        {
+            new List<MouseEventArgs>
+            {
+                new() { Flags = MouseFlags.Button2Pressed },
+                new(),
+                new() { Flags = MouseFlags.Button2Pressed },
+                new(),
+                new() { Flags = MouseFlags.Button2Pressed },
+                new()
+            },
+            null,
+            MouseFlags.Button2Clicked,
+            null,
+            MouseFlags.Button2DoubleClicked,
+            null,
+            MouseFlags.Button2TripleClicked
+        };
+
+        yield return new object []
+        {
+            new List<MouseEventArgs>
+            {
+                new() { Flags = MouseFlags.Button3Pressed },
+                new(),
+                new() { Flags = MouseFlags.Button3Pressed },
+                new(),
+                new() { Flags = MouseFlags.Button3Pressed },
+                new()
+            },
+            null,
+            MouseFlags.Button3Clicked,
+            null,
+            MouseFlags.Button3DoubleClicked,
+            null,
+            MouseFlags.Button3TripleClicked
+        };
+
+        yield return new object []
+        {
+            new List<MouseEventArgs>
+            {
+                new() { Flags = MouseFlags.Button4Pressed },
+                new(),
+                new() { Flags = MouseFlags.Button4Pressed },
+                new(),
+                new() { Flags = MouseFlags.Button4Pressed },
+                new()
+            },
+            null,
+            MouseFlags.Button4Clicked,
+            null,
+            MouseFlags.Button4DoubleClicked,
+            null,
+            MouseFlags.Button4TripleClicked
+        };
 
         yield return new object []
         {
