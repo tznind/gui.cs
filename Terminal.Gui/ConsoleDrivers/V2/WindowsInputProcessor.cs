@@ -11,6 +11,8 @@ using InputRecord = InputRecord;
 /// </summary>
 internal class WindowsInputProcessor : InputProcessor<InputRecord>
 {
+    private readonly bool[] _lastWasPressed = new bool[4];
+
     /// <inheritdoc/>
     public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer) : base (inputBuffer, new WindowsKeyConverter()) { }
 
@@ -76,7 +78,6 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
             OnKeyUp (key!);
         }
     }
-    bool[] _lastWasPressed = new bool[4];
     private MouseEventArgs ToDriverMouse (MouseEventRecord e)
     {
         MouseFlags mouseFlags = MouseFlags.ReportMousePosition;
@@ -90,12 +91,12 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
         {
             switch ((int)e.ButtonState)
             {
-                case int v when v > 0:
+                case > 0:
                     mouseFlags = MouseFlags.WheeledUp;
 
                     break;
 
-                case int v when v < 0:
+                case < 0:
                     mouseFlags = MouseFlags.WheeledDown;
 
                     break;
