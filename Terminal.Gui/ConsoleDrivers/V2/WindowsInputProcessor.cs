@@ -76,43 +76,58 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
             OnKeyUp (key!);
         }
     }
-
+    bool[] _lastWasPressed = new bool[4];
     private MouseEventArgs ToDriverMouse (MouseEventRecord e)
     {
-        var result = new MouseEventArgs
-        {
-            Position = new (e.MousePosition.X, e.MousePosition.Y),
+        MouseFlags mouseFlags = MouseFlags.ReportMousePosition;
 
-            Flags = e.ButtonState switch
-                    {
-                        ButtonState.NoButtonPressed => MouseFlags.ReportMousePosition,
-                        ButtonState.Button1Pressed => MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition,
-                        ButtonState.Button2Pressed => MouseFlags.Button2Pressed | MouseFlags.ReportMousePosition,
-                        ButtonState.Button3Pressed => MouseFlags.Button3Pressed | MouseFlags.ReportMousePosition,
-                        ButtonState.Button4Pressed => MouseFlags.Button4Pressed | MouseFlags.ReportMousePosition,
-                        ButtonState.RightmostButtonPressed => MouseFlags.Button3Pressed | MouseFlags.ReportMousePosition,
-                        _=> MouseFlags.None
-                    }
-        };
+        mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, ButtonState.Button1Pressed,MouseFlags.Button1Pressed, MouseFlags.Button1Released, 0);
+        mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, ButtonState.Button2Pressed, MouseFlags.Button2Pressed, MouseFlags.Button2Released, 1);
+        mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, ButtonState.Button3Pressed, MouseFlags.Button3Pressed, MouseFlags.Button3Released, 2);
+        mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, ButtonState.Button4Pressed, MouseFlags.Button4Pressed, MouseFlags.Button4Released, 3);
 
         if (e.EventFlags == WindowsConsole.EventFlags.MouseWheeled)
         {
             switch ((int)e.ButtonState)
             {
                 case int v when v > 0:
-                    result.Flags = MouseFlags.WheeledUp;
+                    mouseFlags = MouseFlags.WheeledUp;
 
                     break;
 
                 case int v when v < 0:
-                    result.Flags = MouseFlags.WheeledDown;
+                    mouseFlags = MouseFlags.WheeledDown;
 
                     break;
             }
         }
 
+        var result = new MouseEventArgs
+        {
+            Position = new (e.MousePosition.X, e.MousePosition.Y),
+            Flags = mouseFlags
+        };
+
         // TODO: Return keys too
 
         return result;
     }
+    private MouseFlags UpdateMouseFlags (MouseFlags current, ButtonState newState,ButtonState pressedState, MouseFlags pressedFlag, MouseFlags releasedFlag, int buttonIndex)
+    {
+        if (newState.HasFlag (pressedState))
+        {
+            current |= pressedFlag;
+            _lastWasPressed [buttonIndex] = true;
+        }
+        else
+        {
+            if (_lastWasPressed [buttonIndex])
+            {
+                current |= releasedFlag;
+                _lastWasPressed [buttonIndex] = false;
+            }
+        }
+        return current;
+    }
+
 }
