@@ -235,6 +235,56 @@ public class WindowsInputProcessorTests
                 Tuple.Create(ButtonState.NoButtonPressed, MouseFlags.ReportMousePosition | MouseFlags.ReportMousePosition)
             }
         };
+
+        // Tests for holding down 2 buttons at once and releasing them one after the other
+        yield return new object []
+        {
+            new Tuple<ButtonState, MouseFlags>[]
+            {
+                Tuple.Create(ButtonState.Button1Pressed | ButtonState.Button2Pressed, MouseFlags.Button1Pressed | MouseFlags.Button2Pressed | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.Button1Pressed, MouseFlags.Button1Pressed | MouseFlags.Button2Released | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.NoButtonPressed, MouseFlags.Button1Released | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.NoButtonPressed,  MouseFlags.ReportMousePosition)
+            }
+        };
+
+        yield return new object []
+        {
+            new Tuple<ButtonState, MouseFlags>[]
+            {
+                Tuple.Create(ButtonState.Button3Pressed | ButtonState.Button4Pressed, MouseFlags.Button3Pressed | MouseFlags.Button4Pressed | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.Button3Pressed, MouseFlags.Button3Pressed | MouseFlags.Button4Released | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.NoButtonPressed, MouseFlags.Button3Released | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.NoButtonPressed,  MouseFlags.ReportMousePosition)
+            }
+        };
+
+        // Test for holding down 2 buttons at once and releasing them simultaneously
+        yield return new object []
+        {
+            new Tuple<ButtonState, MouseFlags>[]
+            {
+                Tuple.Create(ButtonState.Button1Pressed | ButtonState.Button2Pressed, MouseFlags.Button1Pressed | MouseFlags.Button2Pressed | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.NoButtonPressed, MouseFlags.Button1Released | MouseFlags.Button2Released | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.NoButtonPressed, MouseFlags.ReportMousePosition)
+            }
+        };
+
+        // Test that rightmost and button 3 are the same button so 2 states is still only 1 flag
+        yield return new object []
+        {
+            new Tuple<ButtonState, MouseFlags>[]
+            {
+                Tuple.Create(ButtonState.Button3Pressed | ButtonState.RightmostButtonPressed, MouseFlags.Button3Pressed | MouseFlags.ReportMousePosition),
+                // Can swap between without raising the released
+                Tuple.Create(ButtonState.Button3Pressed, MouseFlags.Button3Pressed | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.RightmostButtonPressed, MouseFlags.Button3Pressed | MouseFlags.ReportMousePosition),
+
+                // Now with neither we get released
+                Tuple.Create(ButtonState.NoButtonPressed, MouseFlags.Button3Released | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.NoButtonPressed, MouseFlags.ReportMousePosition)
+            }
+        };
     }
 
     [Theory]
