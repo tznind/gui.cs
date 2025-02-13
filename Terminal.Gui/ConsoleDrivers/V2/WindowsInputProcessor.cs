@@ -84,8 +84,22 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
 
         mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, ButtonState.Button1Pressed,MouseFlags.Button1Pressed, MouseFlags.Button1Released, 0);
         mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, ButtonState.Button2Pressed, MouseFlags.Button2Pressed, MouseFlags.Button2Released, 1);
-        mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, ButtonState.Button3Pressed, MouseFlags.Button3Pressed, MouseFlags.Button3Released, 2);
         mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, ButtonState.Button4Pressed, MouseFlags.Button4Pressed, MouseFlags.Button4Released, 3);
+
+        // Deal with button 3 separately because it is considered same as 'rightmost button'
+        if (e.ButtonState.HasFlag (ButtonState.Button3Pressed) || e.ButtonState.HasFlag (ButtonState.RightmostButtonPressed))
+        {
+            mouseFlags |= MouseFlags.Button3Pressed;
+            _lastWasPressed [2] = true;
+        }
+        else
+        {
+            if (_lastWasPressed [2])
+            {
+                mouseFlags |= MouseFlags.Button3Released;
+                _lastWasPressed [2] = false;
+            }
+        }
 
         if (e.EventFlags == WindowsConsole.EventFlags.MouseWheeled)
         {
