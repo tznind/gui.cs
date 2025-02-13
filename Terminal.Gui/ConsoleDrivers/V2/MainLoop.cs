@@ -67,6 +67,11 @@ public class MainLoop<T> : IMainLoop<T>
     }
 
     /// <summary>
+    /// Handles raising events and setting required draw status etc when <see cref="Application.Top"/> changes
+    /// </summary>
+    public IToplevelTransitionManager ToplevelTransitionManager = new ToplevelTransitionManager ();
+
+    /// <summary>
     ///     Determines how to get the current system type, adjust
     ///     in unit tests to simulate specific timings.
     /// </summary>
@@ -113,7 +118,8 @@ public class MainLoop<T> : IMainLoop<T>
     {
         InputProcessor.ProcessQueue ();
 
-        HackLayoutDrawIfTopChanged ();
+        ToplevelTransitionManager.RaiseReadyEventIfNeeded ();
+        ToplevelTransitionManager.HandleTopMaybeChanging ();
 
         if (Application.Top != null)
         {
@@ -144,20 +150,7 @@ public class MainLoop<T> : IMainLoop<T>
         Logging.IterationInvokesAndTimeouts.Record (swCallbacks.Elapsed.Milliseconds);
     }
 
-    private View? _lastTop;
-    private void HackLayoutDrawIfTopChanged ()
-    {
-        // TODO: This fixes closing a modal not making its host (below) refresh
-        //       until you click.  This should not be the job of the main loop!
-        var newTop = Application.Top;
-        if (_lastTop != null && _lastTop != newTop && newTop != null)
-        {
-            newTop.SetNeedsDraw();
-        }
-        
-        _lastTop = Application.Top;
-    }
-
+    
     private void SetCursor ()
     {
         View? mostFocused = Application.Top.MostFocused;
@@ -204,6 +197,7 @@ public class MainLoop<T> : IMainLoop<T>
 
     /// <inheritdoc/>
     public void Dispose ()
-    { // TODO release managed resources here
+    {
+        // TODO release managed resources here
     }
 }
