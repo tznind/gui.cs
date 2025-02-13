@@ -78,7 +78,8 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
             OnKeyUp (key!);
         }
     }
-    private MouseEventArgs ToDriverMouse (MouseEventRecord e)
+
+    public MouseEventArgs ToDriverMouse (MouseEventRecord e)
     {
         MouseFlags mouseFlags = MouseFlags.ReportMousePosition;
 

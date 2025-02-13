@@ -1,6 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using Terminal.Gui.ConsoleDrivers;
 using InputRecord = Terminal.Gui.WindowsConsole.InputRecord;
+using ButtonState = Terminal.Gui.WindowsConsole.ButtonState;
+using MouseEventRecord = Terminal.Gui.WindowsConsole.MouseEventRecord;
 
 namespace UnitTests.ConsoleDrivers.V2;
 public class WindowsInputProcessorTests
@@ -181,6 +183,73 @@ public class WindowsInputProcessorTests
         var s = Assert.Single (mouseEvents);
         Assert.Equal (s.Flags,expectedFlag);
         Assert.Equal (s.ScreenPosition, new Point (32, 31));
+    }
+
+    public static IEnumerable<object []> MouseFlagTestData ()
+    {
+        yield return new object []
+        {
+            new Tuple<ButtonState, MouseFlags>[]
+            {
+                Tuple.Create(ButtonState.Button1Pressed, MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.NoButtonPressed, MouseFlags.Button1Released | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.NoButtonPressed, MouseFlags.ReportMousePosition | MouseFlags.ReportMousePosition)
+            }
+        };
+
+        yield return new object []
+        {
+            new Tuple<ButtonState, MouseFlags>[]
+            {
+                Tuple.Create ( ButtonState.Button2Pressed, MouseFlags.Button2Pressed  | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.NoButtonPressed, MouseFlags.Button2Released | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.NoButtonPressed, MouseFlags.ReportMousePosition | MouseFlags.ReportMousePosition)
+            }
+        }; 
+        yield return new object []
+        {
+            new Tuple<ButtonState, MouseFlags>[]
+            {
+                Tuple.Create(ButtonState.Button3Pressed, MouseFlags.Button3Pressed | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.NoButtonPressed, MouseFlags.Button3Released | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.NoButtonPressed, MouseFlags.ReportMousePosition | MouseFlags.ReportMousePosition)
+            }
+        };
+
+        yield return new object []
+        {
+            new Tuple<ButtonState, MouseFlags>[]
+            {
+                Tuple.Create(ButtonState.Button4Pressed, MouseFlags.Button4Pressed | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.NoButtonPressed, MouseFlags.Button4Released | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.NoButtonPressed, MouseFlags.ReportMousePosition | MouseFlags.ReportMousePosition)
+            }
+        };
+
+        yield return new object []
+        {
+            new Tuple<ButtonState, MouseFlags>[]
+            {
+                Tuple.Create(ButtonState.RightmostButtonPressed, MouseFlags.Button3Pressed | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.NoButtonPressed, MouseFlags.Button3Released | MouseFlags.ReportMousePosition),
+                Tuple.Create(ButtonState.NoButtonPressed, MouseFlags.ReportMousePosition | MouseFlags.ReportMousePosition)
+            }
+        };
+    }
+
+    [Theory]
+    [MemberData (nameof (MouseFlagTestData))]
+    internal void MouseFlags_Should_Map_Correctly (Tuple<ButtonState, MouseFlags>[] inputOutputPairs)
+    {
+        var processor = new WindowsInputProcessor (new ());
+
+        foreach (var pair in inputOutputPairs)
+        {
+            var mockEvent = new MouseEventRecord { ButtonState = pair.Item1 };
+            var result = processor.ToDriverMouse (mockEvent);
+
+            Assert.Equal (pair.Item2, result.Flags);
+        }
     }
 }
 
