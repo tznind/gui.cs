@@ -97,15 +97,27 @@ Example output:
 Press p to pause, r to resume, q to quit.
     Status: Running
 
-Name                                                                                                       Current Value
+Name                                                      Current Value
 [Terminal.Gui]
     Drain Input (ms)
         Percentile
-        50                                                                                                         0            95                                                                                                         0            99                                                                                                         0        
+        50                                                      0
+        95                                                      0
+        99                                                      0
     Invokes & Timers (ms)
         Percentile
-        50                                                                                                         0            95                                                                                                         0            99                                                                                                         0        
+        50                                                      0
+        95                                                      0
+        99                                                      0
     Iteration (ms)
         Percentile
-        50                                                                                                         0            95                                                                                                         1            99                                                                                                         1        Redraws (Count)                                                                                                9    
+        50                                                      0
+        95                                                      1
+        99                                                      1
+        Redraws (Count)                                         9
 ```
+
+Metrics figures issues such as:
+
+- Your console constantly being refreshed (Redraws)
+- You are blocking main thread with long running Invokes / Timeout callbacks (Invokes & Timers)
