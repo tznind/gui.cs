@@ -78,3 +78,34 @@ Example logs:
 2025-02-15 13:36:54.151 +00:00 [VRB] AnsiResponseParser handled as keyboard '[21~'
 2025-02-15 13:36:54.225 +00:00 [INF] Input loop exited cleanly
 ```
+
+## Metrics
+
+If you are finding that the UI is slow or unresponsive - or are just interested in performance metrics.  You can see these by instaling the `dotnet-counter` tool and running it for your process.
+
+```
+dotnet tool install dotnet-counters --global
+```
+
+```
+ dotnet-counters monitor -n YourProcessName --counters Terminal.Gui
+```
+
+Example output:
+
+```
+Press p to pause, r to resume, q to quit.
+    Status: Running
+
+Name                                                                                                       Current Value
+[Terminal.Gui]
+    Drain Input (ms)
+        Percentile
+        50                                                                                                         0            95                                                                                                         0            99                                                                                                         0        
+    Invokes & Timers (ms)
+        Percentile
+        50                                                                                                         0            95                                                                                                         0            99                                                                                                         0        
+    Iteration (ms)
+        Percentile
+        50                                                                                                         0            95                                                                                                         1            99                                                                                                         1        Redraws (Count)                                                                                                9    
+```
