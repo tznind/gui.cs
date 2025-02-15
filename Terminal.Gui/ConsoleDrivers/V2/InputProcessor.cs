@@ -38,7 +38,11 @@ public abstract class InputProcessor<T> : IInputProcessor
     ///     <see cref="OnKeyUp"/>.
     /// </summary>
     /// <param name="a"></param>
-    public void OnKeyDown (Key a) { KeyDown?.Invoke (this, a); }
+    public void OnKeyDown (Key a)
+    {
+        Logging.Logger.LogTrace ($"{nameof(InputProcessor<T>)} raised {a}");
+        KeyDown?.Invoke (this, a);
+    }
 
     /// <summary>Event fired when a key is released.</summary>
     /// <remarks>

@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui;
 
@@ -52,7 +53,7 @@ public class AnsiKeyboardParser
         {
             char finalLetter = match.Groups [1].Value.Single();
 
-            return finalLetter switch
+            var k = finalLetter switch
                    {
                        'P' => Key.F1,
                        'Q' => Key.F2,
@@ -66,6 +67,9 @@ public class AnsiKeyboardParser
 
                        _ => null
                    };
+
+            Logging.Logger.LogTrace ($"{nameof (AnsiKeyboardParser)} interpreted ss3 pattern {input} as {k}");
+            return k;
         }
 
         return null;
@@ -116,6 +120,8 @@ public class AnsiKeyboardParser
                       };
             }
 
+            Logging.Logger.LogTrace ($"{nameof (AnsiKeyboardParser)} interpreted basic cursor pattern {input} as {key}");
+
             return key;
         }
 
@@ -135,7 +141,7 @@ public class AnsiKeyboardParser
 
             int digit = int.Parse (functionDigit);
 
-            return digit switch
+            var f = digit switch
                    {
                        24 => Key.F12,
                        23 => Key.F11,
@@ -151,6 +157,10 @@ public class AnsiKeyboardParser
                        11 => Key.F1,
                        _ => null,
                    };
+
+            Logging.Logger.LogTrace ($"{nameof (AnsiKeyboardParser)} interpreted function key pattern {input} as {f}");
+
+            return f;
         }
 
         return null;
