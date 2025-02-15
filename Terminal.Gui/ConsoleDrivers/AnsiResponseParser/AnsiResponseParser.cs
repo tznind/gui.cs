@@ -217,8 +217,6 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                 RaiseMouseEvent (cur);
                 ResetState ();
 
-                Logging.Logger.LogTrace ($"AnsiResponseParser handled as mouse '{cur}'");
-
                 return false;
             }
 
@@ -226,8 +224,6 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
             {
                 RaiseKeyboardEvent (cur);
                 ResetState ();
-
-                Logging.Logger.LogTrace ($"AnsiResponseParser handled as keyboard '{cur}'");
 
                 return false;
             }
