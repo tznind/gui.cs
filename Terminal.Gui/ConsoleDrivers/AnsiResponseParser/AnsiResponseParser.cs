@@ -162,7 +162,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                         ReleaseHeld (appendOutput, AnsiResponseParserState.ExpectingEscapeSequence);
                         _heldContent.AddToHeld (currentObj); // Hold the new escape
                     }
-                    else if (currentChar == '[' || char.IsLetterOrDigit (currentChar))
+                    else if (currentChar == '[' || (HandleKeyboard && char.IsLetterOrDigit (currentChar)))
                     {
                         //We need O for SS3 mode F1-F4 e.g. "<esc>OP" => F1
                         //We need any letter or digit for Alt+Letter (see EscAsAltPattern)
