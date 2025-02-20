@@ -65,7 +65,7 @@ public class AnsiKeyboardParserTests
     public void ProcessKeyboardInput_ReturnsCorrectKey (string input, Key? expectedKey)
     {
         // Act
-        Key? result = _parser.ProcessKeyboardInput (input);
+        Key? result = _parser.IsKeyboard (input)?.GetKey (input);
 
         // Assert
         Assert.Equal (expectedKey, result); // Verify the returned key matches the expected one

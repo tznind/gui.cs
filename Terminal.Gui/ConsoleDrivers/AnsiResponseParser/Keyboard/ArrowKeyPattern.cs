@@ -9,7 +9,7 @@ public class ArrowKeyPattern : AnsiKeyboardParserPattern
 
     public override bool IsMatch (string input) => _pattern.IsMatch (input);
 
-    public override Key? GetKey (string input)
+    protected override Key? GetKeyImpl (string input)
     {
         var match = _pattern.Match (input);
 
