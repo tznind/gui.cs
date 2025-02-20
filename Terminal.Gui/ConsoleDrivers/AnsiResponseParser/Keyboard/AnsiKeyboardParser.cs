@@ -12,28 +12,19 @@ public class AnsiKeyboardParser
     {
         new Ss3Pattern(),
         new FunctionKeyPattern(),
-        new ArrowKeyPattern()
+        new ArrowKeyPattern(),
+        new EscAsAltPattern(){IsLastMinute=true}
     };
-
-    public Key? ProcessKeyboardInput (string input)
+    
+    /// <summary>
+    /// Looks for any pattern that matches the <paramref name="input"/> and returns
+    /// the matching pattern or <see langword="null"/> if no matches.
+    /// </summary>
+    /// <param name="input"></param>
+    /// <param name="isLastMinute"></param>
+    /// <returns></returns>
+    public AnsiKeyboardParserPattern? IsKeyboard (string input, bool isLastMinute = false)
     {
-        foreach (var pattern in _patterns)
-        {
-            if (pattern.IsMatch (input))
-            {
-                var key = pattern.GetKey (input);
-                if (key != null)
-                {
-                    Logging.Logger.LogTrace ($"{nameof (AnsiKeyboardParser)} interpreted {input} as {key}");
-                    return key;
-                }
-            }
-        }
-        return null;
-    }
-
-    public bool IsKeyboard (string input)
-    {
-        return _patterns.Any (pattern => pattern.IsMatch (input));
+        return _patterns.FirstOrDefault(pattern => pattern.IsLastMinute == isLastMinute && pattern.IsMatch (input));
     }
 }

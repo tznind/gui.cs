@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using System.Runtime.ConstrainedExecution;
 using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui;
@@ -7,7 +8,7 @@ namespace Terminal.Gui;
 internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 {
     private readonly AnsiMouseParser _mouseParser = new ();
-    private readonly AnsiKeyboardParser _keyboardParser = new ();
+    protected readonly AnsiKeyboardParser _keyboardParser = new ();
     protected object _lockExpectedResponses = new ();
 
     protected object _lockState = new ();
@@ -161,13 +162,14 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                         ReleaseHeld (appendOutput, AnsiResponseParserState.ExpectingEscapeSequence);
                         _heldContent.AddToHeld (currentObj); // Hold the new escape
                     }
-                    else if (currentChar == '[' || currentChar == 'O')
+                    else if (currentChar == '[' || char.IsLetterOrDigit (currentChar))
                     {
                         //We need O for SS3 mode F1-F4 e.g. "<esc>OP" => F1
+                        //We need any letter or digit for Alt+Letter (see EscAsAltPattern)
 
                         // Detected '[' or 'O', transition to InResponse state
                         State = AnsiResponseParserState.InResponse;
-                        _heldContent.AddToHeld (currentObj); // Hold the '['
+                        _heldContent.AddToHeld (currentObj); // Hold the letter
                     }
                     else
                     {
@@ -220,12 +222,17 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                 return false;
             }
 
-            if (HandleKeyboard && IsKeyboard (cur))
+            if (HandleKeyboard)
             {
-                RaiseKeyboardEvent (cur);
-                ResetState ();
+                var pattern = _keyboardParser.IsKeyboard (cur);
 
-                return false;
+                if (pattern != null)
+                {
+
+                    RaiseKeyboardEvent (pattern, cur);
+                    ResetState ();
+                    return false;
+                }
             }
 
             lock (_lockExpectedResponses)
@@ -301,9 +308,9 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
     private bool IsMouse (string cur) { return _mouseParser.IsMouse (cur); }
 
-    private void RaiseKeyboardEvent (string cur)
+    protected void RaiseKeyboardEvent (AnsiKeyboardParserPattern pattern, string cur)
     {
-        Key? k = _keyboardParser.ProcessKeyboardInput (cur);
+        Key? k = pattern.GetKey (cur);
 
         if (k is null)
         {
@@ -314,8 +321,6 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
             Keyboard?.Invoke (this, k);
         }
     }
-
-    private bool IsKeyboard (string cur) { return _keyboardParser.IsKeyboard (cur); }
 
     /// <summary>
     ///     <para>
@@ -447,6 +452,21 @@ internal class AnsiResponseParser<T> : AnsiResponseParserBase
         // Lock in case Release is called from different Thread from parse
         lock (_lockState)
         {
+            var cur = _heldContent.HeldToString ();
+
+            if (HandleKeyboard)
+            {
+                var pattern = _keyboardParser.IsKeyboard (cur,true);
+
+                if (pattern != null)
+                {
+                    RaiseKeyboardEvent (pattern, cur);
+                    ResetState ();
+                    return [];
+                }
+            }
+
+
             Tuple<char, T> [] result = HeldToEnumerable ().ToArray ();
 
             ResetState ();

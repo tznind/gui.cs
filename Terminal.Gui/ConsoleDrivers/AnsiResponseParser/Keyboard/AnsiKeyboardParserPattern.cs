@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using Microsoft.Extensions.Logging;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -6,6 +8,26 @@ namespace Terminal.Gui;
 /// </summary>
 public abstract class AnsiKeyboardParserPattern
 {
+    /// <summary>
+    /// Does this pattern dangerously overlap with other sequences
+    /// such that it should only be applied at the lsat second after
+    /// all other sequences have been tried.
+    /// <remarks>
+    /// When <see langword="true"/> this pattern will only be used
+    /// at <see cref="AnsiResponseParser.Release"/> time.
+    /// </remarks>
+    /// </summary>
+    public bool IsLastMinute { get; set; }
+
     public abstract bool IsMatch (string input);
-    public abstract Key? GetKey (string input);
+
+    public Key? GetKey (string input)
+    {
+        var key = GetKeyImpl (input);
+        Logging.Logger.LogTrace ($"{nameof (AnsiKeyboardParser)} interpreted {input} as {key}");
+
+        return key;
+    }
+
+    protected abstract Key? GetKeyImpl (string input);
 }

@@ -124,7 +124,8 @@ public abstract class InputProcessor<T> : IInputProcessor
 
     private IEnumerable<T> ReleaseParserHeldKeysIfStale ()
     {
-        if (Parser.State == AnsiResponseParserState.ExpectingEscapeSequence && DateTime.Now - Parser.StateChangedAt > _escTimeout)
+        if (Parser.State is AnsiResponseParserState.ExpectingEscapeSequence or AnsiResponseParserState.InResponse
+            && DateTime.Now - Parser.StateChangedAt > _escTimeout)
         {
             return Parser.Release ().Select (o => o.Item2);
         }
