@@ -188,7 +188,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                     if (isEscape)
                     {
                         ReleaseHeld (appendOutput);
-                        State = AnsiResponseParserState.InResponse;
+                        State = AnsiResponseParserState.ExpectingEscapeSequence;
                         _heldContent.AddToHeld (currentObj);
                     }
                     else

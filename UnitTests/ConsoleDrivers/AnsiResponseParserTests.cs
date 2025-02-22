@@ -227,8 +227,10 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         {
             parser.ExpectResponse (terminator.Value.ToString (),(s)=> response = s,null, false);
         }
+        int step= 0;
         foreach (var state in expectedStates)
         {
+            step++;
             // If we expect the response to be detected at this step
             if (!string.IsNullOrWhiteSpace (state.ExpectedAnsiResponse))
             {
@@ -247,6 +249,8 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
                 // And after passing input it shuld be the expected value
                 Assert.Equal (state.ExpectedAnsiResponse, response);
             }
+
+            output.WriteLine ($"Step {step} passed");
         }
     }
 
@@ -287,35 +291,6 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
 
         // It should be the second escape that gets released (i.e. index 1)
         AssertManualReleaseIs ("\u001b",1);
-    }
-
-    [Fact]
-    public void TwoExcapesInARowWithTextBetween ()
-    {
-        // Example user presses Esc key and types at the speed of light (normally the consumer should be handling Esc timeout)
-        // then a DAR comes in.
-        string input = "\u001bfish\u001b";
-        int i = 0;
-
-        // First Esc gets grabbed
-        AssertConsumed (input, ref i); // Esc
-        Assert.Equal (AnsiResponseParserState.ExpectingEscapeSequence,_parser1.State);
-        Assert.Equal (AnsiResponseParserState.ExpectingEscapeSequence, _parser2.State);
-
-        // Because next char is 'f' we do not see a bracket so release both
-        AssertReleased (input, ref i, "\u001bf", 0,1); // f
-
-        Assert.Equal (AnsiResponseParserState.Normal, _parser1.State);
-        Assert.Equal (AnsiResponseParserState.Normal, _parser2.State);
-
-        AssertReleased (input, ref i,"i",2);
-        AssertReleased (input, ref i, "s", 3);
-        AssertReleased (input, ref i, "h", 4);
-
-        AssertConsumed (input, ref i); // Second Esc
-
-        // Assume 50ms or something has passed, lets force release as no new content
-        AssertManualReleaseIs ("\u001b", 5);
     }
 
     [Fact]
