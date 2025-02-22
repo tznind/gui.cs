@@ -243,6 +243,21 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                     _heldContent.ClearHeld ();
                 }
             }
+
+            // We have something totally unexpected, not a CSI and
+            // still Esc+<something>. So give last minute swallow chance
+            if (cur.Length >= 2 && cur [0] == Escape)
+            {
+                // Maybe swallow anyway if user has custom delegate
+                bool swallow = ShouldSwallowUnexpectedResponse ();
+
+                if (swallow)
+                {
+                    _heldContent.ClearHeld ();
+
+                    Logging.Logger.LogTrace ($"AnsiResponseParser last minute swallowed '{cur}'");
+                }
+            }
         }
     }
 
@@ -321,7 +336,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                 {
                     _heldContent.ClearHeld ();
 
-                    Logging.Logger.LogTrace ($"AnsiResponseParser bespoke processed '{cur}'");
+                    Logging.Logger.LogTrace ($"AnsiResponseParser swallowed '{cur}'");
 
                     // Do not send back to input stream
                     return false;
