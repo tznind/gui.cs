@@ -241,6 +241,8 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                 {
                     RaiseKeyboardEvent (pattern, cur);
                     _heldContent.ClearHeld ();
+
+                    return;
                 }
             }
 
