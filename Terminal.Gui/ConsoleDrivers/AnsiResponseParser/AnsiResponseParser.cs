@@ -7,6 +7,7 @@ namespace Terminal.Gui;
 
 internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 {
+    private const char Escape = '\x1B';
     private readonly AnsiMouseParser _mouseParser = new ();
     protected readonly AnsiKeyboardParser _keyboardParser = new ();
     protected object _lockExpectedResponses = new ();
@@ -136,7 +137,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
             char currentChar = getCharAtIndex (index);
             object currentObj = getObjectAtIndex (index);
 
-            bool isEscape = currentChar == '\x1B';
+            bool isEscape = currentChar == Escape;
 
             switch (State)
             {
@@ -181,12 +182,24 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                     break;
 
                 case AnsiResponseParserState.InResponse:
-                    _heldContent.AddToHeld (currentObj);
 
-                    // Check if the held content should be released
-                    if (ShouldReleaseHeldContent ())
+                    // if seeing another esc, we must resolve the current one first
+                    if (isEscape)
                     {
                         ReleaseHeld (appendOutput);
+                        State = AnsiResponseParserState.InResponse;
+                        _heldContent.AddToHeld (currentObj);
+                    }
+                    else
+                    {
+                        // Non esc, so continue to build sequence
+                        _heldContent.AddToHeld (currentObj);
+
+                        // Check if the held content should be released
+                        if (ShouldReleaseHeldContent ())
+                        {
+                            ReleaseHeld (appendOutput);
+                        }
                     }
 
                     break;
@@ -198,6 +211,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
     private void ReleaseHeld (Action<object> appendOutput, AnsiResponseParserState newState = AnsiResponseParserState.Normal)
     {
+        TryLastMinuteSequences ();
         foreach (object o in _heldContent.HeldToObjects ())
         {
             appendOutput (o);
@@ -205,6 +219,31 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
         State = newState;
         _heldContent.ClearHeld ();
+    }
+
+    /// <summary>
+    /// Checks current held chars against any sequences that have
+    /// conflicts with longer sequences e.g. Esc as Alt sequences
+    /// which can conflict if resolved earlier e.g. with EscOP ss3
+    /// sequences.
+    /// </summary>
+    protected void TryLastMinuteSequences ()
+    {
+        lock (_lockState)
+        {
+            string cur = _heldContent.HeldToString ();
+
+            if (HandleKeyboard)
+            {
+                var pattern = _keyboardParser.IsKeyboard (cur, true);
+
+                if (pattern != null)
+                {
+                    RaiseKeyboardEvent (pattern, cur);
+                    _heldContent.ClearHeld ();
+                }
+            }
+        }
     }
 
     // Common response handler logic
@@ -452,20 +491,7 @@ internal class AnsiResponseParser<T> : AnsiResponseParserBase
         // Lock in case Release is called from different Thread from parse
         lock (_lockState)
         {
-            var cur = _heldContent.HeldToString ();
-
-            if (HandleKeyboard)
-            {
-                var pattern = _keyboardParser.IsKeyboard (cur,true);
-
-                if (pattern != null)
-                {
-                    RaiseKeyboardEvent (pattern, cur);
-                    ResetState ();
-                    return [];
-                }
-            }
-
+            TryLastMinuteSequences ();
 
             Tuple<char, T> [] result = HeldToEnumerable ().ToArray ();
 
@@ -542,6 +568,8 @@ internal class AnsiResponseParser () : AnsiResponseParserBase (new StringHeld ()
     {
         lock (_lockState)
         {
+            TryLastMinuteSequences ();
+
             string output = _heldContent.HeldToString ();
             ResetState ();
 
