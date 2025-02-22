@@ -164,8 +164,8 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
             new []
             {
                 new StepExpectation ('\u001b',AnsiResponseParserState.ExpectingEscapeSequence,string.Empty),
-                new StepExpectation ('H',AnsiResponseParserState.Normal,"\u001bH"), // H is known terminator and not expected one so here we release both chars
-                new StepExpectation ('\u001b',AnsiResponseParserState.ExpectingEscapeSequence,string.Empty),
+                new StepExpectation ('H',AnsiResponseParserState.InResponse,string.Empty), // H is known terminator and not expected one so here we release both chars
+                new StepExpectation ('\u001b',AnsiResponseParserState.ExpectingEscapeSequence,"\u001bH"),
                 new StepExpectation ('[',AnsiResponseParserState.InResponse,string.Empty),
                 new StepExpectation ('0',AnsiResponseParserState.InResponse,string.Empty),
                 new StepExpectation ('c',AnsiResponseParserState.Normal,string.Empty,"\u001b[0c"), // c is expected terminator so here we swallow input and populate expected response
