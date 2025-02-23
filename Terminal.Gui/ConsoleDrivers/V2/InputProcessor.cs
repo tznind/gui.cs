@@ -33,6 +33,9 @@ public abstract class InputProcessor<T> : IInputProcessor
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="KeyUp"/>.</summary>
     public event EventHandler<Key>? KeyDown;
 
+    /// <summary>Event fired when a terminal sequence read from input is not recognized and therefore ignored.</summary>
+    public event EventHandler<string>? AnsiSequenceSwallowed;
+
     /// <summary>
     ///     Called when a key is pressed down. Fires the <see cref="KeyDown"/> event. This is a precursor to
     ///     <see cref="OnKeyUp"/>.
@@ -100,7 +103,9 @@ public abstract class InputProcessor<T> : IInputProcessor
         // TODO: For now handle all other escape codes with ignore
         Parser.UnexpectedResponseHandler = str =>
                                            {
-                                               Logging.Logger.LogInformation ($"{nameof (InputProcessor<T>)} ignored unrecognized response '{new string (str.Select (k => k.Item1).ToArray ())}'");
+                                               var cur = new string (str.Select (k => k.Item1).ToArray ());
+                                               Logging.Logger.LogInformation ($"{nameof (InputProcessor<T>)} ignored unrecognized response '{cur}'");
+                                               AnsiSequenceSwallowed?.Invoke (this,cur);
                                                return true;
                                            };
         KeyConverter = keyConverter;

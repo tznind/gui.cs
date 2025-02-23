@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-internal class ConsoleDriverFacade<T> : IConsoleDriver
+internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
 {
     private readonly IInputProcessor _inputProcessor;
     private readonly IConsoleOutput _output;
@@ -12,7 +12,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver
 
     /// <summary>The event fired when the terminal is resized.</summary>
     public event EventHandler<SizeChangedEventArgs> SizeChanged;
-
+    public IInputProcessor InputProcessor => _inputProcessor;
     public ConsoleDriverFacade (
         IInputProcessor inputProcessor,
         IOutputBuffer outputBuffer,

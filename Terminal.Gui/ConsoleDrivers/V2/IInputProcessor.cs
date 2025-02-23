@@ -18,6 +18,9 @@ public interface IInputProcessor
     /// </remarks>
     event EventHandler<Key>? KeyUp;
 
+    /// <summary>Event fired when a terminal sequence read from input is not recognized and therefore ignored.</summary>
+    public event EventHandler<string>? AnsiSequenceSwallowed;
+
     /// <summary>Event fired when a mouse event occurs.</summary>
     event EventHandler<MouseEventArgs>? MouseEvent;
 

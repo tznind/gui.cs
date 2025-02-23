@@ -191,7 +191,7 @@
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AQAkEAAAAASAiAAEAgwgAAAABAIAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AQAkEAAAAASAiAAEAgwgAAAABAIAAAAAAAAAAAAEAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\InputProcessor.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -229,7 +229,7 @@
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AQMgAAAAAKBAgFEIBBgAQJEAAjkaQiIAGQADKABDggQ=</HashCode>
+      <HashCode>AQMgAAAAAKBAgFEIBBgAAJEAAjkaQiIAGQADKABDAgQ=</HashCode>
       <FileName>ConsoleDrivers\V2\ConsoleDriverFacade.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -247,7 +247,7 @@
   <Class Name="Terminal.Gui.AnsiResponseParserBase" Collapsed="true">
     <Position X="20.25" Y="9" Width="2" />
     <TypeIdentifier>
-      <HashCode>UAiASAAAEICQALAAQAAAKAAAoAIAAABAAQIAJgAQASU=</HashCode>
+      <HashCode>UAiASAAAEICQALAAQAAAKAAAoAIAAABAAQIAJiAQASQ=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\AnsiResponseParser.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -277,7 +277,7 @@
   <Class Name="Terminal.Gui.StringHeld" Collapsed="true">
     <Position X="21.5" Y="11" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAIAACAAAAAAAIAAAAAAAACAAAAAAAgAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAIAACAAAAAAAIBAAAAAAACAAAAAAAgAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\StringHeld.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -285,7 +285,7 @@
   <Class Name="Terminal.Gui.GenericHeld&lt;T&gt;" Collapsed="true">
     <Position X="19.75" Y="11" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAgAIAACAAAAAAAIAAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAgAIAACAAAAAAAIBAAAAAAACAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\GenericHeld.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -366,8 +366,8 @@
   <Class Name="Terminal.Gui.AnsiKeyboardParser">
     <Position X="25.5" Y="9.5" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAQEAAAAAAAAAAAAAAAAAAAQgAAAAAAABCAAAAAE=</HashCode>
-      <FileName>ConsoleDrivers\AnsiResponseParser\AnsiKeyboardParser.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAE=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\Keyboard\AnsiKeyboardParser.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Terminal.Gui.ToplevelTransitionManager" Collapsed="true">
@@ -416,7 +416,7 @@
   <Interface Name="Terminal.Gui.IHeld">
     <Position X="23.75" Y="6.5" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAIAACAAAAAAAIAAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAIAACAAAAAAAIBAAAAAAACAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\AnsiResponseParser\IHeld.cs</FileName>
     </TypeIdentifier>
   </Interface>
@@ -473,6 +473,13 @@
     <TypeIdentifier>
       <HashCode>AIAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\IToplevelTransitionManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.IConsoleDriverFacade">
+    <Position X="4.5" Y="8.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\IConsoleDriverFacade.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Enum Name="Terminal.Gui.AnsiResponseParserState">
