@@ -5,10 +5,23 @@ namespace Terminal.Gui;
 
 public class ArrowKeyPattern : AnsiKeyboardParserPattern
 {
-    private static readonly Regex _pattern = new (@"^\u001b\[(1;(\d+))?([A-D])$");
+    private Dictionary<char, Key> _terminators = new Dictionary<char, Key> ()
+    {
+        { 'A', Key.CursorUp },
+        {'B',Key.CursorDown},
+        {'C',Key.CursorRight},
+        {'D',Key.CursorLeft}
+    };
+
+    private readonly Regex _pattern;
 
     public override bool IsMatch (string input) => _pattern.IsMatch (input);
 
+    public ArrowKeyPattern ()
+    {
+        var terms = new string (_terminators.Select (k => k.Key).ToArray ());
+        _pattern = new (@$"^\u001b\[(1;(\d+))?([{terms}])$");
+    }
     protected override Key? GetKeyImpl (string input)
     {
         var match = _pattern.Match (input);
@@ -18,17 +31,10 @@ public class ArrowKeyPattern : AnsiKeyboardParserPattern
             return null;
         }
 
-        char direction = match.Groups [3].Value [0];
+        char terminator = match.Groups [3].Value [0];
         string modifierGroup = match.Groups [2].Value;
 
-        Key? key = direction switch
-                   {
-                       'A' => Key.CursorUp,
-                       'B' => Key.CursorDown,
-                       'C' => Key.CursorRight,
-                       'D' => Key.CursorLeft,
-                       _ => null
-                   };
+        var key = _terminators.GetValueOrDefault (terminator);
 
         if (key != null && int.TryParse (modifierGroup, out var modifier))
         {
