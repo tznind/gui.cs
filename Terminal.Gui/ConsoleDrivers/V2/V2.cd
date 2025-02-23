@@ -229,9 +229,12 @@
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AQMgAAAAAKBAgFEIBBgAAJEAAjkaQiIAGQADKABDAgQ=</HashCode>
+      <HashCode>AQcgAAAAAKBAgFEIBBgAAJEAAjkaQiIAGQADKABDAgQ=</HashCode>
       <FileName>ConsoleDrivers\V2\ConsoleDriverFacade.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="InputProcessor" />
+    </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.AnsiRequestScheduler" Collapsed="true">
@@ -409,7 +412,7 @@
   <Interface Name="Terminal.Gui.IInputProcessor">
     <Position X="14" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAkAAAAAACAgAAAAAggAAAABAIAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAkAAAAAACAgAAAAAggAAAABAIAAAAAAAAAAAAEAAA=</HashCode>
       <FileName>ConsoleDrivers\V2\IInputProcessor.cs</FileName>
     </TypeIdentifier>
   </Interface>
