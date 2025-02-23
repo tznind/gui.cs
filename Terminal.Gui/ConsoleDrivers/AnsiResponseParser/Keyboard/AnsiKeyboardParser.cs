@@ -11,8 +11,7 @@ public class AnsiKeyboardParser
     private readonly List<AnsiKeyboardParserPattern> _patterns = new ()
     {
         new Ss3Pattern(),
-        new FunctionKeyPattern(),
-        new ArrowKeyPattern(),
+        new CsiKeyPattern(),
         new EscAsAltPattern(){IsLastMinute=true}
     };
     

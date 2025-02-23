@@ -20,11 +20,16 @@ public abstract class AnsiKeyboardParserPattern
     public bool IsLastMinute { get; set; }
 
     public abstract bool IsMatch (string input);
+    private string _name;
 
+    public AnsiKeyboardParserPattern ()
+    {
+        _name = GetType ().Name;
+    }
     public Key? GetKey (string input)
     {
         var key = GetKeyImpl (input);
-        Logging.Logger.LogTrace ($"{nameof (AnsiKeyboardParser)} interpreted {input} as {key}");
+        Logging.Logger.LogTrace ($"{nameof (AnsiKeyboardParser)} interpreted {input} as {key} using {_name}");
 
         return key;
     }
