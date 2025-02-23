@@ -24,6 +24,12 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
     /// <inheritdoc/>
     protected override void Process (ConsoleKeyInfo consoleKeyInfo)
     {
+        // For building test cases
+        if (GenerateTestCasesForKeyPresses)
+        {
+            Logging.Logger.LogTrace (FormatConsoleKeyInfoForTestCase (consoleKeyInfo));
+        }
+
         foreach (Tuple<char, ConsoleKeyInfo> released in Parser.ProcessInput (Tuple.Create (consoleKeyInfo.KeyChar, consoleKeyInfo)))
         {
             ProcessAfterParsing (released.Item2);
@@ -33,12 +39,6 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
     /// <inheritdoc/>
     protected override void ProcessAfterParsing (ConsoleKeyInfo input)
     {
-        // For building test cases
-        if (GenerateTestCasesForKeyPresses)
-        {
-            Logging.Logger.LogTrace (FormatConsoleKeyInfoForTestCase (input));
-        }
-
         Key key = KeyConverter.ToKey (input);
         OnKeyDown (key);
         OnKeyUp (key);
@@ -51,9 +51,9 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
         string charLiteral = input.KeyChar == '\0' ? @"'\0'" : $"'{input.KeyChar}'";
         string expectedLiteral = $"new Rune('todo')";
 
-        return $"yield return new object[] {{ new ConsoleKeyInfo({charLiteral}, ConsoleKey.{input.Key}, " +
+        return $"new ConsoleKeyInfo({charLiteral}, ConsoleKey.{input.Key}, " +
                $"{input.Modifiers.HasFlag (ConsoleModifiers.Shift).ToString ().ToLower ()}, " +
                $"{input.Modifiers.HasFlag (ConsoleModifiers.Alt).ToString ().ToLower ()}, " +
-               $"{input.Modifiers.HasFlag (ConsoleModifiers.Control).ToString ().ToLower ()}), {expectedLiteral} }};";
+               $"{input.Modifiers.HasFlag (ConsoleModifiers.Control).ToString ().ToLower ()}), {expectedLiteral}";
     }
 }
