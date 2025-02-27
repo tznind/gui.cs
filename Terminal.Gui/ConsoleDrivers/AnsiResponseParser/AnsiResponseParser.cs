@@ -258,7 +258,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                 {
                     _heldContent.ClearHeld ();
 
-                    Logging.Logger.LogTrace ($"AnsiResponseParser last minute swallowed '{cur}'");
+                    Logging.Trace($"AnsiResponseParser last minute swallowed '{cur}'");
                 }
             }
         }
@@ -339,7 +339,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                 {
                     _heldContent.ClearHeld ();
 
-                    Logging.Logger.LogTrace ($"AnsiResponseParser swallowed '{cur}'");
+                    Logging.Trace($"AnsiResponseParser swallowed '{cur}'");
 
                     // Do not send back to input stream
                     return false;
@@ -400,7 +400,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
         if (matchingResponse?.Response != null)
         {
-            Logging.Logger.LogTrace ($"AnsiResponseParser processed '{cur}'");
+            Logging.Trace($"AnsiResponseParser processed '{cur}'");
 
             if (invokeCallback)
             {
@@ -500,7 +500,7 @@ internal class AnsiResponseParser<T> : AnsiResponseParserBase
     {
         Tuple<char, T> tuple = (Tuple<char, T>)c;
 
-        Logging.Logger.LogTrace ($"AnsiResponseParser releasing '{tuple.Item1}'");
+        Logging.Trace($"AnsiResponseParser releasing '{tuple.Item1}'");
         output.Add (tuple);
     }
 
@@ -578,7 +578,7 @@ internal class AnsiResponseParser () : AnsiResponseParserBase (new StringHeld ()
 
     private void AppendOutput (StringBuilder output, char c)
     {
-        Logging.Logger.LogTrace ($"AnsiResponseParser releasing '{c}'");
+        Logging.Trace($"AnsiResponseParser releasing '{c}'");
         output.Append (c);
     }
 

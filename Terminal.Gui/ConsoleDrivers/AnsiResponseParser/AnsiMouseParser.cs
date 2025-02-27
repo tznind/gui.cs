@@ -55,7 +55,7 @@ public class AnsiMouseParser
             };
 
 
-            Logging.Logger.LogTrace ($"{nameof(AnsiMouseParser)} handled as {input} mouse {m.Flags} at {m.Position}");
+            Logging.Trace($"{nameof(AnsiMouseParser)} handled as {input} mouse {m.Flags} at {m.Position}");
             return m;
         }
 

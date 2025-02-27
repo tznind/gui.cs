@@ -219,7 +219,9 @@ public class UICatalogApp
         // Configure Serilog to write logs to a file
         Log.Logger = new LoggerConfiguration ()
                      .MinimumLevel.Verbose () // Verbose includes Trace and Debug
-                     .WriteTo.File ("logs/logfile.txt", rollingInterval: RollingInterval.Day)
+                     .Enrich.FromLogContext () // Enables dynamic enrichment
+                     .WriteTo.File ("logs/logfile.txt", rollingInterval: RollingInterval.Day,
+                                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
                      .CreateLogger ();
 
         // Create a logger factory compatible with Microsoft.Extensions.Logging

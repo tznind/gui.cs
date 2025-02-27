@@ -29,7 +29,7 @@ public abstract class AnsiKeyboardParserPattern
     public Key? GetKey (string input)
     {
         var key = GetKeyImpl (input);
-        Logging.Logger.LogTrace ($"{nameof (AnsiKeyboardParser)} interpreted {input} as {key} using {_name}");
+        Logging.Trace($"{nameof (AnsiKeyboardParser)} interpreted {input} as {key} using {_name}");
 
         return key;
     }

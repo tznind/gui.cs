@@ -63,7 +63,7 @@ internal class MouseInterpreter
             View = mouseEventArgs.View,
             Position = mouseEventArgs.Position
         };
-        Logging.Logger.LogTrace ($"Raising click event:{newClick.Flags} at screen {newClick.ScreenPosition}");
+        Logging.Trace($"Raising click event:{newClick.Flags} at screen {newClick.ScreenPosition}");
         return newClick;
     }
 

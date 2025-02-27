@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Metrics;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -49,4 +50,17 @@ public static class Logging
     /// </summary>
     public static readonly Histogram<int> DrainInputStream = Logging.Meter.CreateHistogram<int> ("Drain Input (ms)");
 
+    /// <summary>
+    /// Logs a trace message including the 
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="caller"></param>
+    /// <param name="filePath"></param>
+    public static void Trace (string message,
+                                 [CallerMemberName] string caller = "",
+                                 [CallerFilePath] string filePath = "")
+    {
+        string className = Path.GetFileNameWithoutExtension (filePath);
+        Logger.LogTrace ($"[{className}] [{caller}] {message}");
+    }
 }

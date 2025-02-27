@@ -43,7 +43,7 @@ public abstract class InputProcessor<T> : IInputProcessor
     /// <param name="a"></param>
     public void OnKeyDown (Key a)
     {
-        Logging.Logger.LogTrace ($"{nameof(InputProcessor<T>)} raised {a}");
+        Logging.Trace($"{nameof(InputProcessor<T>)} raised {a}");
         KeyDown?.Invoke (this, a);
     }
 
@@ -74,7 +74,7 @@ public abstract class InputProcessor<T> : IInputProcessor
 
         foreach (var e in _mouseInterpreter.Process (a))
         {
-            Logging.Logger.LogTrace ($"Mouse Interpreter raising {e.Flags}");
+            Logging.Trace($"Mouse Interpreter raising {e.Flags}");
             // Pass on
             MouseEvent?.Invoke (this, e);
         }
