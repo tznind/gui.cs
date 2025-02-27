@@ -22,7 +22,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
     /// <summary>
     ///     Event raised when keyboard event is detected (e.g. cursors) - requires setting <see cref="HandleKeyboard"/>
     /// </summary>
-    public event Action<object, Key>? Keyboard;
+    public event EventHandler<Key>? Keyboard;
 
     /// <summary>
     ///     True to explicitly handle mouse escape sequences by passing them to <see cref="Mouse"/> event.
