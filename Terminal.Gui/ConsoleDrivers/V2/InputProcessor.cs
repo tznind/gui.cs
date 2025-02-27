@@ -18,6 +18,11 @@ public abstract class InputProcessor<T> : IInputProcessor
 
     internal AnsiResponseParser<T> Parser { get; } = new ();
 
+    /// <summary>
+    /// Class responsible for translating the driver specific native input class <typeparamref name="T"/> e.g.
+    /// <see cref="ConsoleKeyInfo"/> into the Terminal.Gui <see cref="Key"/> class (used for all
+    /// internal library representations of Keys).
+    /// </summary>
     public IKeyConverter<T> KeyConverter { get; }
 
     /// <summary>
@@ -85,7 +90,9 @@ public abstract class InputProcessor<T> : IInputProcessor
     /// parser events and setting <see cref="InputBuffer"/> to
     /// the provided thread safe input collection.
     /// </summary>
-    /// <param name="inputBuffer"></param>
+    /// <param name="inputBuffer">The collection that will be populated with new input (see <see cref="IConsoleInput{T}"/>)</param>
+    /// <param name="keyConverter">Key converter for translating driver specific
+    /// <typeparamref name="T"/> class into Terminal.Gui <see cref="Key"/>.</param>
     protected InputProcessor (ConcurrentQueue<T> inputBuffer, IKeyConverter<T> keyConverter)
     {
         InputBuffer = inputBuffer;

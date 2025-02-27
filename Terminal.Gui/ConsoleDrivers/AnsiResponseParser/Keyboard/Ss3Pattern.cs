@@ -3,12 +3,22 @@ using System.Text.RegularExpressions;
 
 namespace Terminal.Gui;
 
+/// <summary>
+/// Parser for SS3 terminal escape sequences. These describe specific keys e.g.
+/// <c>EscOP</c> is F1.
+/// </summary>
 public class Ss3Pattern : AnsiKeyboardParserPattern
 {
     private static readonly Regex _pattern = new (@"^\u001bO([PQRStDCAB])$");
 
+    /// <inheritdoc/>
     public override bool IsMatch (string input) => _pattern.IsMatch (input);
 
+    /// <summary>
+    /// Returns the ss3 key that corresponds to the provided input escape sequence
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
     protected override Key? GetKeyImpl (string input)
     {
         var match = _pattern.Match (input);

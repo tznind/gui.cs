@@ -3,6 +3,13 @@ using Terminal.Gui.ConsoleDrivers;
 
 namespace Terminal.Gui;
 
+
+/// <summary>
+/// <see cref="IKeyConverter{T}"/> capable of converting the
+/// windows native <see cref="WindowsConsole.InputRecord"/> class
+/// into Terminal.Gui shared <see cref="Key"/> representation
+/// (used by <see cref="View"/> etc).
+/// </summary>
 internal class WindowsKeyConverter : IKeyConverter<WindowsConsole.InputRecord>
 {
     /// <inheritdoc />

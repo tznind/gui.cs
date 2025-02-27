@@ -19,13 +19,28 @@ public abstract class AnsiKeyboardParserPattern
     /// </summary>
     public bool IsLastMinute { get; set; }
 
+    /// <summary>
+    /// Returns <see langword="true"/> if <paramref name="input"/> is one
+    /// of the terminal sequences recognised by this class.
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
     public abstract bool IsMatch (string input);
-    private string _name;
+    private readonly string _name;
 
-    public AnsiKeyboardParserPattern ()
+    /// <summary>
+    /// Creates a new instance of the class.
+    /// </summary>
+    protected AnsiKeyboardParserPattern ()
     {
         _name = GetType ().Name;
     }
+
+    /// <summary>
+    /// Returns the <see cref="Key"/> described by the escape sequence.
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
     public Key? GetKey (string input)
     {
         var key = GetKeyImpl (input);
@@ -34,5 +49,11 @@ public abstract class AnsiKeyboardParserPattern
         return key;
     }
 
+    /// <summary>
+    /// When overriden in a derived class, returns the <see cref="Key"/>
+    /// that matches the input ansi escape sequence.
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
     protected abstract Key? GetKeyImpl (string input);
 }

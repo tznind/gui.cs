@@ -3,6 +3,11 @@ using System.Text.RegularExpressions;
 
 namespace Terminal.Gui;
 
+/// <summary>
+/// Detects ansi escape sequences in strings that have been read from
+/// the terminal (see <see cref="IAnsiResponseParser"/>). This pattern
+/// handles keys that begin <c>Esc[</c> e.g. <c>Esc[A</c> - cursor up
+/// </summary>
 public class CsiKeyPattern : AnsiKeyboardParserPattern
 {
     private Dictionary<string, Key> _terminators = new Dictionary<string, Key> ()
@@ -36,8 +41,12 @@ public class CsiKeyPattern : AnsiKeyboardParserPattern
 
     private readonly Regex _pattern;
 
+    /// <inheritdoc/>
     public override bool IsMatch (string input) => _pattern.IsMatch (input);
 
+    /// <summary>
+    /// Creates a new instance of the <see cref="CsiKeyPattern"/> class.
+    /// </summary>
     public CsiKeyPattern ()
     {
         var terms = new string (_terminators.Select (k => k.Key [0]).Where (k=> !char.IsDigit (k)).ToArray ());
