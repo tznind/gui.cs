@@ -4,22 +4,22 @@ using System.Text.RegularExpressions;
 namespace Terminal.Gui;
 
 /// <summary>
-/// Detects ansi escape sequences in strings that have been read from
-/// the terminal (see <see cref="IAnsiResponseParser"/>). This pattern
-/// handles keys that begin <c>Esc[</c> e.g. <c>Esc[A</c> - cursor up
+///     Detects ansi escape sequences in strings that have been read from
+///     the terminal (see <see cref="IAnsiResponseParser"/>). This pattern
+///     handles keys that begin <c>Esc[</c> e.g. <c>Esc[A</c> - cursor up
 /// </summary>
 public class CsiKeyPattern : AnsiKeyboardParserPattern
 {
-    private Dictionary<string, Key> _terminators = new Dictionary<string, Key> ()
+    private readonly Dictionary<string, Key> _terminators = new()
     {
         { "A", Key.CursorUp },
         { "B", Key.CursorDown },
         { "C", Key.CursorRight },
         { "D", Key.CursorLeft },
-        { "H", Key.Home },       // Home (older variant)
-        { "F", Key.End },        // End (older variant)
-        { "1~", Key.Home },      // Home (modern variant)
-        { "4~", Key.End },       // End (modern variant)
+        { "H", Key.Home }, // Home (older variant)
+        { "F", Key.End }, // End (older variant)
+        { "1~", Key.Home }, // Home (modern variant)
+        { "4~", Key.End }, // End (modern variant)
         { "5~", Key.PageUp },
         { "6~", Key.PageDown },
         { "2~", Key.InsertChar },
@@ -38,35 +38,35 @@ public class CsiKeyPattern : AnsiKeyboardParserPattern
         { "24~", Key.F12 }
     };
 
-
     private readonly Regex _pattern;
 
     /// <inheritdoc/>
-    public override bool IsMatch (string input) => _pattern.IsMatch (input);
+    public override bool IsMatch (string input) { return _pattern.IsMatch (input); }
 
     /// <summary>
-    /// Creates a new instance of the <see cref="CsiKeyPattern"/> class.
+    ///     Creates a new instance of the <see cref="CsiKeyPattern"/> class.
     /// </summary>
     public CsiKeyPattern ()
     {
-        var terms = new string (_terminators.Select (k => k.Key [0]).Where (k=> !char.IsDigit (k)).ToArray ());
+        var terms = new string (_terminators.Select (k => k.Key [0]).Where (k => !char.IsDigit (k)).ToArray ());
         _pattern = new (@$"^\u001b\[(1;(\d+))?([{terms}]|\d+~)$");
     }
+
     protected override Key? GetKeyImpl (string input)
     {
-        var match = _pattern.Match (input);
+        Match match = _pattern.Match (input);
 
         if (!match.Success)
         {
             return null;
         }
 
-        var terminator = match.Groups [3].Value;
+        string terminator = match.Groups [3].Value;
         string modifierGroup = match.Groups [2].Value;
 
-        var key = _terminators.GetValueOrDefault (terminator);
+        Key? key = _terminators.GetValueOrDefault (terminator);
 
-        if (key != null && int.TryParse (modifierGroup, out var modifier))
+        if (key != null && int.TryParse (modifierGroup, out int modifier))
         {
             key = modifier switch
                   {
@@ -80,6 +80,7 @@ public class CsiKeyPattern : AnsiKeyboardParserPattern
                       _ => key
                   };
         }
+
         return key;
     }
 }

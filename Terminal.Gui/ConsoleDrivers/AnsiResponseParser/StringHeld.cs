@@ -16,6 +16,6 @@ internal class StringHeld : IHeld
 
     public void AddToHeld (object o) { _held.Append ((char)o); }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public int Length => _held.Length;
 }

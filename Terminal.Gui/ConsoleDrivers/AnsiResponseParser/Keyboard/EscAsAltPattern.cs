@@ -5,18 +5,15 @@ namespace Terminal.Gui;
 
 internal class EscAsAltPattern : AnsiKeyboardParserPattern
 {
-    public EscAsAltPattern ()
-    {
-        IsLastMinute=true;
-    }
+    public EscAsAltPattern () { IsLastMinute = true; }
 
     private static readonly Regex _pattern = new (@"^\u001b([a-zA-Z0-9_])$");
 
-    public override bool IsMatch (string input) => _pattern.IsMatch (input);
+    public override bool IsMatch (string input) { return _pattern.IsMatch (input); }
 
     protected override Key? GetKeyImpl (string input)
     {
-        var match = _pattern.Match (input);
+        Match match = _pattern.Match (input);
 
         if (!match.Success)
         {

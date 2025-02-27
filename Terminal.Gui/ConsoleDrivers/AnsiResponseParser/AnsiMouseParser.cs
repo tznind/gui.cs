@@ -1,7 +1,5 @@
 ﻿#nullable enable
-using System.Runtime.ConstrainedExecution;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui;
 
@@ -48,14 +46,14 @@ public class AnsiMouseParser
             int y = int.Parse (match.Groups [3].Value) - 1;
             char terminator = match.Groups [4].Value.Single ();
 
-            var m = new MouseEventArgs()
+            var m = new MouseEventArgs
             {
                 Position = new (x, y),
                 Flags = GetFlags (buttonCode, terminator)
             };
 
+            Logging.Trace ($"{nameof (AnsiMouseParser)} handled as {input} mouse {m.Flags} at {m.Position}");
 
-            Logging.Trace($"{nameof(AnsiMouseParser)} handled as {input} mouse {m.Flags} at {m.Position}");
             return m;
         }
 

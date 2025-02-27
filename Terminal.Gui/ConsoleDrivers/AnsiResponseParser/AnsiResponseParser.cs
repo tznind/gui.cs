@@ -1,6 +1,5 @@
 ﻿#nullable enable
 
-using System.Runtime.ConstrainedExecution;
 using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui;
@@ -86,6 +85,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                                                                   'l', 'm', 'n',
                                                                   'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
                                                               ]);
+
     protected AnsiResponseParserBase (IHeld heldContent) { _heldContent = heldContent; }
 
     protected void ResetState ()
@@ -213,6 +213,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
     private void ReleaseHeld (Action<object> appendOutput, AnsiResponseParserState newState = AnsiResponseParserState.Normal)
     {
         TryLastMinuteSequences ();
+
         foreach (object o in _heldContent.HeldToObjects ())
         {
             appendOutput (o);
@@ -223,10 +224,10 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
     }
 
     /// <summary>
-    /// Checks current held chars against any sequences that have
-    /// conflicts with longer sequences e.g. Esc as Alt sequences
-    /// which can conflict if resolved earlier e.g. with EscOP ss3
-    /// sequences.
+    ///     Checks current held chars against any sequences that have
+    ///     conflicts with longer sequences e.g. Esc as Alt sequences
+    ///     which can conflict if resolved earlier e.g. with EscOP ss3
+    ///     sequences.
     /// </summary>
     protected void TryLastMinuteSequences ()
     {
@@ -236,7 +237,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
             if (HandleKeyboard)
             {
-                var pattern = _keyboardParser.IsKeyboard (cur, true);
+                AnsiKeyboardParserPattern? pattern = _keyboardParser.IsKeyboard (cur, true);
 
                 if (pattern != null)
                 {
@@ -258,7 +259,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                 {
                     _heldContent.ClearHeld ();
 
-                    Logging.Trace($"AnsiResponseParser last minute swallowed '{cur}'");
+                    Logging.Trace ($"AnsiResponseParser last minute swallowed '{cur}'");
                 }
             }
         }
@@ -281,13 +282,13 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
             if (HandleKeyboard)
             {
-                var pattern = _keyboardParser.IsKeyboard (cur);
+                AnsiKeyboardParserPattern? pattern = _keyboardParser.IsKeyboard (cur);
 
                 if (pattern != null)
                 {
-
                     RaiseKeyboardEvent (pattern, cur);
                     ResetState ();
+
                     return false;
                 }
             }
@@ -339,7 +340,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                 {
                     _heldContent.ClearHeld ();
 
-                    Logging.Trace($"AnsiResponseParser swallowed '{cur}'");
+                    Logging.Trace ($"AnsiResponseParser swallowed '{cur}'");
 
                     // Do not send back to input stream
                     return false;
@@ -400,7 +401,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
         if (matchingResponse?.Response != null)
         {
-            Logging.Trace($"AnsiResponseParser processed '{cur}'");
+            Logging.Trace ($"AnsiResponseParser processed '{cur}'");
 
             if (invokeCallback)
             {
@@ -500,7 +501,7 @@ internal class AnsiResponseParser<T> : AnsiResponseParserBase
     {
         Tuple<char, T> tuple = (Tuple<char, T>)c;
 
-        Logging.Trace($"AnsiResponseParser releasing '{tuple.Item1}'");
+        Logging.Trace ($"AnsiResponseParser releasing '{tuple.Item1}'");
         output.Add (tuple);
     }
 
@@ -578,7 +579,7 @@ internal class AnsiResponseParser () : AnsiResponseParserBase (new StringHeld ()
 
     private void AppendOutput (StringBuilder output, char c)
     {
-        Logging.Trace($"AnsiResponseParser releasing '{c}'");
+        Logging.Trace ($"AnsiResponseParser releasing '{c}'");
         output.Append (c);
     }
 
