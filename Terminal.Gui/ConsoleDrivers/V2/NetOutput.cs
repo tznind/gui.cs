@@ -3,8 +3,8 @@
 namespace Terminal.Gui;
 
 /// <summary>
-/// Implementation of <see cref="IConsoleOutput"/> that uses native dotnet
-/// methods e.g. <see cref="System.Console"/>
+///     Implementation of <see cref="IConsoleOutput"/> that uses native dotnet
+///     methods e.g. <see cref="System.Console"/>
 /// </summary>
 public class NetOutput : IConsoleOutput
 {
@@ -13,7 +13,7 @@ public class NetOutput : IConsoleOutput
     private CursorVisibility? _cachedCursorVisibility;
 
     /// <summary>
-    /// Creates a new instance of the <see cref="NetOutput"/> class.
+    ///     Creates a new instance of the <see cref="NetOutput"/> class.
     /// </summary>
     public NetOutput ()
     {
@@ -191,11 +191,11 @@ public class NetOutput : IConsoleOutput
         outputWidth = 0;
     }
 
-
     /// <inheritdoc/>
     public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
 
-    private Point _lastCursorPosition = new Point ();
+    private Point _lastCursorPosition;
+
     private bool SetCursorPositionImpl (int col, int row)
     {
         if (_lastCursorPosition.X == col && _lastCursorPosition.Y == row)
@@ -203,7 +203,7 @@ public class NetOutput : IConsoleOutput
             return true;
         }
 
-        _lastCursorPosition = new Point (col, row);
+        _lastCursorPosition = new (col, row);
 
         if (_isWinPlatform)
         {

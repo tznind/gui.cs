@@ -2,9 +2,9 @@
 namespace Terminal.Gui;
 
 /// <summary>
-/// Describes the screen state that you want the console to be in.
-/// Is designed to be drawn to repeatedly then manifest into the console
-/// once at the end of iteration after all drawing is finalized.
+///     Describes the screen state that you want the console to be in.
+///     Is designed to be drawn to repeatedly then manifest into the console
+///     once at the end of iteration after all drawing is finalized.
 /// </summary>
 public interface IOutputBuffer
 {
@@ -50,14 +50,14 @@ public interface IOutputBuffer
     public int Col { get; }
 
     /// <summary>
-    /// The first cell index on left of screen - basically always 0.
-    /// Changing this may have unexpected consequences.
+    ///     The first cell index on left of screen - basically always 0.
+    ///     Changing this may have unexpected consequences.
     /// </summary>
     int Left { get; set; }
 
     /// <summary>
-    /// The first cell index on top of screen - basically always 0.
-    /// Changing this may have unexpected consequences.
+    ///     The first cell index on top of screen - basically always 0.
+    ///     Changing this may have unexpected consequences.
     /// </summary>
     int Top { get; set; }
 
@@ -105,16 +105,16 @@ public interface IOutputBuffer
     void SetWindowSize (int cols, int rows);
 
     /// <summary>
-    /// Fills the given <paramref name="rect"/> with the given
-    /// symbol using the currently selected attribute.
+    ///     Fills the given <paramref name="rect"/> with the given
+    ///     symbol using the currently selected attribute.
     /// </summary>
     /// <param name="rect"></param>
     /// <param name="rune"></param>
     void FillRect (Rectangle rect, Rune rune);
 
     /// <summary>
-    /// Fills the given <paramref name="rect"/> with the given
-    /// symbol using the currently selected attribute.
+    ///     Fills the given <paramref name="rect"/> with the given
+    ///     symbol using the currently selected attribute.
     /// </summary>
     /// <param name="rect"></param>
     /// <param name="rune"></param>

@@ -2,8 +2,8 @@
 namespace Terminal.Gui;
 
 /// <summary>
-/// Interface for classes responsible for reporting the current
-/// size of the terminal window.
+///     Interface for classes responsible for reporting the current
+///     size of the terminal window.
 /// </summary>
 public interface IWindowSizeMonitor
 {
@@ -11,8 +11,8 @@ public interface IWindowSizeMonitor
     event EventHandler<SizeChangedEventArgs>? SizeChanging;
 
     /// <summary>
-    /// Examines the current size of the terminal and raises <see cref="SizeChanging"/> if it is different
-    /// from last inspection.
+    ///     Examines the current size of the terminal and raises <see cref="SizeChanging"/> if it is different
+    ///     from last inspection.
     /// </summary>
     /// <returns></returns>
     bool Poll ();

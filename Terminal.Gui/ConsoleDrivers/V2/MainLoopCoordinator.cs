@@ -4,11 +4,11 @@ using Microsoft.Extensions.Logging;
 namespace Terminal.Gui;
 
 /// <summary>
-///<para>
-/// Handles creating the input loop thread and bootstrapping the
-/// <see cref="MainLoop{T}"/> that handles layout/drawing/events etc.
-/// </para>
-/// <para>This class is designed to be managed by <see cref="ApplicationV2"/></para>
+///     <para>
+///         Handles creating the input loop thread and bootstrapping the
+///         <see cref="MainLoop{T}"/> that handles layout/drawing/events etc.
+///     </para>
+///     <para>This class is designed to be managed by <see cref="ApplicationV2"/></para>
 /// </summary>
 /// <typeparam name="T"></typeparam>
 internal class MainLoopCoordinator<T> : IMainLoopCoordinator
@@ -75,10 +75,10 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
         BootMainLoop ();
 
         // Wait asynchronously for the semaphore or task failure.
-        var waitForSemaphore = _startupSemaphore.WaitAsync ();
+        Task waitForSemaphore = _startupSemaphore.WaitAsync ();
 
         // Wait for either the semaphore to be released or the input task to crash.
-        var completedTask = await Task.WhenAny (waitForSemaphore, _inputTask).ConfigureAwait (false);
+        Task completedTask = await Task.WhenAny (waitForSemaphore, _inputTask).ConfigureAwait (false);
 
         // Check if the task was the input task and if it has failed.
         if (completedTask == _inputTask)
@@ -88,7 +88,7 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
                 throw _inputTask.Exception;
             }
 
-            throw new Exception ("Input loop exited during startup instead of entering read loop properly (i.e. and blocking)");
+            throw new ("Input loop exited during startup instead of entering read loop properly (i.e. and blocking)");
         }
 
         Logging.Logger.LogInformation ("Main Loop Coordinator booting complete");
@@ -164,7 +164,7 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
         }
     }
 
-    private bool _stopCalled = false;
+    private bool _stopCalled;
 
     /// <inheritdoc/>
     public void Stop ()
@@ -174,6 +174,7 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
         {
             return;
         }
+
         _stopCalled = true;
 
         _tokenSource.Cancel ();

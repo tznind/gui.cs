@@ -3,16 +3,16 @@
 namespace Terminal.Gui;
 
 /// <summary>
-/// Console input implementation that uses native dotnet methods e.g. <see cref="System.Console"/>.
+///     Console input implementation that uses native dotnet methods e.g. <see cref="System.Console"/>.
 /// </summary>
 public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
 {
     private readonly NetWinVTConsole _adjustConsole;
 
     /// <summary>
-    /// Creates a new instance of the class. Implicitly sends
-    /// console mode settings that enable virtual input (mouse
-    /// reporting etc).
+    ///     Creates a new instance of the class. Implicitly sends
+    ///     console mode settings that enable virtual input (mouse
+    ///     reporting etc).
     /// </summary>
     public NetInput ()
     {

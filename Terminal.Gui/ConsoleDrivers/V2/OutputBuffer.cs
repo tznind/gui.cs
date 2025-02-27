@@ -344,7 +344,7 @@ public class OutputBuffer : IOutputBuffer
             {
                 for (var c = 0; c < Cols; c++)
                 {
-                    Contents [row, c] = new()
+                    Contents [row, c] = new ()
                     {
                         Rune = (Rune)' ',
                         Attribute = new Attribute (Color.White, Color.Black),
@@ -403,7 +403,7 @@ public class OutputBuffer : IOutputBuffer
                         continue;
                     }
 
-                    Contents [r, c] = new()
+                    Contents [r, c] = new ()
                     {
                         Rune = rune != default (Rune) ? rune : (Rune)' ',
                         Attribute = CurrentAttribute, IsDirty = true

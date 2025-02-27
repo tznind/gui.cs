@@ -10,7 +10,7 @@ internal class MouseButtonStateEx
     private readonly TimeSpan _repeatClickThreshold;
     private readonly int _buttonIdx;
     private int _consecutiveClicks;
-    private Point _lastPosition = new Point ();
+    private Point _lastPosition;
 
     /// <summary>
     ///     When the button entered its current state.

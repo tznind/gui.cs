@@ -3,10 +3,10 @@
 namespace Terminal.Gui;
 
 /// <summary>
-/// Interface for reading console input indefinitely -
-/// i.e. in an infinite loop. The class is responsible only
-/// for reading and storing the input in a thread safe input buffer
-/// which is then processed downstream e.g. on main UI thread.
+///     Interface for reading console input indefinitely -
+///     i.e. in an infinite loop. The class is responsible only
+///     for reading and storing the input in a thread safe input buffer
+///     which is then processed downstream e.g. on main UI thread.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public interface IConsoleInput<T> : IDisposable

@@ -5,9 +5,9 @@ using Microsoft.Extensions.Logging;
 namespace Terminal.Gui;
 
 /// <summary>
-/// Processes the queued input buffer contents - which must be of Type <typeparamref name="T"/>.
-/// Is responsible for <see cref="ProcessQueue"/> and translating into common Terminal.Gui
-/// events and data models.
+///     Processes the queued input buffer contents - which must be of Type <typeparamref name="T"/>.
+///     Is responsible for <see cref="ProcessQueue"/> and translating into common Terminal.Gui
+///     events and data models.
 /// </summary>
 public abstract class InputProcessor<T> : IInputProcessor
 {
@@ -19,14 +19,14 @@ public abstract class InputProcessor<T> : IInputProcessor
     internal AnsiResponseParser<T> Parser { get; } = new ();
 
     /// <summary>
-    /// Class responsible for translating the driver specific native input class <typeparamref name="T"/> e.g.
-    /// <see cref="ConsoleKeyInfo"/> into the Terminal.Gui <see cref="Key"/> class (used for all
-    /// internal library representations of Keys).
+    ///     Class responsible for translating the driver specific native input class <typeparamref name="T"/> e.g.
+    ///     <see cref="ConsoleKeyInfo"/> into the Terminal.Gui <see cref="Key"/> class (used for all
+    ///     internal library representations of Keys).
     /// </summary>
     public IKeyConverter<T> KeyConverter { get; }
 
     /// <summary>
-    /// Input buffer which will be drained from by this class.
+    ///     Input buffer which will be drained from by this class.
     /// </summary>
     public ConcurrentQueue<T> InputBuffer { get; }
 
@@ -48,7 +48,7 @@ public abstract class InputProcessor<T> : IInputProcessor
     /// <param name="a"></param>
     public void OnKeyDown (Key a)
     {
-        Logging.Trace($"{nameof(InputProcessor<T>)} raised {a}");
+        Logging.Trace ($"{nameof (InputProcessor<T>)} raised {a}");
         KeyDown?.Invoke (this, a);
     }
 
@@ -77,22 +77,25 @@ public abstract class InputProcessor<T> : IInputProcessor
         // Ensure ScreenPosition is set
         a.ScreenPosition = a.Position;
 
-        foreach (var e in _mouseInterpreter.Process (a))
+        foreach (MouseEventArgs e in _mouseInterpreter.Process (a))
         {
-            Logging.Trace($"Mouse Interpreter raising {e.Flags}");
+            Logging.Trace ($"Mouse Interpreter raising {e.Flags}");
+
             // Pass on
             MouseEvent?.Invoke (this, e);
         }
     }
 
     /// <summary>
-    /// Constructs base instance including wiring all relevant
-    /// parser events and setting <see cref="InputBuffer"/> to
-    /// the provided thread safe input collection.
+    ///     Constructs base instance including wiring all relevant
+    ///     parser events and setting <see cref="InputBuffer"/> to
+    ///     the provided thread safe input collection.
     /// </summary>
     /// <param name="inputBuffer">The collection that will be populated with new input (see <see cref="IConsoleInput{T}"/>)</param>
-    /// <param name="keyConverter">Key converter for translating driver specific
-    /// <typeparamref name="T"/> class into Terminal.Gui <see cref="Key"/>.</param>
+    /// <param name="keyConverter">
+    ///     Key converter for translating driver specific
+    ///     <typeparamref name="T"/> class into Terminal.Gui <see cref="Key"/>.
+    /// </param>
     protected InputProcessor (ConcurrentQueue<T> inputBuffer, IKeyConverter<T> keyConverter)
     {
         InputBuffer = inputBuffer;
@@ -112,7 +115,8 @@ public abstract class InputProcessor<T> : IInputProcessor
                                            {
                                                var cur = new string (str.Select (k => k.Item1).ToArray ());
                                                Logging.Logger.LogInformation ($"{nameof (InputProcessor<T>)} ignored unrecognized response '{cur}'");
-                                               AnsiSequenceSwallowed?.Invoke (this,cur);
+                                               AnsiSequenceSwallowed?.Invoke (this, cur);
+
                                                return true;
                                            };
         KeyConverter = keyConverter;
@@ -146,15 +150,15 @@ public abstract class InputProcessor<T> : IInputProcessor
     }
 
     /// <summary>
-    /// Process the provided single input element <paramref name="input"/>. This method
-    /// is called sequentially for each value read from <see cref="InputBuffer"/>.
+    ///     Process the provided single input element <paramref name="input"/>. This method
+    ///     is called sequentially for each value read from <see cref="InputBuffer"/>.
     /// </summary>
     /// <param name="input"></param>
     protected abstract void Process (T input);
 
     /// <summary>
-    /// Process the provided single input element - short-circuiting the <see cref="Parser"/>
-    /// stage of the processing.
+    ///     Process the provided single input element - short-circuiting the <see cref="Parser"/>
+    ///     stage of the processing.
     /// </summary>
     /// <param name="input"></param>
     protected abstract void ProcessAfterParsing (T input);

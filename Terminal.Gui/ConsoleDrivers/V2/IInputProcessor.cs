@@ -2,9 +2,9 @@
 namespace Terminal.Gui;
 
 /// <summary>
-/// Interface for main loop class that will process the queued input buffer contents.
-/// Is responsible for <see cref="ProcessQueue"/> and translating into common Terminal.Gui
-/// events and data models.
+///     Interface for main loop class that will process the queued input buffer contents.
+///     Is responsible for <see cref="ProcessQueue"/> and translating into common Terminal.Gui
+///     events and data models.
 /// </summary>
 public interface IInputProcessor
 {
@@ -53,7 +53,7 @@ public interface IInputProcessor
     void ProcessQueue ();
 
     /// <summary>
-    /// Gets the response parser currently configured on this input processor.
+    ///     Gets the response parser currently configured on this input processor.
     /// </summary>
     /// <returns></returns>
     public IAnsiResponseParser GetParser ();

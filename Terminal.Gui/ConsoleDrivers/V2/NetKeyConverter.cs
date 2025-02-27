@@ -1,14 +1,14 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-/// <see cref="IKeyConverter{T}"/> capable of converting the
-/// dotnet <see cref="ConsoleKeyInfo"/> class into Terminal.Gui
-/// shared <see cref="Key"/> representation (used by <see cref="View"/>
-/// etc).
+///     <see cref="IKeyConverter{T}"/> capable of converting the
+///     dotnet <see cref="ConsoleKeyInfo"/> class into Terminal.Gui
+///     shared <see cref="Key"/> representation (used by <see cref="View"/>
+///     etc).
 /// </summary>
 internal class NetKeyConverter : IKeyConverter<ConsoleKeyInfo>
 {
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public Key ToKey (ConsoleKeyInfo input)
     {
         ConsoleKeyInfo adjustedInput = EscSeqUtils.MapConsoleKeyInfo (input);

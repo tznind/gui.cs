@@ -3,16 +3,15 @@ using Terminal.Gui.ConsoleDrivers;
 
 namespace Terminal.Gui;
 
-
 /// <summary>
-/// <see cref="IKeyConverter{T}"/> capable of converting the
-/// windows native <see cref="WindowsConsole.InputRecord"/> class
-/// into Terminal.Gui shared <see cref="Key"/> representation
-/// (used by <see cref="View"/> etc).
+///     <see cref="IKeyConverter{T}"/> capable of converting the
+///     windows native <see cref="WindowsConsole.InputRecord"/> class
+///     into Terminal.Gui shared <see cref="Key"/> representation
+///     (used by <see cref="View"/> etc).
 /// </summary>
 internal class WindowsKeyConverter : IKeyConverter<WindowsConsole.InputRecord>
 {
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public Key ToKey (WindowsConsole.InputRecord inputEvent)
     {
         if (inputEvent.KeyEvent.wVirtualKeyCode == (ConsoleKeyMapping.VK)ConsoleKey.Packet)
@@ -23,7 +22,7 @@ internal class WindowsKeyConverter : IKeyConverter<WindowsConsole.InputRecord>
             inputEvent.KeyEvent = WindowsDriver.FromVKPacketToKeyEventRecord (inputEvent.KeyEvent);
         }
 
-        WindowsConsole.ConsoleKeyInfoEx keyInfo = WindowsDriver.ToConsoleKeyInfoEx (inputEvent.KeyEvent);
+        var keyInfo = WindowsDriver.ToConsoleKeyInfoEx (inputEvent.KeyEvent);
 
         //Debug.WriteLine ($"event: KBD: {GetKeyboardLayoutName()} {inputEvent.ToString ()} {keyInfo.ToString (keyInfo)}");
 
@@ -34,6 +33,6 @@ internal class WindowsKeyConverter : IKeyConverter<WindowsConsole.InputRecord>
             return (Key)0;
         }
 
-        return new Key (map);
+        return new (map);
     }
 }

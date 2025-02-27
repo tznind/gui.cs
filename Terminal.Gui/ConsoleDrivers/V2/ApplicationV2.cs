@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 
@@ -22,8 +21,8 @@ public class ApplicationV2 : ApplicationImpl
     private readonly ITimedEvents _timedEvents = new TimedEvents ();
 
     /// <summary>
-    /// Creates anew instance of the Application backend. The provided
-    /// factory methods will be used on Init calls to get things booted.
+    ///     Creates anew instance of the Application backend. The provided
+    ///     factory methods will be used on Init calls to get things booted.
     /// </summary>
     public ApplicationV2 () : this (
                                     () => new NetInput (),
@@ -52,10 +51,10 @@ public class ApplicationV2 : ApplicationImpl
     [RequiresDynamicCode ("AOT")]
     public override void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
-
         if (Application.Initialized)
         {
             Logging.Logger.LogError ("Init called multiple times without shutdown, ignoring.");
+
             return;
         }
 
@@ -80,7 +79,6 @@ public class ApplicationV2 : ApplicationImpl
         Application.SubscribeDriverEvents ();
     }
 
-
     private void CreateDriver (string? driverName)
     {
         PlatformID p = Environment.OSVersion.Platform;
@@ -98,7 +96,7 @@ public class ApplicationV2 : ApplicationImpl
         }
         else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {
-            _coordinator = CreateWindowsSubcomponents();
+            _coordinator = CreateWindowsSubcomponents ();
         }
         else
         {
@@ -115,30 +113,30 @@ public class ApplicationV2 : ApplicationImpl
 
     private IMainLoopCoordinator CreateWindowsSubcomponents ()
     {
-        ConcurrentQueue<WindowsConsole.InputRecord> inputBuffer = new ConcurrentQueue<WindowsConsole.InputRecord> ();
-        MainLoop<WindowsConsole.InputRecord> loop = new MainLoop<WindowsConsole.InputRecord> ();
+        ConcurrentQueue<WindowsConsole.InputRecord> inputBuffer = new ();
+        MainLoop<WindowsConsole.InputRecord> loop = new ();
 
         return new MainLoopCoordinator<WindowsConsole.InputRecord> (
-                                                                            _timedEvents,
-                                                                            _winInputFactory,
-                                                                            inputBuffer,
-                                                                            new WindowsInputProcessor (inputBuffer),
-                                                                            _winOutputFactory,
-                                                                            loop);
+                                                                    _timedEvents,
+                                                                    _winInputFactory,
+                                                                    inputBuffer,
+                                                                    new WindowsInputProcessor (inputBuffer),
+                                                                    _winOutputFactory,
+                                                                    loop);
     }
 
     private IMainLoopCoordinator CreateNetSubcomponents ()
     {
-        ConcurrentQueue<ConsoleKeyInfo> inputBuffer = new ConcurrentQueue<ConsoleKeyInfo> ();
-        MainLoop<ConsoleKeyInfo> loop = new MainLoop<ConsoleKeyInfo> ();
+        ConcurrentQueue<ConsoleKeyInfo> inputBuffer = new ();
+        MainLoop<ConsoleKeyInfo> loop = new ();
 
         return new MainLoopCoordinator<ConsoleKeyInfo> (
-                                                                _timedEvents,
-                                                                _netInputFactory,
-                                                                inputBuffer,
-                                                                new NetInputProcessor (inputBuffer),
-                                                                _netOutputFactory,
-                                                                loop);
+                                                        _timedEvents,
+                                                        _netInputFactory,
+                                                        inputBuffer,
+                                                        new NetInputProcessor (inputBuffer),
+                                                        _netOutputFactory,
+                                                        loop);
     }
 
     /// <inheritdoc/>
@@ -161,7 +159,7 @@ public class ApplicationV2 : ApplicationImpl
 
         if (!Application.Initialized)
         {
-            throw new NotInitializedException (nameof(Run));
+            throw new NotInitializedException (nameof (Run));
         }
 
         Application.Top = view;
@@ -173,8 +171,9 @@ public class ApplicationV2 : ApplicationImpl
         {
             if (_coordinator is null)
             {
-                throw new Exception ($"{nameof (IMainLoopCoordinator)}inexplicably became null during Run");
+                throw new ($"{nameof (IMainLoopCoordinator)}inexplicably became null during Run");
             }
+
             _coordinator.RunIteration ();
         }
     }
@@ -209,27 +208,24 @@ public class ApplicationV2 : ApplicationImpl
     public override void Invoke (Action action)
     {
         _timedEvents.AddIdle (
-                             () =>
-                             {
-                                 action ();
+                              () =>
+                              {
+                                  action ();
 
-                                 return false;
-                             }
-                            );
+                                  return false;
+                              }
+                             );
     }
 
     /// <inheritdoc/>
     public override void AddIdle (Func<bool> func) { _timedEvents.AddIdle (func); }
 
     /// <summary>
-    /// Removes an idle function added by <see cref="AddIdle"/>
+    ///     Removes an idle function added by <see cref="AddIdle"/>
     /// </summary>
     /// <param name="fnTrue">Function to remove</param>
     /// <returns>True if it was found and removed</returns>
-    public bool RemoveIdle (Func<bool> fnTrue)
-    {
-        return _timedEvents.RemoveIdle (fnTrue);
-    }
+    public bool RemoveIdle (Func<bool> fnTrue) { return _timedEvents.RemoveIdle (fnTrue); }
 
     /// <inheritdoc/>
     public override object AddTimeout (TimeSpan time, Func<bool> callback) { return _timedEvents.AddTimeout (time, callback); }

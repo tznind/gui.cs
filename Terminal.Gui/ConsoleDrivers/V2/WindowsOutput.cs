@@ -201,15 +201,15 @@ internal class WindowsOutput : IConsoleOutput
 
             foreach (ExtendedCharInfo info in charInfoBuffer)
             {
-                ci [i++] = new()
+                ci [i++] = new ()
                 {
-                    Char = new() { UnicodeChar = info.Char },
+                    Char = new () { UnicodeChar = info.Char },
                     Attributes =
                         (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor16 () | ((int)info.Attribute.Background.GetClosestNamedColor16 () << 4))
                 };
             }
 
-            result = WriteConsoleOutput (_screenBuffer, ci, bufferSize, new() { X = window.Left, Y = window.Top }, ref window);
+            result = WriteConsoleOutput (_screenBuffer, ci, bufferSize, new () { X = window.Left, Y = window.Top }, ref window);
         }
         else
         {
@@ -302,23 +302,22 @@ internal class WindowsOutput : IConsoleOutput
         Write (sb.ToString ());
     }
 
-    private Point _lastCursorPosition = new Point ();
+    private Point _lastCursorPosition;
 
     /// <inheritdoc/>
     public void SetCursorPosition (int col, int row)
     {
-
         if (_lastCursorPosition.X == col && _lastCursorPosition.Y == row)
         {
             return;
         }
 
-        _lastCursorPosition = new Point (col, row);
+        _lastCursorPosition = new (col, row);
 
         SetConsoleCursorPosition (_screenBuffer, new ((short)col, (short)row));
     }
 
-    private bool _isDisposed = false;
+    private bool _isDisposed;
 
     /// <inheritdoc/>
     public void Dispose ()
@@ -336,9 +335,10 @@ internal class WindowsOutput : IConsoleOutput
             }
             catch (Exception e)
             {
-                Logging.Logger.LogError (e,"Error trying to close screen buffer handle in WindowsOutput via interop method");
+                Logging.Logger.LogError (e, "Error trying to close screen buffer handle in WindowsOutput via interop method");
             }
         }
-        _isDisposed=true;
+
+        _isDisposed = true;
     }
 }

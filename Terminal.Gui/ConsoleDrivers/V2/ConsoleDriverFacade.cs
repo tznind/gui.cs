@@ -4,7 +4,6 @@ namespace Terminal.Gui;
 
 internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
 {
-    private readonly IInputProcessor _inputProcessor;
     private readonly IConsoleOutput _output;
     private readonly IOutputBuffer _outputBuffer;
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
@@ -12,7 +11,9 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
 
     /// <summary>The event fired when the terminal is resized.</summary>
     public event EventHandler<SizeChangedEventArgs> SizeChanged;
-    public IInputProcessor InputProcessor => _inputProcessor;
+
+    public IInputProcessor InputProcessor { get; }
+
     public ConsoleDriverFacade (
         IInputProcessor inputProcessor,
         IOutputBuffer outputBuffer,
@@ -21,14 +22,14 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
         IWindowSizeMonitor windowSizeMonitor
     )
     {
-        _inputProcessor = inputProcessor;
+        InputProcessor = inputProcessor;
         _output = output;
         _outputBuffer = outputBuffer;
         _ansiRequestScheduler = ansiRequestScheduler;
 
-        _inputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
-        _inputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
-        _inputProcessor.MouseEvent += (s, e) => MouseEvent?.Invoke (s, e);
+        InputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
+        InputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
+        InputProcessor.MouseEvent += (s, e) => MouseEvent?.Invoke (s, e);
 
         windowSizeMonitor.SizeChanging += (_, e) => SizeChanged?.Invoke (this, e);
 
@@ -226,18 +227,18 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     /// <inheritdoc/>
     public virtual string GetVersionInfo ()
     {
-        string type = "";
+        var type = "";
 
-        if (_inputProcessor is WindowsInputProcessor)
+        if (InputProcessor is WindowsInputProcessor)
         {
             type = "(win)";
         }
-        else if (_inputProcessor is NetInputProcessor)
+        else if (InputProcessor is NetInputProcessor)
         {
             type = "(net)";
         }
 
-        return GetType().Name.TrimEnd('`','1') + type;
+        return GetType ().Name.TrimEnd ('`', '1') + type;
     }
 
     /// <summary>Tests if the specified rune is supported by the driver.</summary>

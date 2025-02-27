@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui;
 
@@ -18,16 +17,16 @@ public class MainLoop<T> : IMainLoop<T>
     /// <inheritdoc/>
     public ITimedEvents TimedEvents
     {
-        get => _timedEvents ?? throw new NotInitializedException(nameof(TimedEvents));
+        get => _timedEvents ?? throw new NotInitializedException (nameof (TimedEvents));
         private set => _timedEvents = value;
     }
 
     // TODO: follow above pattern for others too
 
     /// <summary>
-    /// The input events thread-safe collection. This is populated on separate
-    /// thread by a <see cref="IConsoleInput{T}"/>. Is drained as part of each
-    /// <see cref="Iteration"/>
+    ///     The input events thread-safe collection. This is populated on separate
+    ///     thread by a <see cref="IConsoleInput{T}"/>. Is drained as part of each
+    ///     <see cref="Iteration"/>
     /// </summary>
     public ConcurrentQueue<T> InputBuffer
     {
@@ -67,7 +66,7 @@ public class MainLoop<T> : IMainLoop<T>
     }
 
     /// <summary>
-    /// Handles raising events and setting required draw status etc when <see cref="Application.Top"/> changes
+    ///     Handles raising events and setting required draw status etc when <see cref="Application.Top"/> changes
     /// </summary>
     public IToplevelTransitionManager ToplevelTransitionManager = new ToplevelTransitionManager ();
 
@@ -78,7 +77,7 @@ public class MainLoop<T> : IMainLoop<T>
     public Func<DateTime> Now { get; set; } = () => DateTime.Now;
 
     /// <summary>
-    /// Initializes the class with the provided subcomponents
+    ///     Initializes the class with the provided subcomponents
     /// </summary>
     /// <param name="timedEvents"></param>
     /// <param name="inputBuffer"></param>
@@ -130,6 +129,7 @@ public class MainLoop<T> : IMainLoop<T>
             if (needsDrawOrLayout || sizeChanged)
             {
                 Logging.Redraws.Add (1);
+
                 // TODO: Test only
                 Application.LayoutAndDraw (true);
 
@@ -138,7 +138,7 @@ public class MainLoop<T> : IMainLoop<T>
                 Out.SetCursorVisibility (CursorVisibility.Default);
             }
 
-            this.SetCursor ();
+            SetCursor ();
         }
 
         var swCallbacks = Stopwatch.StartNew ();
@@ -150,7 +150,6 @@ public class MainLoop<T> : IMainLoop<T>
         Logging.IterationInvokesAndTimeouts.Record (swCallbacks.Elapsed.Milliseconds);
     }
 
-    
     private void SetCursor ()
     {
         View? mostFocused = Application.Top.MostFocused;
@@ -180,7 +179,8 @@ public class MainLoop<T> : IMainLoop<T>
     {
         if (v.NeedsDraw || v.NeedsLayout)
         {
-            Logging.Trace( $"{v.GetType ().Name} triggered redraw (NeedsDraw={v.NeedsDraw} NeedsLayout={v.NeedsLayout}) ");
+            Logging.Trace ($"{v.GetType ().Name} triggered redraw (NeedsDraw={v.NeedsDraw} NeedsLayout={v.NeedsLayout}) ");
+
             return true;
         }
 

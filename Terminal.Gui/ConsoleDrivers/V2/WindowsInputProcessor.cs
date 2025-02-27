@@ -11,10 +11,10 @@ using InputRecord = InputRecord;
 /// </summary>
 internal class WindowsInputProcessor : InputProcessor<InputRecord>
 {
-    private readonly bool[] _lastWasPressed = new bool[4];
+    private readonly bool [] _lastWasPressed = new bool[4];
 
     /// <inheritdoc/>
-    public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer) : base (inputBuffer, new WindowsKeyConverter()) { }
+    public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer) : base (inputBuffer, new WindowsKeyConverter ()) { }
 
     /// <inheritdoc/>
     protected override void Process (InputRecord inputEvent)
@@ -72,7 +72,7 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
     {
         var key = KeyConverter.ToKey (input);
 
-        if(key != (Key)0)
+        if (key != (Key)0)
         {
             OnKeyDown (key!);
             OnKeyUp (key!);
@@ -81,9 +81,9 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
 
     public MouseEventArgs ToDriverMouse (MouseEventRecord e)
     {
-        MouseFlags mouseFlags = MouseFlags.ReportMousePosition;
+        var mouseFlags = MouseFlags.ReportMousePosition;
 
-        mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, ButtonState.Button1Pressed,MouseFlags.Button1Pressed, MouseFlags.Button1Released, 0);
+        mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, ButtonState.Button1Pressed, MouseFlags.Button1Pressed, MouseFlags.Button1Released, 0);
         mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, ButtonState.Button2Pressed, MouseFlags.Button2Pressed, MouseFlags.Button2Released, 1);
         mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, ButtonState.Button4Pressed, MouseFlags.Button4Pressed, MouseFlags.Button4Released, 3);
 
@@ -102,7 +102,7 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
             }
         }
 
-        if (e.EventFlags == WindowsConsole.EventFlags.MouseWheeled)
+        if (e.EventFlags == EventFlags.MouseWheeled)
         {
             switch ((int)e.ButtonState)
             {
@@ -128,7 +128,15 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
 
         return result;
     }
-    private MouseFlags UpdateMouseFlags (MouseFlags current, ButtonState newState,ButtonState pressedState, MouseFlags pressedFlag, MouseFlags releasedFlag, int buttonIndex)
+
+    private MouseFlags UpdateMouseFlags (
+        MouseFlags current,
+        ButtonState newState,
+        ButtonState pressedState,
+        MouseFlags pressedFlag,
+        MouseFlags releasedFlag,
+        int buttonIndex
+    )
     {
         if (newState.HasFlag (pressedState))
         {
@@ -143,7 +151,7 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
                 _lastWasPressed [buttonIndex] = false;
             }
         }
+
         return current;
     }
-
 }
