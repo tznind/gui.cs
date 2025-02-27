@@ -68,14 +68,14 @@ public abstract class CollectionNavigatorBase
             {
                 // "dd" is a candidate
                 candidateState = SearchString + keyStruck;
-                Logging.Trace($"Appending, search is now for '{SearchString}'");
+                Logging.Trace($"Appending, search is now for '{candidateState}'");
             }
             else
             {
                 // its a fresh keystroke after some time
                 // or its first ever key press
                 SearchString = new string (keyStruck, 1);
-                Logging.Trace($"It has been too long since last key press so beginning new search for '{SearchString}'");
+                Logging.Trace($"It has been too long since last key press so beginning new search");
             }
 
             int idxCandidate = GetNextMatchingItem (
