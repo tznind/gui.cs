@@ -108,6 +108,8 @@ public class MainLoop<T> : IMainLoop<T>
 
         Logging.TotalIterationMetric.Record (took.Milliseconds);
 
+        Application.RaiseIteration ();
+
         if (sleepFor.Milliseconds > 0)
         {
             Task.Delay (sleepFor).Wait ();
