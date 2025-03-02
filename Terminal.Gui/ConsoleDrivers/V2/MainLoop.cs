@@ -99,11 +99,12 @@ public class MainLoop<T> : IMainLoop<T>
     public void Iteration ()
     {
         DateTime dt = Now ();
+        int timeAllowed = 1000 / Math.Max(1,(int)Application.MaximumIterationsPerSecond);
 
         IterationImpl ();
 
         TimeSpan took = Now () - dt;
-        TimeSpan sleepFor = TimeSpan.FromMilliseconds (50) - took;
+        TimeSpan sleepFor = TimeSpan.FromMilliseconds (timeAllowed) - took;
 
         Logging.TotalIterationMetric.Record (took.Milliseconds);
 
