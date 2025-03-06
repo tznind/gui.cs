@@ -72,7 +72,7 @@ public static partial class Application
             {
                 Rune rune = contents [r, c].Rune;
 
-                if (rune.DecodeSurrogatePair (out char [] sp))
+                if (rune.DecodeSurrogatePair (out char []? sp))
                 {
                     sb.Append (sp);
                 }
@@ -161,7 +161,7 @@ public static partial class Application
 #if DEBUG_IDISPOSABLE
 
         // Don't dispose the Top. It's up to caller dispose it
-        if (!ignoreDisposed && Top is { })
+        if (View.DebugIDisposable && !ignoreDisposed && Top is { })
         {
             Debug.Assert (Top.WasDisposed);
 
@@ -182,6 +182,7 @@ public static partial class Application
         MainThreadId = -1;
         Iteration = null;
         EndAfterFirstIteration = false;
+        ClearScreenNextIteration = false;
 
         // Driver stuff
         if (Driver is { })
@@ -221,7 +222,6 @@ public static partial class Application
 
         Navigation = null;
 
-        ClearScreenNextIteration = false;
 
         KeyBindings.Clear ();
         AddKeyBindings ();
