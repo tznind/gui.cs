@@ -60,7 +60,7 @@ Terminal.Gui now supports a configuration manager enabling library and app setti
 
 ## Logging & Metrics
 
-Terminal.Gui now features multi level logging of engine internals and system performance metrics (redraws, invoke durations etc).  Never wonder why your frame rate is low, or a given terminal/distro does not behave as expected.
+Terminal.Gui now features multi level logging of engine internals and system performance metrics (redraws, invoke durations etc).  Never again wonder why your frame rate is low, or a given terminal/distro does not behave as expected.
 See [Logging](logging.md) for details.
 
 ## Sixel Image Support
