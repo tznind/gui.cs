@@ -1,4 +1,4 @@
-t# Terminal.Gui v2
+# Terminal.Gui v2
 
 This document provides an overview of the new features and improvements in Terminal.Gui v2.
 
