@@ -3,7 +3,8 @@ namespace Terminal.Gui;
 
 /// <summary>
 ///     Provides a cascading menu that pops over all other content. Can be used as a context menu or a drop-down
-///     menu as part of <see cref="MenuBar"/>.
+///     all other content. Can be used as a context menu or a drop-down
+///     menu as part of <see cref="MenuBar"/> as part of <see cref="MenuBar"/>.
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -33,8 +34,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         base.Visible = false;
 
-        //base.ColorScheme = Colors.ColorSchemes ["Menu"];
-
         Root = root;
 
         AddCommand (Command.Right, MoveRight);
@@ -53,7 +52,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                         return false;
                     });
 
-        KeyBindings.Add (DefaultKey, Command.Quit);
+        KeyBindings.Add (Key, Command.Quit);
         KeyBindings.ReplaceCommands (Application.QuitKey, Command.Quit);
 
         AddCommand (
@@ -67,7 +66,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
                         Visible = false;
 
-                        return RaiseAccepted (ctx);
+                        return false;
                     });
 
         return;
@@ -98,7 +97,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                 return true;
             }
 
-            return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+            return false; //AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         }
     }
 
@@ -220,8 +219,11 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                 _root.Accepting += MenuOnAccepting;
             }
 
+            // TODO: This needs to be done whenever any MenuItem in the menu tree changes to support dynamic menus
+            // TODO: And it needs to clear the old bindings first
             UpdateKeyBindings ();
 
+            // TODO: This needs to be done whenever any MenuItem in the menu tree changes to support dynamic menus
             IEnumerable<Menuv2> allMenus = GetAllSubMenus ();
 
             foreach (Menuv2 menu in allMenus)
@@ -235,13 +237,12 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     private void UpdateKeyBindings ()
     {
-        // TODO: This needs to be done whenever any MenuItem in the menu tree changes to support dynamic menus
-        // TODO: And it needs to clear them first
         IEnumerable<MenuItemv2> all = GetMenuItemsOfAllSubMenus ();
 
         foreach (MenuItemv2 menuItem in all.Where (mi => mi.Command != Command.NotBound))
         {
             Key? key;
+
             if (menuItem.TargetView is { })
             {
                 // A TargetView implies HotKey
@@ -447,17 +448,16 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     private void MenuOnAccepting (object? sender, CommandEventArgs e)
     {
+        var senderView = sender as View;
+        Logging.Trace ($"Sender: {senderView?.GetType ().Name}, {e.Context?.Source?.Title}");
+
         if (e.Context?.Command != Command.HotKey)
         {
             Visible = false;
         }
-        else
-        {
-            // This supports the case when a hotkey of a menuitem with a submenu is pressed
-            e.Cancel = true;
-        }
 
-        //Logging.Trace ($"{e.Context?.Source?.Title}");
+        // This supports the case when a hotkey of a menuitem with a submenu is pressed
+        //e.Cancel = true;
     }
 
     private void MenuAccepted (object? sender, CommandEventArgs e)
@@ -514,8 +514,19 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     private void MenuOnSelectedMenuItemChanged (object? sender, MenuItemv2? e)
     {
-        //Logging.Trace ($"{e}");
+        Logging.Trace ($"e: {e?.Title}");
         ShowSubMenu (e);
+    }
+
+    /// <inheritdoc/>
+    protected override void OnSubViewAdded (View view)
+    {
+        if (Root is null && (view is Menuv2 || view is MenuItemv2))
+        {
+            throw new InvalidOperationException ("Do not add MenuItems or Menus directly to a PopoverMenu. Use the Root property.");
+        }
+
+        base.OnSubViewAdded (view);
     }
 
     /// <inheritdoc/>
@@ -539,20 +550,20 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         base.Dispose (disposing);
     }
 
-
     /// <inheritdoc/>
     public bool EnableForDesign<TContext> (ref readonly TContext context) where TContext : notnull
     {
-        Root = new Menuv2 (
-                           [
-                               new MenuItemv2 (this, Command.Cut),
-                               new MenuItemv2 (this, Command.Copy),
-                               new MenuItemv2 (this, Command.Paste),
-                               new Line (),
-                               new MenuItemv2 (this, Command.SelectAll)
-                           ]);
+        Root = new (
+                    [
+                        new MenuItemv2 (this, Command.Cut),
+                        new MenuItemv2 (this, Command.Copy),
+                        new MenuItemv2 (this, Command.Paste),
+                        new Line (),
+                        new MenuItemv2 (this, Command.SelectAll)
+                    ]);
 
         Visible = true;
+
         return true;
     }
 }

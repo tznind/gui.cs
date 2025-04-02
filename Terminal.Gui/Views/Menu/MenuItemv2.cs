@@ -7,6 +7,7 @@ namespace Terminal.Gui;
 
 /// <summary>
 ///     A <see cref="Shortcut"/>-derived object to be used as a menu item in a <see cref="Menuv2"/>. Has title, an
+///     A <see cref="Shortcut"/>-derived object to be used as a menu item in a <see cref="Menuv2"/>. Has title, an
 ///     associated help text, and an action to execute on activation.
 /// </summary>
 public class MenuItemv2 : Shortcut
@@ -54,6 +55,11 @@ public class MenuItemv2 : Shortcut
     { }
 
     /// <inheritdoc/>
+    public MenuItemv2 (string commandText, Key key, Action ? action = null)
+        : base (key ?? Key.Empty, commandText, action, null)
+    { }
+
+    /// <inheritdoc/>
     public MenuItemv2 (string? commandText = null, string? helpText = null, Menuv2? subMenu = null)
         : base (Key.Empty, commandText, null, helpText)
     {
@@ -98,6 +104,7 @@ public class MenuItemv2 : Shortcut
 
     internal override bool? DispatchCommand (ICommandContext? commandContext)
     {
+        Logging.Trace($"{commandContext?.Source?.Title}");
         bool? ret = null;
 
         if (commandContext is { Command: not Command.HotKey })
@@ -116,11 +123,11 @@ public class MenuItemv2 : Shortcut
 
         if (ret is not true)
         {
+            Logging.Trace($"Calling base.DispatchCommand");
             ret = base.DispatchCommand (commandContext);
         }
 
-        //Logging.Trace ($"{commandContext?.Source?.Title}");
-
+        Logging.Trace($"Calling RaiseAccepted");
         RaiseAccepted (commandContext);
 
         return ret;
