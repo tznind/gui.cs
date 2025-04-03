@@ -27,7 +27,7 @@ internal class Branch<T> where T : class
     ///     The children of the current branch.  This is null until the first call to <see cref="FetchChildren"/> to avoid
     ///     enumerating the entire underlying hierarchy.
     /// </summary>
-    public Dictionary<T, Branch<T>> ChildBranches { get; set; }
+    public List<Branch<T>> ChildBranches { get; set; }
 
     /// <summary>The depth of the current branch.  Depth of 0 indicates root level branches.</summary>
     public int Depth { get; }
@@ -275,14 +275,14 @@ internal class Branch<T> where T : class
 
         if (Depth >= tree.MaxDepth)
         {
-            children = Enumerable.Empty<T> ();
+            children = [];
         }
         else
         {
-            children = tree.TreeBuilder.GetChildren (Model) ?? Enumerable.Empty<T> ();
+            children = tree.TreeBuilder.GetChildren (Model) ?? [];
         }
 
-        ChildBranches = children.ToDictionary (k => k, val => new Branch<T> (tree, this, val));
+        ChildBranches = children.Select (o=>new Branch<T> (tree, this, o)).ToList ();
     }
 
     /// <summary>
@@ -340,10 +340,10 @@ internal class Branch<T> where T : class
             // we already knew about some children so preserve the state of the old children
 
             // first gather the new Children
-            IEnumerable<T> newChildren = tree.TreeBuilder?.GetChildren (Model) ?? Enumerable.Empty<T> ();
+            T[] newChildren = tree.TreeBuilder?.GetChildren (Model).ToArray () ?? [];
 
             // Children who no longer appear need to go
-            foreach (T toRemove in ChildBranches.Keys.Except (newChildren).ToArray ())
+            foreach (Branch<T> toRemove in ChildBranches.Where (b=>!newChildren.Contains(b.Model)).ToArray ())
             {
                 ChildBranches.Remove (toRemove);
 
@@ -357,17 +357,21 @@ internal class Branch<T> where T : class
             // New children need to be added
             foreach (T newChild in newChildren)
             {
+                Branch<T> existingBranch = ChildBranches.FirstOrDefault (b => b.Model.Equals (newChild));
                 // If we don't know about the child, yet we need a new branch
-                if (!ChildBranches.ContainsKey (newChild))
+                if (existingBranch == null)
                 {
-                    ChildBranches.Add (newChild, new Branch<T> (tree, this, newChild));
+                    ChildBranches.Add (new (tree, this, newChild));
                 }
                 else
                 {
                     //we already have this object but update the reference anyway in case Equality match but the references are new
-                    ChildBranches [newChild].Model = newChild;
+                    existingBranch.Model = newChild;
                 }
             }
+
+            // Order the list
+            ChildBranches = ChildBranches.OrderBy (b => newChildren.IndexOf (b.Model)).ToList ();
         }
     }
 
@@ -381,9 +385,9 @@ internal class Branch<T> where T : class
 
         if (ChildBranches is { })
         {
-            foreach (KeyValuePair<T, Branch<T>> child in ChildBranches)
+            foreach (Branch<T> child in ChildBranches)
             {
-                child.Value.CollapseAll ();
+                child.CollapseAll ();
             }
         }
     }
@@ -395,9 +399,9 @@ internal class Branch<T> where T : class
 
         if (ChildBranches is { })
         {
-            foreach (KeyValuePair<T, Branch<T>> child in ChildBranches)
+            foreach (Branch<T> child in ChildBranches)
             {
-                child.Value.ExpandAll ();
+                child.ExpandAll ();
             }
         }
     }
@@ -487,9 +491,9 @@ internal class Branch<T> where T : class
             if (IsExpanded)
             {
                 // if we are expanded we need to update the visible children
-                foreach (KeyValuePair<T, Branch<T>> child in ChildBranches)
+                foreach (Branch<T> child in ChildBranches)
                 {
-                    child.Value.Rebuild ();
+                    child.Rebuild ();
                 }
             }
             else
@@ -526,7 +530,7 @@ internal class Branch<T> where T : class
             return this == tree.roots.Values.LastOrDefault ();
         }
 
-        return Parent.ChildBranches.Values.LastOrDefault () == this;
+        return Parent.ChildBranches.LastOrDefault () == this;
     }
 
     private static Cell NewCell (Attribute attr, Rune r) { return new Cell { Rune = r, Attribute = new (attr) }; }
