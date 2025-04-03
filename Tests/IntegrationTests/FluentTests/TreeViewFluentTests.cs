@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terminal.Gui;
+﻿using Terminal.Gui;
 using TerminalGuiFluentTesting;
 using Xunit.Abstractions;
 
@@ -11,7 +6,6 @@ namespace IntegrationTests.FluentTests;
 
 public class TreeViewFluentTests
 {
-
     private readonly TextWriter _out;
 
     public TreeViewFluentTests (ITestOutputHelper outputHelper) { _out = new TestOutputWriter (outputHelper); }
@@ -20,10 +14,10 @@ public class TreeViewFluentTests
     [ClassData (typeof (V2TestDrivers))]
     public void TreeView_AllowReOrdering (V2TestDriver d)
     {
-        var tv = new TreeView ()
+        var tv = new TreeView
         {
-            Width = Dim.Fill(),
-            Height = Dim.Fill()
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
         };
 
         TreeNode car;
@@ -32,27 +26,27 @@ public class TreeViewFluentTests
 
         var root = new TreeNode ("Root")
         {
-            Children = [
-                           car = new TreeNode("Car"),
-                           lorry = new TreeNode("Lorry"),
-                           bike = new TreeNode("Bike")
-                ]
+            Children =
+            [
+                car = new ("Car"),
+                lorry = new ("Lorry"),
+                bike = new ("Bike")
+            ]
         };
 
         tv.AddObject (root);
 
-
         using GuiTestContext context =
             With.A<Window> (40, 10, d)
                 .Add (tv)
-                .Focus(tv)
+                .Focus (tv)
                 .WaitIteration ()
-                .ScreenShot ("Before expanding",_out)
+                .ScreenShot ("Before expanding", _out)
                 .Then (() => Assert.Equal (root, tv.GetObjectOnRow (0)))
                 .Then (() => Assert.Null (tv.GetObjectOnRow (1)))
                 .Right ()
-                .ScreenShot ("After expanding",_out)
-                .Then (()=>Assert.Equal (root,tv.GetObjectOnRow (0)))
+                .ScreenShot ("After expanding", _out)
+                .Then (() => Assert.Equal (root, tv.GetObjectOnRow (0)))
                 .Then (() => Assert.Equal (car, tv.GetObjectOnRow (1)))
                 .Then (() => Assert.Equal (lorry, tv.GetObjectOnRow (2)))
                 .Then (() => Assert.Equal (bike, tv.GetObjectOnRow (3)))
@@ -64,7 +58,7 @@ public class TreeViewFluentTests
                            tv.RefreshObject (root);
                        })
                 .WaitIteration ()
-                .ScreenShot ("After re-order",_out)
+                .ScreenShot ("After re-order", _out)
                 .Then (() => Assert.Equal (root, tv.GetObjectOnRow (0)))
                 .Then (() => Assert.Equal (bike, tv.GetObjectOnRow (1)))
                 .Then (() => Assert.Equal (car, tv.GetObjectOnRow (2)))
@@ -78,7 +72,7 @@ public class TreeViewFluentTests
     [ClassData (typeof (V2TestDrivers))]
     public void TreeViewReOrder_PreservesExpansion (V2TestDriver d)
     {
-        var tv = new TreeView ()
+        var tv = new TreeView
         {
             Width = Dim.Fill (),
             Height = Dim.Fill ()
@@ -98,32 +92,36 @@ public class TreeViewFluentTests
 
         var root = new TreeNode ("Root")
         {
-            Children = [
-                           car = new TreeNode("Car")
-                           {
-                               Children = [
-                                              mrA = new TreeNode("Mr A"),
-                                              mrB = new TreeNode("Mr B")
-                                   ]
-                           },
-                           lorry = new TreeNode("Lorry")
-                           {
-                               Children = [
-                                              mrC = new TreeNode("Mr C"),
-                                              ]
-                           },
-                           bike = new TreeNode("Bike")
-                           {
-                               Children = [
-                                              mrD = new TreeNode("Mr D"),
-                                              mrE = new TreeNode("Mr E")
-                                          ]
-                           }
-                       ]
+            Children =
+            [
+                car = new ("Car")
+                {
+                    Children =
+                    [
+                        mrA = new ("Mr A"),
+                        mrB = new ("Mr B")
+                    ]
+                },
+                lorry = new ("Lorry")
+                {
+                    Children =
+                    [
+                        mrC = new ("Mr C")
+                    ]
+                },
+                bike = new ("Bike")
+                {
+                    Children =
+                    [
+                        mrD = new ("Mr D"),
+                        mrE = new ("Mr E")
+                    ]
+                }
+            ]
         };
 
         tv.AddObject (root);
-        tv.ExpandAll();
+        tv.ExpandAll ();
 
         using GuiTestContext context =
             With.A<Window> (40, 13, d)
