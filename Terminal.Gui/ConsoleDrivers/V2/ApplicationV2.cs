@@ -85,14 +85,10 @@ public class ApplicationV2 : ApplicationImpl
 
     private void CreateDriver (string? driverName)
     {
+        PlatformID p = Environment.OSVersion.Platform;
 
         bool definetlyWin = driverName?.Contains ("win") ?? false;
         bool definetlyNet = driverName?.Contains ("net") ?? false;
-
-        var finder = new ConsoleFeatureFinder ();
-        var result = finder.GetResults ();
-
-        Logging.Logger.LogInformation ($"Feature detection results:{ result}");
 
         if (definetlyWin)
         {
@@ -102,7 +98,7 @@ public class ApplicationV2 : ApplicationImpl
         {
             _coordinator = CreateNetSubcomponents ();
         }
-        else if (result.IsWindows)
+        else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {
             _coordinator = CreateWindowsSubcomponents ();
         }
