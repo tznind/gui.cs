@@ -348,7 +348,7 @@ internal class Branch<T> where T : class
                 ChildBranches.Remove (toRemove);
 
                 //also if the user has this node selected (its disappearing) so lets change selection to us (the parent object) to be helpful
-                if (Equals (tree.SelectedObject, toRemove))
+                if (Equals (tree.SelectedObject, toRemove.Model))
                 {
                     tree.SelectedObject = Model;
                 }
