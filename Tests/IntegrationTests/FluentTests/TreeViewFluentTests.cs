@@ -74,4 +74,91 @@ public class TreeViewFluentTests
         context.Stop ();
     }
 
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void TreeViewReOrder_PreservesExpansion (V2TestDriver d)
+    {
+        var tv = new TreeView ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+
+        TreeNode car;
+        TreeNode lorry;
+        TreeNode bike;
+
+        TreeNode mrA;
+        TreeNode mrB;
+
+        TreeNode mrC;
+
+        TreeNode mrD;
+        TreeNode mrE;
+
+        var root = new TreeNode ("Root")
+        {
+            Children = [
+                           car = new TreeNode("Car")
+                           {
+                               Children = [
+                                              mrA = new TreeNode("Mr A"),
+                                              mrB = new TreeNode("Mr B")
+                                   ]
+                           },
+                           lorry = new TreeNode("Lorry")
+                           {
+                               Children = [
+                                              mrC = new TreeNode("Mr C"),
+                                              ]
+                           },
+                           bike = new TreeNode("Bike")
+                           {
+                               Children = [
+                                              mrD = new TreeNode("Mr D"),
+                                              mrE = new TreeNode("Mr E")
+                                          ]
+                           }
+                       ]
+        };
+
+        tv.AddObject (root);
+        tv.ExpandAll();
+
+        using GuiTestContext context =
+            With.A<Window> (40, 13, d)
+                .Add (tv)
+                .WaitIteration ()
+                .ScreenShot ("Initial State", _out)
+                .Then (() => Assert.Equal (root, tv.GetObjectOnRow (0)))
+                .Then (() => Assert.Equal (car, tv.GetObjectOnRow (1)))
+                .Then (() => Assert.Equal (mrA, tv.GetObjectOnRow (2)))
+                .Then (() => Assert.Equal (mrB, tv.GetObjectOnRow (3)))
+                .Then (() => Assert.Equal (lorry, tv.GetObjectOnRow (4)))
+                .Then (() => Assert.Equal (mrC, tv.GetObjectOnRow (5)))
+                .Then (() => Assert.Equal (bike, tv.GetObjectOnRow (6)))
+                .Then (() => Assert.Equal (mrD, tv.GetObjectOnRow (7)))
+                .Then (() => Assert.Equal (mrE, tv.GetObjectOnRow (8)))
+                .Then (
+                       () =>
+                       {
+                           // Re order
+                           root.Children = [bike, car, lorry];
+                           tv.RefreshObject (root);
+                       })
+                .WaitIteration ()
+                .ScreenShot ("After re-order", _out)
+                .Then (() => Assert.Equal (root, tv.GetObjectOnRow (0)))
+                .Then (() => Assert.Equal (bike, tv.GetObjectOnRow (1)))
+                .Then (() => Assert.Equal (mrD, tv.GetObjectOnRow (2)))
+                .Then (() => Assert.Equal (mrE, tv.GetObjectOnRow (3)))
+                .Then (() => Assert.Equal (car, tv.GetObjectOnRow (4)))
+                .Then (() => Assert.Equal (mrA, tv.GetObjectOnRow (5)))
+                .Then (() => Assert.Equal (mrB, tv.GetObjectOnRow (6)))
+                .Then (() => Assert.Equal (lorry, tv.GetObjectOnRow (7)))
+                .Then (() => Assert.Equal (mrC, tv.GetObjectOnRow (8)))
+                .WriteOutLogs (_out);
+
+        context.Stop ();
+    }
 }
