@@ -135,6 +135,15 @@ public class GuiTestContext : IDisposable
     }
 
     /// <summary>
+    ///     Hard stops the application and waits for the background thread to exit.
+    /// </summary>
+    public void HardStop ()
+    {
+        _hardStop.Cancel ();
+        Stop ();
+    }
+
+    /// <summary>
     /// Cleanup to avoid state bleed between tests
     /// </summary>
     public void Dispose ()
@@ -249,8 +258,7 @@ public class GuiTestContext : IDisposable
         }
         catch(Exception)
         {
-            Stop ();
-            _hardStop.Cancel();
+            HardStop ();
 
             throw;
 
@@ -258,6 +266,7 @@ public class GuiTestContext : IDisposable
 
         return this;
     }
+
 
     /// <summary>
     /// Simulates a right click at the given screen coordinates on the current driver.

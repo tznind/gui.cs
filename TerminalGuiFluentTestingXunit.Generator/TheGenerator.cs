@@ -36,7 +36,11 @@ public class TheGenerator : IIncrementalGenerator
         var sb = new StringBuilder ();
         var assertType = arg2.Left.GetTypeByMetadataName ("Xunit.Assert");
 
-            var equalMethods = assertType
+
+        // Create a HashSet to track unique method signatures
+        var signaturesDone = new HashSet<string> ();
+
+        var equalMethods = assertType
                                .GetMembers ("Equal")
                                .OfType<IMethodSymbol> ()
                                .Where (m => m.Parameters.Length == 2)
@@ -73,17 +77,30 @@ public class TheGenerator : IIncrementalGenerator
         {
             var signature = GetModifiedMethodSignature (m,out var expected, out var actual);
 
+            if (!signaturesDone.Add (signature))
+            {
+                continue;
+            }
+
             string method = $$"""
-                            {{signature}}
-                            {
-                                context.Then (
-                                              () =>
-                                              {
-                                                  Assert.Equal ({{expected}},{{actual}});
-                                              });
-                                return context;
-                            }
-                            """;
+                              {{signature}}
+                              {
+                                  try
+                                  {
+                                      Assert.Equal ({{expected}},{{actual}});
+                                  }
+                                  catch(Exception)
+                                  {
+                                      context.HardStop ();
+                                      
+                                  
+                                      throw;
+                                  
+                                  }
+                                  
+                                  return context;
+                              }
+                              """;
 
             sb.AppendLine (method);
         }
@@ -139,6 +156,25 @@ public class TheGenerator : IIncrementalGenerator
         {
             // Add the <T> here
             dec = dec.WithTypeParameterList (SyntaxFactory.TypeParameterList (SyntaxFactory.SeparatedList (typeParameters)));
+
+            // Handle type parameter constraints
+            var constraintClauses = methodSymbol.TypeParameters
+                                                .Where (tp => tp.ConstraintTypes.Length > 0)
+                                                .Select (tp =>
+                                                             SyntaxFactory.TypeParameterConstraintClause (tp.Name)
+                                                                          .WithConstraints (
+                                                                                            SyntaxFactory.SeparatedList<TypeParameterConstraintSyntax> (
+                                                                                                 tp.ConstraintTypes.Select (constraintType =>
+                                                                                                         SyntaxFactory.TypeConstraint (SyntaxFactory.ParseTypeName (constraintType.ToDisplayString ()))
+                                                                                                     )
+                                                                                                )
+                                                                                           )
+                                                        ).ToList ();
+
+            if (constraintClauses.Any ())
+            {
+                dec = dec.WithConstraintClauses (SyntaxFactory.List (constraintClauses));
+            }
         }
 
         // Build the method signature syntax tree
