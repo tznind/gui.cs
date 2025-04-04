@@ -1,8 +1,10 @@
 ﻿using System.Collections.Immutable;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace TerminalGuiFluentTestingXunit.Generator;
@@ -40,16 +42,6 @@ public class TheGenerator : IIncrementalGenerator
                                .Where (m => m.Parameters.Length == 2)
                                .ToList ();
 
-            /*foreach (var method in equalMethods)
-            {
-                var signature = string.Join (", ", method.Parameters.Select (p => p.Type.ToDisplayString ()));
-                context.ReportDiagnostic (Diagnostic.Create (
-                                                             new DiagnosticDescriptor ("GEN002", "Equal Overload", $"Equal({signature})", "Generator", DiagnosticSeverity.Info, true),
-                                                             Location.None));
-            }*/
-        
-
-
         string header = """"
                         using TerminalGuiFluentTesting;
                         using Xunit;
@@ -77,29 +69,85 @@ public class TheGenerator : IIncrementalGenerator
 
         sb.AppendLine (header);
 
-        foreach (var m in equalMethods)
-        //for (int i = 0; i < 1; i++)
+        foreach (IMethodSymbol? m in equalMethods)
         {
-            string method = """
-                            public static GuiTestContext AssertEqual (this GuiTestContext context, object? expected, object? actual)
+            var signature = GetModifiedMethodSignature (m,out var expected, out var actual);
+
+            string method = $$"""
+                            {{signature}}
                             {
                                 context.Then (
                                               () =>
                                               {
-                                                  Assert.Equal (expected,actual);
+                                                  Assert.Equal ({{expected}},{{actual}});
                                               });
                                 return context;
                             }
                             """;
 
             sb.AppendLine (method);
-
-            break;
         }
 
         sb.AppendLine (tail);
 
         context.AddSource("XunitContextExtensions.g.cs", sb.ToString());
+    }
+
+    
+    private string GetModifiedMethodSignature (IMethodSymbol methodSymbol, out string expectedParamName, out string actualParamName)
+    {
+        // Create the "this GuiTestContext context" parameter
+        var contextParam = SyntaxFactory.Parameter (SyntaxFactory.Identifier ("context"))
+                                         .WithType (SyntaxFactory.ParseTypeName ("GuiTestContext"))
+                                         .AddModifiers (SyntaxFactory.Token (SyntaxKind.ThisKeyword)); // Add the "this" keyword
+
+
+        // Extract the parameter names (expected and actual)
+        expectedParamName = methodSymbol.Parameters.FirstOrDefault ()?.Name ?? "expected";
+        actualParamName = methodSymbol.Parameters.Skip (1).FirstOrDefault ()?.Name ?? "actual";
+
+
+        // Get the current method parameters and add the context parameter at the start
+        var parameters = methodSymbol.Parameters.Select (p =>
+                                                             SyntaxFactory.Parameter (SyntaxFactory.Identifier (p.Name))
+                                                                          .WithType (SyntaxFactory.ParseTypeName (p.Type.ToDisplayString ()))
+                                                        ).ToList ();
+
+        parameters.Insert (0, contextParam); // Insert 'context' as the first parameter
+
+        // Change the return type to GuiTestContext
+        TypeSyntax returnType = SyntaxFactory.ParseTypeName ("GuiTestContext");
+
+        // Change the method name to AssertEqual
+        SyntaxToken methodName = SyntaxFactory.Identifier ("AssertEqual");
+
+        // Handle generic type parameters if the method is generic
+        var typeParameters = methodSymbol.TypeParameters.Select (
+                                                                 tp =>
+                                                                     SyntaxFactory.TypeParameter (SyntaxFactory.Identifier (tp.Name))
+                                                                )
+                                         .ToArray ();
+
+        MethodDeclarationSyntax dec = SyntaxFactory.MethodDeclaration (returnType, methodName)
+                                                   .WithModifiers (
+                                                                   SyntaxFactory.TokenList (
+                                                                                            SyntaxFactory.Token (SyntaxKind.PublicKeyword),
+                                                                                            SyntaxFactory.Token (SyntaxKind.StaticKeyword)))
+                                                   .WithParameterList (SyntaxFactory.ParameterList (SyntaxFactory.SeparatedList (parameters)));
+
+        if (typeParameters.Any ())
+        {
+            // Add the <T> here
+            dec = dec.WithTypeParameterList (SyntaxFactory.TypeParameterList (SyntaxFactory.SeparatedList (typeParameters)));
+        }
+
+        // Build the method signature syntax tree
+        MethodDeclarationSyntax methodSyntax = dec.NormalizeWhitespace ();
+
+        // Convert the method syntax to a string
+        string methodString = methodSyntax.ToString ();
+
+        return methodString;
     }
 
 }
