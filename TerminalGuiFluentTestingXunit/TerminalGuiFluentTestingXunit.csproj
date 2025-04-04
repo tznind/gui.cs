@@ -4,9 +4,11 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TerminalGuiFluentTestingXunit.Generator\TerminalGuiFluentTestingXunit.Generator.csproj" OutputItemType="Analyzer" />
     <ProjectReference Include="..\TerminalGuiFluentTesting\TerminalGuiFluentTesting.csproj" />
     <PackageReference Include="xunit" />
   </ItemGroup>
