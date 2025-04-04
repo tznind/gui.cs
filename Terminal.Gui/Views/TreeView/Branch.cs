@@ -1,8 +1,10 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+
+namespace Terminal.Gui;
 
 internal class Branch<T> where T : class
 {
-    private readonly TreeView<T> tree;
+    private readonly TreeView<T> _tree;
 
     /// <summary>
     ///     Declares a new branch of <paramref name="tree"/> in which the users object <paramref name="model"/> is
@@ -11,9 +13,9 @@ internal class Branch<T> where T : class
     /// <param name="tree">The UI control in which the branch resides.</param>
     /// <param name="parentBranchIfAny">Pass null for root level branches, otherwise pass the parent.</param>
     /// <param name="model">The user's object that should be displayed.</param>
-    public Branch (TreeView<T> tree, Branch<T> parentBranchIfAny, T model)
+    public Branch (TreeView<T> tree, Branch<T>? parentBranchIfAny, T model)
     {
-        this.tree = tree;
+        _tree = tree;
         Model = model;
 
         if (parentBranchIfAny is { })
@@ -27,7 +29,7 @@ internal class Branch<T> where T : class
     ///     The children of the current branch.  This is null until the first call to <see cref="FetchChildren"/> to avoid
     ///     enumerating the entire underlying hierarchy.
     /// </summary>
-    public List<Branch<T>> ChildBranches { get; set; }
+    public List<Branch<T>>? ChildBranches { get; set; }
 
     /// <summary>The depth of the current branch.  Depth of 0 indicates root level branches.</summary>
     public int Depth { get; }
@@ -39,7 +41,7 @@ internal class Branch<T> where T : class
     public T Model { get; private set; }
 
     /// <summary>The parent <see cref="Branch{T}"/> or null if it is a root.</summary>
-    public Branch<T> Parent { get; }
+    public Branch<T>? Parent { get; }
 
     /// <summary>
     ///     Returns true if the current branch can be expanded according to the <see cref="TreeBuilder{T}"/> or cached
@@ -52,13 +54,13 @@ internal class Branch<T> where T : class
         if (ChildBranches is null)
         {
             //if there is a rapid method for determining whether there are children
-            if (tree.TreeBuilder.SupportsCanExpand)
+            if (_tree.TreeBuilder.SupportsCanExpand)
             {
-                return tree.TreeBuilder.CanExpand (Model);
+                return _tree.TreeBuilder.CanExpand (Model);
             }
 
             //there is no way of knowing whether we can expand without fetching the children
-            FetchChildren ();
+            ChildBranches = FetchChildren ();
         }
 
         //we fetched or already know the children, so return whether we have any
@@ -80,21 +82,21 @@ internal class Branch<T> where T : class
         int indexOfModelText;
 
         // true if the current line of the tree is the selected one and control has focus
-        bool isSelected = tree.IsSelected (Model);
+        bool isSelected = _tree.IsSelected (Model);
 
         Attribute textColor =
-            isSelected ? tree.HasFocus ? colorScheme.Focus : colorScheme.HotNormal : colorScheme.Normal;
-        Attribute symbolColor = tree.Style.HighlightModelTextOnly ? colorScheme.Normal : textColor;
+            isSelected ? _tree.HasFocus ? colorScheme.Focus : colorScheme.HotNormal : colorScheme.Normal;
+        Attribute symbolColor = _tree.Style.HighlightModelTextOnly ? colorScheme.Normal : textColor;
 
         // Everything on line before the expansion run and branch text
         Rune [] prefix = GetLinePrefix (driver).ToArray ();
         Rune expansion = GetExpandableSymbol (driver);
-        string lineBody = tree.AspectGetter (Model) ?? "";
+        string lineBody = _tree.AspectGetter (Model) ?? "";
 
-        tree.Move (0, y);
+        _tree.Move (0, y);
 
         // if we have scrolled to the right then bits of the prefix will have disappeared off the screen
-        int toSkip = tree.ScrollOffsetHorizontal;
+        int toSkip = _tree.ScrollOffsetHorizontal;
         Attribute attr = symbolColor;
 
         // Draw the line prefix (all parallel lanes or whitespace and an expand/collapse/leaf symbol)
@@ -112,20 +114,20 @@ internal class Branch<T> where T : class
         }
 
         // pick color for expanded symbol
-        if (tree.Style.ColorExpandSymbol || tree.Style.InvertExpandSymbolColors)
+        if (_tree.Style.ColorExpandSymbol || _tree.Style.InvertExpandSymbolColors)
         {
-            Attribute color = symbolColor;
+            Attribute color;
 
-            if (tree.Style.ColorExpandSymbol)
+            if (_tree.Style.ColorExpandSymbol)
             {
                 if (isSelected)
                 {
-                    color = tree.Style.HighlightModelTextOnly ? colorScheme.HotNormal :
-                            tree.HasFocus ? tree.ColorScheme.HotFocus : tree.ColorScheme.HotNormal;
+                    color = _tree.Style.HighlightModelTextOnly ? colorScheme.HotNormal :
+                            _tree.HasFocus ? _tree.GetHotFocusColor () : _tree.GetHotNormalColor ();
                 }
                 else
                 {
-                    color = tree.ColorScheme.HotNormal;
+                    color = _tree.GetHotNormalColor ();
                 }
             }
             else
@@ -133,9 +135,9 @@ internal class Branch<T> where T : class
                 color = symbolColor;
             }
 
-            if (tree.Style.InvertExpandSymbolColors)
+            if (_tree.Style.InvertExpandSymbolColors)
             {
-                color = new Attribute (color.Background, color.Foreground);
+                color = new (color.Background, color.Foreground);
             }
 
             attr = color;
@@ -177,10 +179,10 @@ internal class Branch<T> where T : class
         if (lineBody.EnumerateRunes ().Sum (l => l.GetColumns ()) > availableWidth)
         {
             // remaining space is zero and truncate the line
-            lineBody = new string (
-                                   lineBody.TakeWhile (c => (availableWidth -= ((Rune)c).GetColumns ()) >= 0)
-                                           .ToArray ()
-                                  );
+            lineBody = new (
+                            lineBody.TakeWhile (c => (availableWidth -= ((Rune)c).GetColumns ()) >= 0)
+                                    .ToArray ()
+                           );
             availableWidth = 0;
         }
         else
@@ -194,9 +196,9 @@ internal class Branch<T> where T : class
         Attribute modelColor = textColor;
 
         // if custom color delegate invoke it
-        if (tree.ColorGetter is { })
+        if (_tree.ColorGetter is { })
         {
-            ColorScheme modelScheme = tree.ColorGetter (Model);
+            ColorScheme modelScheme = _tree.ColorGetter (Model);
 
             // if custom color scheme is defined for this Model
             if (modelScheme is { })
@@ -206,12 +208,12 @@ internal class Branch<T> where T : class
             }
             else
             {
-                modelColor = new Attribute ();
+                modelColor = new ();
             }
         }
 
         attr = modelColor;
-        cells.AddRange (lineBody.Select (r => NewCell (attr, new Rune (r))));
+        cells.AddRange (lineBody.Select (r => NewCell (attr, new (r))));
 
         if (availableWidth > 0)
         {
@@ -219,7 +221,7 @@ internal class Branch<T> where T : class
 
             cells.AddRange (
                             Enumerable.Repeat (
-                                               NewCell (attr, new Rune (' ')),
+                                               NewCell (attr, new (' ')),
                                                availableWidth
                                               )
                            );
@@ -230,12 +232,12 @@ internal class Branch<T> where T : class
             Model = Model,
             Y = y,
             Cells = cells,
-            Tree = tree,
+            Tree = _tree,
             IndexOfExpandCollapseSymbol =
                 indexOfExpandCollapseSymbol,
             IndexOfModelText = indexOfModelText
         };
-        tree.OnDrawLine (e);
+        _tree.OnDrawLine (e);
 
         if (!e.Handled && driver != null)
         {
@@ -252,10 +254,7 @@ internal class Branch<T> where T : class
     /// <summary>Expands the current branch if possible.</summary>
     public void Expand ()
     {
-        if (ChildBranches is null)
-        {
-            FetchChildren ();
-        }
+        ChildBranches ??= FetchChildren ();
 
         if (ChildBranches.Any ())
         {
@@ -264,25 +263,25 @@ internal class Branch<T> where T : class
     }
 
     /// <summary>Fetch the children of this branch. This method populates <see cref="ChildBranches"/>.</summary>
-    public virtual void FetchChildren ()
+    private List<Branch<T>> FetchChildren ()
     {
-        if (tree.TreeBuilder is null)
+        if (_tree.TreeBuilder is null)
         {
-            return;
+            return [];
         }
 
         IEnumerable<T> children;
 
-        if (Depth >= tree.MaxDepth)
+        if (Depth >= _tree.MaxDepth)
         {
             children = [];
         }
         else
         {
-            children = tree.TreeBuilder.GetChildren (Model) ?? [];
+            children = _tree.TreeBuilder.GetChildren (Model) ?? [];
         }
 
-        ChildBranches = children.Select (o=>new Branch<T> (tree, this, o)).ToList ();
+        return children.Select (o => new Branch<T> (_tree, this, o)).ToList ();
     }
 
     /// <summary>
@@ -293,16 +292,16 @@ internal class Branch<T> where T : class
     /// <returns></returns>
     public Rune GetExpandableSymbol (IConsoleDriver driver)
     {
-        Rune leafSymbol = tree.Style.ShowBranchLines ? Glyphs.HLine : (Rune)' ';
+        Rune leafSymbol = _tree.Style.ShowBranchLines ? Glyphs.HLine : (Rune)' ';
 
         if (IsExpanded)
         {
-            return tree.Style.CollapseableSymbol ?? leafSymbol;
+            return _tree.Style.CollapseableSymbol ?? leafSymbol;
         }
 
         if (CanExpand ())
         {
-            return tree.Style.ExpandableSymbol ?? leafSymbol;
+            return _tree.Style.ExpandableSymbol ?? leafSymbol;
         }
 
         return leafSymbol;
@@ -316,7 +315,7 @@ internal class Branch<T> where T : class
     public virtual int GetWidth (IConsoleDriver driver)
     {
         return
-            GetLinePrefix (driver).Sum (r => r.GetColumns ()) + GetExpandableSymbol (driver).GetColumns () + (tree.AspectGetter (Model) ?? "").Length;
+            GetLinePrefix (driver).Sum (r => r.GetColumns ()) + GetExpandableSymbol (driver).GetColumns () + (_tree.AspectGetter (Model) ?? "").Length;
     }
 
     /// <summary>Refreshes cached knowledge in this branch e.g. what children an object has.</summary>
@@ -333,35 +332,36 @@ internal class Branch<T> where T : class
         //if we don't know about any children yet just use the normal method
         if (ChildBranches is null)
         {
-            FetchChildren ();
+            ChildBranches = FetchChildren ();
         }
         else
         {
             // we already knew about some children so preserve the state of the old children
 
             // first gather the new Children
-            T[] newChildren = tree.TreeBuilder?.GetChildren (Model).ToArray () ?? [];
+            T [] newChildren = _tree.TreeBuilder?.GetChildren (Model).ToArray () ?? [];
 
             // Children who no longer appear need to go
-            foreach (Branch<T> toRemove in ChildBranches.Where (b=>!newChildren.Contains(b.Model)).ToArray ())
+            foreach (Branch<T> toRemove in ChildBranches.Where (b => !newChildren.Contains (b.Model)).ToArray ())
             {
                 ChildBranches.Remove (toRemove);
 
                 //also if the user has this node selected (its disappearing) so lets change selection to us (the parent object) to be helpful
-                if (Equals (tree.SelectedObject, toRemove.Model))
+                if (Equals (_tree.SelectedObject, toRemove.Model))
                 {
-                    tree.SelectedObject = Model;
+                    _tree.SelectedObject = Model;
                 }
             }
 
             // New children need to be added
             foreach (T newChild in newChildren)
             {
-                Branch<T> existingBranch = ChildBranches.FirstOrDefault (b => b.Model.Equals (newChild));
+                Branch<T>? existingBranch = ChildBranches.FirstOrDefault (b => b.Model.Equals (newChild));
+
                 // If we don't know about the child, yet we need a new branch
                 if (existingBranch == null)
                 {
-                    ChildBranches.Add (new (tree, this, newChild));
+                    ChildBranches.Add (new (_tree, this, newChild));
                 }
                 else
                 {
@@ -415,11 +415,11 @@ internal class Branch<T> where T : class
     internal IEnumerable<Rune> GetLinePrefix (IConsoleDriver driver)
     {
         // If not showing line branches or this is a root object.
-        if (!tree.Style.ShowBranchLines)
+        if (!_tree.Style.ShowBranchLines)
         {
             for (var i = 0; i < Depth; i++)
             {
-                yield return new Rune (' ');
+                yield return new (' ');
             }
 
             yield break;
@@ -430,14 +430,14 @@ internal class Branch<T> where T : class
         {
             if (cur.IsLast ())
             {
-                yield return new Rune (' ');
+                yield return new (' ');
             }
             else
             {
                 yield return Glyphs.VLine;
             }
 
-            yield return new Rune (' ');
+            yield return new (' ');
         }
 
         if (IsLast ())
@@ -466,13 +466,13 @@ internal class Branch<T> where T : class
         }
 
         // if we could theoretically expand
-        if (!IsExpanded && tree.Style.ExpandableSymbol != default (Rune?))
+        if (!IsExpanded && _tree.Style.ExpandableSymbol != default (Rune?))
         {
             return x == GetLinePrefix (driver).Count ();
         }
 
         // if we could theoretically collapse
-        if (IsExpanded && tree.Style.CollapseableSymbol != default (Rune?))
+        if (IsExpanded && _tree.Style.CollapseableSymbol != default (Rune?))
         {
             return x == GetLinePrefix (driver).Count ();
         }
@@ -508,7 +508,7 @@ internal class Branch<T> where T : class
     /// <returns></returns>
     private IEnumerable<Branch<T>> GetParentBranches ()
     {
-        Branch<T> cur = Parent;
+        Branch<T>? cur = Parent;
 
         while (cur is { })
         {
@@ -527,11 +527,13 @@ internal class Branch<T> where T : class
     {
         if (Parent is null)
         {
-            return this == tree.roots.Values.LastOrDefault ();
+            return this == _tree.roots.Values.LastOrDefault ();
         }
+
+        Parent.ChildBranches ??= Parent.FetchChildren ();
 
         return Parent.ChildBranches.LastOrDefault () == this;
     }
 
-    private static Cell NewCell (Attribute attr, Rune r) { return new Cell { Rune = r, Attribute = new (attr) }; }
+    private static Cell NewCell (Attribute attr, Rune r) { return new() { Rune = r, Attribute = new (attr) }; }
 }
