@@ -1,8 +1,5 @@
 ﻿using System.Collections.Immutable;
-using System.Reflection;
-using System.Reflection.Metadata;
 using System.Text;
-using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -10,8 +7,25 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace TerminalGuiFluentTestingXunit.Generator;
 
 [Generator]
-public class TheGenerator : IIncrementalGenerator
+public class AssertIsTypeGenerator : TheGenerator
 {
+    public AssertIsTypeGenerator () :
+        base ("IsType", 2,true)
+    {
+    }
+}
+
+[Generator]
+public class EqualGenerator : TheGenerator
+{
+    public EqualGenerator ():
+        base("Equal",2,false)
+    {
+    }
+}
+public abstract class TheGenerator(string methodName, int paramCount, bool invokeTExplicitly) : IIncrementalGenerator
+{
+
     /// <inheritdoc />
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -40,10 +54,10 @@ public class TheGenerator : IIncrementalGenerator
         // Create a HashSet to track unique method signatures
         var signaturesDone = new HashSet<string> ();
 
-        var equalMethods = assertType
-                               .GetMembers ("Equal")
+        var methods = assertType
+                               .GetMembers (methodName)
                                .OfType<IMethodSymbol> ()
-                               .Where (m => m.Parameters.Length == 2)
+                               .Where (m => m.Parameters.Length == paramCount)
                                .ToList ();
 
         string header = """"
@@ -55,15 +69,7 @@ public class TheGenerator : IIncrementalGenerator
                         public static partial class XunitContextExtensions
                         {
                         
-                            public static GuiTestContext AssertTrue (this GuiTestContext context, bool? condition)
-                            {
-                                context.Then (
-                                              () =>
-                                              {
-                                                  Assert.True (condition);
-                                              });
-                                return context;
-                            }
+
                         """";
 
         string tail = """
@@ -73,9 +79,9 @@ public class TheGenerator : IIncrementalGenerator
 
         sb.AppendLine (header);
 
-        foreach (IMethodSymbol? m in equalMethods)
+        foreach (IMethodSymbol? m in methods)
         {
-            var signature = GetModifiedMethodSignature (m,out var expected, out var actual);
+            var signature = GetModifiedMethodSignature (m,out var paramNames, out var typeParams);
 
             if (!signaturesDone.Add (signature))
             {
@@ -87,7 +93,7 @@ public class TheGenerator : IIncrementalGenerator
                               {
                                   try
                                   {
-                                      Assert.Equal ({{expected}},{{actual}});
+                                      Assert.{{methodName}}{{typeParams}} ({{string.Join(",",paramNames)}});
                                   }
                                   catch(Exception)
                                   {
@@ -107,12 +113,13 @@ public class TheGenerator : IIncrementalGenerator
 
         sb.AppendLine (tail);
 
-        context.AddSource("XunitContextExtensions.g.cs", sb.ToString());
+        context.AddSource($"XunitContextExtensions{methodName}.g.cs", sb.ToString());
     }
 
-    
-    private string GetModifiedMethodSignature (IMethodSymbol methodSymbol, out string expectedParamName, out string actualParamName)
+    private string GetModifiedMethodSignature (IMethodSymbol methodSymbol, out string[] paramNames, out string typeParams)
     {
+        typeParams = string.Empty;
+
         // Create the "this GuiTestContext context" parameter
         var contextParam = SyntaxFactory.Parameter (SyntaxFactory.Identifier ("context"))
                                          .WithType (SyntaxFactory.ParseTypeName ("GuiTestContext"))
@@ -120,15 +127,37 @@ public class TheGenerator : IIncrementalGenerator
 
 
         // Extract the parameter names (expected and actual)
-        expectedParamName = methodSymbol.Parameters.FirstOrDefault ()?.Name ?? "expected";
-        actualParamName = methodSymbol.Parameters.Skip (1).FirstOrDefault ()?.Name ?? "actual";
+        paramNames = new string [paramCount];
 
+        for (int i = 0; i < paramCount; i++)
+        {
+            paramNames [i] = methodSymbol.Parameters.ElementAt (i).Name;
+
+            // Check if the parameter name is a reserved keyword and prepend "@" if it is
+            if (IsReservedKeyword (paramNames [i]))
+            {
+                paramNames [i] = "@" + paramNames [i];
+            }
+            else
+            {
+                paramNames [i] = paramNames [i];
+            }
+        }
 
         // Get the current method parameters and add the context parameter at the start
         var parameters = methodSymbol.Parameters.Select (p =>
-                                                             SyntaxFactory.Parameter (SyntaxFactory.Identifier (p.Name))
-                                                                          .WithType (SyntaxFactory.ParseTypeName (p.Type.ToDisplayString ()))
-                                                        ).ToList ();
+                                                         {
+                                                             var paramName = p.Name;
+                                                             // Check if the parameter name is a reserved keyword and prepend "@" if it is
+                                                             if (IsReservedKeyword (paramName))
+                                                             {
+                                                                 paramName = "@" + paramName;
+                                                             }
+
+                                                             // Create the parameter syntax with the modified name
+                                                             return SyntaxFactory.Parameter (SyntaxFactory.Identifier (paramName))
+                                                                                 .WithType (SyntaxFactory.ParseTypeName (p.Type.ToDisplayString ()));
+                                                         }).ToList ();
 
         parameters.Insert (0, contextParam); // Insert 'context' as the first parameter
 
@@ -136,7 +165,7 @@ public class TheGenerator : IIncrementalGenerator
         TypeSyntax returnType = SyntaxFactory.ParseTypeName ("GuiTestContext");
 
         // Change the method name to AssertEqual
-        SyntaxToken methodName = SyntaxFactory.Identifier ("AssertEqual");
+        SyntaxToken newMethodName = SyntaxFactory.Identifier ($"Assert{methodName}");
 
         // Handle generic type parameters if the method is generic
         var typeParameters = methodSymbol.TypeParameters.Select (
@@ -145,7 +174,7 @@ public class TheGenerator : IIncrementalGenerator
                                                                 )
                                          .ToArray ();
 
-        MethodDeclarationSyntax dec = SyntaxFactory.MethodDeclaration (returnType, methodName)
+        MethodDeclarationSyntax dec = SyntaxFactory.MethodDeclaration (returnType, newMethodName)
                                                    .WithModifiers (
                                                                    SyntaxFactory.TokenList (
                                                                                             SyntaxFactory.Token (SyntaxKind.PublicKeyword),
@@ -174,6 +203,13 @@ public class TheGenerator : IIncrementalGenerator
             if (constraintClauses.Any ())
             {
                 dec = dec.WithConstraintClauses (SyntaxFactory.List (constraintClauses));
+
+            }
+
+            // Add the <T> here
+            if (invokeTExplicitly)
+            {
+                typeParams = "<" + string.Join (", ", typeParameters.Select (tp => tp.Identifier.ValueText)) + ">";
             }
         }
 
@@ -186,4 +222,9 @@ public class TheGenerator : IIncrementalGenerator
         return methodString;
     }
 
+    // Helper method to check if a parameter name is a reserved keyword
+    private bool IsReservedKeyword (string name)
+    {
+        return string.Equals (name, "object");
+    }
 }
