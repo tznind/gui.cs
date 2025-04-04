@@ -71,11 +71,9 @@ internal class Branch<T> where T : class
     public void Collapse () { IsExpanded = false; }
 
     /// <summary>Renders the current <see cref="Model"/> on the specified line <paramref name="y"/>.</summary>
-    /// <param name="driver"></param>
-    /// <param name="colorScheme"></param>
     /// <param name="y"></param>
     /// <param name="availableWidth"></param>
-    public virtual void Draw (IConsoleDriver driver, ColorScheme colorScheme, int y, int availableWidth)
+    public virtual void Draw (int y, int availableWidth)
     {
         List<Cell> cells = new ();
         int? indexOfExpandCollapseSymbol = null;
@@ -85,12 +83,12 @@ internal class Branch<T> where T : class
         bool isSelected = _tree.IsSelected (Model);
 
         Attribute textColor =
-            isSelected ? _tree.HasFocus ? colorScheme.Focus : colorScheme.HotNormal : colorScheme.Normal;
-        Attribute symbolColor = _tree.Style.HighlightModelTextOnly ? colorScheme.Normal : textColor;
+            isSelected ? _tree.HasFocus ? _tree.GetFocusColor () : _tree.GetHotNormalColor () : _tree.GetNormalColor ();
+        Attribute symbolColor = _tree.Style.HighlightModelTextOnly ? _tree.GetNormalColor () : textColor;
 
         // Everything on line before the expansion run and branch text
-        Rune [] prefix = GetLinePrefix (driver).ToArray ();
-        Rune expansion = GetExpandableSymbol (driver);
+        Rune [] prefix = GetLinePrefix ().ToArray ();
+        Rune expansion = GetExpandableSymbol ();
         string lineBody = _tree.AspectGetter (Model) ?? "";
 
         _tree.Move (0, y);
@@ -122,7 +120,7 @@ internal class Branch<T> where T : class
             {
                 if (isSelected)
                 {
-                    color = _tree.Style.HighlightModelTextOnly ? colorScheme.HotNormal :
+                    color = _tree.Style.HighlightModelTextOnly ? _tree.GetHotNormalColor () :
                             _tree.HasFocus ? _tree.GetHotFocusColor () : _tree.GetHotNormalColor ();
                 }
                 else
@@ -239,16 +237,16 @@ internal class Branch<T> where T : class
         };
         _tree.OnDrawLine (e);
 
-        if (!e.Handled && driver != null)
+        if (!e.Handled)
         {
             foreach (Cell cell in cells)
             {
-                driver.SetAttribute ((Attribute)cell.Attribute!);
-                driver.AddRune (cell.Rune);
+                _tree.SetAttribute ((Attribute)cell.Attribute!);
+                _tree.AddRune (cell.Rune);
             }
         }
 
-        driver?.SetAttribute (colorScheme.Normal);
+        _tree.SetAttribute (_tree.GetNormalColor());
     }
 
     /// <summary>Expands the current branch if possible.</summary>
@@ -288,9 +286,8 @@ internal class Branch<T> where T : class
     ///     Returns an appropriate symbol for displaying next to the string representation of the <see cref="Model"/>
     ///     object to indicate whether it <see cref="IsExpanded"/> or not (or it is a leaf).
     /// </summary>
-    /// <param name="driver"></param>
     /// <returns></returns>
-    public Rune GetExpandableSymbol (IConsoleDriver driver)
+    public Rune GetExpandableSymbol ()
     {
         Rune leafSymbol = _tree.Style.ShowBranchLines ? Glyphs.HLine : (Rune)' ';
 
@@ -312,10 +309,10 @@ internal class Branch<T> where T : class
     ///     line body).
     /// </summary>
     /// <returns></returns>
-    public virtual int GetWidth (IConsoleDriver driver)
+    public virtual int GetWidth ()
     {
         return
-            GetLinePrefix (driver).Sum (r => r.GetColumns ()) + GetExpandableSymbol (driver).GetColumns () + (_tree.AspectGetter (Model) ?? "").Length;
+            GetLinePrefix ().Sum (r => r.GetColumns ()) + GetExpandableSymbol ().GetColumns () + (_tree.AspectGetter (Model) ?? "").Length;
     }
 
     /// <summary>Refreshes cached knowledge in this branch e.g. what children an object has.</summary>
@@ -410,9 +407,8 @@ internal class Branch<T> where T : class
     ///     Gets all characters to render prior to the current branches line.  This includes indentation whitespace and
     ///     any tree branches (if enabled).
     /// </summary>
-    /// <param name="driver"></param>
     /// <returns></returns>
-    internal IEnumerable<Rune> GetLinePrefix (IConsoleDriver driver)
+    internal IEnumerable<Rune> GetLinePrefix ()
     {
         // If not showing line branches or this is a root object.
         if (!_tree.Style.ShowBranchLines)
@@ -468,13 +464,13 @@ internal class Branch<T> where T : class
         // if we could theoretically expand
         if (!IsExpanded && _tree.Style.ExpandableSymbol != default (Rune?))
         {
-            return x == GetLinePrefix (driver).Count ();
+            return x == GetLinePrefix ().Count ();
         }
 
         // if we could theoretically collapse
         if (IsExpanded && _tree.Style.CollapseableSymbol != default (Rune?))
         {
-            return x == GetLinePrefix (driver).Count ();
+            return x == GetLinePrefix ().Count ();
         }
 
         return false;
