@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Reflection;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -6,24 +7,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace TerminalGuiFluentTestingXunit.Generator;
 
-[Generator]
-public class AssertIsTypeGenerator : TheGenerator
-{
-    public AssertIsTypeGenerator () :
-        base ("IsType", 2,true)
-    {
-    }
-}
 
 [Generator]
-public class EqualGenerator : TheGenerator
-{
-    public EqualGenerator ():
-        base("Equal",2,false)
-    {
-    }
-}
-public abstract class TheGenerator(string methodName, int paramCount, bool invokeTExplicitly) : IIncrementalGenerator
+public class TheGenerator : IIncrementalGenerator
 {
 
     /// <inheritdoc />
@@ -47,9 +33,15 @@ public abstract class TheGenerator(string methodName, int paramCount, bool invok
 
     private void Execute(SourceProductionContext context, (Compilation Left, ImmutableArray<ClassDeclarationSyntax> Right) arg2)
     {
-        var sb = new StringBuilder ();
         var assertType = arg2.Left.GetTypeByMetadataName ("Xunit.Assert");
 
+        GenerateMethods (assertType,context, "IsType",true);
+        GenerateMethods (assertType, context, "Equal", false);
+    }
+
+    private void GenerateMethods (INamedTypeSymbol? assertType, SourceProductionContext context, string methodName, bool invokeTExplicitly)
+    {
+        var sb = new StringBuilder ();
 
         // Create a HashSet to track unique method signatures
         var signaturesDone = new HashSet<string> ();
@@ -57,10 +49,10 @@ public abstract class TheGenerator(string methodName, int paramCount, bool invok
         var methods = assertType
                                .GetMembers (methodName)
                                .OfType<IMethodSymbol> ()
-                               .Where (m => m.Parameters.Length == paramCount)
                                .ToList ();
 
         string header = """"
+                        #nullable enable
                         using TerminalGuiFluentTesting;
                         using Xunit;
 
@@ -81,7 +73,7 @@ public abstract class TheGenerator(string methodName, int paramCount, bool invok
 
         foreach (IMethodSymbol? m in methods)
         {
-            var signature = GetModifiedMethodSignature (m,out var paramNames, out var typeParams);
+            var signature = GetModifiedMethodSignature (m,methodName,invokeTExplicitly, out var paramNames, out var typeParams);
 
             if (!signaturesDone.Add (signature))
             {
@@ -93,7 +85,7 @@ public abstract class TheGenerator(string methodName, int paramCount, bool invok
                               {
                                   try
                                   {
-                                      Assert.{{methodName}}{{typeParams}} ({{string.Join(",",paramNames)}});
+                                      Assert.{{methodName}}{{typeParams}} ({{string.Join (",", paramNames)}});
                                   }
                                   catch(Exception)
                                   {
@@ -110,13 +102,12 @@ public abstract class TheGenerator(string methodName, int paramCount, bool invok
 
             sb.AppendLine (method);
         }
-
         sb.AppendLine (tail);
 
-        context.AddSource($"XunitContextExtensions{methodName}.g.cs", sb.ToString());
+        context.AddSource ($"XunitContextExtensions{methodName}.g.cs", sb.ToString ());
     }
 
-    private string GetModifiedMethodSignature (IMethodSymbol methodSymbol, out string[] paramNames, out string typeParams)
+    private string GetModifiedMethodSignature (IMethodSymbol methodSymbol, string methodName, bool invokeTExplicitly, out string [] paramNames, out string typeParams)
     {
         typeParams = string.Empty;
 
@@ -127,9 +118,9 @@ public abstract class TheGenerator(string methodName, int paramCount, bool invok
 
 
         // Extract the parameter names (expected and actual)
-        paramNames = new string [paramCount];
+        paramNames = new string [methodSymbol.Parameters.Length];
 
-        for (int i = 0; i < paramCount; i++)
+        for (int i = 0; i < methodSymbol.Parameters.Length; i++)
         {
             paramNames [i] = methodSymbol.Parameters.ElementAt (i).Name;
 
