@@ -34,7 +34,6 @@ public class TreeViewFluentTests
                 bike = new ("Bike")
             ]
         };
-        
         tv.AddObject (root);
 
         using GuiTestContext context =
