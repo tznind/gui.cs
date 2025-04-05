@@ -136,19 +136,7 @@ public class TheGenerator : IIncrementalGenerator
         }
 
         // Get the current method parameters and add the context parameter at the start
-        var parameters = methodSymbol.Parameters.Select (p =>
-                                                         {
-                                                             var paramName = p.Name;
-                                                             // Check if the parameter name is a reserved keyword and prepend "@" if it is
-                                                             if (IsReservedKeyword (paramName))
-                                                             {
-                                                                 paramName = "@" + paramName;
-                                                             }
-
-                                                             // Create the parameter syntax with the modified name
-                                                             return SyntaxFactory.Parameter (SyntaxFactory.Identifier (paramName))
-                                                                                 .WithType (SyntaxFactory.ParseTypeName (p.Type.ToDisplayString ()));
-                                                         }).ToList ();
+        var parameters = methodSymbol.Parameters.Select (p=>CreateParameter(p)).ToList ();
 
         parameters.Insert (0, contextParam); // Insert 'context' as the first parameter
 
@@ -211,6 +199,47 @@ public class TheGenerator : IIncrementalGenerator
         string methodString = methodSyntax.ToString ();
 
         return methodString;
+    }
+
+    /// <summary>
+    /// Creates a <see cref="ParameterSyntax"/> from a discovered parameter on real xunit method parameter <paramref name="p"/>
+    /// </summary>
+    /// <param name="p"></param>
+    /// <returns></returns>
+    private ParameterSyntax CreateParameter (IParameterSymbol p)
+    {
+        var paramName = p.Name;
+        // Check if the parameter name is a reserved keyword and prepend "@" if it is
+        if (IsReservedKeyword (paramName))
+        {
+            paramName = "@" + paramName;
+        }
+
+        // Create the basic parameter syntax with the modified name and type
+        var parameterSyntax = SyntaxFactory.Parameter (SyntaxFactory.Identifier (paramName))
+                                           .WithType (SyntaxFactory.ParseTypeName (p.Type.ToDisplayString ()));
+
+        // Add default value if one is present
+        if (p.HasExplicitDefaultValue)
+        {
+            var defaultValueExpression = p.ExplicitDefaultValue switch
+            {
+                null => SyntaxFactory.LiteralExpression (SyntaxKind.NullLiteralExpression),
+                bool b => SyntaxFactory.LiteralExpression (b ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression),
+                int i => SyntaxFactory.LiteralExpression (SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal (i)),
+                double d => SyntaxFactory.LiteralExpression (SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal (d)),
+                string s => SyntaxFactory.LiteralExpression (SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal (s)),
+                _ => SyntaxFactory.ParseExpression (p.ExplicitDefaultValue.ToString ()) // Fallback
+            };
+
+            parameterSyntax = parameterSyntax.WithDefault (
+                 SyntaxFactory.EqualsValueClause (defaultValueExpression)
+                );
+
+        }
+
+        return parameterSyntax;
+
     }
 
     // Helper method to check if a parameter name is a reserved keyword

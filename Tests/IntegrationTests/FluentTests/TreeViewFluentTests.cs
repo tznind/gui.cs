@@ -47,7 +47,7 @@ public class TreeViewFluentTests
                 .Then (() => Assert.Null (tv.GetObjectOnRow (1)))
                 .Right ()
                 .ScreenShot ("After expanding", _out)
-                .AssertIsType<ITreeNode>(tv.SelectedObject,false)
+                .AssertIsType<ITreeNode>(tv.SelectedObject)
                 .AssertEqual (root, tv.GetObjectOnRow (0))
                 .AssertEqual (car, tv.GetObjectOnRow (1))
                 .AssertEqual (lorry, tv.GetObjectOnRow (2))
