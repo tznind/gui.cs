@@ -53,6 +53,30 @@ public class TheGenerator : IIncrementalGenerator
         GenerateMethods (assertType, context, "IsNotAssignableFrom", true);
         GenerateMethods (assertType, context, "IsType", true);
         GenerateMethods (assertType, context, "IsNotType", true);
+
+        GenerateMethods (assertType, context, "Matches", true);
+        GenerateMethods (assertType, context, "Multiple", true);
+        GenerateMethods (assertType, context, "NotEmpty", true);
+        GenerateMethods (assertType, context, "NotEqual", true);
+        GenerateMethods (assertType, context, "NotInRange", true);
+        GenerateMethods (assertType, context, "NotNull", false);
+        GenerateMethods (assertType, context, "NotSame", true);
+        GenerateMethods (assertType, context, "NotStrictEqual", true);
+        GenerateMethods (assertType, context, "Null", false);
+        GenerateMethods (assertType, context, "ProperSubset", true);
+        GenerateMethods (assertType, context, "ProperSuperset", true);
+        GenerateMethods (assertType, context, "Raises", true);
+        GenerateMethods (assertType, context, "RaisesAny", true);
+        GenerateMethods (assertType, context, "Same", true);
+        GenerateMethods (assertType, context, "Single", true);
+        GenerateMethods (assertType, context, "StartsWith", false);
+
+        GenerateMethods (assertType, context, "StrictEqual", true);
+        GenerateMethods (assertType, context, "Subset", true);
+        GenerateMethods (assertType, context, "Superset", true);
+//        GenerateMethods (assertType, context, "Throws", true);
+  //      GenerateMethods (assertType, context, "ThrowsAny", true);
+        GenerateMethods (assertType, context, "True", false);
     }
 
     private void GenerateMethods (INamedTypeSymbol? assertType, SourceProductionContext context, string methodName, bool invokeTExplicitly)

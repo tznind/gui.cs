@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+	  <NoWarn>CS8714</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
