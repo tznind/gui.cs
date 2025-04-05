@@ -35,8 +35,24 @@ public class TheGenerator : IIncrementalGenerator
     {
         var assertType = arg2.Left.GetTypeByMetadataName ("Xunit.Assert");
 
-        GenerateMethods (assertType,context, "IsType",true);
         GenerateMethods (assertType, context, "Equal", false);
+
+        GenerateMethods (assertType, context, "All", true);
+        GenerateMethods (assertType, context, "Collection", true);
+        GenerateMethods (assertType, context, "Contains", true);
+        GenerateMethods (assertType, context, "Distinct", true);
+        GenerateMethods (assertType, context, "DoesNotContain", true);
+        GenerateMethods (assertType, context, "DoesNotMatch", true);
+        GenerateMethods (assertType, context, "Empty", true);
+        GenerateMethods (assertType, context, "EndsWith", false);
+        GenerateMethods (assertType, context, "Equivalent", true);
+        GenerateMethods (assertType, context, "Fail", true);
+        GenerateMethods (assertType, context, "False", true);
+        GenerateMethods (assertType, context, "InRange", true);
+        GenerateMethods (assertType, context, "IsAssignableFrom", true);
+        GenerateMethods (assertType, context, "IsNotAssignableFrom", true);
+        GenerateMethods (assertType, context, "IsType", true);
+        GenerateMethods (assertType, context, "IsNotType", true);
     }
 
     private void GenerateMethods (INamedTypeSymbol? assertType, SourceProductionContext context, string methodName, bool invokeTExplicitly)
