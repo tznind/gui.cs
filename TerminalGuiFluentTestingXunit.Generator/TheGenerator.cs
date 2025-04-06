@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using System.Reflection;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -7,33 +6,28 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace TerminalGuiFluentTestingXunit.Generator;
 
-
 [Generator]
 public class TheGenerator : IIncrementalGenerator
 {
-
-    /// <inheritdoc />
-    public void Initialize(IncrementalGeneratorInitializationContext context)
+    /// <inheritdoc/>
+    public void Initialize (IncrementalGeneratorInitializationContext context)
     {
-        var provider = context.SyntaxProvider.CreateSyntaxProvider(
+        IncrementalValuesProvider<ClassDeclarationSyntax> provider = context.SyntaxProvider.CreateSyntaxProvider (
+                                                                             static (node, _) => IsClass (node, "XunitContextExtensions"),
+                                                                             static (ctx, _) =>
+                                                                                 (ClassDeclarationSyntax)ctx.Node)
+                                                                            .Where (m => m is { });
 
-                                                     predicate: static (node, _) => IsClass(node,"XunitContextExtensions"),
-                                                     transform: static (ctx, _) =>
-                                                                   (ClassDeclarationSyntax)ctx.Node)
-               .Where(m => m is { });
-
-        var compilation = context.CompilationProvider.Combine(provider.Collect());
-        context.RegisterSourceOutput(compilation, Execute);
+        IncrementalValueProvider<(Compilation Left, ImmutableArray<ClassDeclarationSyntax> Right)> compilation =
+            context.CompilationProvider.Combine (provider.Collect ());
+        context.RegisterSourceOutput (compilation, Execute);
     }
 
-    private static bool IsClass (SyntaxNode node, string named)
-    {
-        return node is ClassDeclarationSyntax c && c.Identifier.Text == named;
-    }
+    private static bool IsClass (SyntaxNode node, string named) { return node is ClassDeclarationSyntax c && c.Identifier.Text == named; }
 
-    private void Execute(SourceProductionContext context, (Compilation Left, ImmutableArray<ClassDeclarationSyntax> Right) arg2)
+    private void Execute (SourceProductionContext context, (Compilation Left, ImmutableArray<ClassDeclarationSyntax> Right) arg2)
     {
-        var assertType = arg2.Left.GetTypeByMetadataName ("Xunit.Assert");
+        INamedTypeSymbol? assertType = arg2.Left.GetTypeByMetadataName ("Xunit.Assert");
 
         GenerateMethods (assertType, context, "Equal", false);
 
@@ -74,8 +68,9 @@ public class TheGenerator : IIncrementalGenerator
         GenerateMethods (assertType, context, "StrictEqual", true);
         GenerateMethods (assertType, context, "Subset", true);
         GenerateMethods (assertType, context, "Superset", true);
+
 //        GenerateMethods (assertType, context, "Throws", true);
-  //      GenerateMethods (assertType, context, "ThrowsAny", true);
+        //      GenerateMethods (assertType, context, "ThrowsAny", true);
         GenerateMethods (assertType, context, "True", false);
     }
 
@@ -84,83 +79,89 @@ public class TheGenerator : IIncrementalGenerator
         var sb = new StringBuilder ();
 
         // Create a HashSet to track unique method signatures
-        var signaturesDone = new HashSet<string> ();
+        HashSet<string> signaturesDone = new ();
 
-        var methods = assertType
-                               .GetMembers (methodName)
-                               .OfType<IMethodSymbol> ()
-                               .ToList ();
+        List<IMethodSymbol> methods = assertType
+                                      .GetMembers (methodName)
+                                      .OfType<IMethodSymbol> ()
+                                      .ToList ();
 
-        string header = """"
-                        #nullable enable
-                        using TerminalGuiFluentTesting;
-                        using Xunit;
+        var header = """"
+                     #nullable enable
+                     using TerminalGuiFluentTesting;
+                     using Xunit;
 
-                        namespace TerminalGuiFluentTestingXunit;
+                     namespace TerminalGuiFluentTestingXunit;
 
-                        public static partial class XunitContextExtensions
-                        {
-                        
+                     public static partial class XunitContextExtensions
+                     {
 
-                        """";
 
-        string tail = """
+                     """";
 
-                      }
-                      """;
+        var tail = """
+
+                   }
+                   """;
 
         sb.AppendLine (header);
 
         foreach (IMethodSymbol? m in methods)
         {
-            var signature = GetModifiedMethodSignature (m,methodName,invokeTExplicitly, out var paramNames, out var typeParams);
+            string signature = GetModifiedMethodSignature (m, methodName, invokeTExplicitly, out string [] paramNames, out string typeParams);
 
             if (!signaturesDone.Add (signature))
             {
                 continue;
             }
 
-            string method = $$"""
-                              {{signature}}
-                              {
-                                  try
-                                  {
-                                      Assert.{{methodName}}{{typeParams}} ({{string.Join (",", paramNames)}});
-                                  }
-                                  catch(Exception)
-                                  {
-                                      context.HardStop ();
-                                      
-                                  
-                                      throw;
-                                  
-                                  }
-                                  
-                                  return context;
-                              }
-                              """;
+            var method = $$"""
+                           {{signature}}
+                           {
+                               try
+                               {
+                                   Assert.{{methodName}}{{typeParams}} ({{string.Join (",", paramNames)}});
+                               }
+                               catch(Exception)
+                               {
+                                   context.HardStop ();
+                                   
+                               
+                                   throw;
+                               
+                               }
+                               
+                               return context;
+                           }
+                           """;
 
             sb.AppendLine (method);
         }
+
         sb.AppendLine (tail);
 
         context.AddSource ($"XunitContextExtensions{methodName}.g.cs", sb.ToString ());
     }
 
-    private string GetModifiedMethodSignature (IMethodSymbol methodSymbol, string methodName, bool invokeTExplicitly, out string [] paramNames, out string typeParams)
+    private string GetModifiedMethodSignature (
+        IMethodSymbol methodSymbol,
+        string methodName,
+        bool invokeTExplicitly,
+        out string [] paramNames,
+        out string typeParams
+    )
     {
         typeParams = string.Empty;
 
         // Create the "this GuiTestContext context" parameter
-        var contextParam = SyntaxFactory.Parameter (SyntaxFactory.Identifier ("context"))
-                                         .WithType (SyntaxFactory.ParseTypeName ("GuiTestContext"))
-                                         .AddModifiers (SyntaxFactory.Token (SyntaxKind.ThisKeyword)); // Add the "this" keyword
-
+        ParameterSyntax contextParam = SyntaxFactory.Parameter (SyntaxFactory.Identifier ("context"))
+                                                    .WithType (SyntaxFactory.ParseTypeName ("GuiTestContext"))
+                                                    .AddModifiers (SyntaxFactory.Token (SyntaxKind.ThisKeyword)); // Add the "this" keyword
 
         // Extract the parameter names (expected and actual)
         paramNames = new string [methodSymbol.Parameters.Length];
 
-        for (int i = 0; i < methodSymbol.Parameters.Length; i++)
+        for (var i = 0; i < methodSymbol.Parameters.Length; i++)
         {
             paramNames [i] = methodSymbol.Parameters.ElementAt (i).Name;
 
@@ -176,7 +177,7 @@ public class TheGenerator : IIncrementalGenerator
         }
 
         // Get the current method parameters and add the context parameter at the start
-        var parameters = methodSymbol.Parameters.Select (p=>CreateParameter(p)).ToList ();
+        List<ParameterSyntax> parameters = methodSymbol.Parameters.Select (p => CreateParameter (p)).ToList ();
 
         parameters.Insert (0, contextParam); // Insert 'context' as the first parameter
 
@@ -187,11 +188,11 @@ public class TheGenerator : IIncrementalGenerator
         SyntaxToken newMethodName = SyntaxFactory.Identifier ($"Assert{methodName}");
 
         // Handle generic type parameters if the method is generic
-        var typeParameters = methodSymbol.TypeParameters.Select (
-                                                                 tp =>
-                                                                     SyntaxFactory.TypeParameter (SyntaxFactory.Identifier (tp.Name))
-                                                                )
-                                         .ToArray ();
+        TypeParameterSyntax [] typeParameters = methodSymbol.TypeParameters.Select (
+                                                                                    tp =>
+                                                                                        SyntaxFactory.TypeParameter (SyntaxFactory.Identifier (tp.Name))
+                                                                                   )
+                                                            .ToArray ();
 
         MethodDeclarationSyntax dec = SyntaxFactory.MethodDeclaration (returnType, newMethodName)
                                                    .WithModifiers (
@@ -206,23 +207,29 @@ public class TheGenerator : IIncrementalGenerator
             dec = dec.WithTypeParameterList (SyntaxFactory.TypeParameterList (SyntaxFactory.SeparatedList (typeParameters)));
 
             // Handle type parameter constraints
-            var constraintClauses = methodSymbol.TypeParameters
-                                                .Where (tp => tp.ConstraintTypes.Length > 0)
-                                                .Select (tp =>
-                                                             SyntaxFactory.TypeParameterConstraintClause (tp.Name)
-                                                                          .WithConstraints (
-                                                                                            SyntaxFactory.SeparatedList<TypeParameterConstraintSyntax> (
-                                                                                                 tp.ConstraintTypes.Select (constraintType =>
-                                                                                                         SyntaxFactory.TypeConstraint (SyntaxFactory.ParseTypeName (constraintType.ToDisplayString ()))
-                                                                                                     )
-                                                                                                )
-                                                                                           )
-                                                        ).ToList ();
+            List<TypeParameterConstraintClauseSyntax> constraintClauses = methodSymbol.TypeParameters
+                                                                                      .Where (tp => tp.ConstraintTypes.Length > 0)
+                                                                                      .Select (
+                                                                                               tp =>
+                                                                                                   SyntaxFactory.TypeParameterConstraintClause (tp.Name)
+                                                                                                       .WithConstraints (
+                                                                                                            SyntaxFactory
+                                                                                                                .SeparatedList<TypeParameterConstraintSyntax> (
+                                                                                                                     tp.ConstraintTypes.Select (
+                                                                                                                          constraintType =>
+                                                                                                                              SyntaxFactory.TypeConstraint (
+                                                                                                                               SyntaxFactory.ParseTypeName (
+                                                                                                                                constraintType
+                                                                                                                                    .ToDisplayString ()))
+                                                                                                                         )
+                                                                                                                    )
+                                                                                                           )
+                                                                                              )
+                                                                                      .ToList ();
 
             if (constraintClauses.Any ())
             {
                 dec = dec.WithConstraintClauses (SyntaxFactory.List (constraintClauses));
-
             }
 
             // Add the <T> here
@@ -236,19 +243,21 @@ public class TheGenerator : IIncrementalGenerator
         MethodDeclarationSyntax methodSyntax = dec.NormalizeWhitespace ();
 
         // Convert the method syntax to a string
-        string methodString = methodSyntax.ToString ();
+        var methodString = methodSyntax.ToString ();
 
         return methodString;
     }
 
     /// <summary>
-    /// Creates a <see cref="ParameterSyntax"/> from a discovered parameter on real xunit method parameter <paramref name="p"/>
+    ///     Creates a <see cref="ParameterSyntax"/> from a discovered parameter on real xunit method parameter
+    ///     <paramref name="p"/>
     /// </summary>
     /// <param name="p"></param>
     /// <returns></returns>
     private ParameterSyntax CreateParameter (IParameterSymbol p)
     {
-        var paramName = p.Name;
+        string paramName = p.Name;
+
         // Check if the parameter name is a reserved keyword and prepend "@" if it is
         if (IsReservedKeyword (paramName))
         {
@@ -256,35 +265,68 @@ public class TheGenerator : IIncrementalGenerator
         }
 
         // Create the basic parameter syntax with the modified name and type
-        var parameterSyntax = SyntaxFactory.Parameter (SyntaxFactory.Identifier (paramName))
-                                           .WithType (SyntaxFactory.ParseTypeName (p.Type.ToDisplayString ()));
+        ParameterSyntax parameterSyntax = SyntaxFactory.Parameter (SyntaxFactory.Identifier (paramName))
+                                                       .WithType (SyntaxFactory.ParseTypeName (p.Type.ToDisplayString ()));
+
+        // Add 'params' keyword if the parameter has the Params modifier
+        var modifiers = new List<SyntaxToken> ();
+
+        if (p.IsParams)
+        {
+            modifiers.Add (SyntaxFactory.Token (SyntaxKind.ParamsKeyword));
+        }
+
+        // Handle ref/out/in modifiers
+        if (p.RefKind != RefKind.None)
+        {
+            SyntaxKind modifierKind = p.RefKind switch
+                                      {
+                                          RefKind.Ref => SyntaxKind.RefKeyword,
+                                          RefKind.Out => SyntaxKind.OutKeyword,
+                                          RefKind.In => SyntaxKind.InKeyword,
+                                          _ => throw new NotSupportedException ($"Unsupported RefKind: {p.RefKind}")
+                                      };
+
+
+            modifiers.Add (SyntaxFactory.Token (modifierKind));
+        }
+
+
+        if (modifiers.Any ())
+        {
+            parameterSyntax = parameterSyntax.WithModifiers (SyntaxFactory.TokenList (modifiers));
+        }
 
         // Add default value if one is present
         if (p.HasExplicitDefaultValue)
         {
-            var defaultValueExpression = p.ExplicitDefaultValue switch
-            {
-                null => SyntaxFactory.LiteralExpression (SyntaxKind.NullLiteralExpression),
-                bool b => SyntaxFactory.LiteralExpression (b ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression),
-                int i => SyntaxFactory.LiteralExpression (SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal (i)),
-                double d => SyntaxFactory.LiteralExpression (SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal (d)),
-                string s => SyntaxFactory.LiteralExpression (SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal (s)),
-                _ => SyntaxFactory.ParseExpression (p.ExplicitDefaultValue.ToString ()) // Fallback
-            };
+            ExpressionSyntax defaultValueExpression = p.ExplicitDefaultValue switch
+                                                      {
+                                                          null => SyntaxFactory.LiteralExpression (SyntaxKind.NullLiteralExpression),
+                                                          bool b => SyntaxFactory.LiteralExpression (
+                                                                                                     b
+                                                                                                         ? SyntaxKind.TrueLiteralExpression
+                                                                                                         : SyntaxKind.FalseLiteralExpression),
+                                                          int i => SyntaxFactory.LiteralExpression (
+                                                                                                    SyntaxKind.NumericLiteralExpression,
+                                                                                                    SyntaxFactory.Literal (i)),
+                                                          double d => SyntaxFactory.LiteralExpression (
+                                                                                                       SyntaxKind.NumericLiteralExpression,
+                                                                                                       SyntaxFactory.Literal (d)),
+                                                          string s => SyntaxFactory.LiteralExpression (
+                                                                                                       SyntaxKind.StringLiteralExpression,
+                                                                                                       SyntaxFactory.Literal (s)),
+                                                          _ => SyntaxFactory.ParseExpression (p.ExplicitDefaultValue.ToString ()) // Fallback
+                                                      };
 
             parameterSyntax = parameterSyntax.WithDefault (
-                 SyntaxFactory.EqualsValueClause (defaultValueExpression)
-                );
-
+                                                           SyntaxFactory.EqualsValueClause (defaultValueExpression)
+                                                          );
         }
 
         return parameterSyntax;
-
     }
 
     // Helper method to check if a parameter name is a reserved keyword
-    private bool IsReservedKeyword (string name)
-    {
-        return string.Equals (name, "object");
-    }
+    private bool IsReservedKeyword (string name) { return string.Equals (name, "object"); }
 }
