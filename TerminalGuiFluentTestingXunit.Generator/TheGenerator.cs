@@ -27,7 +27,8 @@ public class TheGenerator : IIncrementalGenerator
 
     private void Execute (SourceProductionContext context, (Compilation Left, ImmutableArray<ClassDeclarationSyntax> Right) arg2)
     {
-        INamedTypeSymbol? assertType = arg2.Left.GetTypeByMetadataName ("Xunit.Assert");
+        INamedTypeSymbol assertType = arg2.Left.GetTypeByMetadataName ("Xunit.Assert")
+            ?? throw new NotSupportedException("Referencing codebase does not include Xunit, could not find Xunit.Assert");
 
         GenerateMethods (assertType, context, "Equal", false);
 
@@ -74,7 +75,7 @@ public class TheGenerator : IIncrementalGenerator
         GenerateMethods (assertType, context, "True", false);
     }
 
-    private void GenerateMethods (INamedTypeSymbol? assertType, SourceProductionContext context, string methodName, bool invokeTExplicitly)
+    private void GenerateMethods (INamedTypeSymbol assertType, SourceProductionContext context, string methodName, bool invokeTExplicitly)
     {
         var sb = new StringBuilder ();
 
