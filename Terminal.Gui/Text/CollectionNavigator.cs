@@ -22,9 +22,3 @@ public class CollectionNavigator : CollectionNavigatorBase, IListCollectionNavig
     /// <inheritdoc/>
     protected override int GetCollectionLength () { return Collection.Count; }
 }
-
-public interface IListCollectionNavigator : ICollectionNavigator
-{
-    /// <summary>The collection of objects to search. <see cref="object.ToString()"/> is used to search the collection.</summary>
-    IList Collection { get; set; }
-}
