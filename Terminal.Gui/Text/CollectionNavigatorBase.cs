@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     Navigates a collection of items using keystrokes. The keystrokes are used to build a search string. The
@@ -17,8 +15,8 @@ public abstract class CollectionNavigatorBase
     private DateTime _lastKeystroke = DateTime.Now;
     private string _searchString = "";
 
-    /// <summary>The comparer function to use when searching the collection.</summary>
-    public StringComparer Comparer { get; set; } = StringComparer.InvariantCultureIgnoreCase;
+
+    public INavigationCollectionSearchMatcher SearchMatcher { get; set; } = new DefaultNavigationCollectionSearchMatcher();
 
     /// <summary>
     ///     Gets the current search string. This includes the set of keystrokes that have been pressed since the last
@@ -145,18 +143,7 @@ public abstract class CollectionNavigatorBase
         return -1;
     }
 
-    /// <summary>
-    ///     Returns true if <paramref name="a"/> is a searchable key (e.g. letters, numbers, etc) that are valid to pass
-    ///     to this class for search filtering.
-    /// </summary>
-    /// <param name="a"></param>
-    /// <returns></returns>
-    public static bool IsCompatibleKey (Key a)
-    {
-        Rune rune = a.AsRune;
 
-        return rune != default (Rune) && !Rune.IsControl (rune);
-    }
 
     /// <summary>
     ///     Invoked when the <see cref="SearchString"/> changes. Useful for debugging. Invokes the
@@ -195,7 +182,7 @@ public abstract class CollectionNavigatorBase
 
         int collectionLength = GetCollectionLength ();
 
-        if (currentIndex != -1 && currentIndex < collectionLength && IsMatch (search, ElementAt (currentIndex)))
+        if (currentIndex != -1 && currentIndex < collectionLength && SearchMatcher.IsMatch (search, ElementAt (currentIndex)))
         {
             // we are already at a match
             if (minimizeMovement)
@@ -209,7 +196,7 @@ public abstract class CollectionNavigatorBase
                 //circular
                 int idxCandidate = (i + currentIndex) % collectionLength;
 
-                if (IsMatch (search, ElementAt (idxCandidate)))
+                if (SearchMatcher.IsMatch (search, ElementAt (idxCandidate)))
                 {
                     return idxCandidate;
                 }
@@ -222,7 +209,7 @@ public abstract class CollectionNavigatorBase
         // search terms no longer match the current selection or there is none
         for (var i = 0; i < collectionLength; i++)
         {
-            if (IsMatch (search, ElementAt (i)))
+            if (SearchMatcher.IsMatch (search, ElementAt (i)))
             {
                 return i;
             }
@@ -237,6 +224,4 @@ public abstract class CollectionNavigatorBase
         SearchString = "";
         _lastKeystroke = DateTime.Now;
     }
-
-    private bool IsMatch (string search, object value) { return value?.ToString ().StartsWith (search, StringComparison.InvariantCultureIgnoreCase) ?? false; }
 }

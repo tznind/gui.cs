@@ -1015,7 +1015,7 @@ public class TableView : View, IDesignable
             && Table.Rows != 0
             && key != KeyBindings.GetFirstFromCommands (Command.Accept)
             && key != CellActivationKey
-            && CollectionNavigatorBase.IsCompatibleKey (key)
+            && CollectionNavigator.SearchMatcher.IsCompatibleKey (key)
             && !key.KeyCode.HasFlag (KeyCode.CtrlMask)
             && !key.KeyCode.HasFlag (KeyCode.AltMask)
             && Rune.IsLetterOrDigit ((Rune)key))

@@ -128,7 +128,8 @@ public class CollectionNavigatorTests
     [InlineData (KeyCode.ShiftMask, false)]
     public void IsCompatibleKey_Does_Not_Allow_Alt_And_Ctrl_Keys (KeyCode keyCode, bool compatible)
     {
-        Assert.Equal (compatible, CollectionNavigatorBase.IsCompatibleKey (keyCode));
+        var m = new DefaultNavigationCollectionSearchMatcher ();
+        Assert.Equal (compatible, m.IsCompatibleKey (keyCode));
     }
 
     [Fact]
