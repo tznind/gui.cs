@@ -306,7 +306,7 @@ public class TableView : View, IDesignable
     }
 
     /// <summary>Navigator for cycling the selected item in the table by typing. Set to null to disable this feature.</summary>
-    public CollectionNavigatorBase CollectionNavigator { get; set; }
+    public ICollectionNavigator CollectionNavigator { get; set; }
 
     /// <summary>
     ///     Horizontal scroll offset.  The index of the first column in <see cref="Table"/> to display when when rendering

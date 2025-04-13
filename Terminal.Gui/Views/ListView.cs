@@ -234,7 +234,7 @@ public class ListView : View, IDesignable
     ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as the
     ///     user types.
     /// </summary>
-    public CollectionNavigator KeystrokeNavigator { get; } = new ();
+    public IListCollectionNavigator KeystrokeNavigator { get; } = new CollectionNavigator();
 
     /// <summary>Gets or sets the leftmost column that is currently visible (when scrolling horizontally).</summary>
     /// <value>The left position.</value>

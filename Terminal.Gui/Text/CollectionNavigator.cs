@@ -2,9 +2,9 @@
 
 namespace Terminal.Gui;
 
-/// <inheritdoc/>
+/// <inheritdoc cref="CollectionNavigatorBase"/>
 /// <remarks>This implementation is based on a static <see cref="Collection"/> of objects.</remarks>
-public class CollectionNavigator : CollectionNavigatorBase
+public class CollectionNavigator : CollectionNavigatorBase, IListCollectionNavigator
 {
     /// <summary>Constructs a new CollectionNavigator.</summary>
     public CollectionNavigator () { }
@@ -13,7 +13,7 @@ public class CollectionNavigator : CollectionNavigatorBase
     /// <param name="collection"></param>
     public CollectionNavigator (IList collection) { Collection = collection; }
 
-    /// <summary>The collection of objects to search. <see cref="object.ToString()"/> is used to search the collection.</summary>
+    /// <inheritdoc/>
     public IList Collection { get; set; }
 
     /// <inheritdoc/>
@@ -21,4 +21,10 @@ public class CollectionNavigator : CollectionNavigatorBase
 
     /// <inheritdoc/>
     protected override int GetCollectionLength () { return Collection.Count; }
+}
+
+public interface IListCollectionNavigator : ICollectionNavigator
+{
+    /// <summary>The collection of objects to search. <see cref="object.ToString()"/> is used to search the collection.</summary>
+    IList Collection { get; set; }
 }
