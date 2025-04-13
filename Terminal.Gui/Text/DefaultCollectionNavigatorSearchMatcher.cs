@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-public class DefaultNavigationCollectionSearchMatcher : INavigationCollectionSearchMatcher
+public class DefaultCollectionNavigatorSearchMatcher : ICollectionNavigatorhMatcher
 {
 
     /// <summary>The comparer function to use when searching the collection.</summary>

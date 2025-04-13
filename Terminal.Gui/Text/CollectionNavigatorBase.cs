@@ -16,7 +16,7 @@ public abstract class CollectionNavigatorBase
     private string _searchString = "";
 
 
-    public INavigationCollectionSearchMatcher SearchMatcher { get; set; } = new DefaultNavigationCollectionSearchMatcher();
+    public ICollectionNavigatorhMatcher SearchMatcher { get; set; } = new DefaultCollectionNavigatorSearchMatcher();
 
     /// <summary>
     ///     Gets the current search string. This includes the set of keystrokes that have been pressed since the last
