@@ -830,7 +830,7 @@ public class ListView : View, IDesignable
         }
 
         // Enable user to find & select an item by typing text
-        if (KeystrokeNavigator.SearchMatcher.IsCompatibleKey (a))
+        if (KeystrokeNavigator.Matcher.IsCompatibleKey (a))
         {
             int? newItem = KeystrokeNavigator?.GetNextMatchingItem (SelectedItem, (char)a);
 

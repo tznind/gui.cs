@@ -16,7 +16,7 @@ public abstract class CollectionNavigatorBase
     private string _searchString = "";
 
 
-    public ICollectionNavigatorhMatcher SearchMatcher { get; set; } = new DefaultCollectionNavigatorMatcher();
+    public ICollectionNavigatorhMatcher Matcher { get; set; } = new DefaultCollectionNavigatorMatcher();
 
     /// <summary>
     ///     Gets the current search string. This includes the set of keystrokes that have been pressed since the last
@@ -182,7 +182,7 @@ public abstract class CollectionNavigatorBase
 
         int collectionLength = GetCollectionLength ();
 
-        if (currentIndex != -1 && currentIndex < collectionLength && SearchMatcher.IsMatch (search, ElementAt (currentIndex)))
+        if (currentIndex != -1 && currentIndex < collectionLength && Matcher.IsMatch (search, ElementAt (currentIndex)))
         {
             // we are already at a match
             if (minimizeMovement)
@@ -196,7 +196,7 @@ public abstract class CollectionNavigatorBase
                 //circular
                 int idxCandidate = (i + currentIndex) % collectionLength;
 
-                if (SearchMatcher.IsMatch (search, ElementAt (idxCandidate)))
+                if (Matcher.IsMatch (search, ElementAt (idxCandidate)))
                 {
                     return idxCandidate;
                 }
@@ -209,7 +209,7 @@ public abstract class CollectionNavigatorBase
         // search terms no longer match the current selection or there is none
         for (var i = 0; i < collectionLength; i++)
         {
-            if (SearchMatcher.IsMatch (search, ElementAt (i)))
+            if (Matcher.IsMatch (search, ElementAt (i)))
             {
                 return i;
             }

@@ -1207,7 +1207,7 @@ public class TreeView<T> : View, ITreeView where T : class
         }
 
         // If not a keybinding, is the key a searchable key press?
-        if (KeystrokeNavigator.SearchMatcher.IsCompatibleKey (key) && AllowLetterBasedNavigation)
+        if (KeystrokeNavigator.Matcher.IsCompatibleKey (key) && AllowLetterBasedNavigation)
         {
             // If there has been a call to InvalidateMap since the last time
             // we need a new one to reflect the new exposed tree state
