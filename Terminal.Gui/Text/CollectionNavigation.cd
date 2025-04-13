@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Terminal.Gui.CollectionNavigatorBase">
-    <Position X="7" Y="2" Width="2" />
+    <Position X="5.75" Y="2" Width="2" />
     <TypeIdentifier>
       <HashCode>AAgEAAAAAAAQAAAIAAEAAgAAAAAABAAEAAAAACwAAAA=</HashCode>
       <FileName>Text\CollectionNavigatorBase.cs</FileName>
@@ -12,7 +12,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.CollectionNavigator">
-    <Position X="4" Y="1.75" Width="2" />
+    <Position X="2.75" Y="1.75" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAQAAAAAAAAgAAAAAAAAAEAAAAAAAAAAA=</HashCode>
       <FileName>Text\CollectionNavigator.cs</FileName>
@@ -20,7 +20,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.DefaultCollectionNavigatorMatcher">
-    <Position X="10.5" Y="3.75" Width="2.75" />
+    <Position X="8.75" Y="3.75" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAQA=</HashCode>
       <FileName>Text\DefaultCollectionNavigatorMatcher.cs</FileName>
@@ -28,7 +28,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.TableCollectionNavigator" Collapsed="true">
-    <Position X="3.75" Y="6" Width="2.25" />
+    <Position X="2.5" Y="6" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAgABAAAAAAAEAAAAAAAAAAA=</HashCode>
       <FileName>Text\TableCollectionNavigator.cs</FileName>
@@ -57,7 +57,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.FileDialogCollectionNavigator" Collapsed="true">
-    <Position X="3.75" Y="4.5" Width="2.25" />
+    <Position X="2.5" Y="4.5" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAEAAAAAAAAAAA=</HashCode>
       <FileName>Views\FileDialogCollectionNavigator.cs</FileName>
@@ -72,17 +72,24 @@
     <Lollipop Position="0.2" />
   </Class>
   <Interface Name="Terminal.Gui.ICollectionNavigatorhMatcher" Collapsed="true">
-    <Position X="10.5" Y="2.75" Width="2.25" />
+    <Position X="8.75" Y="2.75" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAA=</HashCode>
       <FileName>Text\ICollectionNavigatorhMatcher.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Terminal.Gui.IListCollectionNavigator" Collapsed="true">
-    <Position X="4" Y="0.5" Width="2" />
+    <Position X="2.75" Y="0.75" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Text\IListCollectionNavigator.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.ICollectionNavigator" Collapsed="true">
+    <Position X="5.75" Y="0.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAAAAAAIAAAAAAAAAAAABAAAAAAAACgAAAA=</HashCode>
+      <FileName>Text\ICollectionNavigator.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Font Name="Segoe UI" Size="9" />
