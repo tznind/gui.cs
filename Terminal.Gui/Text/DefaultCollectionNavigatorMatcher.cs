@@ -2,6 +2,12 @@
 
 namespace Terminal.Gui;
 
+/// <summary>
+/// Default implementation of <see cref="ICollectionNavigatorMatcher"/>, performs
+/// case-insensitive (see <see cref="Comparer"/>) matching of items based on
+/// <see cref="object.ToString()"/>.
+/// 
+/// </summary>
 public class DefaultCollectionNavigatorMatcher : ICollectionNavigatorMatcher
 {
 
