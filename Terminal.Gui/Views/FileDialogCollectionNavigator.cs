@@ -1,8 +1,7 @@
 namespace Terminal.Gui;
 
-internal class FileDialogCollectionNavigator(FileDialog fileDialog,TableView tableView)  : CollectionNavigatorBase
+internal class FileDialogCollectionNavigator (FileDialog fileDialog, TableView tableView) : CollectionNavigatorBase
 {
-
     protected override object ElementAt (int idx)
     {
         object val = FileDialogTableSource.GetRawColumnValue (

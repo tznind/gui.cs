@@ -3,8 +3,8 @@
 namespace Terminal.Gui;
 
 /// <summary>
-/// <see cref="ICollectionNavigator"/> sub-interface for <see cref="ListView"/>. See also
-/// <see cref="ListView.KeystrokeNavigator"/>
+///     <see cref="ICollectionNavigator"/> sub-interface for <see cref="ListView"/>. See also
+///     <see cref="ListView.KeystrokeNavigator"/>
 /// </summary>
 public interface IListCollectionNavigator : ICollectionNavigator
 {

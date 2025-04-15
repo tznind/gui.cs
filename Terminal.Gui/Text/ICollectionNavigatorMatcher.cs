@@ -1,9 +1,9 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-/// Determines which keys trigger collection manager navigation
-/// and how to match typed strings to objects in the collection.
-/// Default implementation is <see cref="DefaultCollectionNavigatorMatcher"/>.
+///     Determines which keys trigger collection manager navigation
+///     and how to match typed strings to objects in the collection.
+///     Default implementation is <see cref="DefaultCollectionNavigatorMatcher"/>.
 /// </summary>
 public interface ICollectionNavigatorMatcher
 {
@@ -16,8 +16,8 @@ public interface ICollectionNavigatorMatcher
     bool IsCompatibleKey (Key a);
 
     /// <summary>
-    /// Return true if the <paramref name="value"/> matches (e.g. starts with)
-    /// the <paramref name="search"/> term.
+    ///     Return true if the <paramref name="value"/> matches (e.g. starts with)
+    ///     the <paramref name="search"/> term.
     /// </summary>
     /// <param name="search"></param>
     /// <param name="value"></param>

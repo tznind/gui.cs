@@ -3,22 +3,17 @@
 namespace Terminal.Gui;
 
 /// <summary>
-/// Default implementation of <see cref="ICollectionNavigatorMatcher"/>, performs
-/// case-insensitive (see <see cref="Comparer"/>) matching of items based on
-/// <see cref="object.ToString()"/>.
-/// 
+///     Default implementation of <see cref="ICollectionNavigatorMatcher"/>, performs
+///     case-insensitive (see <see cref="Comparer"/>) matching of items based on
+///     <see cref="object.ToString()"/>.
 /// </summary>
 public class DefaultCollectionNavigatorMatcher : ICollectionNavigatorMatcher
 {
-
     /// <summary>The comparer function to use when searching the collection.</summary>
     public StringComparison Comparer { get; set; } = StringComparison.InvariantCultureIgnoreCase;
 
-    /// <inheritdoc />
-    public bool IsMatch (string search, object? value)
-    {
-        return value?.ToString ()?.StartsWith (search, Comparer) ?? false;
-    }
+    /// <inheritdoc/>
+    public bool IsMatch (string search, object? value) { return value?.ToString ()?.StartsWith (search, Comparer) ?? false; }
 
     /// <summary>
     ///     Returns true if <paramref name="a"/> is a searchable key (e.g. letters, numbers, etc) that are valid to pass

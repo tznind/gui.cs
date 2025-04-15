@@ -1,7 +1,6 @@
 ﻿#nullable enable
 namespace Terminal.Gui;
 
-
 /// <summary>
 ///     Navigates a collection of items using keystrokes. The keystrokes are used to build a search string. The
 ///     <see cref="SearchString"/> is used to find the next item in the collection that matches the search string when
@@ -20,7 +19,6 @@ public interface ICollectionNavigator
     /// </summary>
     public int TypingDelay { get; set; }
 
-
     /// <summary>This event is invoked when <see cref="SearchString"/>  changes. Useful for debugging.</summary>
     public event EventHandler<KeystrokeNavigatorEventArgs>? SearchStringChanged;
 
@@ -28,14 +26,11 @@ public interface ICollectionNavigator
     ///     Gets the current search string. This includes the set of keystrokes that have been pressed since the last
     ///     unsuccessful match or after <see cref="TypingDelay"/>) milliseconds. Useful for debugging.
     /// </summary>
-    string SearchString
-    {
-        get;
-    }
+    string SearchString { get; }
 
     /// <summary>
-    /// Class responsible for deciding whether given entries in the collection match
-    /// the search term the user is typing.
+    ///     Class responsible for deciding whether given entries in the collection match
+    ///     the search term the user is typing.
     /// </summary>
     ICollectionNavigatorMatcher Matcher { get; set; }
 
