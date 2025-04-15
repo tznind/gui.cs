@@ -1,6 +1,11 @@
 ﻿namespace Terminal.Gui;
 
-public interface ICollectionNavigatorhMatcher
+/// <summary>
+/// Determines which keys trigger collection manager navigation
+/// and how to match typed strings to objects in the collection.
+/// Default implementation is <see cref="DefaultCollectionNavigatorMatcher"/>.
+/// </summary>
+public interface ICollectionNavigatorMatcher
 {
     /// <summary>
     ///     Returns true if <paramref name="a"/> is a searchable key (e.g. letters, numbers, etc) that are valid to pass

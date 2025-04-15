@@ -37,7 +37,7 @@ public interface ICollectionNavigator
     /// Class responsible for deciding whether given entries in the collection match
     /// the search term the user is typing.
     /// </summary>
-    ICollectionNavigatorhMatcher Matcher { get; set; }
+    ICollectionNavigatorMatcher Matcher { get; set; }
 
     /// <summary>
     ///     Gets the index of the next item in the collection that matches the current <see cref="SearchString"/> plus the

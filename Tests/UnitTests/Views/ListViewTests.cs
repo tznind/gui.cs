@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using Moq;
 using UnitTests;
 using Xunit.Abstractions;
 
@@ -1156,5 +1157,69 @@ Item 6",
                 added++;
             }
         }
+    }
+    [Fact]
+    public void ListViewCollectionNavigatorMatcher_DefaultBehaviour ()
+    {
+        ObservableCollection<string> source = new () { "apricot", "arm", "bat", "batman", "bates hotel", "candle" };
+        ListView lv = new ListView { Source = new ListWrapper<string> (source) };
+
+        // Keys are consumed during navigation
+        Assert.True (lv.NewKeyDownEvent (Key.B));
+        Assert.True (lv.NewKeyDownEvent (Key.A));
+        Assert.True (lv.NewKeyDownEvent (Key.T));
+
+        Assert.Equal ("bat", (string)lv.Source.ToList ()[lv.SelectedItem]);
+    }
+
+    [Fact]
+    public void ListViewCollectionNavigatorMatcher_IgnoreKeys ()
+    {
+        ObservableCollection<string> source = new (){ "apricot", "arm", "bat", "batman", "bates hotel", "candle" };
+        ListView lv = new ListView { Source = new ListWrapper<string> (source) };
+
+
+        var matchNone = new Mock<ICollectionNavigatorMatcher> ();
+
+        matchNone.Setup (m => m.IsCompatibleKey (It.IsAny<Key> ()))
+                 .Returns (false);
+
+        lv.KeystrokeNavigator.Matcher = matchNone.Object;
+
+        // Keys are ignored because IsCompatibleKey returned false i.e. don't use these keys for navigation
+        Assert.False(lv.NewKeyDownEvent (Key.B));
+        Assert.False (lv.NewKeyDownEvent (Key.A));
+        Assert.False (lv.NewKeyDownEvent (Key.T));
+
+        // assert IsMatch never called
+        matchNone.Verify (m => m.IsMatch (It.IsAny<string> (), It.IsAny<object> ()), Times.Never ());
+    }
+
+    [Fact]
+    public void ListViewCollectionNavigatorMatcher_OverrideMatching ()
+    {
+        ObservableCollection<string> source = new () { "apricot", "arm", "bat", "batman", "bates hotel", "candle" };
+        ListView lv = new ListView { Source = new ListWrapper<string> (source) };
+
+
+        var matchNone = new Mock<ICollectionNavigatorMatcher> ();
+
+        matchNone.Setup (m => m.IsCompatibleKey (It.IsAny<Key> ()))
+                 .Returns (true);
+
+        // Match any string starting with b to "candle" (psych!)
+        matchNone.Setup (m => m.IsMatch (It.IsAny<string> (), It.IsAny<object> ()))
+                 .Returns ((string s, object key) => s.StartsWith ('B') && key?.ToString () == "candle");
+
+        lv.KeystrokeNavigator.Matcher = matchNone.Object;
+        // Keys are consumed during navigation
+        Assert.True (lv.NewKeyDownEvent (Key.B));
+        Assert.Equal (5,lv.SelectedItem);
+        Assert.True (lv.NewKeyDownEvent (Key.A));
+        Assert.Equal (5, lv.SelectedItem);
+        Assert.True (lv.NewKeyDownEvent (Key.T));
+        Assert.Equal (5, lv.SelectedItem);
+
+        Assert.Equal ("candle", (string)lv.Source.ToList () [lv.SelectedItem]);
     }
 }

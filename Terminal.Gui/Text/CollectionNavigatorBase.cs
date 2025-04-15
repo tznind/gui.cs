@@ -8,7 +8,7 @@ public abstract class CollectionNavigatorBase : ICollectionNavigator
     private string _searchString = "";
 
     /// <inheritdoc/>
-    public ICollectionNavigatorhMatcher Matcher { get; set; } = new DefaultCollectionNavigatorMatcher();
+    public ICollectionNavigatorMatcher Matcher { get; set; } = new DefaultCollectionNavigatorMatcher();
 
     /// <inheritdoc/>
     public string SearchString
