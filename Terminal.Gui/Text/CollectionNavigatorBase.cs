@@ -123,13 +123,13 @@ public abstract class CollectionNavigatorBase : ICollectionNavigator
 
 
     /// <summary>
-    ///     Invoked when the <see cref="SearchString"/> changes. Useful for debugging. Invokes the
+    ///     Raised when the <see cref="SearchString"/> is changed. Useful for debugging. Raises the
     ///     <see cref="SearchStringChanged"/> event.
     /// </summary>
     /// <param name="e"></param>
-    public virtual void OnSearchStringChanged (KeystrokeNavigatorEventArgs e) { SearchStringChanged?.Invoke (this, e); }
+    protected virtual void OnSearchStringChanged (KeystrokeNavigatorEventArgs e) { SearchStringChanged?.Invoke (this, e); }
 
-    /// <summary>This event is invoked when <see cref="SearchString"/>  changes. Useful for debugging.</summary>
+    /// <summary>This event is raised when <see cref="SearchString"/> is changed. Useful for debugging.</summary>
     public event EventHandler<KeystrokeNavigatorEventArgs>? SearchStringChanged;
 
     /// <summary>Returns the collection being navigated element at <paramref name="idx"/>.</summary>

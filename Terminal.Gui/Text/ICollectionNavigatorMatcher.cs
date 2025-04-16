@@ -8,12 +8,12 @@
 public interface ICollectionNavigatorMatcher
 {
     /// <summary>
-    ///     Returns true if <paramref name="a"/> is a searchable key (e.g. letters, numbers, etc) that are valid to pass
+    ///     Returns true if <paramref name="key"/> is key searchable key (e.g. letters, numbers, etc) that are valid to pass
     ///     to this class for search filtering.
     /// </summary>
-    /// <param name="a"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    bool IsCompatibleKey (Key a);
+    bool IsCompatibleKey (Key key);
 
     /// <summary>
     ///     Return true if the <paramref name="value"/> matches (e.g. starts with)
