@@ -18,7 +18,7 @@ public abstract class CollectionNavigatorBase : ICollectionNavigator
         private set
         {
             _searchString = value;
-            OnSearchStringChanged (new KeystrokeNavigatorEventArgs (value));
+            OnSearchStringChanged (new (value));
         }
     }
 
