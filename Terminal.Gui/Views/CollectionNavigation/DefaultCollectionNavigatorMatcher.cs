@@ -1,5 +1,7 @@
 ﻿#nullable enable
 
+using Terminal;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -25,6 +27,6 @@ public class DefaultCollectionNavigatorMatcher : ICollectionNavigatorMatcher
     {
         Rune rune = key.AsRune;
 
-        return rune != default (Rune) && !Rune.IsControl (rune);
+        return rune != default && !Rune.IsControl (rune);
     }
 }

@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using Terminal;
+
 namespace Terminal.Gui;
 
 /// <summary>
