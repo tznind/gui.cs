@@ -350,7 +350,7 @@ public class TreeView<T> : View, ITreeView where T : class
     ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="Objects"/> collection as the user
     ///     types.
     /// </summary>
-    public CollectionNavigator KeystrokeNavigator { get; } = new ();
+    public IListCollectionNavigator KeystrokeNavigator { get; } = new CollectionNavigator();
 
     /// <summary>Maximum number of nodes that can be expanded in any given branch.</summary>
     public int MaxDepth { get; set; } = 100;
