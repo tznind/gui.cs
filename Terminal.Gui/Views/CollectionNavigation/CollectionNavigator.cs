@@ -4,7 +4,7 @@ namespace Terminal.Gui;
 
 /// <inheritdoc cref="CollectionNavigatorBase"/>
 /// <remarks>This implementation is based on a static <see cref="Collection"/> of objects.</remarks>
-public class CollectionNavigator : CollectionNavigatorBase, IListCollectionNavigator
+internal class CollectionNavigator : CollectionNavigatorBase, IListCollectionNavigator
 {
     /// <summary>Constructs a new CollectionNavigator.</summary>
     public CollectionNavigator () { }

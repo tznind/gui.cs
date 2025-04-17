@@ -3,7 +3,7 @@
 namespace Terminal.Gui;
 
 /// <inheritdoc/>
-public abstract class CollectionNavigatorBase : ICollectionNavigator
+internal abstract class CollectionNavigatorBase : ICollectionNavigator
 {
     private DateTime _lastKeystroke = DateTime.Now;
     private string _searchString = "";

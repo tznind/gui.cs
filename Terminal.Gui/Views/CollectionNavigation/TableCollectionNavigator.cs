@@ -1,7 +1,7 @@
 namespace Terminal.Gui;
 
 /// <summary>Collection navigator for cycling selections in a <see cref="TableView"/>.</summary>
-public class TableCollectionNavigator : CollectionNavigatorBase
+internal class TableCollectionNavigator : CollectionNavigatorBase
 {
     private readonly TableView _tableView;
 

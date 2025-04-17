@@ -7,7 +7,7 @@ namespace Terminal.Gui;
 ///     case-insensitive (see <see cref="Comparer"/>) matching of items based on
 ///     <see cref="object.ToString()"/>.
 /// </summary>
-public class DefaultCollectionNavigatorMatcher : ICollectionNavigatorMatcher
+internal class DefaultCollectionNavigatorMatcher : ICollectionNavigatorMatcher
 {
     /// <summary>The comparer function to use when searching the collection.</summary>
     public StringComparison Comparer { get; set; } = StringComparison.InvariantCultureIgnoreCase;

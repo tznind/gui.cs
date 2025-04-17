@@ -360,11 +360,6 @@ public class UICatalogTopLevel : Toplevel
 
     public static ObservableCollection<Scenario>? CachedScenarios { get; set; }
 
-    // UI Catalog uses TableView for the scenario list instead of a ListView to demonstrate how
-    // TableView works. There's no real reason not to use ListView. Because we use TableView, and TableView
-    // doesn't (currently) have CollectionNavigator support built in, we implement it here, within the app.
-    private readonly CollectionNavigator _scenarioCollectionNav = new ();
-
     // If set, holds the scenario the user selected to run
     public static Scenario? CachedSelectedScenario { get; set; }
 
@@ -541,16 +536,6 @@ public class UICatalogTopLevel : Toplevel
                                                                    }
                                                                   );
 
-        // Create a collection of just the scenario names (the 1st column in our TableView)
-        // for CollectionNavigator. 
-        List<object> firstColumnList = [];
-
-        for (var i = 0; i < _scenarioList.Table.Rows; i++)
-        {
-            firstColumnList.Add (_scenarioList.Table [i, 0]);
-        }
-
-        _scenarioCollectionNav.Collection = firstColumnList;
     }
 
     #endregion Category List
