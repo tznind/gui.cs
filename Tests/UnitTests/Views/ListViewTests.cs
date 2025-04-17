@@ -1224,7 +1224,7 @@ Item 6",
     }
 
     [Fact]
-    public void CollectionNavigatorMatcher_KeybindingsOverrideNavigator ()
+    public void ListView_CollectionNavigatorMatcher_KeybindingsOverrideNavigator ()
     {
         Application.Top = new ();
 
