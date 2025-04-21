@@ -13,9 +13,9 @@ public class Mazing : Scenario
     public override void Main ()
     {
         Application.Init ();
-        top = new Toplevel();
+        top = new ();
 
-        m = new MazeGenerator ();
+        m = new ();
 
         top.DrawingContent += (s, e) =>
                               {
@@ -35,12 +35,11 @@ public class Mazing : Scenario
                                   top.AddStr ("e");
 
                                   top.Move (m.player.X, m.player.Y);
-                                  top.SetAttribute (new Attribute (Color.BrightGreen, top.GetNormalColor ().Background));
+                                  top.SetAttribute (new (Color.BrightGreen, top.GetNormalColor ().Background));
                                   top.AddStr ("@");
                               };
 
         top.KeyDown += TopOnKeyDown;
-
 
         Application.Run (top);
 
@@ -50,31 +49,40 @@ public class Mazing : Scenario
 
     private void TopOnKeyDown (object sender, Key e)
     {
-       Point newPos = m.player;
+        Point newPos = m.player;
 
-           if(e.KeyCode ==  Key.CursorLeft)
-               newPos = new Point (m.player.X - 1, m.player.Y);
-           if (e.KeyCode == Key.CursorRight)
-                newPos = new Point (m.player.X + 1, m.player.Y);
-           if (e.KeyCode == Key.CursorUp)
-                newPos = new Point (m.player.X, m.player.Y - 1);
-           if (e.KeyCode == Key.CursorDown)
-                newPos = new Point (m.player.X, m.player.Y + 1);
+        if (e.KeyCode == Key.CursorLeft)
+        {
+            newPos = new (m.player.X - 1, m.player.Y);
+        }
 
-       // Only move if in bounds and it's a path
-       if (newPos.X >= 0 && newPos.X < m.maze.GetLength (1) &&
-           newPos.Y >= 0 && newPos.Y < m.maze.GetLength (0) &&
-           m.maze [newPos.Y, newPos.X] == 0)
-       {
-           m.player = newPos;
-           top.SetNeedsDraw(); // trigger redraw
-       }
+        if (e.KeyCode == Key.CursorRight)
+        {
+            newPos = new (m.player.X + 1, m.player.Y);
+        }
 
-       // Optional win condition:
-       if (m.player == m.end)
-       {
-           MessageBox.Query (30, 7, "Maze", "You made it!", "Ok");
-       }
+        if (e.KeyCode == Key.CursorUp)
+        {
+            newPos = new (m.player.X, m.player.Y - 1);
+        }
+
+        if (e.KeyCode == Key.CursorDown)
+        {
+            newPos = new (m.player.X, m.player.Y + 1);
+        }
+
+        // Only move if in bounds and it's a path
+        if (newPos.X >= 0 && newPos.X < m.maze.GetLength (1) && newPos.Y >= 0 && newPos.Y < m.maze.GetLength (0) && m.maze [newPos.Y, newPos.X] == 0)
+        {
+            m.player = newPos;
+            top.SetNeedsDraw (); // trigger redraw
+        }
+
+        // Optional win condition:
+        if (m.player == m.end)
+        {
+            MessageBox.Query (30, 7, "Maze", "You made it!", "Ok");
+        }
     }
 }
 
@@ -104,7 +112,7 @@ internal class MazeGenerator
         // Start carving from a random odd cell
         int startX = rand.Next (width) * 2 + 1;
         int startY = rand.Next (height) * 2 + 1;
-        Carve (new(startX, startY));
+        Carve (new (startX, startY));
 
         // Set random entrance
         start = GetRandomEdgePoint (w, h, true);
