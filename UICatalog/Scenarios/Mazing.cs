@@ -7,176 +7,176 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Drawing")]
 public class Mazing : Scenario
 {
-    private Toplevel top;
-    private MazeGenerator m;
+    private Toplevel _top;
+    private MazeGenerator _m;
 
-    private List<Point> potions;
-    private List<Point> goblins;
-    private string message;
-    private bool dead;
+    private List<Point> _potions;
+    private List<Point> _goblins;
+    private string _message;
+    private bool _dead;
 
     public override void Main ()
     {
         Application.Init ();
-        top = new ();
+        _top = new ();
 
-        m = new ();
+        _m = new ();
 
         GenerateNpcs ();
 
-        top.DrawingContent += (s, e) =>
+        _top.DrawingContent += (s, e) =>
                               {
                                   // Build maze
-                                  var lc = new LineCanvas (m.BuildWallLinesFromMaze ());
+                                  var lc = new LineCanvas (_m.BuildWallLinesFromMaze ());
 
                                   // Print maze
                                   foreach (KeyValuePair<Point, Rune> p in lc.GetMap ())
                                   {
-                                      top.Move (p.Key.X, p.Key.Y);
-                                      top.AddRune (p.Value);
+                                      _top.Move (p.Key.X, p.Key.Y);
+                                      _top.AddRune (p.Value);
                                   }
 
                                   // Draw objects
-                                  top.Move (m.start.X, m.start.Y);
-                                  top.AddStr ("s");
+                                  _top.Move (_m.start.X, _m.start.Y);
+                                  _top.AddStr ("s");
 
-                                  top.Move (m.end.X, m.end.Y);
-                                  top.AddStr ("e");
+                                  _top.Move (_m.end.X, _m.end.Y);
+                                  _top.AddStr ("e");
 
-                                  top.Move (m.player.X, m.player.Y);
-                                  top.SetAttribute (new (Color.Cyan, top.GetNormalColor ().Background));
-                                  top.AddStr (dead ? "x" : "@");
+                                  _top.Move (_m.player.X, _m.player.Y);
+                                  _top.SetAttribute (new (Color.Cyan, _top.GetNormalColor ().Background));
+                                  _top.AddStr (_dead ? "x" : "@");
 
                                   // Draw goblins
-                                  foreach (Point goblin in goblins)
+                                  foreach (Point goblin in _goblins)
                                   {
-                                      top.Move (goblin.X, goblin.Y);
-                                      top.SetAttribute (new (Color.Red, top.GetNormalColor ().Background));
-                                      top.AddStr ("G");
+                                      _top.Move (goblin.X, goblin.Y);
+                                      _top.SetAttribute (new (Color.Red, _top.GetNormalColor ().Background));
+                                      _top.AddStr ("G");
                                   }
 
                                   // Draw potions
-                                  foreach (Point potion in potions)
+                                  foreach (Point potion in _potions)
                                   {
-                                      top.Move (potion.X, potion.Y);
-                                      top.SetAttribute (new (Color.Yellow, top.GetNormalColor ().Background));
-                                      top.AddStr ("p");
+                                      _top.Move (potion.X, potion.Y);
+                                      _top.SetAttribute (new (Color.Yellow, _top.GetNormalColor ().Background));
+                                      _top.AddStr ("p");
                                   }
 
                                   // Draw UI
-                                  top.SetAttribute (top.GetNormalColor ());
+                                  _top.SetAttribute (_top.GetNormalColor ());
 
                                   var g = new Gradient ([new (Color.Red), new (Color.BrightGreen)], [10]);
-                                  top.Move (m.MazeWidth + 1, 0);
-                                  top.AddStr ("Name: Sir Flibble");
-                                  top.Move (m.MazeWidth + 1, 1);
-                                  top.AddStr ("HP:");
+                                  _top.Move (_m.MazeWidth + 1, 0);
+                                  _top.AddStr ("Name: Sir Flibble");
+                                  _top.Move (_m.MazeWidth + 1, 1);
+                                  _top.AddStr ("HP:");
 
-                                  for (var i = 0; i < m.playerHp; i++)
+                                  for (var i = 0; i < _m.playerHp; i++)
                                   {
-                                      top.Move (m.MazeWidth + 1 + "HP:".Length + i, 1);
-                                      top.SetAttribute (new (g.GetColorAtFraction (i / 20f)));
-                                      top.AddRune ('█');
+                                      _top.Move (_m.MazeWidth + 1 + "HP:".Length + i, 1);
+                                      _top.SetAttribute (new (g.GetColorAtFraction (i / 20f)));
+                                      _top.AddRune ('█');
                                   }
 
-                                  top.SetAttribute (top.GetNormalColor ());
+                                  _top.SetAttribute (_top.GetNormalColor ());
 
-                                  if (!string.IsNullOrWhiteSpace (message))
+                                  if (!string.IsNullOrWhiteSpace (_message))
                                   {
-                                      top.Move (m.MazeWidth + 2, 2);
-                                      top.AddStr (message);
+                                      _top.Move (_m.MazeWidth + 2, 2);
+                                      _top.AddStr (_message);
                                   }
                               };
 
-        top.KeyDown += TopOnKeyDown;
+        _top.KeyDown += TopOnKeyDown;
 
-        Application.Run (top);
+        Application.Run (_top);
 
-        top.Dispose ();
+        _top.Dispose ();
         Application.Shutdown ();
     }
 
     private void GenerateNpcs ()
     {
-        goblins = m.GenerateSpawnLocations (3, new ()); // Generate 3 goblins
-        potions = m.GenerateSpawnLocations (3, goblins); // Generate 3 potions
+        _goblins = _m.GenerateSpawnLocations (3, new ()); // Generate 3 goblins
+        _potions = _m.GenerateSpawnLocations (3, _goblins); // Generate 3 potions
     }
 
     private void TopOnKeyDown (object sender, Key e)
     {
-        if (dead)
+        if (_dead)
         {
             return;
         }
 
-        Point newPos = m.player;
+        Point newPos = _m.player;
 
         if (e.KeyCode == Key.CursorLeft)
         {
-            newPos = new (m.player.X - 1, m.player.Y);
+            newPos = new (_m.player.X - 1, _m.player.Y);
         }
 
         if (e.KeyCode == Key.CursorRight)
         {
-            newPos = new (m.player.X + 1, m.player.Y);
+            newPos = new (_m.player.X + 1, _m.player.Y);
         }
 
         if (e.KeyCode == Key.CursorUp)
         {
-            newPos = new (m.player.X, m.player.Y - 1);
+            newPos = new (_m.player.X, _m.player.Y - 1);
         }
 
         if (e.KeyCode == Key.CursorDown)
         {
-            newPos = new (m.player.X, m.player.Y + 1);
+            newPos = new (_m.player.X, _m.player.Y + 1);
         }
 
         // Only move if in bounds and it's a path
-        if (newPos.X >= 0 && newPos.X < m.maze.GetLength (1) && newPos.Y >= 0 && newPos.Y < m.maze.GetLength (0) && m.maze [newPos.Y, newPos.X] == 0)
+        if (newPos.X >= 0 && newPos.X < _m.maze.GetLength (1) && newPos.Y >= 0 && newPos.Y < _m.maze.GetLength (0) && _m.maze [newPos.Y, newPos.X] == 0)
         {
-            m.player = newPos;
+            _m.player = newPos;
 
             // Check if player is on a goblin
-            if (goblins.Contains (m.player))
+            if (_goblins.Contains (_m.player))
             {
-                message = "You fight a goblin!";
-                m.playerHp -= 5; // Decrease player's HP when attacked
+                _message = "You fight a goblin!";
+                _m.playerHp -= 5; // Decrease player's HP when attacked
 
                 // Remove the goblin
-                goblins.Remove (m.player);
+                _goblins.Remove (_m.player);
 
 
                 // Check if player is dead
-                if (m.playerHp <= 0)
+                if (_m.playerHp <= 0)
                 {
-                    message = "You died!";
-                    top.SetNeedsDraw (); // trigger redraw
-                    dead = true;
+                    _message = "You died!";
+                    _top.SetNeedsDraw (); // trigger redraw
+                    _dead = true;
                     return; // Stop further action if dead
                 }
             }
-            else if (potions.Contains (m.player))
+            else if (_potions.Contains (_m.player))
             {
-                message = "You drink a health potion!";
-                m.playerHp = Math.Min (20, m.playerHp + 5); // increase player's HP when drinking potion
+                _message = "You drink a health potion!";
+                _m.playerHp = Math.Min (20, _m.playerHp + 5); // increase player's HP when drinking potion
 
                 // Remove the potion
-                potions.Remove (m.player);
+                _potions.Remove (_m.player);
             }
             else
             {
-                message = string.Empty;
+                _message = string.Empty;
             }
 
-            top.SetNeedsDraw (); // trigger redraw
+            _top.SetNeedsDraw (); // trigger redraw
         }
 
         // Optional win condition:
-        if (m.player == m.end)
+        if (_m.player == _m.end)
         {
-            m = new (); // Generate a new maze
+            _m = new (); // Generate a new maze
             GenerateNpcs ();
-            top.SetNeedsDraw (); // trigger redraw
+            _top.SetNeedsDraw (); // trigger redraw
         }
     }
 }
