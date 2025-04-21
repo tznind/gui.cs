@@ -11,6 +11,7 @@ public class Mazing : Scenario
     private MazeGenerator m;
 
 
+    private List<Point> potions;
     private List<Point> goblins;
     private string message;
 
@@ -20,7 +21,8 @@ public class Mazing : Scenario
         top = new ();
 
         m = new ();
-        goblins = m.GenerateGoblins (3); // Generate 3 goblins
+
+        GenerateNpcs ();
 
         top.DrawingContent += (s, e) =>
                               {
@@ -51,6 +53,14 @@ public class Mazing : Scenario
                                       top.Move (goblin.X, goblin.Y);
                                       top.SetAttribute (new (Color.Red, top.GetNormalColor ().Background));
                                       top.AddStr ("G");
+                                  }
+
+                                  // Draw potions
+                                  foreach (var potion in potions)
+                                  {
+                                      top.Move (potion.X, potion.Y);
+                                      top.SetAttribute (new (Color.Yellow, top.GetNormalColor ().Background));
+                                      top.AddStr ("p");
                                   }
 
                                   // Draw UI
@@ -84,6 +94,12 @@ public class Mazing : Scenario
 
         top.Dispose ();
         Application.Shutdown ();
+    }
+
+    private void GenerateNpcs ()
+    {
+        goblins = m.GenerateSpawnLocations (3, new ()); // Generate 3 goblins
+        potions = m.GenerateSpawnLocations (3, goblins); // Generate 3 potions
     }
 
     private void TopOnKeyDown (object sender, Key e)
@@ -125,6 +141,15 @@ public class Mazing : Scenario
                 goblins.Remove (m.player);
             }
             else
+            if (potions.Contains (m.player))
+            {
+                message = "You drink a health potion!";
+                m.playerHp = Math.Min (20,m.playerHp + 5);  // increase player's HP when drinking potion
+
+                // Remove the potion
+                potions.Remove (m.player);
+            }
+            else
             {
                 message = string.Empty;
             }
@@ -136,6 +161,7 @@ public class Mazing : Scenario
         if (m.player == m.end)
         {
             m = new MazeGenerator (); // Generate a new maze
+            GenerateNpcs ();
             top.SetNeedsDraw (); // trigger redraw
         }
     }
@@ -250,24 +276,28 @@ internal class MazeGenerator
         return lines;
     }
 
-    public List<Point> GenerateGoblins (int count)
+    public List<Point> GenerateSpawnLocations (int count, List<Point> exclude)
     {
-        List<Point> goblins = new ();
+        // Create a new copy of the list so we can track exclusions
+        exclude = exclude.ToList ();
+
+        List<Point> locations = new List<Point> ();
 
         for (int i = 0; i < count; i++)
         {
-            Point goblin;
+            Point point;
             do
             {
-                goblin = new (rand.Next (1, width * 2), rand.Next (1, height * 2));
+                point = new Point (rand.Next (1, width * 2), rand.Next (1, height * 2));
             }
-            // Check if the goblin is spawning in an open space (not a wall)
-            while (maze [goblin.Y, goblin.X] != 0); // Ensure goblins don't spawn on walls
+            // Ensure the spawn point is not in the exclusion list and it's an open space (not a wall)
+            while (exclude.Contains (point) || maze [point.Y, point.X] != 0);
 
-            goblins.Add (goblin);
+            exclude.Add (point);  // Mark this location as occupied
+            locations.Add (point);  // Add the location to the list
         }
 
-        return goblins;
+        return locations;
     }
 
     private void Carve (Point p)
