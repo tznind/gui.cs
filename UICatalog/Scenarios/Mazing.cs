@@ -7,12 +7,15 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Drawing")]
 public class Mazing : Scenario
 {
+    private Toplevel top;
+    private MazeGenerator m;
+
     public override void Main ()
     {
         Application.Init ();
-        var top = new Toplevel ();
+        top = new Toplevel();
 
-        var m = new MazeGenerator ();
+        m = new MazeGenerator ();
 
         top.DrawingContent += (s, e) =>
                               {
@@ -25,17 +28,53 @@ public class Mazing : Scenario
                                       top.AddRune (p.Value);
                                   }
 
-                                  top.Move (m.start.x, m.start.y);
+                                  top.Move (m.start.X, m.start.Y);
                                   top.AddStr ("s");
 
-                                  top.Move (m.end.x, m.end.y);
+                                  top.Move (m.end.X, m.end.Y);
                                   top.AddStr ("e");
+
+                                  top.Move (m.player.X, m.player.Y);
+                                  top.SetAttribute (new Attribute (Color.BrightGreen, top.GetNormalColor ().Background));
+                                  top.AddStr ("@");
                               };
+
+        top.KeyDown += TopOnKeyDown;
+
 
         Application.Run (top);
 
         top.Dispose ();
         Application.Shutdown ();
+    }
+
+    private void TopOnKeyDown (object sender, Key e)
+    {
+       Point newPos = m.player;
+
+           if(e.KeyCode ==  Key.CursorLeft)
+               newPos = new Point (m.player.X - 1, m.player.Y);
+           if (e.KeyCode == Key.CursorRight)
+                newPos = new Point (m.player.X + 1, m.player.Y);
+           if (e.KeyCode == Key.CursorUp)
+                newPos = new Point (m.player.X, m.player.Y - 1);
+           if (e.KeyCode == Key.CursorDown)
+                newPos = new Point (m.player.X, m.player.Y + 1);
+
+       // Only move if in bounds and it's a path
+       if (newPos.X >= 0 && newPos.X < m.maze.GetLength (1) &&
+           newPos.Y >= 0 && newPos.Y < m.maze.GetLength (0) &&
+           m.maze [newPos.Y, newPos.X] == 0)
+       {
+           m.player = newPos;
+           top.SetNeedsDraw(); // trigger redraw
+       }
+
+       // Optional win condition:
+       if (m.player == m.end)
+       {
+           MessageBox.Query (30, 7, "Maze", "You made it!", "Ok");
+       }
     }
 }
 
@@ -45,8 +84,9 @@ internal class MazeGenerator
     public readonly int height = 10;
     public int [,] maze;
     public readonly Random rand = new ();
-    public readonly (int x, int y) start;
-    public readonly (int x, int y) end;
+    public readonly Point start;
+    public readonly Point end;
+    public Point player;
 
     public MazeGenerator ()
     {
@@ -64,15 +104,16 @@ internal class MazeGenerator
         // Start carving from a random odd cell
         int startX = rand.Next (width) * 2 + 1;
         int startY = rand.Next (height) * 2 + 1;
-        Carve (startX, startY);
+        Carve (new(startX, startY));
 
         // Set random entrance
         start = GetRandomEdgePoint (w, h, true);
-        maze [start.y, start.x] = 0;
+        maze [start.Y, start.X] = 0;
+        player = start;
 
         // Set random exit (ensure it's not same as entrance)
-        end = GetRandomEdgePoint (w, h, false, start.x, start.y);
-        maze [end.y, end.x] = 0;
+        end = GetRandomEdgePoint (w, h, false, start.X, start.Y);
+        maze [end.Y, end.X] = 0;
     }
 
     public List<StraightLine> BuildWallLinesFromMaze ()
@@ -141,9 +182,9 @@ internal class MazeGenerator
         return lines;
     }
 
-    private void Carve (int x, int y)
+    private void Carve (Point p)
     {
-        maze [y, x] = 0;
+        maze [p.Y, p.X] = 0;
 
         int [] [] dirs =
         {
@@ -157,12 +198,12 @@ internal class MazeGenerator
 
         foreach (int [] dir in dirs)
         {
-            int nx = x + dir [0], ny = y + dir [1];
+            int nx = p.X + dir [0], ny = p.Y + dir [1];
 
             if (nx > 0 && ny > 0 && nx < width * 2 && ny < height * 2 && maze [ny, nx] == 1)
             {
-                maze [y + dir [1] / 2, x + dir [0] / 2] = 0;
-                Carve (nx, ny);
+                maze [p.Y + dir [1] / 2, p.X + dir [0] / 2] = 0;
+                Carve (new (nx, ny));
             }
         }
     }
@@ -178,26 +219,26 @@ internal class MazeGenerator
         }
     }
 
-    private (int x, int y) GetRandomEdgePoint (int w, int h, bool isEntrance, int avoidX = -1, int avoidY = -1)
+    private Point GetRandomEdgePoint (int w, int h, bool isEntrance, int avoidX = -1, int avoidY = -1)
     {
-        List<(int x, int y)> candidates = new ();
+        List<Point> candidates = new ();
 
         for (var i = 1; i < h - 1; i += 2)
         {
-            candidates.Add ((0, i)); // Left edge
-            candidates.Add ((w - 1, i)); // Right edge
+            candidates.Add (new (0, i)); // Left edge
+            candidates.Add (new (w - 1, i)); // Right edge
         }
 
         for (var i = 1; i < w - 1; i += 2)
         {
-            candidates.Add ((i, 0)); // Top edge
-            candidates.Add ((i, h - 1)); // Bottom edge
+            candidates.Add (new (i, 0)); // Top edge
+            candidates.Add (new (i, h - 1)); // Bottom edge
         }
 
         // Remove one if same as entrance
         if (!isEntrance)
         {
-            candidates.RemoveAll (p => p.x == avoidX && p.y == avoidY);
+            candidates.RemoveAll (p => p.X == avoidX && p.Y == avoidY);
         }
 
         return candidates [rand.Next (candidates.Count)];
