@@ -81,7 +81,8 @@ public class Mazing : Scenario
         // Optional win condition:
         if (m.player == m.end)
         {
-            MessageBox.Query (30, 7, "Maze", "You made it!", "Ok");
+            m = new MazeGenerator (); // Generate a new maze
+            top.SetNeedsDraw (); // trigger redraw
         }
     }
 }
