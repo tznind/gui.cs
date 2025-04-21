@@ -10,7 +10,6 @@ public class Mazing : Scenario
     private Toplevel top;
     private MazeGenerator m;
 
-
     private List<Point> potions;
     private List<Point> goblins;
     private string message;
@@ -48,7 +47,7 @@ public class Mazing : Scenario
                                   top.AddStr ("@");
 
                                   // Draw goblins
-                                  foreach (var goblin in goblins)
+                                  foreach (Point goblin in goblins)
                                   {
                                       top.Move (goblin.X, goblin.Y);
                                       top.SetAttribute (new (Color.Red, top.GetNormalColor ().Background));
@@ -56,7 +55,7 @@ public class Mazing : Scenario
                                   }
 
                                   // Draw potions
-                                  foreach (var potion in potions)
+                                  foreach (Point potion in potions)
                                   {
                                       top.Move (potion.X, potion.Y);
                                       top.SetAttribute (new (Color.Yellow, top.GetNormalColor ().Background));
@@ -66,16 +65,16 @@ public class Mazing : Scenario
                                   // Draw UI
                                   top.SetAttribute (top.GetNormalColor ());
 
-                                  var g = new Gradient ([new Color (Color.Red), new Color (Color.BrightGreen)], [10]);
+                                  var g = new Gradient ([new (Color.Red), new (Color.BrightGreen)], [10]);
                                   top.Move (m.MazeWidth + 1, 0);
                                   top.AddStr ("Name: Sir Flibble");
                                   top.Move (m.MazeWidth + 1, 1);
                                   top.AddStr ("HP:");
 
-                                  for (int i = 0; i < m.playerHp; i++)
+                                  for (var i = 0; i < m.playerHp; i++)
                                   {
                                       top.Move (m.MazeWidth + 1 + "HP:".Length + i, 1);
-                                      top.SetAttribute(new Attribute (g.GetColorAtFraction (i / 20f)));
+                                      top.SetAttribute (new (g.GetColorAtFraction (i / 20f)));
                                       top.AddRune ('█');
                                   }
 
@@ -135,16 +134,15 @@ public class Mazing : Scenario
             if (goblins.Contains (m.player))
             {
                 message = "You fight a goblin!";
-                m.playerHp -= 5;  // Decrease player's HP when attacked
+                m.playerHp -= 5; // Decrease player's HP when attacked
 
                 // Remove the goblin
                 goblins.Remove (m.player);
             }
-            else
-            if (potions.Contains (m.player))
+            else if (potions.Contains (m.player))
             {
                 message = "You drink a health potion!";
-                m.playerHp = Math.Min (20,m.playerHp + 5);  // increase player's HP when drinking potion
+                m.playerHp = Math.Min (20, m.playerHp + 5); // increase player's HP when drinking potion
 
                 // Remove the potion
                 potions.Remove (m.player);
@@ -160,7 +158,7 @@ public class Mazing : Scenario
         // Optional win condition:
         if (m.player == m.end)
         {
-            m = new MazeGenerator (); // Generate a new maze
+            m = new (); // Generate a new maze
             GenerateNpcs ();
             top.SetNeedsDraw (); // trigger redraw
         }
@@ -281,20 +279,22 @@ internal class MazeGenerator
         // Create a new copy of the list so we can track exclusions
         exclude = exclude.ToList ();
 
-        List<Point> locations = new List<Point> ();
+        List<Point> locations = new ();
 
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
             Point point;
+
             do
             {
-                point = new Point (rand.Next (1, width * 2), rand.Next (1, height * 2));
+                point = new (rand.Next (1, width * 2), rand.Next (1, height * 2));
             }
+
             // Ensure the spawn point is not in the exclusion list and it's an open space (not a wall)
             while (exclude.Contains (point) || maze [point.Y, point.X] != 0);
 
-            exclude.Add (point);  // Mark this location as occupied
-            locations.Add (point);  // Add the location to the list
+            exclude.Add (point); // Mark this location as occupied
+            locations.Add (point); // Add the location to the list
         }
 
         return locations;
