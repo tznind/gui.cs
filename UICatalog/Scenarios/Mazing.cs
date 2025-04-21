@@ -13,6 +13,7 @@ public class Mazing : Scenario
     private List<Point> potions;
     private List<Point> goblins;
     private string message;
+    private bool dead;
 
     public override void Main ()
     {
@@ -44,7 +45,7 @@ public class Mazing : Scenario
 
                                   top.Move (m.player.X, m.player.Y);
                                   top.SetAttribute (new (Color.Cyan, top.GetNormalColor ().Background));
-                                  top.AddStr ("@");
+                                  top.AddStr (dead ? "x" : "@");
 
                                   // Draw goblins
                                   foreach (Point goblin in goblins)
@@ -103,6 +104,11 @@ public class Mazing : Scenario
 
     private void TopOnKeyDown (object sender, Key e)
     {
+        if (dead)
+        {
+            return;
+        }
+
         Point newPos = m.player;
 
         if (e.KeyCode == Key.CursorLeft)
@@ -138,6 +144,16 @@ public class Mazing : Scenario
 
                 // Remove the goblin
                 goblins.Remove (m.player);
+
+
+                // Check if player is dead
+                if (m.playerHp <= 0)
+                {
+                    message = "You died!";
+                    top.SetNeedsDraw (); // trigger redraw
+                    dead = true;
+                    return; // Stop further action if dead
+                }
             }
             else if (potions.Contains (m.player))
             {
