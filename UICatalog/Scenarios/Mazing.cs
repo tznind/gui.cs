@@ -16,9 +16,9 @@ public class Mazing : Scenario
         top.DrawingContent += (s, e) =>
                   {
                       // Print maze
-                      for (var y = 0; y < m.height; y++)
+                      for (var y = 0; y < m.maze.GetLength (0); y++)
                       {
-                          for (var x = 0; x < m.width; x++)
+                          for (var x = 0; x < m.maze.GetLength (1); x++)
                           {
                               top.Move (x, y);
                               var c = m.maze [y, x] == 1 ? "#" : " ";
@@ -44,8 +44,8 @@ public class Mazing : Scenario
 
 internal class MazeGenerator
 {
-   public readonly int width = 40;
-   public readonly int height = 20;
+   public readonly int width = 20;
+   public readonly int height = 10;
    public int [,] maze;
    public readonly Random rand = new ();
    public readonly (int x, int y) start;
