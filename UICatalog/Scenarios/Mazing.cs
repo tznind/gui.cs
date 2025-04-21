@@ -10,15 +10,21 @@ public class Mazing : Scenario
     private Toplevel top;
     private MazeGenerator m;
 
+
+    private List<Point> goblins;
+    private string message;
+
     public override void Main ()
     {
         Application.Init ();
         top = new ();
 
         m = new ();
+        goblins = m.GenerateGoblins (3); // Generate 3 goblins
 
         top.DrawingContent += (s, e) =>
                               {
+                                  // Build maze
                                   var lc = new LineCanvas (m.BuildWallLinesFromMaze ());
 
                                   // Print maze
@@ -28,6 +34,7 @@ public class Mazing : Scenario
                                       top.AddRune (p.Value);
                                   }
 
+                                  // Draw objects
                                   top.Move (m.start.X, m.start.Y);
                                   top.AddStr ("s");
 
@@ -35,8 +42,40 @@ public class Mazing : Scenario
                                   top.AddStr ("e");
 
                                   top.Move (m.player.X, m.player.Y);
-                                  top.SetAttribute (new (Color.BrightGreen, top.GetNormalColor ().Background));
+                                  top.SetAttribute (new (Color.Cyan, top.GetNormalColor ().Background));
                                   top.AddStr ("@");
+
+                                  // Draw goblins
+                                  foreach (var goblin in goblins)
+                                  {
+                                      top.Move (goblin.X, goblin.Y);
+                                      top.SetAttribute (new (Color.Red, top.GetNormalColor ().Background));
+                                      top.AddStr ("G");
+                                  }
+
+                                  // Draw UI
+                                  top.SetAttribute (top.GetNormalColor ());
+
+                                  var g = new Gradient ([new Color (Color.Red), new Color (Color.BrightGreen)], [10]);
+                                  top.Move (m.MazeWidth + 1, 0);
+                                  top.AddStr ("Name: Sir Flibble");
+                                  top.Move (m.MazeWidth + 1, 1);
+                                  top.AddStr ("HP:");
+
+                                  for (int i = 0; i < m.playerHp; i++)
+                                  {
+                                      top.Move (m.MazeWidth + 1 + "HP:".Length + i, 1);
+                                      top.SetAttribute(new Attribute (g.GetColorAtFraction (i / 20f)));
+                                      top.AddRune ('█');
+                                  }
+
+                                  top.SetAttribute (top.GetNormalColor ());
+
+                                  if (!string.IsNullOrWhiteSpace (message))
+                                  {
+                                      top.Move (m.MazeWidth + 2, 2);
+                                      top.AddStr (message);
+                                  }
                               };
 
         top.KeyDown += TopOnKeyDown;
@@ -75,6 +114,21 @@ public class Mazing : Scenario
         if (newPos.X >= 0 && newPos.X < m.maze.GetLength (1) && newPos.Y >= 0 && newPos.Y < m.maze.GetLength (0) && m.maze [newPos.Y, newPos.X] == 0)
         {
             m.player = newPos;
+
+            // Check if player is on a goblin
+            if (goblins.Contains (m.player))
+            {
+                message = "You fight a goblin!";
+                m.playerHp -= 5;  // Decrease player's HP when attacked
+
+                // Remove the goblin
+                goblins.Remove (m.player);
+            }
+            else
+            {
+                message = string.Empty;
+            }
+
             top.SetNeedsDraw (); // trigger redraw
         }
 
@@ -89,13 +143,18 @@ public class Mazing : Scenario
 
 internal class MazeGenerator
 {
-    public readonly int width = 20;
-    public readonly int height = 10;
+    private readonly int width = 20;
+    private readonly int height = 10;
     public int [,] maze;
     public readonly Random rand = new ();
     public readonly Point start;
     public readonly Point end;
     public Point player;
+    public int playerHp = 20;
+
+    // Private accessors for width and height
+    public int MazeWidth => width * 2 + 1;
+    public int MazeHeight => height * 2 + 1;
 
     public MazeGenerator ()
     {
@@ -189,6 +248,26 @@ internal class MazeGenerator
         }
 
         return lines;
+    }
+
+    public List<Point> GenerateGoblins (int count)
+    {
+        List<Point> goblins = new ();
+
+        for (int i = 0; i < count; i++)
+        {
+            Point goblin;
+            do
+            {
+                goblin = new (rand.Next (1, width * 2), rand.Next (1, height * 2));
+            }
+            // Check if the goblin is spawning in an open space (not a wall)
+            while (maze [goblin.Y, goblin.X] != 0); // Ensure goblins don't spawn on walls
+
+            goblins.Add (goblin);
+        }
+
+        return goblins;
     }
 
     private void Carve (Point p)
