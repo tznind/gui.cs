@@ -1,4 +1,5 @@
-﻿using Terminal.Gui;
+﻿using System.Text;
+using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -14,44 +15,40 @@ public class Mazing : Scenario
         var m = new MazeGenerator ();
 
         top.DrawingContent += (s, e) =>
-                  {
-                      // Print maze
-                      for (var y = 0; y < m.maze.GetLength (0); y++)
-                      {
-                          for (var x = 0; x < m.maze.GetLength (1); x++)
-                          {
-                              top.Move (x, y);
-                              var c = m.maze [y, x] == 1 ? "#" : " ";
-                              top.AddStr (c);
-                          }
-                      }
+                              {
+                                  var lc = new LineCanvas (m.BuildWallLinesFromMaze ());
 
-                      top.Move (m.start.x, m.start.y);
-                      top.AddStr ("s");
+                                  // Print maze
+                                  foreach (KeyValuePair<Point, Rune> p in lc.GetMap ())
+                                  {
+                                      top.Move (p.Key.X, p.Key.Y);
+                                      top.AddRune (p.Value);
+                                  }
 
-                      top.Move (m.end.x, m.end.y);
-                      top.AddStr ("e");
-                  };
+                                  top.Move (m.start.x, m.start.y);
+                                  top.AddStr ("s");
+
+                                  top.Move (m.end.x, m.end.y);
+                                  top.AddStr ("e");
+                              };
 
         Application.Run (top);
-
 
         top.Dispose ();
         Application.Shutdown ();
     }
-
 }
 
 internal class MazeGenerator
 {
-   public readonly int width = 20;
-   public readonly int height = 10;
-   public int [,] maze;
-   public readonly Random rand = new ();
-   public readonly (int x, int y) start;
-   public readonly (int x, int y) end;
+    public readonly int width = 20;
+    public readonly int height = 10;
+    public int [,] maze;
+    public readonly Random rand = new ();
+    public readonly (int x, int y) start;
+    public readonly (int x, int y) end;
 
-   public MazeGenerator ()
+    public MazeGenerator ()
     {
         int w = width * 2 + 1;
         int h = height * 2 + 1;
@@ -76,6 +73,72 @@ internal class MazeGenerator
         // Set random exit (ensure it's not same as entrance)
         end = GetRandomEdgePoint (w, h, false, start.x, start.y);
         maze [end.y, end.x] = 0;
+    }
+
+    public List<StraightLine> BuildWallLinesFromMaze ()
+    {
+        List<StraightLine> lines = new ();
+
+        int h = maze.GetLength (0);
+        int w = maze.GetLength (1);
+
+        // Horizontal lines
+        for (var y = 0; y < h; y++)
+        {
+            var x = 0;
+
+            while (x < w)
+            {
+                if (maze [y, x] == 1)
+                {
+                    int startX = x;
+
+                    while (x < w && maze [y, x] == 1)
+                    {
+                        x++;
+                    }
+
+                    int length = x - startX;
+
+                    if (length > 1)
+                    {
+                        lines.Add (new (new (startX, y), length, Orientation.Horizontal, LineStyle.Single));
+                    }
+                }
+                else
+                {
+                    x++;
+                }
+            }
+        }
+
+        // Vertical lines
+        for (var x = 0; x < w; x++)
+        {
+            var y = 0;
+
+            while (y < h)
+            {
+                if (maze [y, x] == 1)
+                {
+                    int startY = y;
+
+                    while (y < h && maze [y, x] == 1)
+                    {
+                        y++;
+                    }
+
+                    int length = y - startY;
+                    lines.Add (new (new (x, startY), length, Orientation.Vertical, LineStyle.Single));
+                }
+                else
+                {
+                    y++;
+                }
+            }
+        }
+
+        return lines;
     }
 
     private void Carve (int x, int y)
