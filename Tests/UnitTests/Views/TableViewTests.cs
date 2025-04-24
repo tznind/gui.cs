@@ -3392,8 +3392,6 @@ A B C
     [Fact]
     public void TableView_CollectionNavigatorMatcher_KeybindingsOverrideNavigator ()
     {
-        Application.Top = new ();
-
         var dt = new DataTable ();
         dt.Columns.Add ("blah");
 
@@ -3406,27 +3404,21 @@ A B C
 
         var tableView = new TableView ();
         tableView.Table = new DataTableSource (dt);
-
-        Application.Top.Add (tableView);
-        tableView.SetFocus ();
-
+        tableView.HasFocus = true;
         tableView.KeyBindings.Add (Key.B, Command.Down);
 
         Assert.Equal (0, tableView.SelectedRow);
 
         // Keys should be consumed to move down the navigation i.e. to apricot
-        Assert.True (Application.RaiseKeyDownEvent (Key.B));
+        Assert.True (tableView.NewKeyDownEvent (Key.B));
         Assert.Equal (1, tableView.SelectedRow);
 
-        Assert.True (Application.RaiseKeyDownEvent (Key.B));
+        Assert.True (tableView.NewKeyDownEvent (Key.B));
         Assert.Equal (2, tableView.SelectedRow);
 
         // There is no keybinding for Key.C so it hits collection navigator i.e. we jump to candle
-        Assert.True (Application.RaiseKeyDownEvent (Key.C));
+        Assert.True (tableView.NewKeyDownEvent (Key.C));
         Assert.Equal (5, tableView.SelectedRow);
-
-        Application.Top.Dispose ();
-        Application.ResetState ();
     }
 
     /// <summary>
