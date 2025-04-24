@@ -821,7 +821,7 @@ public class ListView : View, IDesignable
         {
             int? newItem = KeystrokeNavigator?.GetNextMatchingItem (SelectedItem, (char)key);
 
-            if (newItem is int && newItem != -1)
+            if (newItem is { } && newItem != -1)
             {
                 SelectedItem = (int)newItem;
                 EnsureSelectedItemVisible ();
