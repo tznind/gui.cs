@@ -1433,8 +1433,6 @@ oot two
     [Fact]
     public void TreeView_CollectionNavigatorMatcher_KeybindingsOverrideNavigator ()
     {
-        Application.Top = new ();
-
         var tree = new TreeView ();
         tree.AddObjects ([
                          new TreeNode(){ Text="apricot" },
@@ -1445,7 +1443,6 @@ oot two
                          new TreeNode(){ Text="candle" },
                          ]);
 
-        Application.Top.Add (tree);
         tree.SetFocus ();
 
         tree.KeyBindings.Add (Key.B, Command.Down);
@@ -1453,18 +1450,15 @@ oot two
         Assert.Equal ("apricot", tree.SelectedObject.Text);
 
         // Keys should be consumed to move down the navigation i.e. to apricot
-        Assert.True (Application.RaiseKeyDownEvent (Key.B));
+        Assert.True (tree.NewKeyDownEvent (Key.B));
         Assert.NotNull (tree.SelectedObject);
         Assert.Equal ("arm", tree.SelectedObject.Text);
 
-        Assert.True (Application.RaiseKeyDownEvent (Key.B));
+        Assert.True (tree.NewKeyDownEvent (Key.B));
         Assert.Equal ("bat", tree.SelectedObject.Text);
 
         // There is no keybinding for Key.C so it hits collection navigator i.e. we jump to candle
-        Assert.True (Application.RaiseKeyDownEvent (Key.C));
+        Assert.True (tree.NewKeyDownEvent (Key.C));
         Assert.Equal ("candle", tree.SelectedObject.Text);
-
-        Application.Top.Dispose ();
-        Application.ResetState ();
     }
 }
