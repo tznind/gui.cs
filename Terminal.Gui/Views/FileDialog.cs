@@ -1137,7 +1137,7 @@ public class FileDialog : Dialog, IDesignable
             }
             else if (setPathText)
             {
-                Path = newState.Directory.FullName;
+                SetPathToSelectedObject (newState.Directory);
             }
 
             State = newState;
@@ -1417,7 +1417,7 @@ public class FileDialog : Dialog, IDesignable
             return;
         }
 
-        if (selected is IDirectoryInfo)
+        if (selected is IDirectoryInfo && Style.PreserveFilenameOnDirectoryChanges)
         {
             if (!string.IsNullOrWhiteSpace (Path) && !_fileSystem.Directory.Exists (Path))
             {
