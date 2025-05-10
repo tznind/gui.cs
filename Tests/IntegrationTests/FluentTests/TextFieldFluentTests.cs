@@ -24,6 +24,7 @@ public class TextFieldFluentTests
     [ClassData (typeof (V2TestDrivers))]
     public void TextField_Cursor_AtEnd_WhenTyping (V2TestDriver d)
     {
+        // Simulates typing abcd into a TextField with width 3 (wide enough to render 2 characters only)
         using var c = With.A<Window> (100, 20, d)
                           .Add (new TextField () { Width = 3 })
                           .Focus<TextField> ()
@@ -40,6 +41,10 @@ public class TextFieldFluentTests
                           .WaitIteration ()
                           .ScreenShot ("After typing all letters",_out)
                           .AssertCursorPosition (new Point (3, 1)) // Cursor stays where it is because we are at end of TextField
+                          .RaiseKeyDownEvent (Key.D)
+                          .WaitIteration ()
+                          .ScreenShot ("Typing one more letter", _out)
+                          .AssertCursorPosition (new Point (3, 1)) // Cursor still stays at end of TextField
                           .WriteOutLogs (_out)
                           .Stop ();
     }
