@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui;
 
@@ -29,7 +30,11 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
 
         InputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
         InputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
-        InputProcessor.MouseEvent += (s, e) => MouseEvent?.Invoke (s, e);
+        InputProcessor.MouseEvent += (s, e) =>
+                                     {
+                                         //Logging.Logger.LogTrace ($"Mouse {e.Flags} at x={e.ScreenPosition.X} y={e.ScreenPosition.Y}");
+                                         MouseEvent?.Invoke (s, e);
+                                     };
 
         windowSizeMonitor.SizeChanging += (_, e) => SizeChanged?.Invoke (this, e);
 
@@ -141,7 +146,11 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     ///         <see langword="false"/>, indicating that the <see cref="ConsoleDriver"/> cannot support TrueColor.
     ///     </para>
     /// </remarks>
-    public bool Force16Colors { get; set; }
+    public bool Force16Colors
+    {
+        get => Application.Force16Colors || !SupportsTrueColor;
+        set => Application.Force16Colors = value || !SupportsTrueColor;
+    }
 
     /// <summary>
     ///     The <see cref="Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or <see cref="AddStr"/>
@@ -335,7 +344,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     {
         // TODO: what even is this? why Attribute constructor wants to call Driver method which must return an instance of Attribute? ?!?!?!
         return new (
-                    -1, // only used by cursesdriver!
+                    0xFF, // only used by cursesdriver!
                     foreground,
                     background
                    );

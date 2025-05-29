@@ -7,6 +7,7 @@ namespace Terminal.Gui;
 
 public static partial class Application // Initialization (Init/Shutdown)
 {
+
     /// <summary>Initializes a new instance of a Terminal.Gui Application. <see cref="Shutdown"/> must be called when the application is closing.</summary>
     /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
     /// <para>
@@ -82,7 +83,11 @@ public static partial class Application // Initialization (Init/Shutdown)
             ResetState (ignoreDisposed: true);
         }
 
+        Debug.Assert (Navigation is null);
         Navigation = new ();
+
+        Debug.Assert(Popover is null);
+        Popover = new ();
 
         // For UnitTests
         if (driver is { })
@@ -91,18 +96,16 @@ public static partial class Application // Initialization (Init/Shutdown)
 
             if (driver is FakeDriver)
             {
-                // We're running unit tests. Disable loading config files other than default
-                if (Locations == ConfigLocations.All)
-                {
-                    Locations = ConfigLocations.Default;
-                    Reset ();
-                }
+                //// We're running unit tests. Disable loading config files other than default
+                //if (Locations == ConfigLocations.All)
+                //{
+                //    Locations = ConfigLocations.Default;
+                //    ResetAllSettings ();
+                //}
             }
         }
 
         AddKeyBindings ();
-
-        InitializeConfigurationManagement ();
 
         // Ignore Configuration for ForceDriver if driverName is specified
         if (!string.IsNullOrEmpty (driverName))
@@ -162,28 +165,15 @@ public static partial class Application // Initialization (Init/Shutdown)
 
         SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
 
+        // TODO: This is probably not needed
+        if (Popover.GetActivePopover () is View popover)
+        {
+            popover.Visible = false;
+        }
+
         MainThreadId = Thread.CurrentThread.ManagedThreadId;
         bool init = Initialized = true;
         InitializedChanged?.Invoke (null, new (init));
-    }
-
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-    internal static void InitializeConfigurationManagement ()
-    {
-        // Start the process of configuration management.
-        // Note that we end up calling LoadConfigurationFromAllSources
-        // multiple times. We need to do this because some settings are only
-        // valid after a Driver is loaded. In this case we need just
-        // `Settings` so we can determine which driver to use.
-        // Don't reset, so we can inherit the theme from the previous run.
-        string previousTheme = Themes?.Theme ?? string.Empty;
-        Load ();
-        if (Themes is { } && !string.IsNullOrEmpty (previousTheme) && previousTheme != "Default")
-        {
-            ThemeManager.SelectedTheme = previousTheme;
-        }
-        Apply ();
     }
 
     internal static void SubscribeDriverEvents ()
@@ -265,6 +255,6 @@ public static partial class Application // Initialization (Init/Shutdown)
     /// </summary>
     internal static void OnInitializedChanged (object sender, EventArgs<bool> e)
     {
-        Application.InitializedChanged?.Invoke (sender,e);
+        Application.InitializedChanged?.Invoke (sender, e);
     }
 }

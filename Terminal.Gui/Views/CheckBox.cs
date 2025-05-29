@@ -1,13 +1,18 @@
 ﻿#nullable enable
 namespace Terminal.Gui;
 
-/// <summary>Shows a check box that can be cycled between two or three states.</summary>
+/// <summary>Shows a checkbox that can be cycled between two or three states.</summary>
+/// <remarks>
+///     <para>
+///         <see cref="RadioStyle"/> is used to display radio button style glyphs (●) instead of checkbox style glyphs (☑).
+///     </para>
+/// </remarks>
 public class CheckBox : View
 {
     /// <summary>
     ///     Gets or sets the default Highlight Style.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static HighlightStyle DefaultHighlightStyle { get; set; } = HighlightStyle.PressedOutside | HighlightStyle.Pressed | HighlightStyle.Hover;
 
     /// <summary>
@@ -175,7 +180,7 @@ public class CheckBox : View
     /// <summary>Called when the <see cref="CheckBox"/> state is changing.</summary>
     /// <remarks>
     ///     <para>
-    ///         The state cahnge can be cancelled by setting the args.Cancel to <see langword="true"/>.
+    ///         The state change can be cancelled by setting the args.Cancel to <see langword="true"/>.
     ///     </para>
     /// </remarks>
     protected virtual bool OnCheckedStateChanging (CancelEventArgs<CheckState> args) { return false; }
@@ -250,22 +255,23 @@ public class CheckBox : View
     {
         base.UpdateTextFormatterText ();
 
+        Rune glyph = RadioStyle ? GetRadioGlyph () : GetCheckGlyph ();
         switch (TextAlignment)
         {
             case Alignment.Start:
             case Alignment.Center:
             case Alignment.Fill:
-                TextFormatter.Text = $"{GetCheckedGlyph ()} {Text}";
+                TextFormatter.Text = $"{glyph} {Text}";
 
                 break;
             case Alignment.End:
-                TextFormatter.Text = $"{Text} {GetCheckedGlyph ()}";
+                TextFormatter.Text = $"{Text} {glyph}";
 
                 break;
         }
     }
 
-    private Rune GetCheckedGlyph ()
+    private Rune GetCheckGlyph ()
     {
         return CheckedState switch
         {
@@ -274,5 +280,22 @@ public class CheckBox : View
             CheckState.None => Glyphs.CheckStateNone,
             _ => throw new ArgumentOutOfRangeException ()
         };
+    }
+
+    /// <summary>
+    ///     If <see langword="true"/>, the <see cref="CheckBox"/> will display radio button style glyphs (●) instead of
+    ///     checkbox style glyphs (☑).
+    /// </summary>
+    public bool RadioStyle { get; set; }
+
+    private Rune GetRadioGlyph ()
+    {
+        return CheckedState switch
+               {
+                   CheckState.Checked => Glyphs.Selected,
+                   CheckState.UnChecked => Glyphs.UnSelected,
+                   CheckState.None => Glyphs.Dot,
+                   _ => throw new ArgumentOutOfRangeException ()
+               };
     }
 }

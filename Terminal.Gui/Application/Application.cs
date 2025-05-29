@@ -53,6 +53,7 @@ public static partial class Application
         {
             return string.Empty;
         }
+
         var sb = new StringBuilder ();
 
         Cell [,] contents = driver?.Contents!;
@@ -103,6 +104,7 @@ public static partial class Application
                        .ToList ();
     }
 
+    // BUGBUG: This does not return en-US even though it's supported by default
     internal static List<CultureInfo> GetSupportedCultures ()
     {
         CultureInfo [] cultures = CultureInfo.GetCultures (CultureTypes.AllCultures);
@@ -138,7 +140,7 @@ public static partial class Application
     // starts running and after Shutdown returns.
     internal static void ResetState (bool ignoreDisposed = false)
     {
-        Application.Navigation = new ApplicationNavigation ();
+        Navigation = new ();
 
         // Shutdown is the bookend for Init. As such it needs to clean up all resources
         // Init created. Apps that do any threading will need to code defensively for this.
@@ -148,13 +150,23 @@ public static partial class Application
             t!.Running = false;
         }
 
+        if (Popover?.GetActivePopover () is View popover)
+        {
+            // This forcefully closes the popover; invoking Command.Quit would be more graceful
+            // but since this is shutdown, doing this is ok.
+            popover.Visible = false;
+        }
+
+        Popover?.Dispose ();
+        Popover = null;
+
         TopLevels.Clear ();
 #if DEBUG_IDISPOSABLE
 
         // Don't dispose the Top. It's up to caller dispose it
-        if (View.DebugIDisposable && !ignoreDisposed && Top is { })
+        if (View.EnableDebugIDisposableAsserts && !ignoreDisposed && Top is { })
         {
-            Debug.Assert (Top.WasDisposed);
+            Debug.Assert (Top.WasDisposed, $"Title = {Top.Title}, Id = {Top.Id}");
 
             // If End wasn't called _cachedRunStateToplevel may be null
             if (_cachedRunStateToplevel is { })
@@ -197,8 +209,10 @@ public static partial class Application
         Initialized = false;
 
         // Mouse
-        _lastMousePosition = null;
-        _cachedViewsUnderMouse.Clear ();
+        // Do not clear _lastMousePosition; Popover's require it to stay set with
+        // last mouse pos.
+        //_lastMousePosition = null;
+        CachedViewsUnderMouse.Clear ();
         WantContinuousButtonPressedView = null;
         MouseEvent = null;
         GrabbedMouse = null;
@@ -213,7 +227,6 @@ public static partial class Application
 
         Navigation = null;
 
-
         KeyBindings.Clear ();
         AddKeyBindings ();
 
@@ -224,10 +237,9 @@ public static partial class Application
         SynchronizationContext.SetSynchronizationContext (null);
     }
 
-
     /// <summary>
     ///     Adds specified idle handler function to main iteration processing. The handler function will be called
     ///     once per iteration of the main loop after other events have been handled.
     /// </summary>
-    public static void AddIdle (Func<bool> func) => ApplicationImpl.Instance.AddIdle (func);
+    public static void AddIdle (Func<bool> func) { ApplicationImpl.Instance.AddIdle (func); }
 }

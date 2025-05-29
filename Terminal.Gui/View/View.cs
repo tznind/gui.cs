@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics;
 
@@ -31,28 +32,15 @@ public partial class View : IDisposable, ISupportInitializeNotification
     {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Disposing?.Invoke (this, EventArgs.Empty);
+
         Dispose (true);
         GC.SuppressFinalize (this);
+
 #if DEBUG_IDISPOSABLE
-        if (DebugIDisposable)
-        {
-            WasDisposed = true;
-
-            foreach (View? instance in Instances.Where (
-                                                        x =>
-                                                        {
-                                                            if (x is { })
-                                                            {
-                                                                return x.WasDisposed;
-                                                            }
-
-                                                            return false;
-                                                        })
-                                                .ToList ())
-            {
-                Instances.Remove (instance);
-            }
-        }
+        WasDisposed = true;
+        // Safely remove any disposed views from the Instances list
+        List<View> itemsToKeep = Instances.Where (view => !view.WasDisposed).ToList ();
+        Instances = new ConcurrentBag<View> (itemsToKeep);
 #endif
     }
 
@@ -74,31 +62,44 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// <param name="disposing"></param>
     protected virtual void Dispose (bool disposing)
     {
-        LineCanvas.Dispose ();
-
-        DisposeMouse ();
-        DisposeKeyboard ();
-        DisposeAdornments ();
-        DisposeScrollBars ();
-
-        for (int i = InternalSubViews.Count - 1; i >= 0; i--)
+        if (disposing)
         {
-            View subview = InternalSubViews [i];
-            Remove (subview);
-            subview.Dispose ();
-        }
+            LineCanvas.Dispose ();
 
-        if (!_disposedValue)
-        {
-            if (disposing)
+            DisposeMouse ();
+            DisposeKeyboard ();
+            DisposeAdornments ();
+            DisposeScrollBars ();
+
+            if (Application.MouseGrabView == this)
             {
-                // TODO: dispose managed state (managed objects)
+                Application.UngrabMouse ();
             }
 
-            _disposedValue = true;
-        }
+            if (Application.WantContinuousButtonPressedView == this)
+            {
+                Application.WantContinuousButtonPressedView = null;
+            }
 
-        Debug.Assert (InternalSubViews.Count == 0);
+            for (int i = InternalSubViews.Count - 1; i >= 0; i--)
+            {
+                View subview = InternalSubViews [i];
+                Remove (subview);
+                subview.Dispose ();
+            }
+
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                }
+
+                _disposedValue = true;
+            }
+
+            Debug.Assert (InternalSubViews.Count == 0);
+        }
     }
 
     #region Constructors and Initialization
@@ -112,11 +113,23 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
     public string Id { get; set; } = "";
 
+    private IConsoleDriver? _driver = null;
     /// <summary>
-    ///     Points to the current driver in use by the view, it is a convenience property for simplifying the development
+    ///     INTERNAL: Use <see cref="Application.Driver"/> instead. Points to the current driver in use by the view, it is a convenience property for simplifying the development
     ///     of new views.
     /// </summary>
-    public static IConsoleDriver? Driver => Application.Driver;
+    internal IConsoleDriver? Driver
+    {
+        get
+        {
+            if (_driver is { })
+            {
+                return _driver;
+            }
+            return Application.Driver;
+        }
+        set => _driver = value;
+    }
 
     /// <summary>Initializes a new instance of <see cref="View"/>.</summary>
     /// <remarks>
@@ -128,10 +141,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     public View ()
     {
 #if DEBUG_IDISPOSABLE
-        if (DebugIDisposable)
-        {
-            Instances.Add (this);
-        }
+        Instances.Add (this);
 #endif
 
         SetupAdornments ();
@@ -337,6 +347,8 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
             if (!_visible)
             {
+                // BUGBUG: Ideally we'd reset _previouslyFocused to the first focusable subview
+                _previouslyFocused = SubViews.FirstOrDefault (v => v.CanFocus);
                 if (HasFocus)
                 {
                     HasFocus = false;
@@ -443,18 +455,12 @@ public partial class View : IDisposable, ISupportInitializeNotification
     {
         get
         {
-#if DEBUG_IDISPOSABLE
-            if (DebugIDisposable && WasDisposed)
-            {
-                throw new ObjectDisposedException (GetType ().FullName);
-            }
-#endif
             return _title;
         }
         set
         {
 #if DEBUG_IDISPOSABLE
-            if (DebugIDisposable && WasDisposed)
+            if (EnableDebugIDisposableAsserts && WasDisposed)
             {
                 throw new ObjectDisposedException (GetType ().FullName);
             }
@@ -473,12 +479,6 @@ public partial class View : IDisposable, ISupportInitializeNotification
                 SetTitleTextFormatterSize ();
                 SetHotKeyFromTitle ();
                 SetNeedsDraw ();
-#if DEBUG
-                if (string.IsNullOrEmpty (Id))
-                {
-                    Id = _title;
-                }
-#endif // DEBUG
                 OnTitleChanged ();
             }
         }
@@ -525,17 +525,34 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
 #if DEBUG_IDISPOSABLE
     /// <summary>
-    ///     Set to false to disable the debug IDisposable feature.
+    ///     Gets or sets whether failure to appropriately call Dispose() on a View will result in an Assert.
+    ///     The default is <see langword="true"/>.
+    ///     Note, this is a static property and will affect all Views.
+    ///     For debug purposes to verify objects are being disposed properly.
+    ///     Only valid when DEBUG_IDISPOSABLE is defined.
     /// </summary>
-    public static bool DebugIDisposable { get; set; } = false;
+    public static bool EnableDebugIDisposableAsserts { get; set; } = true;
 
-    /// <summary>For debug purposes to verify objects are being disposed properly</summary>
-    public bool WasDisposed { get; set; }
+    /// <summary>
+    ///     Gets whether <see cref="Dispose"/> was called on this view or not.
+    ///     For debug purposes to verify objects are being disposed properly.
+    ///     Only valid when DEBUG_IDISPOSABLE is defined.
+    /// </summary>
+    public bool WasDisposed { get; private set; }
 
-    /// <summary>For debug purposes to verify objects are being disposed properly</summary>
-    public int DisposedCount { get; set; } = 0;
+    /// <summary>
+    ///     Gets the number of times <see cref="Dispose"/> was called on this view.
+    ///     For debug purposes to verify objects are being disposed properly.
+    ///     Only valid when DEBUG_IDISPOSABLE is defined.
+    /// </summary>
+    public int DisposedCount { get; private set; } = 0;
 
-    /// <summary>For debug purposes</summary>
-    public static List<View> Instances { get; set; } = [];
+    /// <summary>
+    ///     Gets the list of Views that have been created and not yet disposed.
+    ///     Note, this is a static property and will affect all Views.
+    ///     For debug purposes to verify objects are being disposed properly.
+    ///     Only valid when DEBUG_IDISPOSABLE is defined.
+    /// </summary>
+    public static ConcurrentBag<View> Instances { get; private set; } = [];
 #endif
 }

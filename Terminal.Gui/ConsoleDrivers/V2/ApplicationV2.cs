@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 
@@ -63,15 +64,17 @@ public class ApplicationV2 : ApplicationImpl
             _driverName = driverName;
         }
 
+        Debug.Assert(Application.Navigation is null);
         Application.Navigation = new ();
+
+        Debug.Assert (Application.Popover is null);
+        Application.Popover = new ();
 
         Application.AddKeyBindings ();
 
         // This is consistent with Application.ForceDriver which magnetically picks up driverName
         // making it use custom driver in future shutdown/init calls where no driver is specified
         CreateDriver (driverName ?? _driverName);
-
-        Application.InitializeConfigurationManagement ();
 
         Application.Initialized = true;
 
@@ -157,7 +160,7 @@ public class ApplicationV2 : ApplicationImpl
     /// <inheritdoc/>
     public override void Run (Toplevel view, Func<Exception, bool>? errorHandler = null)
     {
-        Logging.Logger.LogInformation ($"Run '{view}'");
+        Logging.Information ($"Run '{view}'");
         ArgumentNullException.ThrowIfNull (view);
 
         if (!Application.Initialized)
@@ -167,10 +170,12 @@ public class ApplicationV2 : ApplicationImpl
 
         Application.Top = view;
 
-        Application.Begin (view);
+        RunState rs = Application.Begin (view);
 
-        // TODO : how to know when we are done?
-        while (Application.TopLevels.TryPeek (out Toplevel? found) && found == view)
+        Application.Top.Running = true;
+
+        // QUESTION: how to know when we are done? - ANSWER: Running == false
+        while (Application.TopLevels.TryPeek (out Toplevel? found) && found == view && view.Running)
         {
             if (_coordinator is null)
             {
@@ -179,6 +184,9 @@ public class ApplicationV2 : ApplicationImpl
 
             _coordinator.RunIteration ();
         }
+
+        Logging.Information ($"Run - Calling End");
+        Application.End (rs);
     }
 
     /// <inheritdoc/>
@@ -192,7 +200,7 @@ public class ApplicationV2 : ApplicationImpl
     /// <inheritdoc/>
     public override void RequestStop (Toplevel? top)
     {
-        Logging.Logger.LogInformation ($"RequestStop '{top}'");
+        Logging.Logger.LogInformation ($"RequestStop '{(top is {} ? top : "null")}'");
 
         top ??= Application.Top;
 
@@ -209,22 +217,9 @@ public class ApplicationV2 : ApplicationImpl
             return;
         }
 
+        // All RequestStop does is set the Running property to false - In the next iteration
+        // this will be detected
         top.Running = false;
-
-        // TODO: This definition of stop seems sketchy
-        Application.TopLevels.TryPop (out _);
-
-        if (Application.TopLevels.Count > 0)
-        {
-            Application.Top = Application.TopLevels.Peek ();
-        }
-        else
-        {
-            Application.Top = null;
-        }
-
-        // Notify that it is closed
-        top.OnClosed (top);
     }
 
     /// <inheritdoc/>

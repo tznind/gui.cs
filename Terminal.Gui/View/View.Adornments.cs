@@ -48,7 +48,7 @@ public partial class View // Adornments
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         The margin is typically transparent. This can be overriden by explicitly setting <see cref="ColorScheme"/>.
+    ///         The margin is typically transparent. This can be overriden by explicitly setting <see cref="Scheme"/>.
     ///     </para>
     ///     <para>
     ///         Enabling <see cref="ShadowStyle"/> will change the Thickness of the Margin to include the shadow.
@@ -121,6 +121,7 @@ public partial class View // Adornments
     /// </remarks>
     public Border? Border { get; private set; }
 
+    // TODO: Make BorderStyle nullable https://github.com/gui-cs/Terminal.Gui/issues/4021
     /// <summary>Gets or sets whether the view has a one row/col thick border.</summary>
     /// <remarks>
     ///     <para>
@@ -133,7 +134,7 @@ public partial class View // Adornments
     ///         <see cref="Adornment.Thickness"/> to `0` and <see cref="BorderStyle"/> to <see cref="LineStyle.None"/>.
     ///     </para>
     ///     <para>
-    ///         Calls <see cref="OnBorderStyleChanging"/> and raises <see cref="BorderStyleChanging"/>, which allows change
+    ///         Raises <see cref="OnBorderStyleChanged"/> and raises <see cref="BorderStyleChanged"/>, which allows change
     ///         to be cancelled.
     ///     </para>
     ///     <para>For more advanced customization of the view's border, manipulate see <see cref="Border"/> directly.</para>
@@ -148,44 +149,21 @@ public partial class View // Adornments
                 return;
             }
 
-            LineStyle old = Border?.LineStyle ?? LineStyle.None;
-
-            // It's tempting to try to optimize this by checking that old != value and returning.
-            // Do not.
-
-            CancelEventArgs<LineStyle> e = new (ref old, ref value);
-
-            if (OnBorderStyleChanging (e) || e.Cancel)
-            {
-                return;
-            }
-
-            BorderStyleChanging?.Invoke (this, e);
-
-            if (e.Cancel)
-            {
-                return;
-            }
-
-            SetBorderStyle (e.NewValue);
-            SetAdornmentFrames ();
-            SetNeedsLayout ();
+            SetBorderStyle (value);
+            OnBorderStyleChanged ();
+            BorderStyleChanged?.Invoke (this, EventArgs.Empty);
         }
     }
 
     /// <summary>
-    ///     Called when the <see cref="BorderStyle"/> is changing.
+    ///     Called when the <see cref="BorderStyle"/> has changed.
     /// </summary>
-    /// <remarks>
-    ///     Set e.Cancel to true to prevent the <see cref="BorderStyle"/> from changing.
-    /// </remarks>
-    /// <param name="e"></param>
-    protected virtual bool OnBorderStyleChanging (CancelEventArgs<LineStyle> e) { return false; }
+    protected virtual bool OnBorderStyleChanged () { return false; }
 
     /// <summary>
-    ///     Fired when the <see cref="BorderStyle"/> is changing. Allows the event to be cancelled.
+    ///     Fired when the <see cref="BorderStyle"/> has changed.
     /// </summary>
-    public event EventHandler<CancelEventArgs<LineStyle>>? BorderStyleChanging;
+    public event EventHandler<EventArgs>? BorderStyleChanged;
 
     /// <summary>
     ///     Sets the <see cref="BorderStyle"/> of the view to the specified value.
@@ -203,10 +181,10 @@ public partial class View // Adornments
     ///     </para>
     ///     <para>For more advanced customization of the view's border, manipulate see <see cref="Border"/> directly.</para>
     /// </remarks>
-    /// <param name="value"></param>
-    public virtual void SetBorderStyle (LineStyle value)
+    /// <param name="style"></param>
+    internal void SetBorderStyle (LineStyle style)
     {
-        if (value != LineStyle.None)
+        if (style != LineStyle.None)
         {
             if (Border!.Thickness == Thickness.Empty)
             {
@@ -218,7 +196,10 @@ public partial class View // Adornments
             Border!.Thickness = new (0);
         }
 
-        Border.LineStyle = value;
+        Border.LineStyle = style;
+
+        SetAdornmentFrames ();
+        SetNeedsLayout ();
     }
 
     /// <summary>

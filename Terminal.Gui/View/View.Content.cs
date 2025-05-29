@@ -5,35 +5,31 @@ public partial class View
 {
     #region Content Area
 
-    internal Size? _contentSize;
+    // nullable holder of developer specified Content Size. If null then the developer did not
+    // explicitly set it and the content size will be calculated dynamically.
+    private Size? _contentSize;
 
     /// <summary>
     ///     Sets the size of the View's content.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         See the View Layout Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///         See the View Layout Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         Negative sizes are not supported.
     ///     </para>
     ///     <para>
-    ///         If not explicitly set, and the View has no visible subviews, <see cref="GetContentSize ()"/> will return the
-    ///         size of
-    ///         <see cref="Viewport"/>.
+    ///         If not explicitly set to a non-<see langword="null"/> value, and the View has Subviews,
+    ///         <see cref="GetContentSize ()"/> will return
+    ///         the size of the <see cref="Viewport"/>.
     ///     </para>
     ///     <para>
-    ///         If not explicitly set, and the View has visible subviews, <see cref="GetContentSize ()"/> will return the
-    ///         maximum
-    ///         position + dimension of the SubViews, supporting <see cref="Dim.Auto"/> with the
-    ///         <see cref="DimAutoStyle.Content"/> flag set.
-    ///     </para>
-    ///     <para>
-    ///         If set <see cref="Viewport"/> describes the portion of the content currently visible to the user. This enables
-    ///         virtual scrolling.
-    ///     </para>
-    ///     <para>
-    ///         If set the behavior of <see cref="DimAutoStyle.Content"/> will be to use the ContentSize to determine the size
+    ///         If set to a non-<see langword="null"/> value, <see cref="Viewport"/> describes the portion of the content
+    ///         currently visible to the user. This enables
+    ///         virtual scrolling and the behavior of <see cref="DimAutoStyle.Content"/> will be to use
+    ///         <see cref="GetContentSize ()"/> to determine the size
     ///         of the view.
     ///     </para>
     /// </remarks>
@@ -66,10 +62,7 @@ public partial class View
     ///         <see cref="Viewport"/>.
     ///     </para>
     ///     <para>
-    ///         If the content size was not explicitly set by <see cref="SetContentSize"/>, and the View has visible subviews, <see cref="GetContentSize ()"/> will return the
-    ///         maximum
-    ///         position + dimension of the SubViews, supporting <see cref="Dim.Auto"/> with the
-    ///         <see cref="DimAutoStyle.Content"/> flag set.
+    ///         If the content size was not explicitly set by <see cref="SetContentSize"/>, this function will return the Viewport size.
     ///     </para>
     ///     <para>
     ///         If set <see cref="Viewport"/> describes the portion of the content currently visible to the user. This enables
@@ -85,6 +78,84 @@ public partial class View
     ///     return the size of the <see cref="Viewport"/> and <see cref="ContentSizeTracksViewport"/> will be <see langword="true"/>.
     /// </returns>
     public Size GetContentSize () { return _contentSize ?? Viewport.Size; }
+
+    /// <summary>
+    ///     Gets the number of rows required for all the View's SubViews.
+    /// </summary>
+    /// <returns></returns>
+    public int GetWidthRequiredForSubViews ()
+    {
+        int max = GetContentSize ().Width;
+
+        // If ContentSizeTracksViewport is false and there are no subviews, use the explicitly set ContentSize
+        if (!ContentSizeTracksViewport && InternalSubViews.Count == 0)
+        {
+            return max;
+        }
+
+        if (max == 0)
+        {
+            max = Viewport.Width;
+        }
+
+        // Iterate through all subviews to calculate the maximum height
+        foreach (View subView in InternalSubViews)
+        {
+            if (subView.Width is { })
+            {
+                //if (subView.Height is DimAbsolute)
+                //{
+                //    max = Math.Max (max, subView.Height.GetAnchor (0));
+                //}
+                //else
+                {
+                    max = Math.Max (max, subView.X.GetAnchor (0) + subView.Width.Calculate (0, max, subView, Dimension.Width));
+                }
+            }
+        }
+
+        // Return the calculated maximum content size
+        return max;
+    }
+
+    /// <summary>
+    ///     Gets the number of rows required for all the View's SubViews.
+    /// </summary>
+    /// <returns></returns>
+    public int GetHeightRequiredForSubViews ()
+    {
+        int max = GetContentSize ().Height;
+
+        // If ContentSizeTracksViewport is false and there are no subviews, use the explicitly set ContentSize
+        if (!ContentSizeTracksViewport && InternalSubViews.Count == 0)
+        {
+            return max;
+        }
+
+        if (max == 0)
+        {
+            max = Viewport.Height;
+        }
+
+        // Iterate through all subviews to calculate the maximum height
+        foreach (View subView in InternalSubViews)
+        {
+            if (subView.Height is { })
+            {
+                //if (subView.Height is DimAbsolute)
+                //{
+                //    max = Math.Max (max, subView.Height.GetAnchor (0));
+                //}
+                //else
+                {
+                    max = Math.Max (max, subView.Y.GetAnchor (0) + subView.Height.Calculate (0, max, subView, Dimension.Height));
+                }
+            }
+        }
+
+        // Return the calculated maximum content size
+        return max;
+    }
 
     /// <summary>
     ///     Gets or sets a value indicating whether the view's content size tracks the <see cref="Viewport"/>'s

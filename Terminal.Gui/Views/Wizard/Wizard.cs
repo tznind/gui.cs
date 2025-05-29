@@ -145,20 +145,11 @@ public class Wizard : Dialog
 
             if (base.Modal)
             {
-                ColorScheme = Colors.ColorSchemes ["Dialog"];
+                SchemeName = "Dialog";
                 BorderStyle = LineStyle.Rounded;
             }
             else
             {
-                if (SuperView is { })
-                {
-                    ColorScheme = SuperView.ColorScheme;
-                }
-                else
-                {
-                    ColorScheme = Colors.ColorSchemes ["Base"];
-                }
-
                 CanFocus = true;
                 BorderStyle = LineStyle.None;
             }
@@ -453,7 +444,7 @@ public class Wizard : Dialog
 
         if (!args.Cancel)
         {
-            e.Cancel = GoBack ();
+            e.Handled = GoBack ();
         }
     }
 
@@ -471,7 +462,7 @@ public class Wizard : Dialog
                 if (IsCurrentTop)
                 {
                     Application.RequestStop (this);
-                    e.Cancel = true;
+                    e.Handled = true;
                 }
 
                 // Wizard was created as a non-modal (just added to another View). 
@@ -485,7 +476,7 @@ public class Wizard : Dialog
 
             if (!args.Cancel)
             {
-                e.Cancel = GoNext ();
+                e.Handled = GoNext ();
             }
         }
     }

@@ -595,7 +595,7 @@ public abstract class ConsoleDriver : IConsoleDriver
             // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. Once Attribute.PlatformColor is removed, this can be fixed.
             if (Application.Driver is { })
             {
-                _currentAttribute = new (value.Foreground, value.Background);
+                _currentAttribute = new (value.Foreground, value.Background, value.Style);
 
                 return;
             }
@@ -629,7 +629,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     {
         // Encode the colors into the int value.
         return new (
-                    -1, // only used by cursesdriver!
+                    0xFF, // only used by cursesdriver!
                     foreground,
                     background
                    );
@@ -682,7 +682,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     public void OnKeyUp (Key a) { KeyUp?.Invoke (this, a); }
 
     // TODO: Remove this API - it was needed when we didn't have a reliable way to simulate key presses.
-    // TODO: We now do: Applicaiton.RaiseKeyDown and Application.RaiseKeyUp
+    // TODO: We now do: Application.RaiseKeyDown and Application.RaiseKeyUp
     /// <summary>Simulates a key press.</summary>
     /// <param name="keyChar">The key character.</param>
     /// <param name="key">The key.</param>
@@ -690,6 +690,40 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
     /// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
     public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
+
+    internal char _highSurrogate = '\0';
+
+    internal bool IsValidInput (KeyCode keyCode, out KeyCode result)
+    {
+        result = keyCode;
+
+        if (char.IsHighSurrogate ((char)keyCode))
+        {
+            _highSurrogate = (char)keyCode;
+
+            return false;
+        }
+
+        if (_highSurrogate > 0 && char.IsLowSurrogate ((char)keyCode))
+        {
+            result = (KeyCode)new Rune (_highSurrogate, (char)keyCode).Value;
+            _highSurrogate = '\0';
+
+            return true;
+        }
+
+        if (char.IsSurrogate ((char)keyCode))
+        {
+            return false;
+        }
+
+        if (_highSurrogate > 0)
+        {
+            _highSurrogate = '\0';
+        }
+
+        return true;
+    }
 
     #endregion
 

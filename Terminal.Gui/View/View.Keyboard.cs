@@ -282,6 +282,10 @@ public partial class View // Keyboard APIs
             return false;
         }
 
+        // TODO: We really need an event before recursing into Focused. Without, there's no way for 
+        // TODO: SuperViews to prevent SubViews from seeing certain keys. A use-case for this:
+        // TODO:    - MenuBar needs to prevent MenuItems from seeing QuitKey if the MenuItem is not visible
+
         // If there's a Focused subview, give it a chance (this recurses down the hierarchy)
         if (Focused?.NewKeyDownEvent (key) == true)
         {
@@ -302,9 +306,9 @@ public partial class View // Keyboard APIs
             return true;
         }
 
-        bool? handled = false;
+        bool? handled = InvokeCommandsBoundToHotKey (key);
 
-        if (InvokeCommandsBoundToHotKey (key, ref handled))
+        if (handled is true)
         {
             return true;
         }
@@ -555,6 +559,11 @@ public partial class View // Keyboard APIs
 
     private static bool InvokeCommandsBoundToKeyOnAdornment (Adornment adornment, Key key, ref bool? handled)
     {
+        if (!adornment.Enabled)
+        {
+            return false;
+        }
+
         bool? adornmentHandled = adornment.InvokeCommands (key);
 
         if (adornmentHandled is true)
@@ -590,13 +599,29 @@ public partial class View // Keyboard APIs
     ///     Invokes any commands bound to <paramref name="hotKey"/> on this view and subviews.
     /// </summary>
     /// <param name="hotKey"></param>
-    /// <param name="handled"></param>
-    /// <returns></returns>
-    internal bool InvokeCommandsBoundToHotKey (Key hotKey, ref bool? handled)
+    /// <returns>
+    ///     <see langword="null"/> if no command was invoked; input processing should continue.
+    ///     <see langword="false"/> if at least one command was invoked and was not handled (or cancelled); input processing
+    ///     should continue.
+    ///     <see langword="true"/> if at least one command was invoked and handled (or cancelled); input processing should
+    ///     stop.
+    /// </returns>
+    internal bool? InvokeCommandsBoundToHotKey (Key hotKey)
     {
+        if (!Enabled)
+        {
+            return false;
+        }
+
+        bool? handled = null;
         // Process this View
         if (HotKeyBindings.TryGet (hotKey, out KeyBinding binding))
         {
+            if (binding.Key is null || binding.Key == Key.Empty)
+            {
+                binding.Key = hotKey;
+            }
+
             if (InvokeCommands (binding.Commands, binding) is true)
             {
                 return true;
@@ -604,16 +629,16 @@ public partial class View // Keyboard APIs
         }
 
         // Now, process any HotKey bindings in the subviews
-        foreach (View subview in InternalSubViews)
+        foreach (View subview in InternalSubViews.ToList())
         {
             if (subview == Focused)
             {
                 continue;
             }
 
-            bool recurse = subview.InvokeCommandsBoundToHotKey (hotKey, ref handled);
+            bool? recurse = subview.InvokeCommandsBoundToHotKey (hotKey);
 
-            if (recurse || (handled is { } && (bool)handled))
+            if (recurse is true || (handled is { } && (bool)handled))
             {
                 return true;
             }
@@ -641,26 +666,10 @@ public partial class View // Keyboard APIs
             return null;
         }
 
-        return InvokeCommands (binding.Commands, binding);
-    }
-
-    /// <summary>
-    ///     Invokes the Commands bound to <paramref name="hotKey"/>.
-    ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
-    /// </summary>
-    /// <param name="hotKey">The hot key event passed.</param>
-    /// <returns>
-    ///     <see langword="null"/> if no command was invoked; input processing should continue.
-    ///     <see langword="false"/> if at least one command was invoked and was not handled (or cancelled); input processing
-    ///     should continue.
-    ///     <see langword="true"/> if at least one command was invoked and handled (or cancelled); input processing should
-    ///     stop.
-    /// </returns>
-    protected bool? InvokeCommandsBoundToHotKey (Key hotKey)
-    {
-        if (!HotKeyBindings.TryGet (hotKey, out KeyBinding binding))
+        // TODO: Should we set binding.Key = key if it's not set?
+        if (binding is {} && (binding.Key is null || !binding.Key.IsValid))
         {
-            return null;
+            binding.Key = key;
         }
 
         return InvokeCommands (binding.Commands, binding);

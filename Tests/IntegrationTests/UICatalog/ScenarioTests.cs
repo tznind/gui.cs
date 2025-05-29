@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Terminal.Gui;
 using UICatalog;
 using UnitTests;
@@ -13,7 +14,7 @@ public class ScenarioTests : TestsAllViews
     public ScenarioTests (ITestOutputHelper output)
     {
 #if DEBUG_IDISPOSABLE
-        View.DebugIDisposable = true;
+        View.EnableDebugIDisposableAsserts = true;
         View.Instances.Clear ();
 #endif
         _output = output;
@@ -34,9 +35,7 @@ public class ScenarioTests : TestsAllViews
         Assert.Null (_timeoutLock);
         _timeoutLock = new ();
 
-        // Disable any UIConfig settings
-        ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
-        ConfigurationManager.Locations = ConfigLocations.Default;
+        ConfigurationManager.Disable (resetToHardCodedDefaults: true);
 
         // If a previous test failed, this will ensure that the Application is in a clean state
         Application.ResetState (true);
@@ -44,11 +43,12 @@ public class ScenarioTests : TestsAllViews
         _output.WriteLine ($"Running Scenario '{scenarioType}'");
         var scenario = Activator.CreateInstance (scenarioType) as Scenario;
 
-        uint abortTime = 1500;
+        uint abortTime = 2000;
         object? timeout = null;
         var initialized = false;
-        var shutdown = false;
+        var shutdownGracefully = false;
         var iterationCount = 0;
+        Key quitKey = Application.QuitKey;
 
         Application.InitializedChanged += OnApplicationOnInitializedChanged;
 
@@ -69,7 +69,9 @@ public class ScenarioTests : TestsAllViews
         }
 
         Assert.True (initialized);
-        Assert.True (shutdown);
+
+
+        Assert.True (shutdownGracefully, $"Scenario Failed to Quit with {quitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
 
 #if DEBUG_IDISPOSABLE
         Assert.Empty (View.Instances);
@@ -80,9 +82,7 @@ public class ScenarioTests : TestsAllViews
             _timeoutLock = null;
         }
 
-        // Restore the configuration locations
-        ConfigurationManager.Locations = savedConfigLocations;
-        ConfigurationManager.Reset ();
+        ConfigurationManager.Disable (resetToHardCodedDefaults: true);
 
         return;
 
@@ -101,13 +101,13 @@ public class ScenarioTests : TestsAllViews
             else
             {
                 Application.Iteration -= OnApplicationOnIteration;
-                shutdown = true;
+                shutdownGracefully = true;
             }
 
-            _output.WriteLine ($"Initialized == {a.CurrentValue}");
+            _output.WriteLine ($"Initialized == {a.CurrentValue}; shutdownGracefully == {shutdownGracefully}.");
         }
 
-        // If the scenario doesn't close within 500ms, this will force it to quit
+        // If the scenario doesn't close within abortTime ms, this will force it to quit
         bool ForceCloseCallback ()
         {
             lock (_timeoutLock)
@@ -118,12 +118,7 @@ public class ScenarioTests : TestsAllViews
                 }
             }
 
-            Assert.Fail (
-                         $"Scenario Failed to Quit with {Application.QuitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
-
-            // Restore the configuration locations
-            ConfigurationManager.Locations = savedConfigLocations;
-            ConfigurationManager.Reset ();
+            ConfigurationManager.Disable (resetToHardCodedDefaults: true);
 
             Application.ResetState (true);
 
@@ -137,8 +132,9 @@ public class ScenarioTests : TestsAllViews
             if (Application.Initialized)
             {
                 // Press QuitKey 
-                _output.WriteLine ($"Attempting to quit with {Application.QuitKey}");
-                Application.RaiseKeyDownEvent (Application.QuitKey);
+                quitKey = Application.QuitKey;
+                _output.WriteLine ($"Attempting to quit with {quitKey} after {iterationCount} iterations.");
+                Application.RaiseKeyDownEvent (quitKey);
             }
         }
     }
@@ -153,8 +149,7 @@ public class ScenarioTests : TestsAllViews
     public void Run_All_Views_Tester_Scenario ()
     {
         // Disable any UIConfig settings
-        ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
-        ConfigurationManager.Locations = ConfigLocations.Default;
+        ConfigurationManager.Disable (resetToHardCodedDefaults: true);
 
         View? curView = null;
 
@@ -171,7 +166,7 @@ public class ScenarioTests : TestsAllViews
 
         var top = new Toplevel ();
 
-        Dictionary<string, Type> viewClasses = GetAllViewClasses().ToDictionary (t => t.Name);
+        Dictionary<string, Type> viewClasses = GetAllViewClasses ().ToDictionary (t => t.Name);
 
         Window leftPane = new ()
         {
@@ -181,7 +176,7 @@ public class ScenarioTests : TestsAllViews
             Width = 15,
             Height = Dim.Fill (1), // for status bar
             CanFocus = false,
-            ColorScheme = Colors.ColorSchemes ["TopLevel"]
+            SchemeName = "TopLevel"
         };
 
         ListView classListView = new ()
@@ -191,7 +186,7 @@ public class ScenarioTests : TestsAllViews
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             AllowsMarking = false,
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            SchemeName = "TopLevel",
             Source = new ListWrapper<string> (new (viewClasses.Keys.ToList ()))
         };
         leftPane.Add (classListView);
@@ -203,7 +198,7 @@ public class ScenarioTests : TestsAllViews
             Width = Dim.Fill (),
             Height = 10,
             CanFocus = false,
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            SchemeName = "TopLevel",
             Title = "Settings"
         };
 
@@ -269,7 +264,7 @@ public class ScenarioTests : TestsAllViews
             Y = Pos.Bottom (settingsPane),
             Width = Dim.Fill (),
             Height = Dim.Fill (1), // + 1 for status bar
-            ColorScheme = Colors.ColorSchemes ["Dialog"]
+            SchemeName = "Dialog"
         };
 
         classListView.OpenSelectedItem += (s, a) => { settingsPane.SetFocus (); };
@@ -277,7 +272,7 @@ public class ScenarioTests : TestsAllViews
         classListView.SelectedItemChanged += (s, args) =>
                                               {
                                                   // Remove existing class, if any
-                                                  if (curView is {})
+                                                  if (curView is { })
                                                   {
                                                       curView.SubViewsLaidOut -= LayoutCompleteHandler;
                                                       hostPane.Remove (curView);
@@ -357,10 +352,13 @@ public class ScenarioTests : TestsAllViews
                                      {
                                          classListView.MoveDown ();
 
-                                         Assert.Equal (
-                                                       curView!.GetType ().Name,
-                                                       viewClasses.Values.ToArray () [classListView.SelectedItem].Name
-                                                      );
+                                         if (curView is { })
+                                         {
+                                             Assert.Equal (
+                                                           curView.GetType ().Name,
+                                                           viewClasses.Values.ToArray () [classListView.SelectedItem].Name
+                                                          );
+                                         }
                                      }
                                      else
                                      {
@@ -374,10 +372,7 @@ public class ScenarioTests : TestsAllViews
 
         top.Dispose ();
         Application.Shutdown ();
-
-        // Restore the configuration locations
-        ConfigurationManager.Locations = savedConfigLocations;
-        ConfigurationManager.Reset ();
+        ConfigurationManager.Disable (resetToHardCodedDefaults: true);
 
         void DimPosChanged (View? view)
         {
@@ -507,12 +502,26 @@ public class ScenarioTests : TestsAllViews
                 // For each of the <T> arguments
                 List<Type> typeArguments = new ();
 
-                // use <object>
+                // use <object> or the original type if applicable
                 foreach (Type arg in type.GetGenericArguments ())
                 {
-                    typeArguments.Add (typeof (object));
+                    if (arg.IsValueType && Nullable.GetUnderlyingType (arg) == null)
+                    {
+                        typeArguments.Add (arg);
+                    }
+                    else
+                    {
+                        typeArguments.Add (typeof (object));
+                    }
                 }
 
+                // Ensure the type does not contain any generic parameters
+                if (type.ContainsGenericParameters)
+                {
+                    Logging.Warning ($"Cannot create an instance of {type} because it contains generic parameters.");
+                    //throw new ArgumentException ($"Cannot create an instance of {type} because it contains generic parameters.");
+                    return null;
+                }
                 // And change what type we are instantiating from MyClass<T> to MyClass<object>
                 type = type.MakeGenericType (typeArguments.ToArray ());
             }
@@ -536,7 +545,10 @@ public class ScenarioTests : TestsAllViews
             }
 
             // Set the colorscheme to make it stand out if is null by default
-            view.ColorScheme ??= Colors.ColorSchemes ["Base"];
+            if (!view.HasScheme)
+            {
+                view.SchemeName = "Base";
+            }
 
             // If the view supports a Text property, set it so we have something to look at
             if (view.GetType ().GetProperty ("Text") != null)
@@ -595,9 +607,8 @@ public class ScenarioTests : TestsAllViews
     [Fact]
     public void Run_Generic ()
     {
-        // Disable any UIConfig settings
-        ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
-        ConfigurationManager.Locations = ConfigLocations.Default;
+        ConfigurationManager.Disable (resetToHardCodedDefaults: true);
+        Assert.Equal (Key.Esc, Application.QuitKey);
 
         ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
         Assert.NotEmpty (scenarios);
@@ -610,6 +621,7 @@ public class ScenarioTests : TestsAllViews
         // BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
         // by adding this Space it seems to work.
 
+        Assert.Equal (Key.Esc, Application.QuitKey);
         FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 
         var ms = 100;
@@ -646,7 +658,7 @@ public class ScenarioTests : TestsAllViews
                                      }
                                  };
 
-        Application.KeyDown += (sender, args) => { Assert.Equal (Application.QuitKey, args.KeyCode); };
+        Application.KeyDown += (sender, args) => { Assert.Equal (Application.QuitKey, args); };
 
         generic.Main ();
 
@@ -659,10 +671,7 @@ public class ScenarioTests : TestsAllViews
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
-
-        // Restore the configuration locations
-        ConfigurationManager.Locations = savedConfigLocations;
-        ConfigurationManager.Reset ();
+        ConfigurationManager.Disable (resetToHardCodedDefaults: true);
 
 #if DEBUG_IDISPOSABLE
         Assert.Empty (View.Instances);

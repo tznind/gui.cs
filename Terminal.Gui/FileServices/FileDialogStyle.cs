@@ -45,14 +45,14 @@ public class FileDialogStyle
     ///     Gets or sets the default value to use for <see cref="UseColors"/>. This can be populated from .tui config
     ///     files via <see cref="ConfigurationManager"/>
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool DefaultUseColors { get; set; }
 
     /// <summary>
     ///     Gets or sets the default value to use for <see cref="UseUnicodeCharacters"/>. This can be populated from .tui
     ///     config files via <see cref="ConfigurationManager"/>
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool DefaultUseUnicodeCharacters { get; set; }
 
     /// <summary>
@@ -144,6 +144,21 @@ public class FileDialogStyle
     /// </summary>
     public string WrongFileTypeFeedback { get; set; } = Strings.fdWrongFileTypeFeedback;
 
+
+    /// <summary>
+    /// <para>
+    /// Gets or sets a flag that determines behaviour when opening (double click/enter) or selecting a
+    /// directory in a <see cref="FileDialog"/>.
+    /// </para>
+    /// <para>If <see langword="false"/> (the default) then the <see cref="FileDialog.Path"/> is simply
+    /// updated to the new directory path.</para>
+    /// <para>If <see langword="true"/> then any typed or previously selected file
+    /// name is preserved (e.g. "c:/hello.csv" when opening "temp" becomes "c:/temp/hello.csv").
+    /// </para>
+    /// </summary>
+    public bool PreserveFilenameOnDirectoryChanges { get; set; }
+
+
     [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
     private Dictionary<IDirectoryInfo, string> DefaultTreeRootGetter ()
     {
@@ -151,14 +166,11 @@ public class FileDialogStyle
 
         try
         {
-            foreach (string d in GetLogicalDrives ())
+            foreach (string d in _fileSystem.Directory.GetLogicalDrives ())
             {
                 IDirectoryInfo dir = _fileSystem.DirectoryInfo.New (d);
 
-                if (!roots.ContainsKey (dir))
-                {
-                    roots.Add (dir, d);
-                }
+                roots.TryAdd (dir, d);
             }
         }
         catch (Exception)
@@ -181,7 +193,7 @@ public class FileDialogStyle
 
                     IDirectoryInfo dir = _fileSystem.DirectoryInfo.New (path);
 
-                    if (!roots.ContainsKey (dir) && dir.Exists)
+                    if (!roots.ContainsKey (dir) && !roots.ContainsValue (special.ToString ()) && dir.Exists)
                     {
                         roots.Add (dir, special.ToString ());
                     }

@@ -20,7 +20,7 @@ public class Bar : View, IOrientation, IDesignable
     public Bar () : this ([]) { }
 
     /// <inheritdoc/>
-    public Bar (IEnumerable<Shortcut>? shortcuts)
+    public Bar (IEnumerable<View>? shortcuts)
     {
         CanFocus = true;
 
@@ -32,9 +32,10 @@ public class Bar : View, IOrientation, IDesignable
         // Initialized += Bar_Initialized;
         MouseEvent += OnMouseEvent;
 
+
         if (shortcuts is { })
         {
-            foreach (Shortcut shortcut in shortcuts)
+            foreach (View shortcut in shortcuts)
             {
                 Add (shortcut);
             }
@@ -70,23 +71,6 @@ public class Bar : View, IOrientation, IDesignable
         if (e.Handled)
         {
             e.Handled = AdvanceFocus (direction, TabBehavior.TabStop);
-        }
-    }
-
-    /// <inheritdoc />
-    public override void EndInit ()
-    {
-        base.EndInit ();
-        ColorScheme = Colors.ColorSchemes ["Menu"];
-    }
-
-    /// <inheritdoc/>
-    public override void SetBorderStyle (LineStyle value)
-    {
-        if (Border is { })
-        {
-            // The default changes the thickness. We don't want that. We just set the style.
-            Border.LineStyle = value;
         }
     }
 
@@ -214,10 +198,16 @@ public class Bar : View, IOrientation, IDesignable
                 {
                     View barItem = SubViews.ElementAt (index);
 
-                    barItem.ColorScheme = ColorScheme;
+                    //barItem.Scheme = Scheme;
                     barItem.X = Pos.Align (Alignment.Start, AlignmentModes);
                     barItem.Y = 0; //Pos.Center ();
+
+                    if (barItem is Shortcut sc)
+                    {
+                        sc.Width = sc.GetWidthDimAuto ();
+                    }
                 }
+
                 break;
 
             case Orientation.Vertical:
@@ -227,7 +217,7 @@ public class Bar : View, IOrientation, IDesignable
 
                     var minKeyWidth = 0;
 
-                    List<Shortcut> shortcuts = SubViews.Where (s => s is Shortcut && s.Visible).Cast<Shortcut> ().ToList ();
+                    List<Shortcut> shortcuts = SubViews.OfType<Shortcut> ().Where (s => s.Visible).ToList ();
 
                     foreach (Shortcut shortcut in shortcuts)
                     {
@@ -242,7 +232,7 @@ public class Bar : View, IOrientation, IDesignable
                         View barItem = SubViews.ElementAt (index);
 
 
-                        barItem.ColorScheme = ColorScheme;
+                       // barItem.Scheme = Scheme;
 
                         if (!barItem.Visible)
                         {
@@ -278,7 +268,7 @@ public class Bar : View, IOrientation, IDesignable
                     {
                         if (subView is not Line)
                         {
-                            subView.Width = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: maxBarItemWidth);
+                            subView.Width = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: maxBarItemWidth, maximumContentDim: maxBarItemWidth);
                         }
                     }
                 }
@@ -298,7 +288,7 @@ public class Bar : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc />
-    public bool EnableForDesign ()
+    public virtual bool EnableForDesign ()
     {
         var shortcut = new Shortcut
         {
