@@ -5,11 +5,18 @@ namespace Terminal.Gui.ViewBase;
 
 public partial class View // Mouse APIs
 {
+    /// <summary>
+    /// Handles <see cref="WantContinuousButtonPressed"/>, we have detected a button
+    /// down in the view and have grabbed the mouse.
+    /// </summary>
+    private IMouseHeldDown? _mouseHeldDown;
+
     /// <summary>Gets the mouse bindings for this view.</summary>
     public MouseBindings MouseBindings { get; internal set; } = null!;
 
     private void SetupMouse ()
     {
+        _mouseHeldDown = new MouseHeldDown (this);
         MouseBindings = new ();
 
         // TODO: Should the default really work with any button or just button1?
@@ -681,3 +688,71 @@ public partial class View // Mouse APIs
 
     private void DisposeMouse () { }
 }
+
+internal interface IMouseHeldDown : IDisposable
+{
+
+}
+
+class MouseHeldDown : IMouseHeldDown
+{
+    private readonly View _host;
+    private bool _down;
+    private object? _timeout;
+
+    public MouseHeldDown (View host) { _host = host; }
+
+    public event Action MouseIsHeldDownTick;
+
+    public void Start ()
+    {
+        _down = true;
+        Application.GrabMouse (_host);
+
+
+        // Give first tick
+        TickWhileMouseIsHeldDown ();
+
+        // Then periodic ticks
+        _timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (500), TickWhileMouseIsHeldDown);
+
+    }
+
+    private bool TickWhileMouseIsHeldDown ()
+    {
+        if (_down)
+        {
+            MouseIsHeldDownTick?.Invoke ();
+        }
+        else
+        {
+            Stop ();
+        }
+
+        return _down;
+    }
+
+    public void Stop ()
+    {
+        if (Application.MouseGrabView == _host)
+        {
+            Application.UngrabMouse ();
+        }
+
+        if (_timeout != null)
+        {
+            Application.RemoveTimeout (_timeout);
+        }
+
+        _down = false;
+    }
+
+    public void Dispose ()
+    {
+        if (Application.MouseGrabView == _host)
+        {
+            Stop();
+        }
+    }
+}
+
