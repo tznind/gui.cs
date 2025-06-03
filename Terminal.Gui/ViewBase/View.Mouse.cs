@@ -9,14 +9,14 @@ public partial class View // Mouse APIs
     /// Handles <see cref="WantContinuousButtonPressed"/>, we have detected a button
     /// down in the view and have grabbed the mouse.
     /// </summary>
-    private IMouseHeldDown? _mouseHeldDown;
+    protected IMouseHeldDown? MouseHeldDown { get; private set; }
 
     /// <summary>Gets the mouse bindings for this view.</summary>
     public MouseBindings MouseBindings { get; internal set; } = null!;
 
     private void SetupMouse ()
     {
-        _mouseHeldDown = new MouseHeldDown (this);
+        MouseHeldDown = new MouseHeldDown (this);
         MouseBindings = new ();
 
         // TODO: Should the default really work with any button or just button1?
@@ -314,6 +314,19 @@ public partial class View // Mouse APIs
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     public bool RaiseMouseEvent (MouseEventArgs mouseEvent)
     {
+        // TODO: probably this should be moved elsewhere, please advise
+        if (WantContinuousButtonPressed && MouseHeldDown != null)
+        {
+            if (mouseEvent.IsPressed)
+            {
+                MouseHeldDown.Start ();
+            }
+            else
+            {
+                MouseHeldDown.Stop ();
+            }
+        }
+
         if (OnMouseEvent (mouseEvent) || mouseEvent.Handled)
         {
             return true;
@@ -689,9 +702,25 @@ public partial class View // Mouse APIs
     private void DisposeMouse () { }
 }
 
-internal interface IMouseHeldDown : IDisposable
-{
 
+/// <summary>
+/// <para>
+/// Handler for raising periodic events while the mouse is held down.
+/// Typically, mouse pointer only needs to be pressed down in a view
+/// to begin this event after which it can be moved elsewhere.
+/// </para>
+/// <para>
+/// Common use cases for this includes holding a button down to increase
+/// a counter (e.g. in <see cref="NumericUpDown"/>).
+/// </para>
+/// </summary>
+public interface IMouseHeldDown : IDisposable
+{
+    // TODO: Guess this should follow the established events type - need to double check what that is.
+    public event Action MouseIsHeldDownTick;
+
+    void Start ();
+    void Stop ();
 }
 
 class MouseHeldDown : IMouseHeldDown
