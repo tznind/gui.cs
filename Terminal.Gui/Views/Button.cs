@@ -72,7 +72,7 @@ public class Button : View, IDesignable
 
         if (MouseHeldDown != null)
         {
-            MouseHeldDown.MouseIsHeldDownTick += () => RaiseAccepting (null);
+            MouseHeldDown.MouseIsHeldDownTick += (_,_) => RaiseAccepting (null);
         }
     }
 

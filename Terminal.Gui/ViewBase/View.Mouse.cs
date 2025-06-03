@@ -717,7 +717,7 @@ public partial class View // Mouse APIs
 public interface IMouseHeldDown : IDisposable
 {
     // TODO: Guess this should follow the established events type - need to double check what that is.
-    public event Action MouseIsHeldDownTick;
+    public event EventHandler<CancelEventArgs> MouseIsHeldDownTick;
 
     void Start ();
     void Stop ();
@@ -731,7 +731,33 @@ class MouseHeldDown : IMouseHeldDown
 
     public MouseHeldDown (View host) { _host = host; }
 
-    public event Action MouseIsHeldDownTick;
+    public event EventHandler<CancelEventArgs>? MouseIsHeldDownTick;
+
+
+    public bool RaiseMouseIsHeldDownTick ()
+    {
+        CancelEventArgs args = new ();
+
+        args.Cancel = OnMouseIsHeldDownTick (args) || args.Cancel;
+
+        if (!args.Cancel && MouseIsHeldDownTick is { })
+        {
+            MouseIsHeldDownTick?.Invoke (this, args);
+        }
+
+        // User event cancelled the mouse held down status so
+        // stop the currently running operation.
+        if (args.Cancel)
+        {
+            Stop ();
+        }
+
+        return args.Cancel;
+    }
+    protected virtual bool OnMouseIsHeldDownTick (CancelEventArgs eventArgs)
+    {
+        return false;
+    }
 
     public void Start ()
     {
@@ -751,7 +777,7 @@ class MouseHeldDown : IMouseHeldDown
     {
         if (_down)
         {
-            MouseIsHeldDownTick?.Invoke ();
+            RaiseMouseIsHeldDownTick ();
         }
         else
         {
