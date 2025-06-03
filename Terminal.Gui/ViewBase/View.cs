@@ -76,11 +76,6 @@ public partial class View : IDisposable, ISupportInitializeNotification
                 Application.UngrabMouse ();
             }
 
-            if (Application.WantContinuousButtonPressedView == this)
-            {
-                Application.WantContinuousButtonPressedView = null;
-            }
-
             for (int i = InternalSubViews.Count - 1; i >= 0; i--)
             {
                 View subview = InternalSubViews [i];

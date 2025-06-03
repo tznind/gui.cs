@@ -229,7 +229,6 @@ public static partial class Application
         // last mouse pos.
         //_lastMousePosition = null;
         CachedViewsUnderMouse.Clear ();
-        WantContinuousButtonPressedView = null;
         MouseEvent = null;
         GrabbedMouse = null;
         UnGrabbingMouse = null;

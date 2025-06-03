@@ -19,9 +19,6 @@ public static partial class Application // Mouse handling
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool IsMouseDisabled { get; set; }
 
-    /// <summary>Gets <see cref="View"/> that has registered to get continuous mouse button pressed events.</summary>
-    public static View? WantContinuousButtonPressedView { get; internal set; }
-
     /// <summary>
     ///     Gets the view that grabbed the mouse (e.g. for dragging). When this is set, all mouse events will be routed to
     ///     this view until the view calls <see cref="UngrabMouse"/> or the mouse is released.
@@ -202,15 +199,6 @@ public static partial class Application // Mouse handling
             return;
         }
 
-        if (Initialized)
-        {
-            WantContinuousButtonPressedView = deepestViewUnderMouse switch
-                                              {
-                                                  { WantContinuousButtonPressed: true } => deepestViewUnderMouse,
-                                                  _ => null
-                                              };
-        }
-
         // May be null before the prior condition or the condition may set it as null.
         // So, the checking must be outside the prior condition.
         if (deepestViewUnderMouse is null)
@@ -261,11 +249,6 @@ public static partial class Application // Mouse handling
         }
 
         RaiseMouseEnterLeaveEvents (viewMouseEvent.ScreenPosition, currentViewsUnderMouse);
-
-        if (Initialized)
-        {
-            WantContinuousButtonPressedView = deepestViewUnderMouse.WantContinuousButtonPressed ? deepestViewUnderMouse : null;
-        }
 
         while (deepestViewUnderMouse.NewMouseEvent (viewMouseEvent) is not true && MouseGrabView is not { })
         {

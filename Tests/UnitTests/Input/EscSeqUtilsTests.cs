@@ -750,8 +750,6 @@ public class EscSeqUtilsTests
         Application.Run (top);
         top.Dispose ();
 
-        Assert.Null (Application.WantContinuousButtonPressedView);
-
         Assert.Equal (MouseFlags.Button1Pressed, _arg1);
         Assert.Equal (new (1, 2), _arg2);
 

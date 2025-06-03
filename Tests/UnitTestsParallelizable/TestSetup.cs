@@ -41,7 +41,6 @@ public class GlobalTestSetup : IDisposable
         // Public Properties
         Assert.Null (Application.Top);
         Assert.Null (Application.MouseGrabView);
-        Assert.Null (Application.WantContinuousButtonPressedView);
 
         // Don't check Application.ForceDriver
         // Assert.Empty (Application.ForceDriver);

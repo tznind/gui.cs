@@ -308,7 +308,6 @@ public class ApplicationTests
             // Public Properties
             Assert.Null (Application.Top);
             Assert.Null (Application.MouseGrabView);
-            Assert.Null (Application.WantContinuousButtonPressedView);
 
             // Don't check Application.ForceDriver
             // Assert.Empty (Application.ForceDriver);
@@ -570,7 +569,6 @@ public class ApplicationTests
         RunState rs = Application.Begin (new ());
         Assert.Equal (Application.Top, rs.Toplevel);
         Assert.Null (Application.MouseGrabView); // public
-        Assert.Null (Application.WantContinuousButtonPressedView); // public
         Application.Top!.Dispose ();
     }
 
