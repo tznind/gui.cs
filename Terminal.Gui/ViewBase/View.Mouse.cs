@@ -445,11 +445,6 @@ public partial class View // Mouse APIs
                 }
             }
 
-            if (WantContinuousButtonPressed && Application.MouseGrabView == this)
-            {
-                return RaiseMouseClickEvent (mouseEvent);
-            }
-
             return mouseEvent.Handled = true;
         }
 
