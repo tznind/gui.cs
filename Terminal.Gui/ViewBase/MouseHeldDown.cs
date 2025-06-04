@@ -46,9 +46,6 @@ internal class MouseHeldDown : IMouseHeldDown
         _down = true;
         Application.GrabMouse (_host);
 
-        // Give first tick
-        TickWhileMouseIsHeldDown ();
-
         // Then periodic ticks
         _timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (500), TickWhileMouseIsHeldDown);
     }
