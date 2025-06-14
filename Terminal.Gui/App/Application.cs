@@ -42,6 +42,15 @@ public static partial class Application
     /// <summary>Gets all cultures supported by the application without the invariant language.</summary>
     public static List<CultureInfo>? SupportedCultures { get; private set; } = GetSupportedCultures ();
 
+
+    /// <summary>
+    /// <para>
+    /// Handles recurring events. These are invoked on the main UI thread - allowing for
+    /// safe updates to <see cref="View"/> instances.
+    /// </para>
+    /// </summary>
+    public static ITimedEvents TimedEvents => ApplicationImpl.Instance.TimedEvents;
+
     /// <summary>
     ///     Gets a string representation of the Application as rendered by <see cref="Driver"/>.
     /// </summary>

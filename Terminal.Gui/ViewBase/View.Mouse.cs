@@ -16,7 +16,7 @@ public partial class View // Mouse APIs
 
     private void SetupMouse ()
     {
-        MouseHeldDown = new MouseHeldDown (this, Application.MainLoop?.TimedEvents,Application.MouseGrabHandler);
+        MouseHeldDown = new MouseHeldDown (this, Application.TimedEvents,Application.MouseGrabHandler);
         MouseBindings = new ();
 
         // TODO: Should the default really work with any button or just button1?

@@ -18,6 +18,10 @@ public class ApplicationImpl : IApplication
     /// </summary>
     public static IApplication Instance => _lazyInstance.Value;
 
+
+    /// <inheritdoc/>
+    public virtual ITimedEvents TimedEvents => Application.MainLoop.TimedEvents;
+
     /// <summary>
     /// Handles which <see cref="View"/> (if any) has captured the mouse
     /// </summary>
