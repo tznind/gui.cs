@@ -16,7 +16,7 @@ public partial class View // Mouse APIs
 
     private void SetupMouse ()
     {
-        MouseHeldDown = new MouseHeldDown (this);
+        MouseHeldDown = new MouseHeldDown (this, Application.MainLoop!.TimedEvents,Application.MouseGrabHandler);
         MouseBindings = new ();
 
         // TODO: Should the default really work with any button or just button1?
@@ -375,7 +375,7 @@ public partial class View // Mouse APIs
 
         if (mouseEvent.IsReleased)
         {
-            if (Application.MouseGrabView == this)
+            if (Application.MouseGrabHandler.MouseGrabView == this)
             {
                 //Logging.Debug ($"{Id} - {MouseState}");
                 MouseState &= ~MouseState.Pressed;
@@ -407,9 +407,9 @@ public partial class View // Mouse APIs
         if (mouseEvent.IsPressed)
         {
             // The first time we get pressed event, grab the mouse and set focus
-            if (Application.MouseGrabView != this)
+            if (Application.MouseGrabHandler.MouseGrabView != this)
             {
-                Application.GrabMouse (this);
+                Application.MouseGrabHandler.GrabMouse (this);
 
                 if (!HasFocus && CanFocus)
                 {
@@ -541,10 +541,10 @@ public partial class View // Mouse APIs
     {
         mouseEvent.Handled = false;
 
-        if (Application.MouseGrabView == this && mouseEvent.IsSingleClicked)
+        if (Application.MouseGrabHandler.MouseGrabView == this && mouseEvent.IsSingleClicked)
         {
             // We're grabbed. Clicked event comes after the last Release. This is our signal to ungrab
-            Application.UngrabMouse ();
+            Application.MouseGrabHandler.UngrabMouse ();
 
             // TODO: Prove we need to unset MouseState.Pressed and MouseState.PressedOutside here
             // TODO: There may be perf gains if we don't unset these flags here

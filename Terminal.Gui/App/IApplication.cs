@@ -12,7 +12,7 @@ public interface IApplication
     /// <summary>
     /// Handles grabbing the mouse (only a single <see cref="View"/> can grab the mouse at once).
     /// </summary>
-    IMouseGrabHandler MouseGrabHandler { get; }
+    IMouseGrabHandler MouseGrabHandler { get; set; }
 
     /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
     /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>

@@ -18,7 +18,10 @@ public class ApplicationImpl : IApplication
     /// </summary>
     public static IApplication Instance => _lazyInstance.Value;
 
-    public IMouseGrabHandler MouseGrabHandler { get; } = new MouseGrabHandler ();
+    /// <summary>
+    /// Handles which <see cref="View"/> (if any) has captured the mouse
+    /// </summary>
+    public IMouseGrabHandler MouseGrabHandler { get; set; } = new MouseGrabHandler ();
 
     /// <summary>
     /// Change the singleton implementation, should not be called except before application

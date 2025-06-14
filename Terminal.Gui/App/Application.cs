@@ -221,7 +221,7 @@ public static partial class Application
         // Run State stuff
         NotifyNewRunState = null;
         NotifyStopRunState = null;
-        MouseGrabView = null;
+        MouseGrabHandler = new MouseGrabHandler ();
         Initialized = false;
 
         // Mouse
@@ -230,10 +230,6 @@ public static partial class Application
         //_lastMousePosition = null;
         CachedViewsUnderMouse.Clear ();
         MouseEvent = null;
-        GrabbedMouse = null;
-        UnGrabbingMouse = null;
-        GrabbedMouse = null;
-        UnGrabbedMouse = null;
 
         // Keyboard
         KeyDown = null;

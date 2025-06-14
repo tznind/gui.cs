@@ -23,14 +23,14 @@ public interface IMouseHeldDown : IDisposable
 
     /// <summary>
     /// Call to indicate that the mouse has been pressed down and any relevant actions should
-    /// be undertaken (start timers, <see cref="Application.GrabMouse"/> etc).
+    /// be undertaken (start timers, <see cref="Application.MouseGrabHandler.GrabMouse"/> etc).
     /// </summary>
     void Start ();
 
 
     /// <summary>
     /// Call to indicate that the mouse has been released and any relevant actions should
-    /// be undertaken (stop timers, <see cref="Application.UngrabMouse"/> etc).
+    /// be undertaken (stop timers, <see cref="Application.MouseGrabHandler.UngrabMouse"/> etc).
     /// </summary>
     void Stop ();
 }
