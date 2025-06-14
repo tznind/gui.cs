@@ -9,7 +9,7 @@ public partial class View // Mouse APIs
     /// Handles <see cref="WantContinuousButtonPressed"/>, we have detected a button
     /// down in the view and have grabbed the mouse.
     /// </summary>
-    public IMouseHeldDown? MouseHeldDown { get; private set; }
+    public IMouseHeldDown? MouseHeldDown { get; set; }
 
     /// <summary>Gets the mouse bindings for this view.</summary>
     public MouseBindings MouseBindings { get; internal set; } = null!;
