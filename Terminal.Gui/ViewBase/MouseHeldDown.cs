@@ -8,8 +8,15 @@ internal class MouseHeldDown : IMouseHeldDown
     private readonly View _host;
     private bool _down;
     private object? _timeout;
+    private readonly ITimedEvents? _timedEvents;
+    private readonly IMouseGrabHandler? _mouseGrabber;
 
-    public MouseHeldDown (View host, ITimedEvents timedEvents, IMouseGrabHandler mouseGrabber) { _host = host; }
+    public MouseHeldDown (View host, ITimedEvents? timedEvents, IMouseGrabHandler? mouseGrabber)
+    {
+        _host = host;
+        _timedEvents = timedEvents;
+        _mouseGrabber = mouseGrabber;
+    }
 
     public event EventHandler<CancelEventArgs>? MouseIsHeldDownTick;
 
@@ -44,10 +51,10 @@ internal class MouseHeldDown : IMouseHeldDown
         }
 
         _down = true;
-        Application.MouseGrabHandler.GrabMouse (_host);
+        _mouseGrabber?.GrabMouse (_host);
 
         // Then periodic ticks
-        _timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (500), TickWhileMouseIsHeldDown);
+        _timeout = _timedEvents?.AddTimeout (TimeSpan.FromMilliseconds (500), TickWhileMouseIsHeldDown);
     }
 
     private bool TickWhileMouseIsHeldDown ()
@@ -67,14 +74,14 @@ internal class MouseHeldDown : IMouseHeldDown
 
     public void Stop ()
     {
-        if (Application.MouseGrabHandler.MouseGrabView == _host)
+        if (_mouseGrabber?.MouseGrabView == _host)
         {
-            Application.MouseGrabHandler.UngrabMouse ();
+            _mouseGrabber?.UngrabMouse ();
         }
 
         if (_timeout != null)
         {
-            Application.RemoveTimeout (_timeout);
+            _timedEvents?.RemoveTimeout (_timeout);
         }
 
         _down = false;
@@ -82,7 +89,7 @@ internal class MouseHeldDown : IMouseHeldDown
 
     public void Dispose ()
     {
-        if (Application.MouseGrabHandler.MouseGrabView == _host)
+        if (_mouseGrabber?.MouseGrabView == _host)
         {
             Stop ();
         }
