@@ -20,7 +20,7 @@ public class ApplicationImpl : IApplication
 
 
     /// <inheritdoc/>
-    public virtual ITimedEvents TimedEvents => Application.MainLoop.TimedEvents;
+    public virtual ITimedEvents? TimedEvents => Application.MainLoop?.TimedEvents;
 
     /// <summary>
     /// Handles which <see cref="View"/> (if any) has captured the mouse

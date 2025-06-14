@@ -49,7 +49,7 @@ public static partial class Application
     /// safe updates to <see cref="View"/> instances.
     /// </para>
     /// </summary>
-    public static ITimedEvents TimedEvents => ApplicationImpl.Instance.TimedEvents;
+    public static ITimedEvents? TimedEvents => ApplicationImpl.Instance?.TimedEvents;
 
     /// <summary>
     ///     Gets a string representation of the Application as rendered by <see cref="Driver"/>.

@@ -13,7 +13,7 @@ public interface IApplication
     /// Handles recurring events. These are invoked on the main UI thread - allowing for
     /// safe updates to <see cref="View"/> instances.
     /// </summary>
-    ITimedEvents TimedEvents { get; }
+    ITimedEvents? TimedEvents { get; }
 
     /// <summary>
     /// Handles grabbing the mouse (only a single <see cref="View"/> can grab the mouse at once).
