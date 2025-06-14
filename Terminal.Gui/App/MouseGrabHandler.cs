@@ -2,7 +2,6 @@
 
 internal class MouseGrabHandler : IMouseGrabHandler
 {
-
     /// <summary>
     ///     Gets the view that grabbed the mouse (e.g. for dragging). When this is set, all mouse events will be routed to
     ///     this view until the view calls <see cref="UngrabMouse"/> or the mouse is released.
@@ -26,21 +25,21 @@ internal class MouseGrabHandler : IMouseGrabHandler
     ///     is called.
     /// </summary>
     /// <param name="view">View that will receive all mouse events until <see cref="UngrabMouse"/> is invoked.</param>
-    public void GrabMouse(View? view)
+    public void GrabMouse (View? view)
     {
-        if (view is null || RaiseGrabbingMouseEvent(view))
+        if (view is null || RaiseGrabbingMouseEvent (view))
         {
             return;
         }
 
-        RaiseGrabbedMouseEvent(view);
+        RaiseGrabbedMouseEvent (view);
 
         // MouseGrabView is a static; only set if the application is initialized.
         MouseGrabView = view;
     }
 
     /// <summary>Releases the mouse grab, so mouse events will be routed to the view on which the mouse is.</summary>
-    public void UngrabMouse()
+    public void UngrabMouse ()
     {
         if (MouseGrabView is null)
         {
@@ -50,66 +49,65 @@ internal class MouseGrabHandler : IMouseGrabHandler
 #if DEBUG_IDISPOSABLE
         if (View.EnableDebugIDisposableAsserts)
         {
-            ObjectDisposedException.ThrowIf(MouseGrabView.WasDisposed, MouseGrabView);
+            ObjectDisposedException.ThrowIf (MouseGrabView.WasDisposed, MouseGrabView);
         }
 #endif
 
-        if (!RaiseUnGrabbingMouseEvent(MouseGrabView))
+        if (!RaiseUnGrabbingMouseEvent (MouseGrabView))
         {
             View view = MouseGrabView;
             MouseGrabView = null;
-            RaiseUnGrabbedMouseEvent(view);
+            RaiseUnGrabbedMouseEvent (view);
         }
     }
 
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    private bool RaiseGrabbingMouseEvent(View? view)
+    private bool RaiseGrabbingMouseEvent (View? view)
     {
         if (view is null)
         {
             return false;
         }
 
-        var evArgs = new GrabMouseEventArgs(view);
-        GrabbingMouse?.Invoke(view, evArgs);
+        var evArgs = new GrabMouseEventArgs (view);
+        GrabbingMouse?.Invoke (view, evArgs);
 
         return evArgs.Cancel;
     }
 
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    private bool RaiseUnGrabbingMouseEvent(View? view)
+    private bool RaiseUnGrabbingMouseEvent (View? view)
     {
         if (view is null)
         {
             return false;
         }
 
-        var evArgs = new GrabMouseEventArgs(view);
-        UnGrabbingMouse?.Invoke(view, evArgs);
+        var evArgs = new GrabMouseEventArgs (view);
+        UnGrabbingMouse?.Invoke (view, evArgs);
 
         return evArgs.Cancel;
     }
 
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    private void RaiseGrabbedMouseEvent(View? view)
+    private void RaiseGrabbedMouseEvent (View? view)
     {
         if (view is null)
         {
             return;
         }
 
-        GrabbedMouse?.Invoke(view, new(view));
+        GrabbedMouse?.Invoke (view, new (view));
     }
 
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    private void RaiseUnGrabbedMouseEvent(View? view)
+    private void RaiseUnGrabbedMouseEvent (View? view)
     {
         if (view is null)
         {
             return;
         }
 
-        UnGrabbedMouse?.Invoke(view, new(view));
+        UnGrabbedMouse?.Invoke (view, new (view));
     }
-
 }

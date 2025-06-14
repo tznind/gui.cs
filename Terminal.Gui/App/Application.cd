@@ -94,7 +94,7 @@
     <Position X="6.25" Y="6.5" Width="2" />
     <TypeIdentifier>
       <HashCode>BAAgAAAAAAAAAgAAAAAAABAAACEAAAAAAAAAAgAAAAA=</HashCode>
-      <FileName>App\IGrabMouse.cs</FileName>
+      <FileName>App\IMouseGrabHandler.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Font Name="Segoe UI" Size="9" />

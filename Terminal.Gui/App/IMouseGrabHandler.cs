@@ -1,5 +1,11 @@
 ﻿namespace Terminal.Gui.App;
 
+/// <summary>
+///     Interface for class that tracks which <see cref="View"/> (if any) has 'grabbed' the mouse
+///     and wants priority updates about its activity e.g. where it moves to, when it is released
+///     etc. Example use case is a button on a scroll bar being held down by the mouse - resulting
+///     in continuous scrolling.
+/// </summary>
 public interface IMouseGrabHandler
 {
     /// <summary>
