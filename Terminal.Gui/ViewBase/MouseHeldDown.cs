@@ -9,7 +9,7 @@ internal class MouseHeldDown : IMouseHeldDown
     private bool _down;
     private object? _timeout;
 
-    public MouseHeldDown (View host) { _host = host; }
+    public MouseHeldDown (View host, ITimedEvents timedEvents, IGrabMouse mouseGrabber) { _host = host; }
 
     public event EventHandler<CancelEventArgs>? MouseIsHeldDownTick;
 

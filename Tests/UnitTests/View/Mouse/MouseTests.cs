@@ -268,7 +268,9 @@ public class MouseTests : TestsAllViews
 
         var clickedCount = 0;
 
-        view.MouseClick += (s, e) => clickedCount++;
+        view.MouseHeldDown!.MouseIsHeldDownTick += (_, _) => clickedCount++;
+
+        Assert.Empty (Application.MainLoop.TimedEvents.Timeouts);
 
         // Start in Viewport
         me.Flags = MouseFlags.Button1Pressed;
@@ -277,11 +279,21 @@ public class MouseTests : TestsAllViews
         Assert.Equal (0, clickedCount);
         me.Handled = false;
 
+        // Mouse is held down so timer should be ticking
+        Assert.NotEmpty (Application.MainLoop.TimedEvents.Timeouts);
+        Assert.Equal (clickedCount,0);
+
+        // Don't wait, just force it to expire
+        Application.MainLoop.TimedEvents.Timeouts.Single ().Value.Callback.Invoke ();
+        Assert.Equal (clickedCount, 1);
+
         // Move out of Viewport
         me.Flags = MouseFlags.Button1Pressed;
         me.Position = me.Position with { X = 1 };
         view.NewMouseEvent (me);
-        Assert.Equal (1, clickedCount);
+
+        Application.MainLoop.TimedEvents.Timeouts.Single ().Value.Callback.Invoke ();
+        Assert.Equal (clickedCount, 2);
         me.Handled = false;
 
         // Move into Viewport

@@ -16,9 +16,21 @@ namespace Terminal.Gui.ViewBase;
 /// </summary>
 public interface IMouseHeldDown : IDisposable
 {
-    // TODO: Guess this should follow the established events type - need to double check what that is.
+    /// <summary>
+    /// Periodically raised when the mouse is pressed down inside the view <see cref="View"/>.
+    /// </summary>
     public event EventHandler<CancelEventArgs> MouseIsHeldDownTick;
 
+    /// <summary>
+    /// Call to indicate that the mouse has been pressed down and any relevant actions should
+    /// be undertaken (start timers, <see cref="Application.GrabMouse"/> etc).
+    /// </summary>
     void Start ();
+
+
+    /// <summary>
+    /// Call to indicate that the mouse has been released and any relevant actions should
+    /// be undertaken (stop timers, <see cref="Application.UngrabMouse"/> etc).
+    /// </summary>
     void Stop ();
 }
