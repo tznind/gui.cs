@@ -902,7 +902,7 @@ public static class EscSeqUtils
 
             if ((mouseFlags [0] & MouseFlags.ReportMousePosition) == 0)
             {
-                Application.MainLoop?.AddIdle (
+                Application.MainLoop?.TimedEvents.AddTimeout (TimeSpan.Zero,
                                               () =>
                                               {
                                                   // INTENT: What's this trying to do?
@@ -945,7 +945,7 @@ public static class EscSeqUtils
             _isButtonClicked = false;
             _isButtonDoubleClicked = true;
 
-            Application.MainLoop?.AddIdle (
+            Application.MainLoop?.TimedEvents.AddTimeout (TimeSpan.Zero,
                                           () =>
                                           {
                                               Task.Run (async () => await ProcessButtonDoubleClickedAsync ());
@@ -959,7 +959,7 @@ public static class EscSeqUtils
         //	lastMouseButtonReleased = null;
         //	isButtonReleased = false;
         //	isButtonClicked = true;
-        //	Application.MainLoop.AddIdle (() => {
+        //	Application.MainLoop.AddTimeout (() => {
         //		Task.Run (async () => await ProcessButtonClickedAsync ());
         //		return false;
         //	});
@@ -984,7 +984,7 @@ public static class EscSeqUtils
                 mouseFlags.Add (GetButtonClicked (buttonState));
                 _isButtonClicked = true;
 
-                Application.MainLoop?.AddIdle (
+                Application.MainLoop?.TimedEvents.AddTimeout (TimeSpan.Zero,
                                               () =>
                                               {
                                                   Task.Run (async () => await ProcessButtonClickedAsync ());

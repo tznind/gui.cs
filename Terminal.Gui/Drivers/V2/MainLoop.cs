@@ -144,9 +144,7 @@ public class MainLoop<T> : IMainLoop<T>
         var swCallbacks = Stopwatch.StartNew ();
 
         TimedEvents.LockAndRunTimers ();
-
-        TimedEvents.LockAndRunIdles ();
-
+        
         Logging.IterationInvokesAndTimeouts.Record (swCallbacks.Elapsed.Milliseconds);
     }
 

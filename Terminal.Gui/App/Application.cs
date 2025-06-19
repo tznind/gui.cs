@@ -252,10 +252,4 @@ public static partial class Application
         // (https://github.com/gui-cs/Terminal.Gui/issues/1084).
         SynchronizationContext.SetSynchronizationContext (null);
     }
-
-    /// <summary>
-    ///     Adds specified idle handler function to main iteration processing. The handler function will be called
-    ///     once per iteration of the main loop after other events have been handled.
-    /// </summary>
-    public static void AddIdle (Func<bool> func) { ApplicationImpl.Instance.AddIdle (func); }
 }

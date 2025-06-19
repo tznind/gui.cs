@@ -1045,7 +1045,7 @@ public class MenuBar : View, IDesignable
             return false;
         }
 
-        Application.AddIdle (
+        Application.AddTimeout (TimeSpan.Zero,
                                        () =>
                                        {
                                            action ();

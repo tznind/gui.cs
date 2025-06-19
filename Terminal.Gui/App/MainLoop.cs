@@ -75,32 +75,6 @@ public class MainLoop : IDisposable
         MainLoopDriver = null;
     }
 
-    /// <summary>
-    ///     Adds specified idle handler function to <see cref="MainLoop"/> processing. The handler function will be called
-    ///     once per iteration of the main loop after other events have been handled.
-    /// </summary>
-    /// <remarks>
-    ///     <para>Remove an idle handler by calling <see cref="TimedEvents.RemoveIdle(Func{bool})"/> with the token this method returns.</para>
-    ///     <para>
-    ///         If the <paramref name="idleHandler"/> returns  <see langword="false"/> it will be removed and not called
-    ///         subsequently.
-    ///     </para>
-    /// </remarks>
-    /// <param name="idleHandler">Token that can be used to remove the idle handler with <see cref="TimedEvents.RemoveIdle(Func{bool})"/> .</param>
-    // QUESTION: Why are we re-inventing the event wheel here?
-    // PERF: This is heavy.
-    // CONCURRENCY: Race conditions exist here.
-    // CONCURRENCY: null delegates will hose this.
-    // 
-    internal Func<bool> AddIdle (Func<bool> idleHandler)
-    {
-        TimedEvents.AddIdle (idleHandler);
-
-        MainLoopDriver?.Wakeup ();
-
-        return idleHandler;
-    }
-
 
     /// <summary>Determines whether there are pending events to be processed.</summary>
     /// <remarks>
@@ -139,8 +113,6 @@ public class MainLoop : IDisposable
         MainLoopDriver?.Iteration ();
 
         TimedEvents.LockAndRunTimers ();
-
-        TimedEvents.LockAndRunIdles ();
     }
 
     private void RunAnsiScheduler ()

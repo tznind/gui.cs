@@ -156,13 +156,7 @@ public interface IApplication
     /// is cutting edge.
     /// </summary>
     bool IsLegacy { get; }
-
-    /// <summary>
-    ///     Adds specified idle handler function to main iteration processing. The handler function will be called
-    ///     once per iteration of the main loop after other events have been handled.
-    /// </summary>
-    void AddIdle (Func<bool> func);
-
+    
     /// <summary>Adds a timeout to the application.</summary>
     /// <remarks>
     ///     When time specified passes, the callback will be invoked. If the callback returns true, the timeout will be

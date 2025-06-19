@@ -990,7 +990,7 @@ internal class WindowsDriver : ConsoleDriver
         if (_isButtonDoubleClicked || _isOneFingerDoubleClicked)
         {
             // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
-            Application.MainLoop!.AddIdle (
+            Application.MainLoop!.TimedEvents.AddTimeout (TimeSpan.Zero,
                                           () =>
                                           {
                                               Task.Run (async () => await ProcessButtonDoubleClickedAsync ());
@@ -1062,7 +1062,7 @@ internal class WindowsDriver : ConsoleDriver
             if ((mouseFlag & MouseFlags.ReportMousePosition) == 0)
             {
                 // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
-                Application.MainLoop!.AddIdle (
+                Application.MainLoop!.TimedEvents.AddTimeout (TimeSpan.Zero,
                                               () =>
                                               {
                                                   Task.Run (async () => await ProcessContinuousButtonPressedAsync (mouseFlag));

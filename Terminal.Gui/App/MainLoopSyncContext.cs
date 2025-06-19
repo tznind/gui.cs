@@ -10,7 +10,7 @@ internal sealed class MainLoopSyncContext : SynchronizationContext
 
     public override void Post (SendOrPostCallback d, object state)
     {
-        Application.MainLoop?.AddIdle (
+        Application.MainLoop?.TimedEvents.AddTimeout (TimeSpan.Zero,
                                        () =>
                                        {
                                            d (state);
