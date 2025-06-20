@@ -18,6 +18,7 @@ internal sealed class MainLoopSyncContext : SynchronizationContext
                                            return false;
                                        }
                                       );
+        Application.MainLoop?.Wakeup ();
     }
 
     //_mainLoop.Driver.Wakeup ();
