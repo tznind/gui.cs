@@ -261,6 +261,12 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc />
     public virtual void Invoke (Action action)
     {
+        if (Application.MainLoop == null)
+        {
+            Logging.Warning ("Ignored Invoke because MainLoop is not initialized yet");
+            return;
+        }
+
         Application.AddTimeout (TimeSpan.Zero,
                            () =>
                            {
