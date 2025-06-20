@@ -91,7 +91,7 @@ public class MainLoopDriverTests
         bool result = mainLoop.TimedEvents.CheckTimers (out int waitTimeout);
 
         Assert.True (result);
-        Assert.Equal (-1, waitTimeout);
+        Assert.Equal (0, waitTimeout);
         mainLoop.Dispose ();
     }
 
@@ -114,7 +114,7 @@ public class MainLoopDriverTests
         bool result = mainLoop.TimedEvents.CheckTimers (out int waitTimeout);
 
         Assert.False (result);
-        Assert.Equal (-1, waitTimeout);
+        Assert.Equal (0, waitTimeout);
         mainLoop.Dispose ();
     }
 
