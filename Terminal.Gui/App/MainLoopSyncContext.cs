@@ -10,15 +10,25 @@ internal sealed class MainLoopSyncContext : SynchronizationContext
 
     public override void Post (SendOrPostCallback d, object state)
     {
-        Application.MainLoop?.TimedEvents.AddTimeout (TimeSpan.Zero,
-                                       () =>
-                                       {
-                                           d (state);
 
-                                           return false;
-                                       }
-                                      );
-        Application.MainLoop?.Wakeup ();
+        // If we are already on the main UI thread
+        if (Application.MainThreadId == Thread.CurrentThread.ManagedThreadId)
+        {
+            d (state);
+        }
+        else
+        {
+            // Queue the task
+            Application.MainLoop?.TimedEvents.AddTimeout (TimeSpan.Zero,
+                                                          () =>
+                                                          {
+                                                              d (state);
+
+                                                              return false;
+                                                          }
+                                                         );
+            Application.MainLoop?.Wakeup ();
+        }
     }
 
     //_mainLoop.Driver.Wakeup ();
