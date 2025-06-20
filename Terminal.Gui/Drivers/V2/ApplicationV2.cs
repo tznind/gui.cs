@@ -225,6 +225,13 @@ public class ApplicationV2 : ApplicationImpl
     /// <inheritdoc/>
     public override void Invoke (Action action)
     {
+        // If we are already on the main UI thread
+        if (Application.MainThreadId == Thread.CurrentThread.ManagedThreadId)
+        {
+            action ();
+            return;
+        }
+
         _timedEvents.AddTimeout (TimeSpan.Zero,
                               () =>
                               {

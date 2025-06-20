@@ -578,7 +578,7 @@ public class MainLoopTests
                         new App.Timeout { Span = new (), Callback = () => true }
                        );
     }
-    /*
+
     [Theory]
     [MemberData (nameof (TestAddTimeout))]
     public void Mainloop_Invoke_Or_AddTimeout_Can_Be_Used_For_Events_Or_Actions (
@@ -661,7 +661,7 @@ public class MainLoopTests
 
         Application.Shutdown ();
     }
-    */
+    
     [Fact]
     public void RemoveIdle_Function_NotCalled ()
     {

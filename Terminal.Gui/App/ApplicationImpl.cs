@@ -261,11 +261,20 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc />
     public virtual void Invoke (Action action)
     {
+
+        // If we are already on the main UI thread
+        if (Application.MainThreadId == Thread.CurrentThread.ManagedThreadId)
+        {
+            action ();
+            return;
+        }
+
         if (Application.MainLoop == null)
         {
             Logging.Warning ("Ignored Invoke because MainLoop is not initialized yet");
             return;
         }
+
 
         Application.AddTimeout (TimeSpan.Zero,
                            () =>
