@@ -24,7 +24,7 @@ public class LogarithmicTimeout : Timeout
             }
 
             // Calculate logarithmic increase
-            double multiplier = Math.Log (stage + 1); // ln(stage + 1)
+            double multiplier = 1 + Math.Log (stage + 1); // ln(stage + 1)
             return TimeSpan.FromMilliseconds (baseDelay.TotalMilliseconds * multiplier);
         }
     }
