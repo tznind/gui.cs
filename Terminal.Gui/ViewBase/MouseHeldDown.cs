@@ -11,11 +11,14 @@ internal class MouseHeldDown : IMouseHeldDown
     private readonly ITimedEvents? _timedEvents;
     private readonly IMouseGrabHandler? _mouseGrabber;
 
+    private readonly SmoothAcceleratingTimeout _smoothTimeout;
+
     public MouseHeldDown (View host, ITimedEvents? timedEvents, IMouseGrabHandler? mouseGrabber)
     {
         _host = host;
         _timedEvents = timedEvents;
         _mouseGrabber = mouseGrabber;
+        _smoothTimeout = new (TimeSpan.FromMilliseconds (500), TimeSpan.FromMilliseconds (50), 0.5, TickWhileMouseIsHeldDown);
     }
 
     public event EventHandler<CancelEventArgs>? MouseIsHeldDownTick;
@@ -53,8 +56,9 @@ internal class MouseHeldDown : IMouseHeldDown
         _down = true;
         _mouseGrabber?.GrabMouse (_host);
 
+
         // Then periodic ticks
-        _timeout = _timedEvents?.AddTimeout (TimeSpan.FromMilliseconds (500), TickWhileMouseIsHeldDown);
+        _timeout = _timedEvents?.AddTimeout (_smoothTimeout);
     }
 
     private bool TickWhileMouseIsHeldDown ()
@@ -62,10 +66,12 @@ internal class MouseHeldDown : IMouseHeldDown
         Logging.Debug ("Raising TickWhileMouseIsHeldDown...");
         if (_down)
         {
+            _smoothTimeout.AdvanceStage ();
             RaiseMouseIsHeldDownTick ();
         }
         else
         {
+            _smoothTimeout.Reset ();
             Stop ();
         }
 
@@ -74,6 +80,8 @@ internal class MouseHeldDown : IMouseHeldDown
 
     public void Stop ()
     {
+        _smoothTimeout.Reset ();
+
         if (_mouseGrabber?.MouseGrabView == _host)
         {
             _mouseGrabber?.UngrabMouse ();
