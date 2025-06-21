@@ -89,10 +89,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         //#endif
 
         // Ensure the mouse is ungrabbed.
-        if (MouseGrabView is { })
+        if (MouseGrabHandler.MouseGrabView is { })
         {
-            UngrabMouse ();
-            MouseGrabView = null;
+            MouseGrabHandler.UngrabMouse ();
         }
 
         var rs = new RunState (toplevel);

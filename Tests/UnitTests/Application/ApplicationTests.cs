@@ -307,8 +307,7 @@ public class ApplicationTests
 
             // Public Properties
             Assert.Null (Application.Top);
-            Assert.Null (Application.MouseGrabView);
-            Assert.Null (Application.WantContinuousButtonPressedView);
+            Assert.Null (Application.MouseGrabHandler.MouseGrabView);
 
             // Don't check Application.ForceDriver
             // Assert.Empty (Application.ForceDriver);
@@ -569,8 +568,7 @@ public class ApplicationTests
         Assert.Null (Application.Top);
         RunState rs = Application.Begin (new ());
         Assert.Equal (Application.Top, rs.Toplevel);
-        Assert.Null (Application.MouseGrabView); // public
-        Assert.Null (Application.WantContinuousButtonPressedView); // public
+        Assert.Null (Application.MouseGrabHandler.MouseGrabView); // public
         Application.Top!.Dispose ();
     }
 
@@ -952,7 +950,7 @@ public class ApplicationTests
         Assert.Equal (new (0, 0), w.Frame.Location);
 
         Application.RaiseMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
-        Assert.Equal (w.Border, Application.MouseGrabView);
+        Assert.Equal (w.Border, Application.MouseGrabHandler.MouseGrabView);
         Assert.Equal (new (0, 0), w.Frame.Location);
 
         // Move down and to the right.

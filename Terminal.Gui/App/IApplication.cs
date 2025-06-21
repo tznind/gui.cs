@@ -9,6 +9,17 @@ namespace Terminal.Gui.App;
 /// </summary>
 public interface IApplication
 {
+    /// <summary>
+    /// Handles recurring events. These are invoked on the main UI thread - allowing for
+    /// safe updates to <see cref="View"/> instances.
+    /// </summary>
+    ITimedEvents? TimedEvents { get; }
+
+    /// <summary>
+    /// Handles grabbing the mouse (only a single <see cref="View"/> can grab the mouse at once).
+    /// </summary>
+    IMouseGrabHandler MouseGrabHandler { get; set; }
+
     /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
     /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
     /// <para>

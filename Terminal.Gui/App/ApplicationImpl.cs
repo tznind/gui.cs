@@ -18,6 +18,15 @@ public class ApplicationImpl : IApplication
     /// </summary>
     public static IApplication Instance => _lazyInstance.Value;
 
+
+    /// <inheritdoc/>
+    public virtual ITimedEvents? TimedEvents => Application.MainLoop?.TimedEvents;
+
+    /// <summary>
+    /// Handles which <see cref="View"/> (if any) has captured the mouse
+    /// </summary>
+    public IMouseGrabHandler MouseGrabHandler { get; set; } = new MouseGrabHandler ();
+
     /// <summary>
     /// Change the singleton implementation, should not be called except before application
     /// startup. This method lets you provide alternative implementations of core static gateway
