@@ -76,6 +76,6 @@ public class LogarithmicTimeoutTests
         Assert.NotEqual (baseDelay, timeout.Span);
 
         timeout.Reset ();
-        Assert.Equal (baseDelay, timeout.Span);
+        Assert.Equal (TimeSpan.Zero, timeout.Span);
     }
 }
