@@ -10,7 +10,7 @@ namespace Terminal.Gui.Drivers;
 public interface IMainLoop<T> : IDisposable
 {
     /// <summary>
-    ///     Gets the class responsible for servicing user timeouts and idles
+    ///     Gets the class responsible for servicing user timeouts
     /// </summary>
     public ITimedEvents TimedEvents { get; }
 

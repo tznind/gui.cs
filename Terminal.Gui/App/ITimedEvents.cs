@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 namespace Terminal.Gui.App;
 
 /// <summary>
-/// Manages timers and idles
+/// Manages timers
 /// </summary>
 public interface ITimedEvents
 {
