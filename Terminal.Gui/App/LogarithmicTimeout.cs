@@ -6,6 +6,12 @@ public class LogarithmicTimeout : Timeout
     private int stage = 0;
     private readonly TimeSpan baseDelay;
 
+    /// <summary>
+    /// Creates a new instance where stages are the logarithm multiplied by the
+    /// <paramref name="baseDelay"/> (starts fast then slows).
+    /// </summary>
+    /// <param name="baseDelay">Multiple for the logarithm</param>
+    /// <param name="callback">Method to invoke</param>
     public LogarithmicTimeout (TimeSpan baseDelay, Func<bool> callback)
     {
         this.baseDelay = baseDelay;
