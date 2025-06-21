@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui.App;
+﻿#nullable enable
+namespace Terminal.Gui.App;
 
 internal class MouseGrabHandler : IMouseGrabHandler
 {

@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui.App;
+﻿#nullable enable
+namespace Terminal.Gui.App;
+
 
 /// <summary>
 ///     Interface for class that tracks which <see cref="View"/> (if any) has 'grabbed' the mouse
