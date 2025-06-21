@@ -141,6 +141,13 @@ public class TimedEvents : ITimedEvents
         return timeout;
     }
 
+    /// <inheritdoc />
+    public object AddTimeout (Timeout timeout)
+    {
+        AddTimeout (timeout.Span, timeout);
+        return timeout;
+    }
+
     /// <inheritdoc/>
     public bool CheckTimers(out int waitTimeout)
     {

@@ -21,6 +21,9 @@ public interface ITimedEvents
     /// </remarks>
     object AddTimeout (TimeSpan time, Func<bool> callback);
 
+    /// <inheritdoc cref="AddTimeout(System.TimeSpan,System.Func{bool})"/>
+    object AddTimeout (Timeout timeout);
+
     /// <summary>Removes a previously scheduled timeout</summary>
     /// <remarks>The token parameter is the value returned by AddTimeout.</remarks>
     /// <returns>
