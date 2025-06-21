@@ -8,7 +8,7 @@ public class LogarithmicTimeoutTests
         var baseDelay = TimeSpan.FromMilliseconds (1000);
         var timeout = new LogarithmicTimeout (baseDelay, () => true);
 
-        Assert.Equal (baseDelay, timeout.Span);
+        Assert.Equal (TimeSpan.Zero, timeout.Span);
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class LogarithmicTimeoutTests
         // baseDelayMs, stage, expectedSpanMs
         double baseMs = 1000;
 
-        yield return new object [] { baseMs, 0, baseMs };
+        yield return new object [] { baseMs, 0, 0 };
         yield return new object [] { baseMs, 1, baseMs * Math.Log (2) };
         yield return new object [] { baseMs, 2, baseMs * Math.Log (3) };
         yield return new object [] { baseMs, 5, baseMs * Math.Log (6) };

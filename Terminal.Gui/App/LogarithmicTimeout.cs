@@ -17,14 +17,8 @@ public class LogarithmicTimeout : Timeout
     {
         get
         {
-            // For stage 0, return base delay directly
-            if (stage == 0)
-            {
-                return baseDelay;
-            }
-
             // Calculate logarithmic increase
-            double multiplier = 1 + Math.Log (stage + 1); // ln(stage + 1)
+            double multiplier = Math.Log (stage + 1); // ln(stage + 1)
             return TimeSpan.FromMilliseconds (baseDelay.TotalMilliseconds * multiplier);
         }
     }
