@@ -1,19 +1,19 @@
 ﻿namespace Terminal.Gui.App;
 
 /// <summary>
-/// Timeout which accelerates slowly at first then fast up to a maximum speed.
-/// Use <see cref="AdvanceStage"/> to increment the stage of the timer (e.g. in
-/// your timer callback code).
+///     Timeout which accelerates slowly at first then fast up to a maximum speed.
+///     Use <see cref="AdvanceStage"/> to increment the stage of the timer (e.g. in
+///     your timer callback code).
 /// </summary>
 public class SmoothAcceleratingTimeout : Timeout
 {
-    private int stage = 0;
-    private readonly TimeSpan initialDelay;
-    private readonly TimeSpan minDelay;
-    private readonly double decayFactor;
+    private int _stage;
+    private readonly TimeSpan _initialDelay;
+    private readonly TimeSpan _minDelay;
+    private readonly double _decayFactor;
 
     /// <summary>
-    /// Creates a new instance of the smooth acceleration timeout.
+    ///     Creates a new instance of the smooth acceleration timeout.
     /// </summary>
     /// <param name="initialDelay">Delay before first tick, the longest it will ever take</param>
     /// <param name="minDelay">The fastest the timer can get no matter how long it runs</param>
@@ -21,10 +21,10 @@ public class SmoothAcceleratingTimeout : Timeout
     /// <param name="callback">Method to call when timer ticks</param>
     public SmoothAcceleratingTimeout (TimeSpan initialDelay, TimeSpan minDelay, double decayFactor, Func<bool> callback)
     {
-        this.initialDelay = initialDelay;
-        this.minDelay = minDelay;
-        this.decayFactor = decayFactor;
-        this.Callback = callback;
+        this._initialDelay = initialDelay;
+        this._minDelay = minDelay;
+        this._decayFactor = decayFactor;
+        Callback = callback;
     }
 
     /// <inheritdoc/>
@@ -32,27 +32,22 @@ public class SmoothAcceleratingTimeout : Timeout
     {
         get
         {
-            double initialMs = initialDelay.TotalMilliseconds;
-            double minMs = minDelay.TotalMilliseconds;
-            double delayMs = minMs + (initialMs - minMs) * Math.Pow (decayFactor, stage);
+            double initialMs = _initialDelay.TotalMilliseconds;
+            double minMs = _minDelay.TotalMilliseconds;
+            double delayMs = minMs + (initialMs - minMs) * Math.Pow (_decayFactor, _stage);
+
             return TimeSpan.FromMilliseconds (delayMs);
         }
     }
 
     /// <summary>
-    /// Advances the timer stage, this should be called from your timer callback or whenever
-    /// you want to advance the speed.
+    ///     Advances the timer stage, this should be called from your timer callback or whenever
+    ///     you want to advance the speed.
     /// </summary>
-    public void AdvanceStage ()
-    {
-        stage++;
-    }
+    public void AdvanceStage () { _stage++; }
 
     /// <summary>
-    /// Resets the timer to original speed.
+    ///     Resets the timer to original speed.
     /// </summary>
-    public void Reset ()
-    {
-        stage = 0;
-    }
+    public void Reset () { _stage = 0; }
 }
