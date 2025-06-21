@@ -32,7 +32,7 @@ internal interface IMainLoopDriver
     void Wakeup ();
 }
 
-/// <summary>The MainLoop monitors timers and idle handlers.</summary>
+/// <summary>The MainLoop monitors timers handlers.</summary>
 /// <remarks>
 ///     Monitoring of file descriptors is only available on Unix, there does not seem to be a way of supporting this
 ///     on Windows.
@@ -40,7 +40,7 @@ internal interface IMainLoopDriver
 public class MainLoop : IDisposable
 {
     /// <summary>
-    /// Gets the class responsible for handling idles and timeouts
+    /// Gets the class responsible for handling timeouts
     /// </summary>
     public ITimedEvents TimedEvents { get; } = new TimedEvents();
 
@@ -101,7 +101,7 @@ public class MainLoop : IDisposable
 
     /// <summary>Runs one iteration of timers and file watches</summary>
     /// <remarks>
-    ///     Use this to process all pending events (timers, idle handlers and file watches).
+    ///     Use this to process all pending events (timers handlers and file watches).
     ///     <code>
     ///     while (main.EventsPending ()) RunIteration ();
     ///   </code>

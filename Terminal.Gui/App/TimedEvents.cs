@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 namespace Terminal.Gui.App;
 
 /// <summary>
-/// Handles timeouts and idles
+/// Handles timeouts
 /// </summary>
 public class TimedEvents : ITimedEvents
 {

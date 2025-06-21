@@ -119,7 +119,7 @@ public class ApplicationImpl : IApplication
     ///         Alternatively, to have a program control the main loop and process events manually, call
     ///         <see cref="Application.Begin(Toplevel)"/> to set things up manually and then repeatedly call
     ///         <see cref="Application.RunLoop(RunState)"/> with the wait parameter set to false. By doing this the
-    ///         <see cref="Application.RunLoop(RunState)"/> method will only process any pending events, timers, idle handlers and then
+    ///         <see cref="Application.RunLoop(RunState)"/> method will only process any pending events, timers handlers and then
     ///         return control immediately.
     ///     </para>
     ///     <para>When using <see cref="Run{T}"/> or
