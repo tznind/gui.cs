@@ -4,7 +4,7 @@ namespace Terminal.Gui.App;
 
 public static partial class Application // Screen related stuff
 {
-    private static readonly object _lock = new ();
+    private static readonly object _lockScreen = new ();
     private static Rectangle? _screen;
 
     /// <summary>
@@ -19,7 +19,7 @@ public static partial class Application // Screen related stuff
     {
         get
         {
-            lock (_lock)
+            lock (_lockScreen)
             {
                 if (_screen == null)
                 {
@@ -36,7 +36,7 @@ public static partial class Application // Screen related stuff
                 throw new NotImplementedException ($"Screen locations other than 0, 0 are not yet supported");
             }
 
-            lock (_lock)
+            lock (_lockScreen)
             {
                 _screen = value;
             }
