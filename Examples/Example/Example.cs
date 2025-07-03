@@ -44,6 +44,18 @@ public class ExampleWindow : Window
             Width = Dim.Fill ()
         };
 
+        Button b = new Button ();
+        #pragma warning disable TGUIG001
+        b.Accepting += (s, e) => {
+            Logging.Information ("hello");
+                       };
+        #pragma warning restore TGUIG001
+
+
+        b.Accepting += (s, e) => {
+                           Logging.Information ("hello");
+                       };
+
         var passwordLabel = new Label
         {
             Text = "Password:", X = Pos.Left (usernameLabel), Y = Pos.Bottom (usernameLabel) + 1
