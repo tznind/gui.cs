@@ -15,14 +15,14 @@ public class HandledEventArgsAnalyzer : DiagnosticAnalyzer
     private static readonly LocalizableString Description = "Handlers for CommandEventArgs should mark the event as handled by setting e.Handled = true.";
     private const string Category = "Usage";
 
-    private static DiagnosticDescriptor _rule = new DiagnosticDescriptor (
-        DiagnosticId,
-        Title,
-        MessageFormat,
-        Category,
-        DiagnosticSeverity.Warning,
-        isEnabledByDefault: true,
-        description: Description);
+    private static readonly DiagnosticDescriptor _rule = new (
+                                                              DiagnosticId,
+                                                              Title,
+                                                              MessageFormat,
+                                                              Category,
+                                                              DiagnosticSeverity.Warning,
+                                                              true,
+                                                              Description);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create (_rule);
 
@@ -33,137 +33,165 @@ public class HandledEventArgsAnalyzer : DiagnosticAnalyzer
         // Only analyze non-generated code
         context.ConfigureGeneratedCodeAnalysis (GeneratedCodeAnalysisFlags.None);
 
-        // Register to analyze syntax nodes of lambda expressions and anonymous methods
-        context.RegisterSyntaxNodeAction (AnalyzeLambdaOrAnonymousMethod, SyntaxKind.ParenthesizedLambdaExpression, SyntaxKind.SimpleLambdaExpression, SyntaxKind.AnonymousMethodExpression);
+        // Register for b.Accepting += (s,e)=>{...};
+        context.RegisterSyntaxNodeAction (
+                                          AnalyzeLambdaOrAnonymous,
+                                          SyntaxKind.ParenthesizedLambdaExpression,
+                                          SyntaxKind.SimpleLambdaExpression,
+                                          SyntaxKind.AnonymousMethodExpression);
+
+        // Register for b.Accepting += MyMethod;
+        context.RegisterSyntaxNodeAction (
+                                          AnalyzeEventSubscriptionWithMethodGroup,
+                                          SyntaxKind.AddAssignmentExpression);
     }
 
-    private static void AnalyzeLambdaOrAnonymousMethod (SyntaxNodeAnalysisContext context)
+    private static void AnalyzeLambdaOrAnonymous (SyntaxNodeAnalysisContext context)
     {
         var lambda = (AnonymousFunctionExpressionSyntax)context.Node;
 
-        // Check if this lambda is assigned to an event called "Accepting"
-        // We'll look for the parent assignment or event subscription
-
-        var parent = lambda.Parent;
-
-        // Common case: assignment or += event subscription like b.Accepting += (s,e) => { ... };
-        if (parent is AssignmentExpressionSyntax assignment)
-        {
-            if (!IsAcceptingEvent (assignment.Left, context))
-            {
-                return;
-            }
-        }
-        else if (parent is ArgumentSyntax argument)
-        {
-            // Could be passed as argument, skip for simplicity
-            return;
-        }
-        else if (parent is EqualsValueClauseSyntax equalsValue)
-        {
-            // Assigned in variable declaration
-            return;
-        }
-        else if (parent is AnonymousFunctionExpressionSyntax)
-        {
-            // nested lambda, ignore for now
-            return;
-        }
-        else if (parent is ArgumentListSyntax)
-        {
-            // passed as argument, skip
-            return;
-        }
-        else if (parent is ExpressionSyntax expr)
-        {
-            // Try to get grandparent assignment, eg b.Accepting += ...
-            if (parent.Parent is AssignmentExpressionSyntax assign2 && IsAcceptingEvent (assign2.Left, context))
-            {
-                // ok continue
-            }
-            else
-            {
-                return;
-            }
-        }
-        else
+        // Check if this lambda is assigned to the Accepting event
+        if (!IsAssignedToAcceptingEvent (lambda.Parent, context))
         {
             return;
         }
 
-        // Look for the parameter named "e"
-        var parameters = GetParameters(lambda);
-        IParameterSymbol eParamSymbol = null;
+        // Look for any parameter of type CommandEventArgs (regardless of name)
+        IParameterSymbol eParam = GetCommandEventArgsParameter (lambda, context.SemanticModel);
 
-        if (parameters == null || parameters.Count == 0)
+        if (eParam == null)
         {
             return;
         }
 
-        // Usually second param is "e"
-        foreach (var param in parameters)
-        {
-            if (param.Identifier.Text == "e")
-            {
-                eParamSymbol = context.SemanticModel.GetDeclaredSymbol (param) as IParameterSymbol;
-                break;
-            }
-        }
-
-        if (eParamSymbol == null)
-        {
-            return;
-        }
-
-        // Check the type of "e" parameter: should be CommandEventArgs or derived
-        var paramType = eParamSymbol.Type;
-        if (paramType == null)
-        {
-            return;
-        }
-
-        if (paramType.Name != "CommandEventArgs")
-        {
-            return;
-        }
-
-        // Now check if the body contains assignment to e.Handled = true
+        // Analyze lambda body for e.Handled = true assignment
         if (lambda.Body is BlockSyntax block)
         {
-            bool setsHandled = false;
-
-            foreach (var statement in block.Statements)
-            {
-                // Look for assignment expressions
-                var assignments = statement.DescendantNodes ().OfType<AssignmentExpressionSyntax> ();
-
-                foreach (var assignmentExpr in assignments)
-                {
-                    if (IsHandledAssignment (assignmentExpr, eParamSymbol, context))
-                    {
-                        setsHandled = true;
-                        break;
-                    }
-                }
-
-                if (setsHandled)
-                {
-                    break;
-                }
-            }
+            bool setsHandled = block.Statements
+                                    .SelectMany (s => s.DescendantNodes ().OfType<AssignmentExpressionSyntax> ())
+                                    .Any (a => IsHandledAssignment (a, eParam, context));
 
             if (!setsHandled)
             {
-                // Report diagnostic on the lambda expression itself
                 var diag = Diagnostic.Create (_rule, lambda.GetLocation ());
                 context.ReportDiagnostic (diag);
             }
         }
-        else if (lambda.Body is ExpressionSyntax exprBody)
+        else if (lambda.Body is ExpressionSyntax)
         {
-            // Expression-bodied lambda, less common for event handlers, skip for now
+            // Expression-bodied lambdas unlikely for event handlers — skip
         }
     }
+
+    /// <summary>
+    ///     Finds the first parameter of type CommandEventArgs in any parameter list (method or lambda).
+    /// </summary>
+    /// <param name="paramOwner"></param>
+    /// <param name="semanticModel"></param>
+    /// <returns></returns>
+    private static IParameterSymbol? GetCommandEventArgsParameter (SyntaxNode paramOwner, SemanticModel semanticModel)
+    {
+        SeparatedSyntaxList<ParameterSyntax>? parameters = paramOwner switch
+                                                           {
+                                                               AnonymousFunctionExpressionSyntax lambda => GetParameters (lambda),
+                                                               MethodDeclarationSyntax method => method.ParameterList.Parameters,
+                                                               _ => null
+                                                           };
+
+        if (parameters == null || parameters.Value.Count == 0)
+        {
+            return null;
+        }
+
+        foreach (ParameterSyntax param in parameters.Value)
+        {
+            IParameterSymbol symbol = semanticModel.GetDeclaredSymbol (param);
+
+            if (symbol != null && IsCommandEventArgsType (symbol.Type))
+            {
+                return symbol;
+            }
+        }
+
+        return null;
+    }
+
+    private static bool IsAssignedToAcceptingEvent (SyntaxNode? node, SyntaxNodeAnalysisContext context)
+    {
+        if (node is AssignmentExpressionSyntax assignment && IsAcceptingEvent (assignment.Left, context))
+        {
+            return true;
+        }
+
+        if (node?.Parent is AssignmentExpressionSyntax parentAssignment && IsAcceptingEvent (parentAssignment.Left, context))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsCommandEventArgsType (ITypeSymbol? type) { return type != null && type.Name == "CommandEventArgs"; }
+
+    private static void AnalyzeEventSubscriptionWithMethodGroup (SyntaxNodeAnalysisContext context)
+    {
+        var assignment = (AssignmentExpressionSyntax)context.Node;
+
+        // Check event name: b.Accepting += ...
+        if (!IsAcceptingEvent (assignment.Left, context))
+        {
+            return;
+        }
+
+        // Right side: should be method group (IdentifierNameSyntax)
+        if (assignment.Right is IdentifierNameSyntax methodGroup)
+        {
+            // Resolve symbol of method group
+            SymbolInfo symbolInfo = context.SemanticModel.GetSymbolInfo (methodGroup);
+
+            if (symbolInfo.Symbol is IMethodSymbol methodSymbol)
+            {
+                // Find method declaration in syntax tree
+                ImmutableArray<SyntaxReference> declRefs = methodSymbol.DeclaringSyntaxReferences;
+
+                foreach (SyntaxReference declRef in declRefs)
+                {
+                    var methodDecl = declRef.GetSyntax () as MethodDeclarationSyntax;
+
+                    if (methodDecl != null)
+                    {
+                        AnalyzeHandlerMethodBody (context, methodDecl, methodSymbol);
+                    }
+                }
+            }
+        }
+    }
+
+    private static void AnalyzeHandlerMethodBody (SyntaxNodeAnalysisContext context, MethodDeclarationSyntax methodDecl, IMethodSymbol methodSymbol)
+    {
+        // Look for any parameter of type CommandEventArgs
+        IParameterSymbol eParam = GetCommandEventArgsParameter (methodDecl, context.SemanticModel);
+
+        if (eParam == null)
+        {
+            return;
+        }
+
+        // Analyze method body
+        if (methodDecl.Body != null)
+        {
+            bool setsHandled = methodDecl.Body.Statements
+                                         .SelectMany (s => s.DescendantNodes ().OfType<AssignmentExpressionSyntax> ())
+                                         .Any (a => IsHandledAssignment (a, eParam, context));
+
+            if (!setsHandled)
+            {
+                var diag = Diagnostic.Create (_rule, methodDecl.Identifier.GetLocation ());
+                context.ReportDiagnostic (diag);
+            }
+        }
+    }
+
     private static SeparatedSyntaxList<ParameterSyntax> GetParameters (AnonymousFunctionExpressionSyntax lambda)
     {
         switch (lambda)
@@ -174,9 +202,9 @@ public class HandledEventArgsAnalyzer : DiagnosticAnalyzer
                 // Simple lambda has a single parameter, wrap it in a list
                 return SyntaxFactory.SeparatedList (new [] { s.Parameter });
             case AnonymousMethodExpressionSyntax a:
-                return a.ParameterList?.Parameters ?? default;
+                return a.ParameterList?.Parameters ?? default (SeparatedSyntaxList<ParameterSyntax>);
             default:
-                return default;
+                return default (SeparatedSyntaxList<ParameterSyntax>);
         }
     }
 
@@ -185,8 +213,8 @@ public class HandledEventArgsAnalyzer : DiagnosticAnalyzer
         // Check if expr is b.Accepting or similar
 
         // Get symbol info
-        var symbolInfo = context.SemanticModel.GetSymbolInfo (expr);
-        var symbol = symbolInfo.Symbol;
+        SymbolInfo symbolInfo = context.SemanticModel.GetSymbolInfo (expr);
+        ISymbol symbol = symbolInfo.Symbol;
 
         if (symbol == null)
         {
@@ -210,7 +238,8 @@ public class HandledEventArgsAnalyzer : DiagnosticAnalyzer
         if (assignment.Left is MemberAccessExpressionSyntax memberAccess)
         {
             // Check that member access expression is "e.Handled"
-            var exprSymbol = context.SemanticModel.GetSymbolInfo (memberAccess.Expression).Symbol;
+            ISymbol exprSymbol = context.SemanticModel.GetSymbolInfo (memberAccess.Expression).Symbol;
+
             if (exprSymbol == null)
             {
                 return false;
@@ -227,8 +256,7 @@ public class HandledEventArgsAnalyzer : DiagnosticAnalyzer
             }
 
             // Check right side is true literal
-            if (assignment.Right is LiteralExpressionSyntax literal &&
-                literal.IsKind (SyntaxKind.TrueLiteralExpression))
+            if (assignment.Right is LiteralExpressionSyntax literal && literal.IsKind (SyntaxKind.TrueLiteralExpression))
             {
                 return true;
             }
