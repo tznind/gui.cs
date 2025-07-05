@@ -1,3 +1,6 @@
-﻿### Release 1.0.0
+﻿## Release 1.0.0
 
-- Added TGUI001: Description of your analyzer rule.
+### New Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|--------------------

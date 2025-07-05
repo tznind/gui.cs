@@ -13,6 +13,7 @@ public class HandledEventArgsAnalyzer : DiagnosticAnalyzer
     private static readonly LocalizableString Title = "Accepting event handler should set Handled = true";
     private static readonly LocalizableString MessageFormat = "Accepting event handler does not set Handled = true";
     private static readonly LocalizableString Description = "Handlers for Accepting should mark the CommandEventArgs as handled by setting Handled = true otherwise subsequent Accepting event handlers may also fire (e.g. default buttons).";
+    private static readonly string Url = "https://github.com/tznind/gui.cs/blob/analyzer-no-handled/Terminal.Gui.Analyzers/TGUI001.md";
     private const string Category = nameof(DiagnosticCategory.Reliability);
 
     private static readonly DiagnosticDescriptor _rule = new (
@@ -22,7 +23,8 @@ public class HandledEventArgsAnalyzer : DiagnosticAnalyzer
                                                               Category,
                                                               DiagnosticSeverity.Warning,
                                                               true,
-                                                              Description);
+                                                              Description,
+                                                              helpLinkUri: Url);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [_rule];
 
@@ -57,7 +59,7 @@ public class HandledEventArgsAnalyzer : DiagnosticAnalyzer
         }
 
         // Look for any parameter of type CommandEventArgs (regardless of name)
-        IParameterSymbol eParam = GetCommandEventArgsParameter (lambda, context.SemanticModel);
+        IParameterSymbol? eParam = GetCommandEventArgsParameter (lambda, context.SemanticModel);
 
         if (eParam == null)
         {
@@ -105,7 +107,7 @@ public class HandledEventArgsAnalyzer : DiagnosticAnalyzer
 
         foreach (ParameterSyntax param in parameters.Value)
         {
-            IParameterSymbol symbol = semanticModel.GetDeclaredSymbol (param);
+            IParameterSymbol? symbol = semanticModel.GetDeclaredSymbol (param);
 
             if (symbol != null && IsCommandEventArgsType (symbol.Type))
             {
@@ -170,7 +172,7 @@ public class HandledEventArgsAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeHandlerMethodBody (SyntaxNodeAnalysisContext context, MethodDeclarationSyntax methodDecl, IMethodSymbol methodSymbol)
     {
         // Look for any parameter of type CommandEventArgs
-        IParameterSymbol eParam = GetCommandEventArgsParameter (methodDecl, context.SemanticModel);
+        IParameterSymbol? eParam = GetCommandEventArgsParameter (methodDecl, context.SemanticModel);
 
         if (eParam == null)
         {
@@ -214,7 +216,7 @@ public class HandledEventArgsAnalyzer : DiagnosticAnalyzer
 
         // Get symbol info
         SymbolInfo symbolInfo = context.SemanticModel.GetSymbolInfo (expr);
-        ISymbol symbol = symbolInfo.Symbol;
+        ISymbol? symbol = symbolInfo.Symbol;
 
         if (symbol == null)
         {
@@ -238,7 +240,7 @@ public class HandledEventArgsAnalyzer : DiagnosticAnalyzer
         if (assignment.Left is MemberAccessExpressionSyntax memberAccess)
         {
             // Check that member access expression is "e.Handled"
-            ISymbol exprSymbol = context.SemanticModel.GetSymbolInfo (memberAccess.Expression).Symbol;
+            ISymbol? exprSymbol = context.SemanticModel.GetSymbolInfo (memberAccess.Expression).Symbol;
 
             if (exprSymbol == null)
             {
