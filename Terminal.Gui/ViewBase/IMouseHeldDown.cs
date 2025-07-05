@@ -6,7 +6,7 @@ namespace Terminal.Gui.ViewBase;
 /// <summary>
 ///     <para>
 ///         Handler for raising periodic events while the mouse is held down.
-///         Typically, mouse pointer only needs to be pressed down in a view
+///         Typically, mouse button only needs to be pressed down in a view
 ///         to begin this event after which it can be moved elsewhere.
 ///     </para>
 ///     <para>
