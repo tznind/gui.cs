@@ -8,7 +8,7 @@ public class HandledEventArgsAnalyzerTests
     [Theory]
     [InlineData("e")]
     [InlineData ("args")]
-    public async Task Should_ReportDiagnostic_When_EHandledNotSet_Lamda (string paramName)
+    public async Task Should_ReportDiagnostic_When_EHandledNotSet_Lambda (string paramName)
     {
         var originalCode = $$"""
                             using Terminal.Gui.Views;

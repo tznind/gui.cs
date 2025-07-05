@@ -9,11 +9,11 @@ namespace Terminal.Gui.Analyzers;
 [DiagnosticAnalyzer (LanguageNames.CSharp)]
 public class HandledEventArgsAnalyzer : DiagnosticAnalyzer
 {
-    public const string DiagnosticId = "TGUIG001";
-    private static readonly LocalizableString Title = "Event handler should set e.Handled = true";
-    private static readonly LocalizableString MessageFormat = "Event handler does not set e.Handled = true";
-    private static readonly LocalizableString Description = "Handlers for CommandEventArgs should mark the event as handled by setting e.Handled = true.";
-    private const string Category = "Usage";
+    public const string DiagnosticId = "TGUI001";
+    private static readonly LocalizableString Title = "Accepting event handler should set Handled = true";
+    private static readonly LocalizableString MessageFormat = "Accepting event handler does not set Handled = true";
+    private static readonly LocalizableString Description = "Handlers for Accepting should mark the CommandEventArgs as handled by setting Handled = true otherwise subsequent Accepting event handlers may also fire (e.g. default buttons).";
+    private const string Category = nameof(DiagnosticCategory.Reliability);
 
     private static readonly DiagnosticDescriptor _rule = new (
                                                               DiagnosticId,
@@ -24,7 +24,7 @@ public class HandledEventArgsAnalyzer : DiagnosticAnalyzer
                                                               true,
                                                               Description);
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create (_rule);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [_rule];
 
     public override void Initialize (AnalysisContext context)
     {
