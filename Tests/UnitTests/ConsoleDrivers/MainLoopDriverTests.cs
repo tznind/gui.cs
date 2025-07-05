@@ -29,7 +29,7 @@ public class MainLoopDriverTests
             return false;
         }
 
-        var token = mainLoop.TimedEvents.AddTimeout(TimeSpan.Zero, IdleHandler);
+        var token = mainLoop.TimedEvents.Add(TimeSpan.Zero, IdleHandler);
 
         Assert.NotNull (token);
         Assert.False (idleHandlerInvoked); // Idle handler should not be invoked immediately
@@ -52,7 +52,7 @@ public class MainLoopDriverTests
         var mainLoop = new MainLoop (mainLoopDriver);
         var callbackInvoked = false;
 
-        object token = mainLoop.TimedEvents.AddTimeout (
+        object token = mainLoop.TimedEvents.Add (
                                             TimeSpan.FromMilliseconds (100),
                                             () =>
                                             {
@@ -87,7 +87,7 @@ public class MainLoopDriverTests
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
-        mainLoop.TimedEvents.AddTimeout (TimeSpan.Zero, () => false);
+        mainLoop.TimedEvents.Add (TimeSpan.Zero, () => false);
         bool result = mainLoop.TimedEvents.CheckTimers (out int waitTimeout);
 
         Assert.True (result);
@@ -134,7 +134,7 @@ public class MainLoopDriverTests
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
-        mainLoop.TimedEvents.AddTimeout (TimeSpan.FromMilliseconds (100), () => false);
+        mainLoop.TimedEvents.Add (TimeSpan.FromMilliseconds (100), () => false);
         bool result = mainLoop.TimedEvents.CheckTimers(out int waitTimeout);
 
         Assert.True (result);
@@ -184,7 +184,7 @@ public class MainLoopDriverTests
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
-        bool result = mainLoop.TimedEvents.RemoveTimeout("flibble");
+        bool result = mainLoop.TimedEvents.Remove("flibble");
 
         Assert.False (result);
         mainLoop.Dispose ();
@@ -206,8 +206,8 @@ public class MainLoopDriverTests
         bool IdleHandler () { return false; }
 
 
-        var token = mainLoop.TimedEvents.AddTimeout (TimeSpan.Zero, IdleHandler);
-        bool result = mainLoop.TimedEvents.RemoveTimeout (token);
+        var token = mainLoop.TimedEvents.Add (TimeSpan.Zero, IdleHandler);
+        bool result = mainLoop.TimedEvents.Remove (token);
 
         Assert.True (result);
         mainLoop.Dispose ();
@@ -226,7 +226,7 @@ public class MainLoopDriverTests
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
-        bool result = mainLoop.TimedEvents.RemoveTimeout (new object ());
+        bool result = mainLoop.TimedEvents.Remove (new object ());
 
         Assert.False (result);
     }
@@ -244,8 +244,8 @@ public class MainLoopDriverTests
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
-        object token = mainLoop.TimedEvents.AddTimeout (TimeSpan.FromMilliseconds (100), () => false);
-        bool result = mainLoop.TimedEvents.RemoveTimeout (token);
+        object token = mainLoop.TimedEvents.Add (TimeSpan.FromMilliseconds (100), () => false);
+        bool result = mainLoop.TimedEvents.Remove (token);
 
         Assert.True (result);
         mainLoop.Dispose ();
@@ -272,7 +272,7 @@ public class MainLoopDriverTests
                                      return false;
                                  };
 
-        mainLoop.TimedEvents.AddTimeout (TimeSpan.Zero, idleHandler);
+        mainLoop.TimedEvents.Add (TimeSpan.Zero, idleHandler);
         mainLoop.RunIteration (); // Run an iteration to process the idle handler
 
         Assert.True (idleHandlerInvoked);

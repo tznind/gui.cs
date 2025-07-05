@@ -18,7 +18,7 @@ public class TimedEvents : ITimedEvents
     public SortedList<long, Timeout> Timeouts => _timeouts;
 
     /// <inheritdoc/>
-    public event EventHandler<TimeoutEventArgs>? TimeoutAdded;
+    public event EventHandler<TimeoutEventArgs>? Added;
 
 
     private void AddTimeout (TimeSpan time, Timeout timeout)
@@ -27,7 +27,7 @@ public class TimedEvents : ITimedEvents
         {
             long k = (DateTime.UtcNow + time).Ticks;
             _timeouts.Add (NudgeToUniqueKey (k), timeout);
-            TimeoutAdded?.Invoke (this, new TimeoutEventArgs (timeout, k));
+            Added?.Invoke (this, new TimeoutEventArgs (timeout, k));
         }
     }
 
@@ -107,7 +107,7 @@ public class TimedEvents : ITimedEvents
     /// This method also returns
     /// <see langword="false"/>
     /// if the timeout is not found.
-    public bool RemoveTimeout (object token)
+    public bool Remove (object token)
     {
         lock (_timeoutsLockToken)
         {
@@ -129,9 +129,9 @@ public class TimedEvents : ITimedEvents
     /// <remarks>
     ///     When time specified passes, the callback will be invoked. If the callback returns true, the timeout will be
     ///     reset, repeating the invocation. If it returns false, the timeout will stop and be removed. The returned value is a
-    ///     token that can be used to stop the timeout by calling <see cref="RemoveTimeout(object)"/>.
+    ///     token that can be used to stop the timeout by calling <see cref="Remove"/>.
     /// </remarks>
-    public object AddTimeout (TimeSpan time, Func<bool> callback)
+    public object Add (TimeSpan time, Func<bool> callback)
     {
         ArgumentNullException.ThrowIfNull (callback);
 
@@ -142,7 +142,7 @@ public class TimedEvents : ITimedEvents
     }
 
     /// <inheritdoc />
-    public object AddTimeout (Timeout timeout)
+    public object Add (Timeout timeout)
     {
         AddTimeout (timeout.Span, timeout);
         return timeout;

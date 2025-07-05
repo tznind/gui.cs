@@ -11,7 +11,7 @@ internal sealed class MainLoopSyncContext : SynchronizationContext
     public override void Post (SendOrPostCallback d, object state)
     {
         // Queue the task
-        Application.MainLoop?.TimedEvents.AddTimeout (TimeSpan.Zero,
+        Application.MainLoop?.TimedEvents.Add (TimeSpan.Zero,
                                                       () =>
                                                       {
                                                           d (state);

@@ -58,7 +58,7 @@ internal class MouseHeldDown : IMouseHeldDown
 
 
         // Then periodic ticks
-        _timeout = _timedEvents?.AddTimeout (_smoothTimeout);
+        _timeout = _timedEvents?.Add (_smoothTimeout);
     }
 
     private bool TickWhileMouseIsHeldDown ()
@@ -89,7 +89,7 @@ internal class MouseHeldDown : IMouseHeldDown
 
         if (_timeout != null)
         {
-            _timedEvents?.RemoveTimeout (_timeout);
+            _timedEvents?.Remove (_timeout);
         }
 
         _down = false;

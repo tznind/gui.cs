@@ -190,14 +190,14 @@ public class Threading : Scenario
         if (_timeoutObj != null)
         {
             _btnLogarithmic.Text = "Start Log Counter";
-            Application.TimedEvents.RemoveTimeout (_timeoutObj);
+            Application.TimedEvents.Remove (_timeoutObj);
             _timeoutObj = null;
         }
         else
         {
             _btnLogarithmic.Text = "Stop Log Counter";
             _logarithmicTimeout = new LogarithmicTimeout (TimeSpan.FromMilliseconds (500), LogTimeout);
-            _timeoutObj = Application.TimedEvents.AddTimeout (_logarithmicTimeout);
+            _timeoutObj = Application.TimedEvents.Add (_logarithmicTimeout);
         }
     }
 
@@ -206,14 +206,14 @@ public class Threading : Scenario
         if (_timeoutObjSmooth != null)
         {
             _btnSmooth.Text = "Start Smooth Counter";
-            Application.TimedEvents.RemoveTimeout (_timeoutObjSmooth);
+            Application.TimedEvents.Remove (_timeoutObjSmooth);
             _timeoutObjSmooth = null;
         }
         else
         {
             _btnSmooth.Text = "Stop Smooth Counter";
             _smoothTimeout = new SmoothAcceleratingTimeout (TimeSpan.FromMilliseconds (500), TimeSpan.FromMilliseconds (50), 0.5, SmoothTimeout);
-            _timeoutObjSmooth = Application.TimedEvents.AddTimeout (_smoothTimeout);
+            _timeoutObjSmooth = Application.TimedEvents.Add (_smoothTimeout);
         }
     }
 

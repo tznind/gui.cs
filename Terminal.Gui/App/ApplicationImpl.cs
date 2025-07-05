@@ -306,13 +306,13 @@ public class ApplicationImpl : IApplication
             throw new NotInitializedException ("Cannot add timeout before main loop is initialized", null);
         }
 
-        return Application.MainLoop.TimedEvents.AddTimeout (time, callback);
+        return Application.MainLoop.TimedEvents.Add (time, callback);
     }
 
     /// <inheritdoc />
     public virtual bool RemoveTimeout (object token)
     {
-        return Application.MainLoop?.TimedEvents.RemoveTimeout (token) ?? false;
+        return Application.MainLoop?.TimedEvents.Remove (token) ?? false;
     }
 
     /// <inheritdoc />

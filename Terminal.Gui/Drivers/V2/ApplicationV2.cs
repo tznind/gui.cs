@@ -235,7 +235,7 @@ public class ApplicationV2 : ApplicationImpl
             return;
         }
 
-        _timedEvents.AddTimeout (TimeSpan.Zero,
+        _timedEvents.Add (TimeSpan.Zero,
                               () =>
                               {
                                   action ();
@@ -246,10 +246,10 @@ public class ApplicationV2 : ApplicationImpl
     }
 
     /// <inheritdoc/>
-    public override object AddTimeout (TimeSpan time, Func<bool> callback) { return _timedEvents.AddTimeout (time, callback); }
+    public override object AddTimeout (TimeSpan time, Func<bool> callback) { return _timedEvents.Add (time, callback); }
 
     /// <inheritdoc/>
-    public override bool RemoveTimeout (object token) { return _timedEvents.RemoveTimeout (token); }
+    public override bool RemoveTimeout (object token) { return _timedEvents.Remove (token); }
 
     /// <inheritdoc />
     public override void LayoutAndDraw (bool forceDraw)

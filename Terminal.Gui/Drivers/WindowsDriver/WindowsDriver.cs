@@ -945,7 +945,7 @@ internal class WindowsDriver : ConsoleDriver
         if (_isButtonDoubleClicked || _isOneFingerDoubleClicked)
         {
             // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
-            Application.MainLoop!.TimedEvents.AddTimeout (TimeSpan.Zero,
+            Application.MainLoop!.TimedEvents.Add (TimeSpan.Zero,
                                           () =>
                                           {
                                               Task.Run (async () => await ProcessButtonDoubleClickedAsync ());
