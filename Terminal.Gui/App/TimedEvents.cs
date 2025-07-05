@@ -51,19 +51,19 @@ public class TimedEvents : ITimedEvents
     }
 
     /// <inheritdoc/>
-    public void LockAndRunTimers ()
+    public void RunTimers ()
     {
         lock (_timeoutsLockToken)
         {
             if (_timeouts.Count > 0)
             {
-                RunTimers ();
+                RunTimersImpl ();
             }
         }
 
     }
 
-    private void RunTimers ()
+    private void RunTimersImpl ()
     {
         long now = DateTime.UtcNow.Ticks;
         SortedList<long, Timeout> copy;

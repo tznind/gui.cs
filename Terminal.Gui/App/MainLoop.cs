@@ -112,7 +112,7 @@ public class MainLoop : IDisposable
 
         MainLoopDriver?.Iteration ();
 
-        TimedEvents.LockAndRunTimers ();
+        TimedEvents.RunTimers ();
     }
 
     private void RunAnsiScheduler ()

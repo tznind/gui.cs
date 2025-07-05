@@ -11,7 +11,7 @@ public interface ITimedEvents
     /// <summary>
     /// Runs all timeouts that are due
     /// </summary>
-    void LockAndRunTimers ();
+    void RunTimers ();
 
     /// <summary>Adds a timeout to the application.</summary>
     /// <remarks>
