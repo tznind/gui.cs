@@ -39,7 +39,6 @@
         <PackageReference Include="System.CommandLine" V="" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\..\Terminal.Gui.Analyzers\Terminal.Gui.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
         <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
     </ItemGroup>
     <ItemGroup>
