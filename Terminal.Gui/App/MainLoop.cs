@@ -32,7 +32,7 @@ internal interface IMainLoopDriver
     void Wakeup ();
 }
 
-/// <summary>The MainLoop monitors timers handlers.</summary>
+/// <summary>The main event loop of v1 driver based applications.</summary>
 /// <remarks>
 ///     Monitoring of file descriptors is only available on Unix, there does not seem to be a way of supporting this
 ///     on Windows.

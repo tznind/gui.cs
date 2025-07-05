@@ -6,7 +6,7 @@ namespace Terminal.Gui.Drivers;
 /// <summary>
 ///     Interface for main loop that runs the core Terminal.Gui UI loop.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">Type of raw input events processed by the loop e.g. <see cref="ConsoleKeyInfo"/></typeparam>
 public interface IMainLoop<T> : IDisposable
 {
     /// <summary>
