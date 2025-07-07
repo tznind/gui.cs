@@ -207,24 +207,7 @@ internal partial class WindowsOutput : IConsoleOutput
 
         var result = false;
 
-        if (force16Colors)
-        {
-            var i = 0;
-            WindowsConsole.CharInfo [] ci = new WindowsConsole.CharInfo [charInfoBuffer.Length];
 
-            foreach (WindowsConsole.ExtendedCharInfo info in charInfoBuffer)
-            {
-                ci [i++] = new ()
-                {
-                    Char = new () { UnicodeChar = info.Char },
-                    Attributes =
-                        (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor16 () | ((int)info.Attribute.Background.GetClosestNamedColor16 () << 4))
-                };
-            }
-
-            result = WriteConsoleOutput (_screenBuffer, ci, bufferSize, new () { X = window.Left, Y = window.Top }, ref window);
-        }
-        else
         {
             StringBuilder stringBuilder = new();
 
@@ -240,8 +223,8 @@ internal partial class WindowsOutput : IConsoleOutput
                 if (attr != prev)
                 {
                     prev = attr;
-                    EscSeqUtils.CSI_AppendForegroundColorRGB (stringBuilder, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
-                    EscSeqUtils.CSI_AppendBackgroundColorRGB (stringBuilder, attr.Background.R, attr.Background.G, attr.Background.B);
+                    stringBuilder.Append(EscSeqUtils.CSI_SetForegroundColor256 (EscSeqUtils.RGBTo256Index( attr.Foreground.R, attr.Foreground.G, attr.Foreground.B)));
+                    stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColor256 (EscSeqUtils.RGBTo256Index (attr.Background.R, attr.Background.G, attr.Background.B)));
                     EscSeqUtils.CSI_AppendTextStyleChange (stringBuilder, _redrawTextStyle, attr.Style);
                     _redrawTextStyle = attr.Style;
                 }

@@ -1792,6 +1792,41 @@ public static class EscSeqUtils
     /// </summary>
     public static string CSI_SetBackgroundColor256 (int color) { return $"{CSI}48;5;{color}m"; }
 
+
+    /// <summary>
+    ///     Converts RGB to the nearest 256-color palette index.
+    /// </summary>
+    public static int RGBTo256Index (int r, int g, int b)
+    {
+        // Clamp RGB to 0-255
+        r = Math.Clamp (r, 0, 255);
+        g = Math.Clamp (g, 0, 255);
+        b = Math.Clamp (b, 0, 255);
+
+        // Grayscale approximation:
+        if (r == g && g == b)
+        {
+            if (r < 8) return 16;
+            if (r > 248) return 231;
+            return 232 + ((r - 8) * 24) / 247;
+        }
+
+        // Quantize R, G, B to 6 levels (0-5)
+        int rc = QuantizeTo6 (r);
+        int gc = QuantizeTo6 (g);
+        int bc = QuantizeTo6 (b);
+
+        return 16 + (36 * rc) + (6 * gc) + bc;
+    }
+
+    /// <summary>
+    ///     Quantizes 0-255 to 0-5.
+    /// </summary>
+    private static int QuantizeTo6 (int c)
+    {
+        return (int)(c / 51.0); // 51 * 5 = 255, so 0–51→0, 52–102→1, etc.
+    }
+
     /// <summary>
     ///     ESC[38;2;{r};{g};{b}m	Set foreground color as RGB.
     /// </summary>
