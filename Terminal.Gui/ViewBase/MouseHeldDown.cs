@@ -92,6 +92,7 @@ internal class MouseHeldDown : IMouseHeldDown
             _timedEvents?.Remove (_timeout);
         }
 
+        _host.MouseState = MouseState.None;
         _down = false;
     }
 
