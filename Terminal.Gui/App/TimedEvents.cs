@@ -26,6 +26,13 @@ public class TimedEvents : ITimedEvents
         lock (_timeoutsLockToken)
         {
             long k = (DateTime.UtcNow + time).Ticks;
+
+            // if user wants to run as soon as possible set timer such that it expires right away (no race conditions)
+            if (time == TimeSpan.Zero)
+            {
+                k -= 100;
+            }
+
             _timeouts.Add (NudgeToUniqueKey (k), timeout);
             Added?.Invoke (this, new TimeoutEventArgs (timeout, k));
         }
