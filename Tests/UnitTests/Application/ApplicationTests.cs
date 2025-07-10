@@ -1114,6 +1114,8 @@ public class ApplicationTests
 
     private class TestToplevel : Toplevel { }
 
+    private readonly object _forceDriverLock = new ();
+
     [Theory]
     [InlineData ("v2win", typeof (ConsoleDriverFacade<WindowsConsole.InputRecord>))]
     [InlineData ("v2net", typeof (ConsoleDriverFacade<ConsoleKeyInfo>))]
@@ -1127,24 +1129,29 @@ public class ApplicationTests
 
         var result = false;
 
-        Task.Run (() =>
-                  {
-                      while (!Application.Initialized)
-                      {
-                          Task.Delay (300).Wait ();
-                      }
-                  }).ContinueWith (
-                                   (t, _) =>
+        lock (_forceDriverLock)
+        {
+            Task.Run (() =>
+            {
+                while (!Application.Initialized)
+                {
+                    Task.Delay (300).Wait ();
+                }
+            })
+                .ContinueWith (
+                               (t, _) =>
+                               {
+                                   // no longer loading
+                                   Assert.True (Application.Initialized);
+
+                                   Application.Invoke (() =>
                                    {
-                                       // no longer loading
-                                       Assert.True (Application.Initialized);
-                                       Application.Invoke (() =>
-                                                           {
-                                                               result = true;
-                                                               Application.RequestStop ();
-                                                           });
-                                   },
-                                   TaskScheduler.FromCurrentSynchronizationContext ());
+                                       result = true;
+                                       Application.RequestStop ();
+                                   });
+                               },
+                               TaskScheduler.FromCurrentSynchronizationContext ());
+        }
 
         Application.ForceDriver = driverName;
         Application.Run<TestToplevel> ();
