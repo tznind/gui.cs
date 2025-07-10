@@ -1129,11 +1129,15 @@ public class ApplicationTests
 
         Task.Run (() =>
                   {
-                      Task.Delay (300).Wait ();
+                      while (!Application.Initialized)
+                      {
+                          Task.Delay (300).Wait ();
+                      }
                   }).ContinueWith (
                                    (t, _) =>
                                    {
                                        // no longer loading
+                                       Assert.True (Application.Initialized);
                                        Application.Invoke (() =>
                                                            {
                                                                result = true;
