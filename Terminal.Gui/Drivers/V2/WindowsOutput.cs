@@ -146,7 +146,7 @@ internal partial class WindowsOutput : IConsoleOutput
 
                 outputBuffer [position].Empty = false;
 
-                var rune = buffer.Contents [row, col].Rune;
+                Rune rune = buffer.Contents [row, col].Rune;
                 int width = rune.GetColumns ();
 
                 if (rune.IsBmp)

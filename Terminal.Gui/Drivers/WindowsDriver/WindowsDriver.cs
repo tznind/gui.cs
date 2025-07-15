@@ -344,7 +344,7 @@ internal class WindowsDriver : ConsoleDriver
 
                 _outputBuffer [position].Empty = false;
 
-                var rune = Contents [row, col].Rune;
+                Rune rune = Contents [row, col].Rune;
                 int width = rune.GetColumns ();
 
                 if (rune.IsBmp)
