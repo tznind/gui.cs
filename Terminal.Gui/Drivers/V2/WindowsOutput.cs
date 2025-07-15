@@ -146,16 +146,37 @@ internal partial class WindowsOutput : IConsoleOutput
 
                 outputBuffer [position].Empty = false;
 
-                if (buffer.Contents [row, col].Rune.IsBmp)
+                var rune = buffer.Contents [row, col].Rune;
+                int width = rune.GetColumns ();
+
+                if (rune.IsBmp)
                 {
-                    outputBuffer [position].Char = (char)buffer.Contents [row, col].Rune.Value;
+                    if (width == 1)
+                    {
+                        // Single-width char, just encode first UTF-16 char
+                        outputBuffer [position].Char = (char)rune.Value;
+                    }
+                    else if (width == 2 && col + 1 < buffer.Cols)
+                    {
+                        // Double-width char: encode to UTF-16 surrogate pair and write both halves
+                        var utf16 = new char [2];
+                        rune.EncodeToUtf16 (utf16);
+                        outputBuffer [position].Char = utf16 [0];
+                        outputBuffer [position].Empty = false;
+
+                        // Write second half into next cell
+                        col++;
+                        position = row * buffer.Cols + col;
+                        outputBuffer [position].Char = utf16 [1];
+                        outputBuffer [position].Empty = false;
+                    }
                 }
                 else
                 {
                     //outputBuffer [position].Empty = true;
                     outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
 
-                    if (buffer.Contents [row, col].Rune.GetColumns () > 1 && col + 1 < buffer.Cols)
+                    if (width > 1 && col + 1 < buffer.Cols)
                     {
                         // TODO: This is a hack to deal with non-BMP and wide characters.
                         col++;
