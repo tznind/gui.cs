@@ -344,37 +344,16 @@ internal class WindowsDriver : ConsoleDriver
 
                 _outputBuffer [position].Empty = false;
 
-                Rune rune = Contents [row, col].Rune;
-                int width = rune.GetColumns ();
-
-                if (rune.IsBmp)
+                if (Contents [row, col].Rune.IsBmp)
                 {
-                    if (width == 1)
-                    {
-                        // Single-width char, just encode first UTF-16 char
-                        _outputBuffer [position].Char = (char)rune.Value;
-                    }
-                    else if (width == 2 && col + 1 < Cols)
-                    {
-                        // Double-width char: encode to UTF-16 surrogate pair and write both halves
-                        var utf16 = new char [2];
-                        rune.EncodeToUtf16 (utf16);
-                        _outputBuffer [position].Char = utf16 [0];
-                        _outputBuffer [position].Empty = false;
-
-                        // Write second half into next cell
-                        col++;
-                        position = row * Cols + col;
-                        _outputBuffer [position].Char = utf16 [1];
-                        _outputBuffer [position].Empty = false;
-                    }
+                    _outputBuffer [position].Char = (char)Contents [row, col].Rune.Value;
                 }
                 else
                 {
                     //_outputBuffer [position].Empty = true;
                     _outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
 
-                    if (width > 1 && col + 1 < Cols)
+                    if (Contents [row, col].Rune.GetColumns () > 1 && col + 1 < Cols)
                     {
                         // TODO: This is a hack to deal with non-BMP and wide characters.
                         col++;
