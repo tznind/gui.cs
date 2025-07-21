@@ -238,6 +238,14 @@ internal partial class WindowsOutput : IConsoleOutput
 
         var result = false;
 
+        GetWindowSize (out var cursorPosition);
+
+        if (force16Colors)
+        {
+            SetConsoleCursorPosition (buffer, new (0, 0));
+
+        }
+
         StringBuilder stringBuilder = new();
 
         stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
@@ -274,6 +282,7 @@ internal partial class WindowsOutput : IConsoleOutput
         if (force16Colors)
         {
             SetConsoleActiveScreenBuffer (buffer);
+            SetConsoleCursorPosition (buffer, new (cursorPosition.X, cursorPosition.Y));
             return true;
         }
 
@@ -344,12 +353,17 @@ internal partial class WindowsOutput : IConsoleOutput
 
     public Size GetWindowSize ()
     {
+        return GetWindowSize (out _);
+    }
+    public Size GetWindowSize (out WindowsConsole.Coord cursorPosition)
+    {
         var csbi = new WindowsConsole.CONSOLE_SCREEN_BUFFER_INFOEX ();
         csbi.cbSize = (uint)Marshal.SizeOf (csbi);
 
         if (!GetConsoleScreenBufferInfoEx (_screenBuffer, ref csbi))
         {
             //throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+            cursorPosition = default;
             return Size.Empty;
         }
 
@@ -357,6 +371,7 @@ internal partial class WindowsOutput : IConsoleOutput
                        csbi.srWindow.Right - csbi.srWindow.Left + 1,
                        csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
 
+        cursorPosition = csbi.dwCursorPosition;
         return sz;
     }
 
