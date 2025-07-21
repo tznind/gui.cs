@@ -3,7 +3,6 @@ using System.Buffers;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
-using static Terminal.Gui.Drivers.WindowsConsole;
 
 namespace Terminal.Gui.Drivers;
 
@@ -59,6 +58,9 @@ internal partial class WindowsOutput : IConsoleOutput
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool SetConsoleCursorInfo (nint hConsoleOutput, [In] ref WindowsConsole.ConsoleCursorInfo lpConsoleCursorInfo);
 
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    public static extern bool SetConsoleTextAttribute (nint hConsoleOutput, ushort wAttributes);
+
     private readonly nint _screenBuffer;
 
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
@@ -73,15 +75,31 @@ internal partial class WindowsOutput : IConsoleOutput
             return;
         }
 
-        _screenBuffer = CreateConsoleScreenBuffer (
-                                                   DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
-                                                   ShareMode.FileShareRead | ShareMode.FileShareWrite,
-                                                   nint.Zero,
-                                                   1,
-                                                   nint.Zero
-                                                  );
+        _screenBuffer = CreateScreenBuffer ();
 
-        if (_screenBuffer == INVALID_HANDLE_VALUE)
+        var backBuffer = CreateScreenBuffer ();
+        _doubleBuffer = [_screenBuffer, backBuffer];
+
+        if (!SetConsoleActiveScreenBuffer (_screenBuffer))
+        {
+            throw new Win32Exception (Marshal.GetLastWin32Error ());
+        }
+    }
+
+    private int _activeDoubleBuffer = 0;
+    private nint [] _doubleBuffer = new nint[2];
+
+    private nint CreateScreenBuffer ()
+    {
+        var buff = CreateConsoleScreenBuffer (
+                                   DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
+                                   ShareMode.FileShareRead | ShareMode.FileShareWrite,
+                                   nint.Zero,
+                                   1,
+                                   nint.Zero
+                                  );
+
+        if (buff == INVALID_HANDLE_VALUE)
         {
             int err = Marshal.GetLastWin32Error ();
 
@@ -91,10 +109,7 @@ internal partial class WindowsOutput : IConsoleOutput
             }
         }
 
-        if (!SetConsoleActiveScreenBuffer (_screenBuffer))
-        {
-            throw new Win32Exception (Marshal.GetLastWin32Error ());
-        }
+        return buff;
     }
 
     public void Write (ReadOnlySpan<char> str)
@@ -218,91 +233,72 @@ internal partial class WindowsOutput : IConsoleOutput
 
     public bool WriteToConsole (Size size, WindowsConsole.ExtendedCharInfo [] charInfoBuffer, WindowsConsole.Coord bufferSize, WindowsConsole.SmallRect window, bool force16Colors)
     {
-
-        //Debug.WriteLine ("WriteToConsole");
-
-        //if (_screenBuffer == nint.Zero)
-        //{
-        //    ReadFromConsoleOutput (size, bufferSize, ref window);
-        //}
+        // for 16 color mode we will write to a backing buffer then flip it to the active one at the end to avoid jitter.
+        var buffer = force16Colors ? _doubleBuffer[_activeDoubleBuffer = (_activeDoubleBuffer + 1) % 2] : _screenBuffer;
 
         var result = false;
 
+        StringBuilder stringBuilder = new();
+
+        stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
+        EscSeqUtils.CSI_AppendCursorPosition (stringBuilder, 0, 0);
+
+        Attribute? prev = null;
+
+        foreach (WindowsConsole.ExtendedCharInfo info in charInfoBuffer)
+        {
+            Attribute attr = info.Attribute;
+
+            if (attr != prev)
+            {
+                prev = attr;
+                AppendOrWrite (attr,force16Colors,stringBuilder,buffer);
+                _redrawTextStyle = attr.Style;
+            }
+
+
+            if (info.Char != '\x1b')
+            {
+                if (!info.Empty)
+                {
+
+                    AppendOrWrite (info.Char, force16Colors, stringBuilder, buffer);
+                }
+            }
+            else
+            {
+                stringBuilder.Append (' ');
+            }
+        }
+
         if (force16Colors)
         {
-            var i = 0;
-            WindowsConsole.CharInfo [] ci = new WindowsConsole.CharInfo [charInfoBuffer.Length];
-
-            foreach (WindowsConsole.ExtendedCharInfo info in charInfoBuffer)
-            {
-                ci [i++] = new ()
-                {
-                    Char = new () { UnicodeChar = info.Char },
-                    Attributes =
-                        (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor16 () | ((int)info.Attribute.Background.GetClosestNamedColor16 () << 4))
-                };
-            }
-
-            result = WriteConsoleOutput (_screenBuffer, ci, bufferSize, new () { X = window.Left, Y = window.Top }, ref window);
+            SetConsoleActiveScreenBuffer (buffer);
+            return true;
         }
-        else
+
+        stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
+        stringBuilder.Append (EscSeqUtils.CSI_HideCursor);
+
+        // TODO: Potentially could stackalloc whenever reasonably small (<= 8 kB?) write buffer is needed.
+        char [] rentedWriteArray = ArrayPool<char>.Shared.Rent (minimumLength: stringBuilder.Length);
+        try
         {
-            StringBuilder stringBuilder = new();
+            Span<char> writeBuffer = rentedWriteArray.AsSpan(0, stringBuilder.Length);
+            stringBuilder.CopyTo (0, writeBuffer, stringBuilder.Length);
 
-            stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
-            EscSeqUtils.CSI_AppendCursorPosition (stringBuilder, 0, 0);
+            // Supply console with the new content.
+            result = WriteConsole (_screenBuffer, writeBuffer, (uint)writeBuffer.Length, out uint _, nint.Zero);
+        }
+        finally
+        {
+            ArrayPool<char>.Shared.Return (rentedWriteArray);
+        }
 
-            Attribute? prev = null;
-
-            foreach (WindowsConsole.ExtendedCharInfo info in charInfoBuffer)
-            {
-                Attribute attr = info.Attribute;
-
-                if (attr != prev)
-                {
-                    prev = attr;
-                    EscSeqUtils.CSI_AppendForegroundColorRGB (stringBuilder, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
-                    EscSeqUtils.CSI_AppendBackgroundColorRGB (stringBuilder, attr.Background.R, attr.Background.G, attr.Background.B);
-                    EscSeqUtils.CSI_AppendTextStyleChange (stringBuilder, _redrawTextStyle, attr.Style);
-                    _redrawTextStyle = attr.Style;
-                }
-
-                if (info.Char != '\x1b')
-                {
-                    if (!info.Empty)
-                    {
-                        stringBuilder.Append (info.Char);
-                    }
-                }
-                else
-                {
-                    stringBuilder.Append (' ');
-                }
-            }
-
-            stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
-            stringBuilder.Append (EscSeqUtils.CSI_HideCursor);
-
-            // TODO: Potentially could stackalloc whenever reasonably small (<= 8 kB?) write buffer is needed.
-            char [] rentedWriteArray = ArrayPool<char>.Shared.Rent (minimumLength: stringBuilder.Length);
-            try
-            {
-                Span<char> writeBuffer = rentedWriteArray.AsSpan(0, stringBuilder.Length);
-                stringBuilder.CopyTo (0, writeBuffer, stringBuilder.Length);
-
-                // Supply console with the new content.
-                result = WriteConsole (_screenBuffer, writeBuffer, (uint)writeBuffer.Length, out uint _, nint.Zero);
-            }
-            finally
-            {
-                ArrayPool<char>.Shared.Return (rentedWriteArray);
-            }
-
-            foreach (SixelToRender sixel in Application.Sixel)
-            {
-                SetCursorPosition ((short)sixel.ScreenPosition.X, (short)sixel.ScreenPosition.Y);
-                WriteConsole (_screenBuffer, sixel.SixelData, (uint)sixel.SixelData.Length, out uint _, nint.Zero);
-            }
+        foreach (SixelToRender sixel in Application.Sixel)
+        {
+            SetCursorPosition ((short)sixel.ScreenPosition.X, (short)sixel.ScreenPosition.Y);
+            WriteConsole (_screenBuffer, sixel.SixelData, (uint)sixel.SixelData.Length, out uint _, nint.Zero);
         }
 
         if (!result)
@@ -316,6 +312,34 @@ internal partial class WindowsOutput : IConsoleOutput
         }
 
         return result;
+    }
+
+    private void AppendOrWrite (char infoChar, bool force16Colors, StringBuilder stringBuilder, nint screenBuffer)
+    {
+
+        if (force16Colors)
+        {
+            WriteConsole (screenBuffer, [infoChar],1, out _, nint.Zero);
+        }
+        else
+        {
+            stringBuilder.Append (infoChar);
+        }
+    }
+
+    private void AppendOrWrite (Attribute attr, bool force16Colors, StringBuilder stringBuilder, nint screenBuffer)
+    {
+        if (force16Colors)
+        {
+            var as16ColorInt = (ushort)((int)attr.Foreground.GetClosestNamedColor16 () | ((int)attr.Background.GetClosestNamedColor16 () << 4));
+            SetConsoleTextAttribute (screenBuffer, as16ColorInt);
+        }
+        else
+        {
+            EscSeqUtils.CSI_AppendForegroundColorRGB (stringBuilder, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
+            EscSeqUtils.CSI_AppendBackgroundColorRGB (stringBuilder, attr.Background.R, attr.Background.G, attr.Background.B);
+            EscSeqUtils.CSI_AppendTextStyleChange (stringBuilder, _redrawTextStyle, attr.Style);
+        }
     }
 
     public Size GetWindowSize ()
