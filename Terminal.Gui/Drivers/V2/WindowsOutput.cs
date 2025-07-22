@@ -1,9 +1,6 @@
 ﻿#nullable enable
-using System;
-using System.Buffers;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using System.Text;
 using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui.Drivers;
@@ -148,12 +145,19 @@ internal partial class WindowsOutput : IConsoleOutput
 
         for (var row = 0; row < outputBuffer.Rows; row++)
         {
-            AppendOrWriteCursorPosition (new (0, row), force16Colors, stringBuilder, _screenBuffer);
+            AppendOrWriteCursorPosition (new (0, row), force16Colors, stringBuilder, consoleBuffer);
 
             for (var col = 0; col < outputBuffer.Cols; col++)
             {
                 var cell = outputBuffer.Contents [row, col];
                 var attr = cell.Attribute ?? prev ?? new ();
+
+                // If we have 10 width and are at 9 it's ok
+                // But if it's width 2 we can't write it so must skip
+                if (cell.Rune.GetColumns () + col > outputBuffer.Cols)
+                {
+                    continue;
+                }
 
                 if (attr != prev)
                 {
@@ -161,7 +165,6 @@ internal partial class WindowsOutput : IConsoleOutput
                     AppendOrWrite (attr!, force16Colors, stringBuilder, (nint)consoleBuffer);
                     _redrawTextStyle = attr.Style;
                 }
-
 
                 if (cell.Rune.Value != '\x1b')
                 {
@@ -176,13 +179,19 @@ internal partial class WindowsOutput : IConsoleOutput
 
         AppendOrWriteCursorPosition(new (originalCursorPosition.X, originalCursorPosition.Y),force16Colors,stringBuilder, consoleBuffer);
 
+        if (force16Colors)
+        {
+            SetConsoleActiveScreenBuffer (consoleBuffer);
+            return;
+        }
+
         var span = stringBuilder.ToString ().AsSpan (); // still allocates the string
-        result = WriteConsole (_screenBuffer, span, (uint)span.Length, out _, nint.Zero);
+        result = WriteConsole (consoleBuffer, span, (uint)span.Length, out _, nint.Zero);
 
         foreach (SixelToRender sixel in Application.Sixel)
         {
             SetCursorPosition ((short)sixel.ScreenPosition.X, (short)sixel.ScreenPosition.Y);
-            WriteConsole (_screenBuffer, sixel.SixelData, (uint)sixel.SixelData.Length, out uint _, nint.Zero);
+            WriteConsole (consoleBuffer, sixel.SixelData, (uint)sixel.SixelData.Length, out uint _, nint.Zero);
         }
 
         if (!result)
