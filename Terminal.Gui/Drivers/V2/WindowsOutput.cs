@@ -145,6 +145,8 @@ internal partial class WindowsOutput : IConsoleOutput
 
         for (var row = 0; row < outputBuffer.Rows; row++)
         {
+            StringBuilder sbSinceLastAttrChange = new StringBuilder ();
+
             AppendOrWriteCursorPosition (new (0, row), force16Colors, stringBuilder, consoleBuffer);
 
             for (var col = 0; col < outputBuffer.Cols; col++)
@@ -162,18 +164,27 @@ internal partial class WindowsOutput : IConsoleOutput
                 if (attr != prev)
                 {
                     prev = attr;
-                    AppendOrWrite (attr!, force16Colors, stringBuilder, (nint)consoleBuffer);
-                    _redrawTextStyle = attr.Style;
-                }
 
-                if (cell.Rune.Value != '\x1b')
-                {
-                    AppendOrWrite (cell.Rune, force16Colors, stringBuilder, consoleBuffer);
+                    // write everything out up till now
+                    AppendOrWrite (sbSinceLastAttrChange.ToString (), force16Colors, stringBuilder, consoleBuffer);
+
+                    // then change color/style etc
+                    AppendOrWrite (attr!, force16Colors, stringBuilder, (nint)consoleBuffer);
+                    sbSinceLastAttrChange.Clear ();
+                    sbSinceLastAttrChange.Append (cell.Rune);
+                    _redrawTextStyle = attr.Style;
                 }
                 else
                 {
-                    stringBuilder.Append (' ');
+                    sbSinceLastAttrChange.Append (cell.Rune);
                 }
+            }
+
+            // write trailing bits
+            if (sbSinceLastAttrChange.Length > 0)
+            {
+                AppendOrWrite (sbSinceLastAttrChange.ToString (), force16Colors, stringBuilder, consoleBuffer);
+                sbSinceLastAttrChange.Clear ();
             }
         }
 
@@ -206,22 +217,25 @@ internal partial class WindowsOutput : IConsoleOutput
     }
 
 
-    private void AppendOrWrite (Rune rune, bool force16Colors, StringBuilder stringBuilder, nint screenBuffer)
+    private void AppendOrWrite (string str, bool force16Colors, StringBuilder stringBuilder, nint screenBuffer)
     {
+        if (str.Length == 0)
+        {
+            return;
+        }
+
+        // Replace escape characters with space
+        str = str.Replace ("\x1b", " ");
+
+
         if (force16Colors)
         {
-            char [] chars = new char [2]; // allocate maximum space (2 chars for surrogate pair)
-            int written = rune.EncodeToUtf16 (chars);
-
-            // Slice array to actual size used
-            char [] result = new char [written];
-            Array.Copy (chars, result, written);
-
-            WriteConsole (screenBuffer,chars ,(uint)written, out _, nint.Zero);
+            var a = str.ToCharArray ();
+            WriteConsole (screenBuffer,a ,(uint)a.Length, out _, nint.Zero);
         }
         else
         {
-            stringBuilder.Append (rune);
+            stringBuilder.Append (str);
         }
     }
 
