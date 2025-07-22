@@ -174,15 +174,7 @@ internal partial class WindowsOutput : IConsoleOutput
             }
         }
 
-        if (force16Colors)
-        {
-            SetConsoleActiveScreenBuffer (consoleBuffer);
-            SetConsoleCursorPosition (consoleBuffer, new (originalCursorPosition.X, originalCursorPosition.Y));
-            return;
-        }
-
-        stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
-        stringBuilder.Append (EscSeqUtils.CSI_HideCursor);
+        AppendOrWriteCursorPosition(new (originalCursorPosition.X, originalCursorPosition.Y),force16Colors,stringBuilder, consoleBuffer);
 
         var span = stringBuilder.ToString ().AsSpan (); // still allocates the string
         result = WriteConsole (_screenBuffer, span, (uint)span.Length, out _, nint.Zero);
