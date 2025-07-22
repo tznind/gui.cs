@@ -1,7 +1,9 @@
 ﻿#nullable enable
+using System;
 using System.Buffers;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Text;
 using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui.Drivers;
@@ -61,7 +63,7 @@ internal partial class WindowsOutput : IConsoleOutput
     [DllImport ("kernel32.dll", SetLastError = true)]
     public static extern bool SetConsoleTextAttribute (nint hConsoleOutput, ushort wAttributes);
 
-    private readonly nint _screenBuffer;
+    private nint _screenBuffer;
 
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
     private TextStyle _redrawTextStyle = TextStyle.None;
@@ -122,7 +124,7 @@ internal partial class WindowsOutput : IConsoleOutput
 
     public void Write (IOutputBuffer buffer)
     {
-        WindowsConsole.ExtendedCharInfo [] outputBuffer = new WindowsConsole.ExtendedCharInfo [buffer.Rows * buffer.Cols];
+        WindowsConsole.ExtendedCharInfo [][] outputBuffer = new WindowsConsole.ExtendedCharInfo[buffer.Rows] [];
 
         // TODO: probably do need this right?
         /*
@@ -139,27 +141,14 @@ internal partial class WindowsOutput : IConsoleOutput
 
         for (var row = 0; row < buffer.Rows; row++)
         {
-            if (!buffer.DirtyLines [row])
-            {
-                continue;
-            }
+            outputBuffer [row]= new WindowsConsole.ExtendedCharInfo[buffer.Cols];
 
-            buffer.DirtyLines [row] = false;
 
             for (var col = 0; col < buffer.Cols; col++)
             {
-                int position = row * buffer.Cols + col;
-                outputBuffer [position].Attribute = buffer.Contents [row, col].Attribute.GetValueOrDefault ();
-
-                if (buffer.Contents [row, col].IsDirty == false)
-                {
-                    outputBuffer [position].Empty = true;
-                    outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
-
-                    continue;
-                }
-
-                outputBuffer [position].Empty = false;
+                int position = col;
+                outputBuffer [row][position].Attribute = buffer.Contents [row, col].Attribute.GetValueOrDefault ();
+                outputBuffer [row][position].Empty = false;
 
                 Rune rune = buffer.Contents [row, col].Rune;
                 int width = rune.GetColumns ();
@@ -169,35 +158,35 @@ internal partial class WindowsOutput : IConsoleOutput
                     if (width == 1)
                     {
                         // Single-width char, just encode first UTF-16 char
-                        outputBuffer [position].Char = (char)rune.Value;
+                        outputBuffer [row][position].Char = (char)rune.Value;
                     }
                     else if (width == 2 && col + 1 < buffer.Cols)
                     {
                         // Double-width char: encode to UTF-16 surrogate pair and write both halves
                         var utf16 = new char [2];
                         rune.EncodeToUtf16 (utf16);
-                        outputBuffer [position].Char = utf16 [0];
-                        outputBuffer [position].Empty = false;
+                        outputBuffer [row][position].Char = utf16 [0];
+                        outputBuffer [row][position].Empty = false;
 
                         // Write second half into next cell
                         col++;
-                        position = row * buffer.Cols + col;
-                        outputBuffer [position].Char = utf16 [1];
-                        outputBuffer [position].Empty = false;
+                        position = col;
+                        outputBuffer [row][position].Char = utf16 [1];
+                        outputBuffer [row][position].Empty = false;
                     }
                 }
                 else
                 {
                     //outputBuffer [position].Empty = true;
-                    outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
+                    outputBuffer [row][position].Char = (char)Rune.ReplacementChar.Value;
 
                     if (width > 1 && col + 1 < buffer.Cols)
                     {
                         // TODO: This is a hack to deal with non-BMP and wide characters.
                         col++;
-                        position = row * buffer.Cols + col;
-                        outputBuffer [position].Empty = false;
-                        outputBuffer [position].Char = ' ';
+                        position = col;
+                        outputBuffer [row][position].Empty = false;
+                        outputBuffer [row][position].Char = ' ';
                     }
                 }
             }
@@ -231,58 +220,58 @@ internal partial class WindowsOutput : IConsoleOutput
         WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
     }
 
-    public bool WriteToConsole (Size size, WindowsConsole.ExtendedCharInfo [] charInfoBuffer, WindowsConsole.Coord bufferSize, WindowsConsole.SmallRect window, bool force16Colors)
+    public bool WriteToConsole (Size size, WindowsConsole.ExtendedCharInfo [][] charInfoBuffer, WindowsConsole.Coord bufferSize, WindowsConsole.SmallRect window, bool force16Colors)
     {
         // for 16 color mode we will write to a backing buffer then flip it to the active one at the end to avoid jitter.
         var buffer = force16Colors ? _doubleBuffer[_activeDoubleBuffer = (_activeDoubleBuffer + 1) % 2] : _screenBuffer;
 
+        _screenBuffer = buffer;
+
         var result = false;
 
-        GetWindowSize (out var cursorPosition);
-
-        if (force16Colors)
-        {
-            SetConsoleCursorPosition (buffer, new (0, 0));
-
-        }
+        GetWindowSize (out var originalCursorPosition);
 
         StringBuilder stringBuilder = new();
 
-        stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
-        EscSeqUtils.CSI_AppendCursorPosition (stringBuilder, 0, 0);
 
         Attribute? prev = null;
 
-        foreach (WindowsConsole.ExtendedCharInfo info in charInfoBuffer)
+        for (int row = 0; row < charInfoBuffer.Length; row++)
         {
-            Attribute attr = info.Attribute;
+            AppendOrWriteCursorPosition (new (0, row), force16Colors, stringBuilder, _screenBuffer);
 
-            if (attr != prev)
+            for(int col =0;col < charInfoBuffer [row].Length;col++)
             {
-                prev = attr;
-                AppendOrWrite (attr,force16Colors,stringBuilder,buffer);
-                _redrawTextStyle = attr.Style;
-            }
+                var info = charInfoBuffer [row] [col];
+                Attribute attr = info.Attribute;
 
-
-            if (info.Char != '\x1b')
-            {
-                if (!info.Empty)
+                if (attr != prev)
                 {
-
-                    AppendOrWrite (info.Char, force16Colors, stringBuilder, buffer);
+                    prev = attr;
+                    AppendOrWrite (attr, force16Colors, stringBuilder, buffer);
+                    _redrawTextStyle = attr.Style;
                 }
-            }
-            else
-            {
-                stringBuilder.Append (' ');
+
+
+                if (info.Char != '\x1b')
+                {
+                    if (!info.Empty)
+                    {
+
+                        AppendOrWrite (info.Char, force16Colors, stringBuilder, buffer);
+                    }
+                }
+                else
+                {
+                    stringBuilder.Append (' ');
+                }
             }
         }
 
         if (force16Colors)
         {
             SetConsoleActiveScreenBuffer (buffer);
-            SetConsoleCursorPosition (buffer, new (cursorPosition.X, cursorPosition.Y));
+            SetConsoleCursorPosition (buffer, new (originalCursorPosition.X, originalCursorPosition.Y));
             return true;
         }
 
@@ -348,6 +337,20 @@ internal partial class WindowsOutput : IConsoleOutput
             EscSeqUtils.CSI_AppendForegroundColorRGB (stringBuilder, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
             EscSeqUtils.CSI_AppendBackgroundColorRGB (stringBuilder, attr.Background.R, attr.Background.G, attr.Background.B);
             EscSeqUtils.CSI_AppendTextStyleChange (stringBuilder, _redrawTextStyle, attr.Style);
+        }
+    }
+
+    private void AppendOrWriteCursorPosition (Point p, bool force16Colors, StringBuilder stringBuilder, nint screenBuffer)
+    {
+        if (force16Colors)
+        {
+            SetConsoleCursorPosition (screenBuffer, new ((short)p.X, (short)p.Y));
+        }
+        else
+        {
+            // CSI codes are 1 indexed
+            stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
+            EscSeqUtils.CSI_AppendCursorPosition (stringBuilder, p.Y+1, p.X+1);
         }
     }
 
@@ -427,15 +430,19 @@ internal partial class WindowsOutput : IConsoleOutput
             return;
         }
 
-        if (_screenBuffer != nint.Zero)
+        for (int i = 0; i < 2; i++)
         {
-            try
+            var buffer = _doubleBuffer [i];
+            if (buffer != nint.Zero)
             {
-                CloseHandle (_screenBuffer);
-            }
-            catch (Exception e)
-            {
-                Logging.Logger.LogError (e, "Error trying to close screen buffer handle in WindowsOutput via interop method");
+                try
+                {
+                    CloseHandle (buffer);
+                }
+                catch (Exception e)
+                {
+                    Logging.Logger.LogError (e, "Error trying to close screen buffer handle in WindowsOutput via interop method");
+                }
             }
         }
 

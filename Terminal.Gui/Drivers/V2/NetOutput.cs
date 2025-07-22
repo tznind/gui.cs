@@ -80,17 +80,11 @@ public class NetOutput : IConsoleOutput
                 return;
             }
 
-            if (!buffer.DirtyLines [row])
-            {
-                continue;
-            }
-
             if (!SetCursorPositionImpl (0, row))
             {
                 return;
             }
 
-            buffer.DirtyLines [row] = false;
             output.Clear ();
 
             for (int col = left; col < cols; col++)
