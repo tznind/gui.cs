@@ -127,9 +127,16 @@ internal partial class WindowsOutput : IConsoleOutput
         bool force16Colors = Application.Driver!.Force16Colors;
 
         // for 16 color mode we will write to a backing buffer then flip it to the active one at the end to avoid jitter.
-        var consoleBuffer = force16Colors ? _doubleBuffer [_activeDoubleBuffer = (_activeDoubleBuffer + 1) % 2] : _screenBuffer;
-
-        _screenBuffer = consoleBuffer;
+        nint consoleBuffer;
+        if (force16Colors)
+        {
+            consoleBuffer = _doubleBuffer [_activeDoubleBuffer = (_activeDoubleBuffer + 1) % 2];
+            _screenBuffer = consoleBuffer;
+        }
+        else
+        {
+            consoleBuffer = _screenBuffer;
+        }
 
         var result = false;
 
