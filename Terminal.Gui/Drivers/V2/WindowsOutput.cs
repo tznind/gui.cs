@@ -268,20 +268,8 @@ internal partial class WindowsOutput : IConsoleOutput
         stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
         stringBuilder.Append (EscSeqUtils.CSI_HideCursor);
 
-        // TODO: Potentially could stackalloc whenever reasonably small (<= 8 kB?) write buffer is needed.
-        char [] rentedWriteArray = ArrayPool<char>.Shared.Rent (minimumLength: stringBuilder.Length);
-        try
-        {
-            Span<char> writeBuffer = rentedWriteArray.AsSpan(0, stringBuilder.Length);
-            stringBuilder.CopyTo (0, writeBuffer, stringBuilder.Length);
-
-            // Supply console with the new content.
-            result = WriteConsole (_screenBuffer, writeBuffer, (uint)writeBuffer.Length, out uint _, nint.Zero);
-        }
-        finally
-        {
-            ArrayPool<char>.Shared.Return (rentedWriteArray);
-        }
+        var span = stringBuilder.ToString ().AsSpan (); // still allocates the string
+        result = WriteConsole (_screenBuffer, span, (uint)span.Length, out _, nint.Zero);
 
         foreach (SixelToRender sixel in Application.Sixel)
         {
