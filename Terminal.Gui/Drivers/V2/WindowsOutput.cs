@@ -122,134 +122,43 @@ internal partial class WindowsOutput : IConsoleOutput
         }
     }
 
-    public void Write (IOutputBuffer buffer)
+    public void Write (IOutputBuffer outputBuffer)
     {
-        WindowsConsole.ExtendedCharInfo [][] outputBuffer = new WindowsConsole.ExtendedCharInfo[buffer.Rows] [];
+        bool force16Colors = Application.Driver!.Force16Colors;
 
-        // TODO: probably do need this right?
-        /*
-        if (!windowSize.IsEmpty && (windowSize.Width != buffer.Cols || windowSize.Height != buffer.Rows))
-        {
-            return;
-        }*/
-
-        var bufferCoords = new WindowsConsole.Coord
-        {
-            X = (short)buffer.Cols, //Clip.Width,
-            Y = (short)buffer.Rows //Clip.Height
-        };
-
-        for (var row = 0; row < buffer.Rows; row++)
-        {
-            outputBuffer [row]= new WindowsConsole.ExtendedCharInfo[buffer.Cols];
-
-
-            for (var col = 0; col < buffer.Cols; col++)
-            {
-                int position = col;
-                outputBuffer [row][position].Attribute = buffer.Contents [row, col].Attribute.GetValueOrDefault ();
-                outputBuffer [row][position].Empty = false;
-
-                Rune rune = buffer.Contents [row, col].Rune;
-                int width = rune.GetColumns ();
-
-                if (rune.IsBmp)
-                {
-                    if (width == 1)
-                    {
-                        // Single-width char, just encode first UTF-16 char
-                        outputBuffer [row][position].Char = (char)rune.Value;
-                    }
-                    else if (width == 2 && col + 1 < buffer.Cols)
-                    {
-                        // Double-width char: encode to UTF-16 surrogate pair and write both halves
-                        var utf16 = new char [2];
-                        rune.EncodeToUtf16 (utf16);
-                        outputBuffer [row][position].Char = utf16 [0];
-                        outputBuffer [row][position].Empty = false;
-
-                        // Write second half into next cell
-                        col++;
-                        position = col;
-                        outputBuffer [row][position].Char = utf16 [1];
-                        outputBuffer [row][position].Empty = false;
-                    }
-                }
-                else
-                {
-                    //outputBuffer [position].Empty = true;
-                    outputBuffer [row][position].Char = (char)Rune.ReplacementChar.Value;
-
-                    if (width > 1 && col + 1 < buffer.Cols)
-                    {
-                        // TODO: This is a hack to deal with non-BMP and wide characters.
-                        col++;
-                        position = col;
-                        outputBuffer [row][position].Empty = false;
-                        outputBuffer [row][position].Char = ' ';
-                    }
-                }
-            }
-        }
-
-
-        //size, ExtendedCharInfo [] charInfoBuffer, Coord , SmallRect window,
-        if (!ConsoleDriver.RunningUnitTests
-            && !WriteToConsole (
-                                new (buffer.Cols, buffer.Rows),
-                                outputBuffer,
-                                bufferCoords,
-                                Application.Driver!.Force16Colors))
-        {
-            int err = Marshal.GetLastWin32Error ();
-
-            if (err != 0)
-            {
-                throw new Win32Exception (err);
-            }
-        }
-    }
-
-    public bool WriteToConsole (Size size, WindowsConsole.ExtendedCharInfo [][] charInfoBuffer, WindowsConsole.Coord bufferSize, bool force16Colors)
-    {
         // for 16 color mode we will write to a backing buffer then flip it to the active one at the end to avoid jitter.
-        var buffer = force16Colors ? _doubleBuffer[_activeDoubleBuffer = (_activeDoubleBuffer + 1) % 2] : _screenBuffer;
+        var consoleBuffer = force16Colors ? _doubleBuffer [_activeDoubleBuffer = (_activeDoubleBuffer + 1) % 2] : _screenBuffer;
 
-        _screenBuffer = buffer;
+        _screenBuffer = consoleBuffer;
 
         var result = false;
 
         GetWindowSize (out var originalCursorPosition);
 
-        StringBuilder stringBuilder = new();
-
+        StringBuilder stringBuilder = new ();
 
         Attribute? prev = null;
 
-        for (int row = 0; row < charInfoBuffer.Length; row++)
+        for (var row = 0; row < outputBuffer.Rows; row++)
         {
             AppendOrWriteCursorPosition (new (0, row), force16Colors, stringBuilder, _screenBuffer);
 
-            for(int col =0;col < charInfoBuffer [row].Length;col++)
+            for (var col = 0; col < outputBuffer.Cols; col++)
             {
-                var info = charInfoBuffer [row] [col];
-                Attribute attr = info.Attribute;
+                var cell = outputBuffer.Contents [row, col];
+                var attr = cell.Attribute ?? prev ?? new ();
 
                 if (attr != prev)
                 {
                     prev = attr;
-                    AppendOrWrite (attr, force16Colors, stringBuilder, buffer);
+                    AppendOrWrite (attr!, force16Colors, stringBuilder, (nint)consoleBuffer);
                     _redrawTextStyle = attr.Style;
                 }
 
 
-                if (info.Char != '\x1b')
+                if (cell.Rune.Value != '\x1b')
                 {
-                    if (!info.Empty)
-                    {
-
-                        AppendOrWrite (info.Char, force16Colors, stringBuilder, buffer);
-                    }
+                    AppendOrWrite (cell.Rune, force16Colors, stringBuilder, consoleBuffer);
                 }
                 else
                 {
@@ -260,9 +169,9 @@ internal partial class WindowsOutput : IConsoleOutput
 
         if (force16Colors)
         {
-            SetConsoleActiveScreenBuffer (buffer);
-            SetConsoleCursorPosition (buffer, new (originalCursorPosition.X, originalCursorPosition.Y));
-            return true;
+            SetConsoleActiveScreenBuffer (consoleBuffer);
+            SetConsoleCursorPosition (consoleBuffer, new (originalCursorPosition.X, originalCursorPosition.Y));
+            return;
         }
 
         stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
@@ -286,20 +195,25 @@ internal partial class WindowsOutput : IConsoleOutput
                 throw new Win32Exception (err);
             }
         }
-
-        return result;
     }
 
-    private void AppendOrWrite (char infoChar, bool force16Colors, StringBuilder stringBuilder, nint screenBuffer)
-    {
 
+    private void AppendOrWrite (Rune rune, bool force16Colors, StringBuilder stringBuilder, nint screenBuffer)
+    {
         if (force16Colors)
         {
-            WriteConsole (screenBuffer, [infoChar],1, out _, nint.Zero);
+            char [] chars = new char [2]; // allocate maximum space (2 chars for surrogate pair)
+            int written = rune.EncodeToUtf16 (chars);
+
+            // Slice array to actual size used
+            char [] result = new char [written];
+            Array.Copy (chars, result, written);
+
+            WriteConsole (screenBuffer,chars ,(uint)written, out _, nint.Zero);
         }
         else
         {
-            stringBuilder.Append (infoChar);
+            stringBuilder.Append (rune);
         }
     }
 
