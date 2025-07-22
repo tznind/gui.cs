@@ -192,13 +192,6 @@ internal partial class WindowsOutput : IConsoleOutput
             }
         }
 
-        var damageRegion = new WindowsConsole.SmallRect
-        {
-            Top = 0,
-            Left = 0,
-            Bottom = (short)buffer.Rows,
-            Right = (short)buffer.Cols
-        };
 
         //size, ExtendedCharInfo [] charInfoBuffer, Coord , SmallRect window,
         if (!ConsoleDriver.RunningUnitTests
@@ -206,7 +199,6 @@ internal partial class WindowsOutput : IConsoleOutput
                                 new (buffer.Cols, buffer.Rows),
                                 outputBuffer,
                                 bufferCoords,
-                                damageRegion,
                                 Application.Driver!.Force16Colors))
         {
             int err = Marshal.GetLastWin32Error ();
@@ -216,11 +208,9 @@ internal partial class WindowsOutput : IConsoleOutput
                 throw new Win32Exception (err);
             }
         }
-
-        WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
     }
 
-    public bool WriteToConsole (Size size, WindowsConsole.ExtendedCharInfo [][] charInfoBuffer, WindowsConsole.Coord bufferSize, WindowsConsole.SmallRect window, bool force16Colors)
+    public bool WriteToConsole (Size size, WindowsConsole.ExtendedCharInfo [][] charInfoBuffer, WindowsConsole.Coord bufferSize, bool force16Colors)
     {
         // for 16 color mode we will write to a backing buffer then flip it to the active one at the end to avoid jitter.
         var buffer = force16Colors ? _doubleBuffer[_activeDoubleBuffer = (_activeDoubleBuffer + 1) % 2] : _screenBuffer;
