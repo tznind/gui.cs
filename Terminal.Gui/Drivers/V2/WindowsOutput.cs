@@ -119,6 +119,26 @@ internal partial class WindowsOutput : IConsoleOutput
         }
     }
 
+    public void RecreateBackBuffer ()
+    {
+        int idx = (_activeDoubleBuffer + 1) % 2;
+        var inactiveBuffer = _doubleBuffer [idx];
+
+        DisposeBuffer (inactiveBuffer);
+        _doubleBuffer [idx] = CreateScreenBuffer ();
+    }
+
+    private void DisposeBuffer (nint buffer)
+    {
+        if (buffer != 0 && buffer != INVALID_HANDLE_VALUE)
+        {
+            if (!CloseHandle (buffer))
+            {
+                throw new Win32Exception (Marshal.GetLastWin32Error (), "Failed to close screen buffer handle.");
+            }
+        }
+    }
+
     public void Write (IOutputBuffer outputBuffer)
     {
         bool force16Colors = Application.Driver!.Force16Colors;
@@ -268,9 +288,29 @@ internal partial class WindowsOutput : IConsoleOutput
         }
     }
 
+    private Size? _lastSize = null;
     public Size GetWindowSize ()
     {
-        return GetWindowSize (out _);
+
+        var newSize = GetWindowSize (out _);
+
+        if (_lastSize == null || _lastSize != newSize)
+        {
+            // Back buffers only apply to 16 color mode so if not in that just ignore
+            if (!Application.Force16Colors)
+            {
+                return newSize;
+            }
+
+            // User is resizing the screen, they can only ever resize the active
+            // buffer since. We now however have issue because background offscreen
+            // buffer will be wrong size, recreate it to ensure it doesn't result in
+            // differing active and back buffer sizes (which causes flickering of window size)
+            RecreateBackBuffer ();
+            _lastSize = newSize;
+        }
+
+        return newSize;
     }
     public Size GetWindowSize (out WindowsConsole.Coord cursorPosition)
     {
