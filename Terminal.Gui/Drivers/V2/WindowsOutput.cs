@@ -320,6 +320,8 @@ internal partial class WindowsOutput : IConsoleOutput
 
         if (_lastSize == null || _lastSize != newSize)
         {
+            _lastSize ??= newSize;
+
             // Back buffers only apply to 16 color mode so if not in that just ignore
             if (_isVirtualTerminal)
             {
@@ -331,11 +333,11 @@ internal partial class WindowsOutput : IConsoleOutput
             // buffer will be wrong size, recreate it to ensure it doesn't result in
             // differing active and back buffer sizes (which causes flickering of window size)
             RecreateBackBuffer ();
-            _lastSize = newSize;
         }
 
         return newSize;
     }
+
     public Size GetWindowSize (out WindowsConsole.Coord cursorPosition)
     {
         var csbi = new WindowsConsole.CONSOLE_SCREEN_BUFFER_INFOEX ();
