@@ -18,6 +18,9 @@ internal partial class WindowsOutput : IConsoleOutput
     );
 
     [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern nint GetStdHandle (int nStdHandle);
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool CloseHandle (nint handle);
 
     [DllImport ("kernel32.dll", SetLastError = true)]
@@ -60,7 +63,14 @@ internal partial class WindowsOutput : IConsoleOutput
     [DllImport ("kernel32.dll", SetLastError = true)]
     public static extern bool SetConsoleTextAttribute (nint hConsoleOutput, ushort wAttributes);
 
+    [DllImport ("kernel32.dll")]
+    private static extern bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
+
+    private const int STD_OUTPUT_HANDLE = -11;
+    private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
+    private readonly nint _outputHandle;
     private nint _screenBuffer;
+    private readonly bool _isVirtualTerminal;
 
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
     private TextStyle _redrawTextStyle = TextStyle.None;
@@ -74,14 +84,25 @@ internal partial class WindowsOutput : IConsoleOutput
             return;
         }
 
-        _screenBuffer = CreateScreenBuffer ();
+        _outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
+        _isVirtualTerminal = GetConsoleMode (_outputHandle, out uint mode) && (mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) != 0;
 
-        var backBuffer = CreateScreenBuffer ();
-        _doubleBuffer = [_screenBuffer, backBuffer];
-
-        if (!SetConsoleActiveScreenBuffer (_screenBuffer))
+        if (_isVirtualTerminal)
         {
-            throw new Win32Exception (Marshal.GetLastWin32Error ());
+            //Enable alternative screen buffer.
+            Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+        }
+        else
+        {
+            _screenBuffer = CreateScreenBuffer ();
+
+            var backBuffer = CreateScreenBuffer ();
+            _doubleBuffer = [_screenBuffer, backBuffer];
+
+            if (!SetConsoleActiveScreenBuffer (_screenBuffer))
+            {
+                throw new Win32Exception (Marshal.GetLastWin32Error ());
+            }
         }
     }
 
@@ -113,7 +134,7 @@ internal partial class WindowsOutput : IConsoleOutput
 
     public void Write (ReadOnlySpan<char> str)
     {
-        if (!WriteConsole (_screenBuffer, str, (uint)str.Length, out uint _, nint.Zero))
+        if (!WriteConsole (_isVirtualTerminal ? _outputHandle : _screenBuffer, str, (uint)str.Length, out uint _, nint.Zero))
         {
             throw new Win32Exception (Marshal.GetLastWin32Error (), "Failed to write to console screen buffer.");
         }
@@ -144,15 +165,18 @@ internal partial class WindowsOutput : IConsoleOutput
         bool force16Colors = Application.Driver!.Force16Colors;
 
         // for 16 color mode we will write to a backing buffer then flip it to the active one at the end to avoid jitter.
-        nint consoleBuffer;
+        nint consoleBuffer = 0;
         if (force16Colors)
         {
-            consoleBuffer = _doubleBuffer [_activeDoubleBuffer = (_activeDoubleBuffer + 1) % 2];
-            _screenBuffer = consoleBuffer;
+            if (!_isVirtualTerminal)
+            {
+                consoleBuffer = _doubleBuffer [_activeDoubleBuffer = (_activeDoubleBuffer + 1) % 2];
+                _screenBuffer = consoleBuffer;
+            }
         }
         else
         {
-            consoleBuffer = _screenBuffer;
+            consoleBuffer = _outputHandle;
         }
 
         var result = false;
@@ -297,7 +321,7 @@ internal partial class WindowsOutput : IConsoleOutput
         if (_lastSize == null || _lastSize != newSize)
         {
             // Back buffers only apply to 16 color mode so if not in that just ignore
-            if (!Application.Force16Colors)
+            if (_isVirtualTerminal)
             {
                 return newSize;
             }
@@ -317,7 +341,7 @@ internal partial class WindowsOutput : IConsoleOutput
         var csbi = new WindowsConsole.CONSOLE_SCREEN_BUFFER_INFOEX ();
         csbi.cbSize = (uint)Marshal.SizeOf (csbi);
 
-        if (!GetConsoleScreenBufferInfoEx (_screenBuffer, ref csbi))
+        if (!GetConsoleScreenBufferInfoEx (_isVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
         {
             //throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
             cursorPosition = default;
@@ -384,18 +408,26 @@ internal partial class WindowsOutput : IConsoleOutput
             return;
         }
 
-        for (int i = 0; i < 2; i++)
+        if (_isVirtualTerminal)
         {
-            var buffer = _doubleBuffer [i];
-            if (buffer != nint.Zero)
+            //Disable alternative screen buffer.
+            Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+        }
+        else
+        {
+            for (int i = 0; i < 2; i++)
             {
-                try
+                var buffer = _doubleBuffer [i];
+                if (buffer != nint.Zero)
                 {
-                    CloseHandle (buffer);
-                }
-                catch (Exception e)
-                {
-                    Logging.Logger.LogError (e, "Error trying to close screen buffer handle in WindowsOutput via interop method");
+                    try
+                    {
+                        CloseHandle (buffer);
+                    }
+                    catch (Exception e)
+                    {
+                        Logging.Logger.LogError (e, "Error trying to close screen buffer handle in WindowsOutput via interop method");
+                    }
                 }
             }
         }
