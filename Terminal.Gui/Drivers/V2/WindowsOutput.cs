@@ -238,7 +238,7 @@ internal partial class WindowsOutput : IConsoleOutput
 
         AppendOrWriteCursorPosition(new (originalCursorPosition.X, originalCursorPosition.Y),force16Colors,stringBuilder, consoleBuffer);
 
-        if (force16Colors)
+        if (force16Colors && !_isVirtualTerminal)
         {
             SetConsoleActiveScreenBuffer (consoleBuffer);
             return;
@@ -276,7 +276,7 @@ internal partial class WindowsOutput : IConsoleOutput
         str = str.Replace ("\x1b", " ");
 
 
-        if (force16Colors)
+        if (force16Colors && !_isVirtualTerminal)
         {
             var a = str.ToCharArray ();
             WriteConsole (screenBuffer,a ,(uint)a.Length, out _, nint.Zero);
@@ -291,8 +291,17 @@ internal partial class WindowsOutput : IConsoleOutput
     {
         if (force16Colors)
         {
-            var as16ColorInt = (ushort)((int)attr.Foreground.GetClosestNamedColor16 () | ((int)attr.Background.GetClosestNamedColor16 () << 4));
-            SetConsoleTextAttribute (screenBuffer, as16ColorInt);
+            if (_isVirtualTerminal)
+            {
+                stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
+                stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
+                EscSeqUtils.CSI_AppendTextStyleChange (stringBuilder, _redrawTextStyle, attr.Style);
+            }
+            else
+            {
+                var as16ColorInt = (ushort)((int)attr.Foreground.GetClosestNamedColor16 () | ((int)attr.Background.GetClosestNamedColor16 () << 4));
+                SetConsoleTextAttribute (screenBuffer, as16ColorInt);
+            }
         }
         else
         {
@@ -304,7 +313,7 @@ internal partial class WindowsOutput : IConsoleOutput
 
     private void AppendOrWriteCursorPosition (Point p, bool force16Colors, StringBuilder stringBuilder, nint screenBuffer)
     {
-        if (force16Colors)
+        if (force16Colors && !_isVirtualTerminal)
         {
             SetConsoleCursorPosition (screenBuffer, new ((short)p.X, (short)p.Y));
         }
