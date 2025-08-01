@@ -168,7 +168,11 @@ internal partial class WindowsOutput : IConsoleOutput
         nint consoleBuffer = 0;
         if (force16Colors)
         {
-            if (!_isVirtualTerminal)
+            if (_isVirtualTerminal)
+            {
+                consoleBuffer = _outputHandle;
+            }
+            else
             {
                 consoleBuffer = _doubleBuffer [_activeDoubleBuffer = (_activeDoubleBuffer + 1) % 2];
                 _screenBuffer = consoleBuffer;
