@@ -103,6 +103,9 @@ internal partial class WindowsOutput : IConsoleOutput
             {
                 throw new Win32Exception (Marshal.GetLastWin32Error ());
             }
+
+            // Force 16 colors if not in virtual terminal mode.
+            Application.Force16Colors = true;
         }
     }
 
