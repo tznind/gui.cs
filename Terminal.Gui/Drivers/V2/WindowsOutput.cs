@@ -379,7 +379,7 @@ internal partial class WindowsOutput : IConsoleOutput
             return;
         }
 
-        if (Application.Driver!.Force16Colors)
+        if (!_isVirtualTerminal)
         {
             var info = new WindowsConsole.ConsoleCursorInfo
             {
