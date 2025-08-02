@@ -14,7 +14,7 @@ public abstract class OutputBase
     private TextStyle _redrawTextStyle = TextStyle.None;
 
     /// <inheritdoc/>
-    public void Write (IOutputBuffer buffer)
+    public virtual void Write (IOutputBuffer buffer)
     {
         if (ConsoleDriver.RunningUnitTests)
         {
