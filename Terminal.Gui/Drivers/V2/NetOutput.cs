@@ -58,6 +58,26 @@ public class NetOutput : OutputBase, IConsoleOutput
     private Point _lastCursorPosition;
 
     /// <inheritdoc />
+    protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
+    {
+        EscSeqUtils.CSI_AppendForegroundColorRGB (
+                                                  output,
+                                                  attr.Foreground.R,
+                                                  attr.Foreground.G,
+                                                  attr.Foreground.B
+                                                 );
+
+        EscSeqUtils.CSI_AppendBackgroundColorRGB (
+                                                  output,
+                                                  attr.Background.R,
+                                                  attr.Background.G,
+                                                  attr.Background.B
+                                                 );
+
+        EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
+    }
+
+    /// <inheritdoc />
     protected override void Write (StringBuilder output)
     {
         Console.Out.Write (output);

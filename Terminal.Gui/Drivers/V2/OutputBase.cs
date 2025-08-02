@@ -94,21 +94,7 @@ public abstract class OutputBase
                     {
                         redrawAttr = attr;
 
-                        EscSeqUtils.CSI_AppendForegroundColorRGB (
-                            output,
-                            attr.Foreground.R,
-                            attr.Foreground.G,
-                            attr.Foreground.B
-                        );
-
-                        EscSeqUtils.CSI_AppendBackgroundColorRGB (
-                            output,
-                            attr.Background.R,
-                            attr.Background.G,
-                            attr.Background.B
-                        );
-
-                        EscSeqUtils.CSI_AppendTextStyleChange (output, _redrawTextStyle, attr.Style);
+                        AppendOrWriteAttribute (output, attr, _redrawTextStyle);
 
                         _redrawTextStyle = attr.Style;
                     }
@@ -164,6 +150,7 @@ public abstract class OutputBase
         _cachedCursorVisibility = savedVisibility;
     }
 
+    protected abstract void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle);
 
     private void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
     {
