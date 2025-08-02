@@ -133,7 +133,7 @@ public abstract class OutputBase
             if (output.Length > 0)
             {
                 SetCursorPositionImpl (lastCol, row);
-                Console.Out.Write (output);
+                Write (output);
             }
         }
 
