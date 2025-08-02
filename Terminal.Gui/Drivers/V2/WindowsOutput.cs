@@ -290,10 +290,6 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
 
         var str = output.ToString ();
 
-        // Replace escape characters with space
-        str = str.Replace ("\x1b", " ");
-
-
         if (_force16Colors && !_isVirtualTerminal)
         {
             var a = str.ToCharArray ();
@@ -332,19 +328,6 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
         }
     }
 
-    private void AppendOrWriteCursorPosition (Point p, bool force16Colors, StringBuilder stringBuilder, nint screenBuffer)
-    {
-        if (force16Colors && !_isVirtualTerminal)
-        {
-            SetConsoleCursorPosition (screenBuffer, new ((short)p.X, (short)p.Y));
-        }
-        else
-        {
-            // CSI codes are 1 indexed
-            stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
-            EscSeqUtils.CSI_AppendCursorPosition (stringBuilder, p.Y+1, p.X+1);
-        }
-    }
 
     private Size? _lastSize = null;
     public Size GetWindowSize ()
@@ -396,8 +379,18 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
     /// <inheritdoc />
     protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY)
     {
-        // TODO: Too many methods with this name lets try and standardize to base class name
-        SetCursorPosition (screenPositionX,screenPositionY);
+
+        if (_force16Colors && !_isVirtualTerminal)
+        {
+            SetConsoleCursorPosition (_screenBuffer, new ((short)screenPositionX, (short)screenPositionY));
+        }
+        else
+        {
+            // CSI codes are 1 indexed
+            _everythingStringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
+            EscSeqUtils.CSI_AppendCursorPosition (_everythingStringBuilder, screenPositionY + 1, screenPositionX + 1);
+        }
+
         return true;
     }
 
