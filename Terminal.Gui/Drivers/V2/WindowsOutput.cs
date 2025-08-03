@@ -413,7 +413,7 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
     }
 
     /// <inheritdoc />
-    protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY)
+    protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY, bool force = false)
     {
 
         if (_force16Colors && !_isVirtualTerminal)
@@ -460,16 +460,25 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
     private Point _lastCursorPosition;
 
     /// <inheritdoc/>
-    public void SetCursorPosition (int col, int row)
+    public void SetCursorPosition (int col, int row, bool force = false)
     {
-        if (_lastCursorPosition.X == col && _lastCursorPosition.Y == row)
+        if (_lastCursorPosition.X == col && _lastCursorPosition.Y == row && !force)
         {
             return;
         }
 
         _lastCursorPosition = new (col, row);
 
-        SetConsoleCursorPosition (_screenBuffer, new ((short)col, (short)row));
+        if (_isVirtualTerminal)
+        {
+            var sb = new StringBuilder ();
+            EscSeqUtils.CSI_AppendCursorPosition (sb, row + 1, col + 1);
+            Write (sb.ToString ());
+        }
+        else
+        {
+            SetConsoleCursorPosition (_screenBuffer, new ((short)col, (short)row));
+        }
     }
 
     private bool _isDisposed;
