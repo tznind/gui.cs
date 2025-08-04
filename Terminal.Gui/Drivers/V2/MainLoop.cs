@@ -131,7 +131,7 @@ public class MainLoop<T> : IMainLoop<T>
             {
                 Logging.Redraws.Add (1);
 
-                Application.LayoutAndDrawImpl (true);
+                Application.LayoutAndDrawImpl (sizeChanged);
 
                 Out.Write (OutputBuffer);
 
