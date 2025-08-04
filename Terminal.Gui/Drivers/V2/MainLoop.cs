@@ -184,7 +184,7 @@ public class MainLoop<T> : IMainLoop<T>
             return false;
         }
 
-        if (v.NeedsDraw || v.NeedsLayout)
+        if (v.NeedsDraw || v.NeedsLayout || v.SubViewNeedsDraw)
         {
            // Logging.Trace ($"{v.GetType ().Name} triggered redraw (NeedsDraw={v.NeedsDraw} NeedsLayout={v.NeedsLayout}) ");
 
