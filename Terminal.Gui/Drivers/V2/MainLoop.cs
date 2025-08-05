@@ -131,14 +131,18 @@ public class MainLoop<T> : IMainLoop<T>
             {
                 Logging.Redraws.Add (1);
 
-                Application.LayoutAndDrawImpl (true);
+                Application.LayoutAndDrawImpl (sizeChanged);
 
                 Out.Write (OutputBuffer);
 
                 Out.SetCursorVisibility (CursorVisibility.Default);
-            }
 
-            SetCursor ();
+                SetCursor (true);
+            }
+            else
+            {
+                SetCursor ();
+            }
         }
 
         var swCallbacks = Stopwatch.StartNew ();
@@ -148,7 +152,7 @@ public class MainLoop<T> : IMainLoop<T>
         Logging.IterationInvokesAndTimeouts.Record (swCallbacks.Elapsed.Milliseconds);
     }
 
-    private void SetCursor ()
+    private void SetCursor (bool force = false)
     {
         View? mostFocused = Application.Top!.MostFocused;
 
@@ -164,7 +168,7 @@ public class MainLoop<T> : IMainLoop<T>
             // Translate to screen coordinates
             to = mostFocused.ViewportToScreen (to.Value);
 
-            Out.SetCursorPosition (to.Value.X, to.Value.Y);
+            Out.SetCursorPosition (to.Value.X, to.Value.Y, force);
             Out.SetCursorVisibility (mostFocused.CursorVisibility);
         }
         else
@@ -180,7 +184,7 @@ public class MainLoop<T> : IMainLoop<T>
             return false;
         }
 
-        if (v.NeedsDraw || v.NeedsLayout)
+        if (v.NeedsDraw || v.NeedsLayout || v.SubViewNeedsDraw)
         {
            // Logging.Trace ($"{v.GetType ().Name} triggered redraw (NeedsDraw={v.NeedsDraw} NeedsLayout={v.NeedsLayout}) ");
 

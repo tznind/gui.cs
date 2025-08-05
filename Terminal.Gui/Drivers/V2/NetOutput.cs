@@ -25,12 +25,6 @@ public class NetOutput : OutputBase, IConsoleOutput
         {
             _isWinPlatform = true;
         }
-
-        //Enable alternative screen buffer.
-        Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
-
-        //Set cursor key to application.
-        Console.Out.Write (EscSeqUtils.CSI_HideCursor);
     }
 
     /// <inheritdoc/>
@@ -53,7 +47,7 @@ public class NetOutput : OutputBase, IConsoleOutput
 
 
     /// <inheritdoc/>
-    public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
+    public void SetCursorPosition (int col, int row, bool force = false) { SetCursorPositionImpl (col, row, force); }
 
     private Point _lastCursorPosition;
 
@@ -83,9 +77,9 @@ public class NetOutput : OutputBase, IConsoleOutput
         Console.Out.Write (output);
     }
 
-    protected override bool SetCursorPositionImpl (int col, int row)
+    protected override bool SetCursorPositionImpl (int col, int row, bool force = false)
     {
-        if (_lastCursorPosition.X == col && _lastCursorPosition.Y == row)
+        if (_lastCursorPosition.X == col && _lastCursorPosition.Y == row && !force)
         {
             return true;
         }
@@ -117,15 +111,6 @@ public class NetOutput : OutputBase, IConsoleOutput
     /// <inheritdoc/>
     public void Dispose ()
     {
-        Console.ResetColor ();
-
-        //Disable alternative screen buffer.
-        Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
-
-        //Set cursor key to cursor.
-        Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
-
-        Console.Out.Close ();
     }
 
     /// <inheritdoc/>

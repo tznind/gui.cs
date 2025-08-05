@@ -71,7 +71,8 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
     {
         var key = KeyConverter.ToKey (input);
 
-        if (key != (Key)0)
+        // If the key is not valid, we don't want to raise any events.
+        if (IsValidInput (key, out key))
         {
             OnKeyDown (key!);
             OnKeyUp (key!);

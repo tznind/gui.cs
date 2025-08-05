@@ -133,7 +133,7 @@ public abstract class OutputBase
             if (output.Length > 0)
             {
                 SetCursorPositionImpl (lastCol, row);
-                Console.Out.Write (output);
+                Write (output);
             }
         }
 
@@ -163,7 +163,7 @@ public abstract class OutputBase
 
     protected abstract void Write (StringBuilder output);
 
-    protected abstract bool SetCursorPositionImpl (int screenPositionX, int screenPositionY);
+    protected abstract bool SetCursorPositionImpl (int screenPositionX, int screenPositionY, bool force = false);
 
     public abstract void SetCursorVisibility (CursorVisibility visibility);
 }
