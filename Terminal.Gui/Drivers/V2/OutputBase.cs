@@ -49,7 +49,7 @@ public abstract class OutputBase
                 return;
             }
 
-            if (!SetCursorPositionImpl (0, row))
+            if (!SetCursorPositionImpl (0, row, true))
             {
                 return;
             }
@@ -123,7 +123,7 @@ public abstract class OutputBase
                     else if (rune.IsSurrogatePair () && rune.GetColumns () < 2)
                     {
                         WriteToConsole (output, ref lastCol, row, ref outputWidth);
-                        SetCursorPositionImpl (col - 1, row);
+                        SetCursorPositionImpl (col - 1, row, true);
                     }
 
                     buffer.Contents [row, col].IsDirty = false;
@@ -132,7 +132,7 @@ public abstract class OutputBase
 
             if (output.Length > 0)
             {
-                SetCursorPositionImpl (lastCol, row);
+                SetCursorPositionImpl (lastCol, row, true);
                 Write (output);
             }
         }
@@ -141,7 +141,7 @@ public abstract class OutputBase
         {
             if (!string.IsNullOrWhiteSpace (s.SixelData))
             {
-                SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
+                SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y, true);
                 Console.Out.Write (s.SixelData);
             }
         }
@@ -154,7 +154,7 @@ public abstract class OutputBase
 
     private void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
     {
-        SetCursorPositionImpl (lastCol, row);
+        SetCursorPositionImpl (lastCol, row, true);
         Write (output);
         output.Clear ();
         lastCol += outputWidth;

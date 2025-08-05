@@ -131,7 +131,7 @@ public class MainLoop<T> : IMainLoop<T>
             {
                 Logging.Redraws.Add (1);
 
-                Application.LayoutAndDrawImpl (sizeChanged);
+                Application.LayoutAndDrawImpl (true);
 
                 Out.Write (OutputBuffer);
 
@@ -184,7 +184,7 @@ public class MainLoop<T> : IMainLoop<T>
             return false;
         }
 
-        if (v.NeedsDraw || v.NeedsLayout || v.SubViewNeedsDraw)
+        if (v.NeedsDraw || v.NeedsLayout)
         {
            // Logging.Trace ($"{v.GetType ().Name} triggered redraw (NeedsDraw={v.NeedsDraw} NeedsLayout={v.NeedsLayout}) ");
 
