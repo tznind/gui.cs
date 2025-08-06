@@ -38,6 +38,5 @@ public interface IConsoleOutput : IDisposable
     /// </summary>
     /// <param name="col"></param>
     /// <param name="row"></param>
-    /// <param name="force">Force setting cursor position if true, even with the same position.</param>
-    void SetCursorPosition (int col, int row, bool force = false);
+    void SetCursorPosition (int col, int row);
 }

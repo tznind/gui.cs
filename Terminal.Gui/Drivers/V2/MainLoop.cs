@@ -136,13 +136,9 @@ public class MainLoop<T> : IMainLoop<T>
                 Out.Write (OutputBuffer);
 
                 Out.SetCursorVisibility (CursorVisibility.Default);
+            }
 
-                SetCursor (true);
-            }
-            else
-            {
-                SetCursor ();
-            }
+            SetCursor ();
         }
 
         var swCallbacks = Stopwatch.StartNew ();
@@ -152,7 +148,7 @@ public class MainLoop<T> : IMainLoop<T>
         Logging.IterationInvokesAndTimeouts.Record (swCallbacks.Elapsed.Milliseconds);
     }
 
-    private void SetCursor (bool force = false)
+    private void SetCursor ()
     {
         View? mostFocused = Application.Top!.MostFocused;
 
@@ -168,7 +164,7 @@ public class MainLoop<T> : IMainLoop<T>
             // Translate to screen coordinates
             to = mostFocused.ViewportToScreen (to.Value);
 
-            Out.SetCursorPosition (to.Value.X, to.Value.Y, force);
+            Out.SetCursorPosition (to.Value.X, to.Value.Y);
             Out.SetCursorVisibility (mostFocused.CursorVisibility);
         }
         else

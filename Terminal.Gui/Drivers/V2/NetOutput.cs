@@ -47,9 +47,9 @@ public class NetOutput : OutputBase, IConsoleOutput
 
 
     /// <inheritdoc/>
-    public void SetCursorPosition (int col, int row, bool force = false) { SetCursorPositionImpl (col, row, force); }
+    public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
 
-    private Point _lastCursorPosition;
+    private Point? _lastCursorPosition;
 
     /// <inheritdoc />
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
@@ -77,9 +77,9 @@ public class NetOutput : OutputBase, IConsoleOutput
         Console.Out.Write (output);
     }
 
-    protected override bool SetCursorPositionImpl (int col, int row, bool force = false)
+    protected override bool SetCursorPositionImpl (int col, int row)
     {
-        if (_lastCursorPosition.X == col && _lastCursorPosition.Y == row && !force)
+        if (_lastCursorPosition is { } && _lastCursorPosition.Value.X == col && _lastCursorPosition.Value.Y == row)
         {
             return true;
         }
