@@ -163,7 +163,7 @@ public abstract class OutputBase
 
     protected abstract void Write (StringBuilder output);
 
-    protected abstract bool SetCursorPositionImpl (int screenPositionX, int screenPositionY, bool force = false);
+    protected abstract bool SetCursorPositionImpl (int screenPositionX, int screenPositionY);
 
     public abstract void SetCursorVisibility (CursorVisibility visibility);
 }
