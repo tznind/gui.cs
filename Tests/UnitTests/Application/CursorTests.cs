@@ -95,6 +95,35 @@ public class CursorTests
         Application.ResetState (true);
     }
 
+
+    [Fact]
+    [SetupFakeDriver2]
+    public void PositionCursor_No_IntersectSuperView_Returns_False_v2 ()
+    {
+        Application.Navigation = new ();
+        View superView = new ()
+        {
+            Width = 1,
+            Height = 1,
+        };
+
+        TestView view = new ()
+        {
+            CanFocus = false,
+            X = 1,
+            Y = 1,
+            Width = 1,
+            Height = 1,
+        };
+        superView.Add (view);
+
+        view.CanFocus = true;
+        view.SetFocus ();
+        view.TestLocation = new Point (0, 0);
+        Assert.False (Application.PositionCursor ());
+        Application.ResetState (true);
+    }
+
     [Fact]
     [SetupFakeDriver]
     public void PositionCursor_Position_OutSide_SuperView_Returns_False ()

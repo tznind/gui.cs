@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui.Drivers;
 
-internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
+public class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
 {
     private readonly IConsoleOutput _output;
     private readonly IOutputBuffer _outputBuffer;
