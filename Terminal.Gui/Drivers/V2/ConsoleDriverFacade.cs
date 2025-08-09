@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui.Drivers;
 
-public class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
+internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
 {
     private readonly IConsoleOutput _output;
     private readonly IOutputBuffer _outputBuffer;
@@ -14,6 +14,7 @@ public class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     public event EventHandler<SizeChangedEventArgs> SizeChanged;
 
     public IInputProcessor InputProcessor { get; }
+    public IOutputBuffer OutputBuffer => _outputBuffer;
 
     public ConsoleDriverFacade (
         IInputProcessor inputProcessor,

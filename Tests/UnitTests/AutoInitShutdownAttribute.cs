@@ -49,7 +49,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     {
         AutoInit = autoInit;
         CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
-        _driverType = consoleDriverType ?? typeof (FakeDriver);
+        _driverType = consoleDriverType;
         FakeDriver.FakeBehaviors.UseFakeClipboard = useFakeClipboard;
         FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException =
             fakeClipboardAlwaysThrowsNotSupportedException;
@@ -59,6 +59,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
     private readonly bool _verifyShutdown;
     private readonly Type _driverType;
+    private IDisposable _v2Cleanup;
 
     public override void After (MethodInfo methodUnderTest)
     {
@@ -66,6 +67,8 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
         // Turn off diagnostic flags in case some test left them on
         View.Diagnostics = ViewDiagnosticFlags.Off;
+
+        _v2Cleanup?.Dispose ();
 
         if (AutoInit)
         {
@@ -131,7 +134,15 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
                 View.Instances.Clear ();
             }
 #endif
-            Application.Init ((IConsoleDriver)Activator.CreateInstance (_driverType));
+            if (_driverType == null)
+            {
+                var fa = new FakeApplicationFactory ();
+                _v2Cleanup = fa.SetupFakeApplication ();
+            }
+            else
+            {
+                Application.Init ((IConsoleDriver)Activator.CreateInstance (_driverType));
+            }
         }
     }
 

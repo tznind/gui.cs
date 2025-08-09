@@ -30,7 +30,7 @@ public class TreeTableSourceTests : IDisposable
     [SetupFakeDriver]
     public void TestTreeTableSource_BasicExpanding_WithKeyboard ()
     {
-        ((FakeDriverV2)Application.Driver!).SetBufferSize (100, 100);
+        ((IFakeDriverV2)Application.Driver!).SetBufferSize (100, 100);
         TableView tv = GetTreeTable (out _);
 
         tv.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
@@ -91,7 +91,7 @@ public class TreeTableSourceTests : IDisposable
     [SetupFakeDriver]
     public void TestTreeTableSource_BasicExpanding_WithMouse ()
     {
-        ((FakeDriverV2)Application.Driver!).SetBufferSize (100, 100);
+        ((IFakeDriverV2)Application.Driver!).SetBufferSize (100, 100);
 
         TableView tv = GetTreeTable (out _);
 

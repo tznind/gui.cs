@@ -1039,7 +1039,7 @@ e
     [SetupFakeDriver]
     public void Label_Height_Zero_Stays_Zero ()
     {
-        ((FakeDriverV2)Application.Driver!).SetBufferSize (10, 4);
+        ((IFakeDriverV2)Application.Driver!).SetBufferSize (10, 4);
         var text = "Label";
 
         var label = new Label

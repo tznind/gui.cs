@@ -11,4 +11,9 @@ public interface IConsoleDriverFacade
     ///     and detecting and processing ansi escape sequences.
     /// </summary>
     public IInputProcessor InputProcessor { get; }
+
+    /// <summary>
+    ///     Describes the desired screen state. Data source for <see cref="IConsoleOutput"/>.
+    /// </summary>
+    public IOutputBuffer OutputBuffer { get; }
 }

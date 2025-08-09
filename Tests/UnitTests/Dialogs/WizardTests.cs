@@ -482,14 +482,14 @@ public class WizardTests ()
     // this test is needed because Wizard overrides Dialog's title behavior ("Title - StepTitle")
     public void Setting_Title_Works ()
     {
-        var d = (FakeDriver)Application.Driver;
-
+        var d = (IConsoleDriverFacade)Application.Driver;
+        
         var title = "1234";
         var stepTitle = " - ABCD";
 
         var width = 40;
         var height = 4;
-        d.SetBufferSize (width, height);
+        d.OutputBuffer.SetWindowSize (width,height);
 
         var btnNextText = "Finish";
 
