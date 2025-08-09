@@ -98,6 +98,9 @@ public class MainLoop<T> : IMainLoop<T>
     /// <inheritdoc/>
     public void Iteration ()
     {
+
+        Application.RaiseIteration ();
+
         DateTime dt = Now ();
 
         IterationImpl ();
