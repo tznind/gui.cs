@@ -468,7 +468,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         var win = new Window ();
         top.Add (win);
         RunState rsTop = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (40, 15);
+        AutoInitShutdownAttribute.FakeResize(new Size(40, 15))    ;
 
         Assert.Equal (new (0, 0, 40, 15), win.Frame);
 
@@ -656,7 +656,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
             Assert.Equal (items [i], menu.Menus [0].Title);
         }
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 15);
+        AutoInitShutdownAttribute.FakeResize(new Size(20, 15));
         menu.OpenMenu ();
         Application.RunIteration (ref rsDialog);
 
@@ -837,7 +837,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
             Assert.Equal (items [i], menu.Menus [0].Title);
         }
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 15);
+        AutoInitShutdownAttribute.FakeResize(new Size(20, 15));
         menu.OpenMenu ();
         Application.RunIteration (ref rs);
 
@@ -908,7 +908,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        ((FakeDriver)Application.Driver!).SetBufferSize (7, 5);
+        AutoInitShutdownAttribute.FakeResize(new Size(7, 5));
         menu.OpenMenu ();
         Application.LayoutAndDraw ();
 
@@ -924,7 +924,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        ((FakeDriver)Application.Driver!).SetBufferSize (7, 3);
+        AutoInitShutdownAttribute.FakeResize(new Size(7, 3));
         menu.OpenMenu ();
         Application.LayoutAndDraw ();
 
@@ -982,7 +982,7 @@ wo
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        ((FakeDriver)Application.Driver!).SetBufferSize (3, 2);
+        AutoInitShutdownAttribute.FakeResize(new Size(3, 2));
         menu.OpenMenu ();
         Application.LayoutAndDraw ();
 
@@ -995,7 +995,7 @@ wo
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        ((FakeDriver)Application.Driver!).SetBufferSize (3, 1);
+        AutoInitShutdownAttribute.FakeResize(new Size(3, 1));
         menu.OpenMenu ();
         Application.LayoutAndDraw ();
 
@@ -1629,7 +1629,7 @@ wo
         Toplevel top = new ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (40, 8);
+        AutoInitShutdownAttribute.FakeResize(new Size(40, 8));
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1741,7 +1741,7 @@ wo
 
         Application.Iteration += (s, a) =>
                                  {
-                                     ((FakeDriver)Application.Driver!).SetBufferSize (40, 8);
+                                     AutoInitShutdownAttribute.FakeResize(new Size (40, 8));
 
                                      DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                    @"
@@ -1853,7 +1853,7 @@ wo
             ]
         };
         win.Add (menu);
-        ((FakeDriver)Application.Driver!).SetBufferSize (40, 8);
+        AutoInitShutdownAttribute.FakeResize(new Size(40, 8));
         RunState rs = Application.Begin (win);
         Application.RunIteration (ref rs);
 
@@ -1940,7 +1940,7 @@ wo
     [AutoInitShutdown]
     public void MenuBar_In_Window_Without_Other_Views_Without_Top_Init_With_Run_T ()
     {
-        ((FakeDriver)Application.Driver!).SetBufferSize (40, 8);
+        AutoInitShutdownAttribute.FakeResize(new Size(40, 8));
 
         Application.Iteration += (s, a) =>
                                  {
@@ -2893,7 +2893,7 @@ Edit
                                                       output
                                                      );
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 15);
+        AutoInitShutdownAttribute.FakeResize(new Size(20, 15));
         firstIteration = false;
         Application.RunIteration (ref rs, firstIteration);
 

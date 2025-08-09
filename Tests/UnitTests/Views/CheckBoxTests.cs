@@ -411,7 +411,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         top.Add (win);
 
         RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (30, 6);
+        AutoInitShutdownAttribute.FakeResize(new Size(30, 6));
 
         Assert.Equal (Alignment.Fill, checkBox1.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox1.Frame);
@@ -472,7 +472,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
+        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
 
         Assert.Equal (Alignment.Start, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
@@ -523,7 +523,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
+        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
 
         Assert.Equal (Alignment.End, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);

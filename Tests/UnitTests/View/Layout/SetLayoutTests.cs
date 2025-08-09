@@ -30,7 +30,7 @@ public class SetLayoutTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, Application.Screen.Width, Application.Screen.Height), Application.Top.Frame);
         Assert.Equal (new (0, 0, 80, 25), Application.Top.Frame);
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
+        AutoInitShutdownAttribute.FakeResize(new Size(20, 10))    ;
         Assert.Equal (new (0, 0, Application.Screen.Width, Application.Screen.Height), Application.Top.Frame);
 
         Assert.Equal (new (0, 0, 20, 10), Application.Top.Frame);

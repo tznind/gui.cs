@@ -121,7 +121,7 @@ Y
         top.Add (win);
 
         RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (15, 15);
+        AutoInitShutdownAttribute.FakeResize(new Size(15, 15))   ;
 
         Assert.Equal (new (0, 0, 15, 15), win.Frame);
         Assert.Equal (new (0, 0, 15, 15), win.Margin.Frame);
@@ -386,7 +386,7 @@ Y
         var top = new Toplevel ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (4, 10);
+        AutoInitShutdownAttribute.FakeResize(new Size(4, 10));
 
         Assert.Equal (5, text.Length);
 
@@ -511,7 +511,7 @@ w ";
         var top = new Toplevel ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 20);
+        AutoInitShutdownAttribute.FakeResize(new Size(20, 20));
 
         Assert.Equal (new (0, 0, 11, 2), horizontalView.Frame);
         Assert.Equal (new (0, 3, 2, 11), verticalView.Frame);
@@ -599,7 +599,7 @@ w ";
         var top = new Toplevel ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (22, 22);
+        AutoInitShutdownAttribute.FakeResize(new Size(22, 22));
 
         Assert.Equal (new (text.GetColumns (), 1), horizontalView.TextFormatter.ConstrainToSize);
         Assert.Equal (new (2, 8), verticalView.TextFormatter.ConstrainToSize);
@@ -913,7 +913,7 @@ w ";
         var top = new Toplevel ();
         top.Add (frame);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (9, height + 2);
+        AutoInitShutdownAttribute.FakeResize(new Size(9, height + 2));
 
         if (autoSize)
         {

@@ -56,7 +56,7 @@ public class ListViewTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (12, 12);
+        AutoInitShutdownAttribute.FakeResize(new Size(12, 12));
         Application.LayoutAndDraw ();
 
         Assert.Equal (-1, lv.SelectedItem);

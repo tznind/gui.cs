@@ -456,7 +456,7 @@ public class ViewTests
         Application.RunIteration (ref rs);
         Assert.Equal ("Testing visibility.".Length, view.Frame.Width);
         Assert.True (view.Visible);
-        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
+        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"

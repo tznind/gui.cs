@@ -5262,7 +5262,7 @@ TAB to jump between text field",
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (15, 15);
+        AutoInitShutdownAttribute.FakeResize(new Size(15, 15));
         Application.LayoutAndDraw ();
 
         //this passes
@@ -5340,7 +5340,7 @@ TAB to jump between text field",
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (15, 15);
+        AutoInitShutdownAttribute.FakeResize(new Size (15, 15));
         Application.LayoutAndDraw ();
 
         //this passes

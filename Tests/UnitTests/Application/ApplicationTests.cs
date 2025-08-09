@@ -166,7 +166,7 @@ public class ApplicationTests
         Toplevel top = new ();
         Application.Begin (top);
         Assert.Equal (new (0, 0, 80, 25), Application.Top!.Frame);
-        ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
+        AutoInitShutdownAttribute.FakeResize(new Size(5, 5));
         Assert.Equal (new (0, 0, 5, 5), Application.Top!.Frame);
         top.Dispose ();
     }
@@ -943,7 +943,7 @@ public class ApplicationTests
             Width = 5, Height = 5,
             Arrangement = ViewArrangement.Movable
         };
-        ((FakeDriver)Application.Driver!).SetBufferSize (10, 10);
+        AutoInitShutdownAttribute.FakeResize(new Size(10, 10));
         RunState rs = Application.Begin (w);
 
         // Don't use visuals to test as style of border can change over time.

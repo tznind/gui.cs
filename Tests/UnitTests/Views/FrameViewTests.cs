@@ -38,7 +38,7 @@ public class FrameViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Draw_Defaults ()
     {
-        ((FakeDriver)Application.Driver!).SetBufferSize (10, 10);
+        AutoInitShutdownAttribute.FakeResize(new Size(10, 10));
         var fv = new FrameView () { BorderStyle = LineStyle.Single };
         Assert.Equal (string.Empty, fv.Title);
         Assert.Equal (string.Empty, fv.Text);

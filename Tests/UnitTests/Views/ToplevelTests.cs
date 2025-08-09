@@ -285,7 +285,7 @@ public class ToplevelTests
 
                                      if (iterations == 0)
                                      {
-                                         ((FakeDriver)Application.Driver!).SetBufferSize (15, 7);
+                                         AutoInitShutdownAttribute.FakeResize(new Size(15, 7));
 
                                          // Don't use MessageBox here; it's too complicated for this unit test; just use Window
                                          testWindow = new ()
@@ -405,7 +405,7 @@ public class ToplevelTests
 
                                      if (iterations == 0)
                                      {
-                                         ((FakeDriver)Application.Driver!).SetBufferSize (30, 10);
+                                         AutoInitShutdownAttribute.FakeResize(new Size(30, 10));
                                      }
                                      else if (iterations == 1)
                                      {
@@ -596,7 +596,7 @@ public class ToplevelTests
         Toplevel top = new ();
         var window = new Window { Width = 20, Height = 3, Arrangement = ViewArrangement.Movable };
         RunState rsTop = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (40, 10);
+        AutoInitShutdownAttribute.FakeResize(new Size(40, 10));
         RunState rsWindow = Application.Begin (window);
         Application.LayoutAndDraw ();
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
@@ -619,7 +619,7 @@ public class ToplevelTests
         Assert.Equal (new (-11, -4, 20, 3), window.Frame);
 
         // Changes Top size to same size as Dialog more menu and scroll bar
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 3);
+        AutoInitShutdownAttribute.FakeResize(new Size(20, 3));
 
         Application.RaiseMouseEvent (
                                      new ()
@@ -632,7 +632,7 @@ public class ToplevelTests
         Assert.Equal (new (-1, -1, 20, 3), window.Frame);
 
         // Changes Top size smaller than Dialog size
-        ((FakeDriver)Application.Driver!).SetBufferSize (19, 2);
+        AutoInitShutdownAttribute.FakeResize(new Size(19, 2));
 
         Application.RaiseMouseEvent (
                                      new ()
