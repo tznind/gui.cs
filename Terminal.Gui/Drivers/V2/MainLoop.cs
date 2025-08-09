@@ -83,7 +83,14 @@ public class MainLoop<T> : IMainLoop<T>
     /// <param name="inputBuffer"></param>
     /// <param name="inputProcessor"></param>
     /// <param name="consoleOutput"></param>
-    public void Initialize (ITimedEvents timedEvents, ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput)
+    /// <param name="componentFactory"></param>
+    public void Initialize (
+        ITimedEvents timedEvents,
+        ConcurrentQueue<T> inputBuffer,
+        IInputProcessor inputProcessor,
+        IConsoleOutput consoleOutput,
+        IComponentFactory<T> componentFactory
+    )
     {
         InputBuffer = inputBuffer;
         Out = consoleOutput;
@@ -92,7 +99,7 @@ public class MainLoop<T> : IMainLoop<T>
         TimedEvents = timedEvents;
         AnsiRequestScheduler = new (InputProcessor.GetParser ());
 
-        WindowSizeMonitor = new WindowSizeMonitor (Out, OutputBuffer);
+        WindowSizeMonitor = componentFactory.CreateWindowSizeMonitor (Out, OutputBuffer);
     }
 
     /// <inheritdoc/>

@@ -262,52 +262,69 @@ public class ApplicationV2 : ApplicationImpl
     }
 }
 
-public class NetComponentFactory : IComponentFactory<ConsoleKeyInfo>
+public class NetComponentFactory : ComponentFactory<ConsoleKeyInfo>
 {
-    public virtual IConsoleInput<ConsoleKeyInfo> CreateInput ()
+    public override IConsoleInput<ConsoleKeyInfo> CreateInput ()
     {
         return new NetInput ();
     }
 
     /// <inheritdoc />
-    public virtual IConsoleOutput CreateOutput ()
+    public override IConsoleOutput CreateOutput ()
     {
         return new NetOutput ();
     }
 
     /// <inheritdoc />
-    public virtual IInputProcessor CreateInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer)
+    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer)
     {
         return new NetInputProcessor (inputBuffer);
     }
 }
 
-public class WindowsComponentFactory : IComponentFactory<WindowsConsole.InputRecord>
+public class WindowsComponentFactory : ComponentFactory<WindowsConsole.InputRecord>
 {
     /// <inheritdoc />
-    public virtual IConsoleInput<WindowsConsole.InputRecord> CreateInput ()
+    public override IConsoleInput<WindowsConsole.InputRecord> CreateInput ()
     {
         return new WindowsInput ();
     }
 
     /// <inheritdoc />
-    public virtual IInputProcessor CreateInputProcessor (ConcurrentQueue<WindowsConsole.InputRecord> inputBuffer)
+    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<WindowsConsole.InputRecord> inputBuffer)
     {
         return new WindowsInputProcessor (inputBuffer);
     }
 
     /// <inheritdoc />
-    public virtual IConsoleOutput CreateOutput ()
+    public override IConsoleOutput CreateOutput ()
     {
         return new WindowsOutput ();
     }
 }
 
+public abstract class ComponentFactory<T> : IComponentFactory<T>
+{
+    /// <inheritdoc />
+    public abstract IConsoleInput<T> CreateInput ();
 
+    /// <inheritdoc />
+    public abstract IInputProcessor CreateInputProcessor (ConcurrentQueue<T> inputBuffer);
+
+    /// <inheritdoc />
+    public IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
+    {
+        return new WindowSizeMonitor (consoleOutput, outputBuffer);
+    }
+
+    /// <inheritdoc />
+    public abstract IConsoleOutput CreateOutput ();
+}
 public interface IComponentFactory<T> : IComponentFactory
 {
     IConsoleInput<T> CreateInput ();
     IInputProcessor CreateInputProcessor (ConcurrentQueue<T> inputBuffer);
+    IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer);
 }
 
 public interface IComponentFactory

@@ -21,7 +21,8 @@ public class MainLoopTTests
         m.Initialize (new TimedEvents (),
                       new ConcurrentQueue<int> (),
                       Mock.Of <IInputProcessor>(),
-                      Mock.Of<IConsoleOutput>());
+                      Mock.Of<IConsoleOutput>(),
+                      Mock.Of<IComponentFactory<int>>());
 
         Assert.NotNull (m.TimedEvents);
         Assert.NotNull (m.InputBuffer);

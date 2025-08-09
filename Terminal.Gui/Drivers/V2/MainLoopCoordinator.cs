@@ -143,7 +143,7 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
         {
             // Instance must be constructed on the thread in which it is used.
             _output = _componentFactory.CreateOutput ();
-            _loop.Initialize (_timedEvents, _inputBuffer, _inputProcessor, _output);
+            _loop.Initialize (_timedEvents, _inputBuffer, _inputProcessor, _output,_componentFactory);
 
             BuildFacadeIfPossible ();
         }
