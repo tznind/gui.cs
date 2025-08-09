@@ -351,7 +351,8 @@ public class CheckBoxTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
+        ((FakeSizeMonitor)((IConsoleDriverFacade)Application.Driver!).WindowSizeMonitor).RaiseSizeChanging (new Size (30, 5));
+        Application.LayoutAndDrawImpl ();
 
         Assert.Equal (Alignment.Center, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
@@ -369,7 +370,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 30, 5), pos);
 
         checkBox.CheckedState = CheckState.Checked;
-        Application.LayoutAndDraw ();
+        Application.LayoutAndDrawImpl ();
 
         expected = @$"
 ┌┤Test Demo 你├──────────────┐

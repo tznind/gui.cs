@@ -31,7 +31,19 @@ public class FakeApplicationFactory
 
         ApplicationImpl.ChangeInstance (v2);
         v2.Init (null,"v2net");
+
+        var d = (ConsoleDriverFacade<ConsoleKeyInfo>)Application.Driver;
+        d.WindowSizeMonitor = new FakeSizeMonitor ();
         
+        d.WindowSizeMonitor.SizeChanging += (_, e) =>
+                                           {
+                                               if (e.Size != null)
+                                               {
+                                                   var s = e.Size.Value;
+                                                   _output.Size = s;
+                                                   d.OutputBuffer.SetWindowSize (s.Width, s.Height);
+                                               }
+                                           };
 
         return new FakeApplicationLifecycle (origApp,cts);
     }
@@ -51,7 +63,7 @@ class FakeApplicationLifecycle : IDisposable
     public void Dispose ()
     {
         _hardStop.Cancel();
-
+        Application.Shutdown ();
         ApplicationImpl.ChangeInstance (_origApp);
     }
 }

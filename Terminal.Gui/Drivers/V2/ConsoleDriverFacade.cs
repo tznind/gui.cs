@@ -16,6 +16,31 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     public IInputProcessor InputProcessor { get; }
     public IOutputBuffer OutputBuffer => _outputBuffer;
 
+    private IWindowSizeMonitor _windowSizeMonitor;
+
+    public IWindowSizeMonitor WindowSizeMonitor
+    {
+        get => _windowSizeMonitor;
+
+        // TODO: Should really not be able to do this, we are making it settable so we can hack in a fake one in tests
+        set
+        {
+            // Remove any old event delegates
+            if (_windowSizeMonitor != null)
+            {
+                _windowSizeMonitor.SizeChanging -= RaiseSizeChanged;
+            }
+
+            _windowSizeMonitor = value;
+            _windowSizeMonitor.SizeChanging += RaiseSizeChanged;
+        }
+    }
+
+    private void RaiseSizeChanged (object sender, SizeChangedEventArgs e)
+    {
+        SizeChanged?.Invoke (this, e);
+    }
+
     public ConsoleDriverFacade (
         IInputProcessor inputProcessor,
         IOutputBuffer outputBuffer,
@@ -37,7 +62,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
                                          MouseEvent?.Invoke (s, e);
                                      };
 
-        windowSizeMonitor.SizeChanging += (_, e) => SizeChanged?.Invoke (this, e);
+        WindowSizeMonitor = windowSizeMonitor;
 
         CreateClipboard ();
     }
