@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
@@ -12,10 +13,7 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class ApplicationV2 : ApplicationImpl
 {
-    private readonly Func<INetInput> _netInputFactory;
-    private readonly Func<IConsoleOutput> _netOutputFactory;
-    private readonly Func<IWindowsInput> _winInputFactory;
-    private readonly Func<IConsoleOutput> _winOutputFactory;
+    private readonly IComponentFactory _componentFactory;
     private IMainLoopCoordinator? _coordinator;
     private string? _driverName;
 
@@ -28,25 +26,12 @@ public class ApplicationV2 : ApplicationImpl
     ///     Creates anew instance of the Application backend. The provided
     ///     factory methods will be used on Init calls to get things booted.
     /// </summary>
-    public ApplicationV2 () : this (
-                                    () => new NetInput (),
-                                    () => new NetOutput (),
-                                    () => new WindowsInput (),
-                                    () => new WindowsOutput ()
-                                   )
+    public ApplicationV2 ()
     { }
 
-    internal ApplicationV2 (
-        Func<INetInput> netInputFactory,
-        Func<IConsoleOutput> netOutputFactory,
-        Func<IWindowsInput> winInputFactory,
-        Func<IConsoleOutput> winOutputFactory
-    )
+    internal ApplicationV2 (IComponentFactory componentFactory)
     {
-        _netInputFactory = netInputFactory;
-        _netOutputFactory = netOutputFactory;
-        _winInputFactory = winInputFactory;
-        _winOutputFactory = winOutputFactory;
+        _componentFactory = componentFactory;
         IsLegacy = false;
     }
 
@@ -125,12 +110,20 @@ public class ApplicationV2 : ApplicationImpl
         ConcurrentQueue<WindowsConsole.InputRecord> inputBuffer = new ();
         MainLoop<WindowsConsole.InputRecord> loop = new ();
 
-        return new MainLoopCoordinator<WindowsConsole.InputRecord> (
-                                                                    _timedEvents,
-                                                                    _winInputFactory,
+        IComponentFactory<WindowsConsole.InputRecord> cf;
+
+        if (_componentFactory != null)
+        {
+            cf = (IComponentFactory<WindowsConsole.InputRecord>)_componentFactory;
+        }
+        else
+        {
+            cf = new WindowsComponentFactory ();
+        }
+
+        return new MainLoopCoordinator<WindowsConsole.InputRecord> (_timedEvents,
                                                                     inputBuffer,
-                                                                    new WindowsInputProcessor (inputBuffer),
-                                                                    _winOutputFactory,
+                                                                    cf
                                                                     loop);
     }
 
@@ -258,4 +251,58 @@ public class ApplicationV2 : ApplicationImpl
         Application.Top?.SetNeedsDraw();
         Application.Top?.SetNeedsLayout ();
     }
+}
+
+
+public class NetComponentFactory : IComponentFactory<ConsoleKeyInfo>
+{
+    public IConsoleInput<ConsoleKeyInfo> CreateInput ()
+    {
+        return new NetInput ();
+    }
+
+    /// <inheritdoc />
+    public IConsoleOutput CreateOutput ()
+    {
+        return new NetOutput ();
+    }
+
+    /// <inheritdoc />
+    public IInputProcessor CreateInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer)
+    {
+        return new NetInputProcessor (inputBuffer);
+    }
+}
+
+public class WindowsComponentFactory : IComponentFactory<WindowsConsole.InputRecord>
+{
+    /// <inheritdoc />
+    public IConsoleInput<WindowsConsole.InputRecord> CreateInput ()
+    {
+        return new WindowsInput ();
+    }
+
+    /// <inheritdoc />
+    public IInputProcessor CreateInputProcessor (ConcurrentQueue<WindowsConsole.InputRecord> inputBuffer)
+    {
+        return new WindowsInputProcessor (inputBuffer);
+    }
+
+    /// <inheritdoc />
+    public IConsoleOutput CreateOutput ()
+    {
+        return new WindowsOutput ();
+    }
+}
+
+
+public interface IComponentFactory<T> : IComponentFactory
+{
+    IConsoleInput<T> CreateInput ();
+    IInputProcessor CreateInputProcessor (ConcurrentQueue<T> inputBuffer);
+}
+
+public interface IComponentFactory
+{
+    IConsoleOutput CreateOutput ();
 }
