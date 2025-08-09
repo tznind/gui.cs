@@ -68,12 +68,6 @@ public class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     {
         get
         {
-            if (ConsoleDriver.RunningUnitTests)
-            {
-                // In unit tests, we don't have a real output, so we return an empty rectangle.
-                return Rectangle.Empty;
-            }
-
             return new (new (0, 0), _output.GetWindowSize ());
         }
     }

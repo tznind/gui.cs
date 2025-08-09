@@ -1,7 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using System.Drawing;
+using TerminalGuiFluentTesting;
 
-namespace TerminalGuiFluentTesting;
+namespace Terminal.Gui.Drivers;
 
 
 public class FakeDriverFactory
@@ -56,10 +57,17 @@ public class FakeDriverV2 : ConsoleDriverFacade<ConsoleKeyInfo>
                        {
                            if (e.Size != null)
                            {
-                               _fakeOutput.Size = e.Size.Value;
+                               var s = e.Size.Value;
+                               _fakeOutput.Size = s;
+                               OutputBuffer.SetWindowSize (s.Width,s.Height);
                            }
                        };
 
+    }
+
+    public void SetBufferSize (int width, int height)
+    {
+        SizeMonitor.RaiseSizeChanging (new Size (width,height));
     }
 }
 

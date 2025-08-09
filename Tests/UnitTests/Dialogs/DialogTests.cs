@@ -1321,7 +1321,7 @@ public class DialogTests (ITestOutputHelper output)
     {
         RunState? runState = null;
 
-        var d = (FakeDriver)Driver!;
+        var d = (FakeDriverV2)Driver!;
 
         var title = "1234";
 
