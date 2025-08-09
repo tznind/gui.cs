@@ -351,8 +351,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        ((FakeSizeMonitor)((IConsoleDriverFacade)Application.Driver!).WindowSizeMonitor).RaiseSizeChanging (new Size (30, 5));
-        Application.LayoutAndDrawImpl ();
+        AutoInitShutdownAttribute.FakeResize (new Size (30, 5));
 
         Assert.Equal (Alignment.Center, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);

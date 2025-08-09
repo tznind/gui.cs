@@ -147,4 +147,14 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     }
 
     private bool AutoInit { get; }
+
+    /// <summary>
+    /// 'Resizes' the application and forces layout. Only works if your test uses <see cref="AutoInitShutdownAttribute"/>
+    /// </summary>
+    /// <param name="size"></param>
+    public static void FakeResize (Size size)
+    {
+        ((FakeSizeMonitor)((IConsoleDriverFacade)Application.Driver!).WindowSizeMonitor).RaiseSizeChanging (new Size (30, 5));
+        Application.LayoutAndDrawImpl ();
+    }
 }
