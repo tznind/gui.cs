@@ -34,10 +34,10 @@ public class GuiTestContext : IDisposable
         _winInput = new (_cts.Token);
 
         _output.Size = new (width, height);
-
+        
         var cf = driver == V2TestDriver.V2Net
-            ? new FakeNetComponentFactory (_netInput, _output):
-            (IComponentFactory)new FakeWindowsComponentFactory(_winInput,_output);
+            ? new FakeNetComponentFactory (_netInput, _output, new FakeSizeMonitor ()):
+            (IComponentFactory)new FakeWindowsComponentFactory(_winInput,_output, new FakeSizeMonitor ());
 
         var v2 = new ApplicationV2 (cf);
 
@@ -837,11 +837,13 @@ internal class FakeWindowsComponentFactory : WindowsComponentFactory
 {
     private readonly FakeWindowsInput _winInput;
     private readonly FakeOutput _output;
+    private readonly FakeSizeMonitor _fakeSizeMonitor;
 
-    public FakeWindowsComponentFactory (FakeWindowsInput winInput, FakeOutput output)
+    public FakeWindowsComponentFactory (FakeWindowsInput winInput, FakeOutput output, FakeSizeMonitor fakeSizeMonitor)
     {
         _winInput = winInput;
         _output = output;
+        _fakeSizeMonitor = fakeSizeMonitor;
     }
 
     /// <inheritdoc />
@@ -855,17 +857,25 @@ internal class FakeWindowsComponentFactory : WindowsComponentFactory
     {
         return _output;
     }
+
+    /// <inheritdoc />
+    public override IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
+    {
+        return _fakeSizeMonitor;
+    }
 }
 
 internal class FakeNetComponentFactory : NetComponentFactory
 {
     private readonly FakeNetInput _netInput;
     private readonly FakeOutput _output;
+    private readonly FakeSizeMonitor _fakeSizeMonitor;
 
-    public FakeNetComponentFactory (FakeNetInput netInput, FakeOutput output)
+    public FakeNetComponentFactory (FakeNetInput netInput, FakeOutput output,FakeSizeMonitor fakeSizeMonitor)
     {
         _netInput = netInput;
         _output = output;
+        _fakeSizeMonitor = fakeSizeMonitor;
     }
 
     /// <inheritdoc />
@@ -878,5 +888,11 @@ internal class FakeNetComponentFactory : NetComponentFactory
     public override IConsoleOutput CreateOutput ()
     {
         return _output;
+    }
+
+    /// <inheritdoc />
+    public override IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
+    {
+        return _fakeSizeMonitor;
     }
 }

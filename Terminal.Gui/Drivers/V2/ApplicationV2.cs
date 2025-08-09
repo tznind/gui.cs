@@ -312,7 +312,7 @@ public abstract class ComponentFactory<T> : IComponentFactory<T>
     public abstract IInputProcessor CreateInputProcessor (ConcurrentQueue<T> inputBuffer);
 
     /// <inheritdoc />
-    public IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
+    public virtual IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
     {
         return new WindowSizeMonitor (consoleOutput, outputBuffer);
     }

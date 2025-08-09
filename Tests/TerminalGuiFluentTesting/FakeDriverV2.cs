@@ -21,15 +21,15 @@ public class FakeApplicationFactory
 
         IApplication origApp = ApplicationImpl.Instance;
 
-        var v2 = new ApplicationV2 (new FakeNetComponentFactory (fakeInput, _output));
+        var sizeMonitor = new FakeSizeMonitor ();
+
+        var v2 = new ApplicationV2 (new FakeNetComponentFactory (fakeInput, _output, sizeMonitor));
 
         ApplicationImpl.ChangeInstance (v2);
         v2.Init (null,"v2net");
 
         var d = (ConsoleDriverFacade<ConsoleKeyInfo>)Application.Driver;
-        d.WindowSizeMonitor = new FakeSizeMonitor ();
-        
-        d.WindowSizeMonitor.SizeChanging += (_, e) =>
+        sizeMonitor.SizeChanging += (_, e) =>
                                            {
                                                if (e.Size != null)
                                                {
