@@ -21,13 +21,7 @@ public class FakeApplicationFactory
 
         IApplication origApp = ApplicationImpl.Instance;
 
-
-        var v2 = new ApplicationV2 (
-                                    () => fakeInput,
-                                    () => _output,
-                                    () => throw new NotSupportedException("Only net input should be created"),
-                                    () => _output);
-
+        var v2 = new ApplicationV2 (new FakeNetComponentFactory (fakeInput, _output));
 
         ApplicationImpl.ChangeInstance (v2);
         v2.Init (null,"v2net");

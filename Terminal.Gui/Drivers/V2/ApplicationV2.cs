@@ -13,7 +13,7 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class ApplicationV2 : ApplicationImpl
 {
-    private readonly IComponentFactory _componentFactory;
+    private readonly IComponentFactory? _componentFactory;
     private IMainLoopCoordinator? _coordinator;
     private string? _driverName;
 
@@ -123,8 +123,8 @@ public class ApplicationV2 : ApplicationImpl
 
         return new MainLoopCoordinator<WindowsConsole.InputRecord> (_timedEvents,
                                                                     inputBuffer,
-                                                                    cf
-                                                                    loop);
+                                                                    loop,
+                                                                    cf);
     }
 
     private IMainLoopCoordinator CreateNetSubcomponents ()
@@ -132,13 +132,22 @@ public class ApplicationV2 : ApplicationImpl
         ConcurrentQueue<ConsoleKeyInfo> inputBuffer = new ();
         MainLoop<ConsoleKeyInfo> loop = new ();
 
+        IComponentFactory<ConsoleKeyInfo> cf;
+
+        if (_componentFactory != null)
+        {
+            cf = (IComponentFactory<ConsoleKeyInfo>)_componentFactory;
+        }
+        else
+        {
+            cf = new NetComponentFactory ();
+        }
+
         return new MainLoopCoordinator<ConsoleKeyInfo> (
                                                         _timedEvents,
-                                                        _netInputFactory,
                                                         inputBuffer,
-                                                        new NetInputProcessor (inputBuffer),
-                                                        _netOutputFactory,
-                                                        loop);
+                                                        loop,
+                                                        cf);
     }
 
     /// <inheritdoc/>
@@ -253,22 +262,21 @@ public class ApplicationV2 : ApplicationImpl
     }
 }
 
-
 public class NetComponentFactory : IComponentFactory<ConsoleKeyInfo>
 {
-    public IConsoleInput<ConsoleKeyInfo> CreateInput ()
+    public virtual IConsoleInput<ConsoleKeyInfo> CreateInput ()
     {
         return new NetInput ();
     }
 
     /// <inheritdoc />
-    public IConsoleOutput CreateOutput ()
+    public virtual IConsoleOutput CreateOutput ()
     {
         return new NetOutput ();
     }
 
     /// <inheritdoc />
-    public IInputProcessor CreateInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer)
+    public virtual IInputProcessor CreateInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer)
     {
         return new NetInputProcessor (inputBuffer);
     }
@@ -277,19 +285,19 @@ public class NetComponentFactory : IComponentFactory<ConsoleKeyInfo>
 public class WindowsComponentFactory : IComponentFactory<WindowsConsole.InputRecord>
 {
     /// <inheritdoc />
-    public IConsoleInput<WindowsConsole.InputRecord> CreateInput ()
+    public virtual IConsoleInput<WindowsConsole.InputRecord> CreateInput ()
     {
         return new WindowsInput ();
     }
 
     /// <inheritdoc />
-    public IInputProcessor CreateInputProcessor (ConcurrentQueue<WindowsConsole.InputRecord> inputBuffer)
+    public virtual IInputProcessor CreateInputProcessor (ConcurrentQueue<WindowsConsole.InputRecord> inputBuffer)
     {
         return new WindowsInputProcessor (inputBuffer);
     }
 
     /// <inheritdoc />
-    public IConsoleOutput CreateOutput ()
+    public virtual IConsoleOutput CreateOutput ()
     {
         return new WindowsOutput ();
     }

@@ -35,11 +35,11 @@ public class GuiTestContext : IDisposable
 
         _output.Size = new (width, height);
 
-        var v2 = new ApplicationV2 (
-                                    () => _netInput,
-                                    () => _output,
-                                    () => _winInput,
-                                    () => _output);
+        var cf = driver == V2TestDriver.V2Net
+            ? new FakeNetComponentFactory (_netInput, _output):
+            (IComponentFactory)new FakeWindowsComponentFactory(_winInput,_output);
+
+        var v2 = new ApplicationV2 (cf);
 
         var booting = new SemaphoreSlim (0, 1);
 
@@ -830,5 +830,53 @@ public class GuiTestContext : IDisposable
     public Point GetCursorPosition ()
     {
         return _output.CursorPosition;
+    }
+}
+
+internal class FakeWindowsComponentFactory : WindowsComponentFactory
+{
+    private readonly FakeWindowsInput _winInput;
+    private readonly FakeOutput _output;
+
+    public FakeWindowsComponentFactory (FakeWindowsInput winInput, FakeOutput output)
+    {
+        _winInput = winInput;
+        _output = output;
+    }
+
+    /// <inheritdoc />
+    public override IConsoleInput<WindowsConsole.InputRecord> CreateInput ()
+    {
+        return _winInput;
+    }
+
+    /// <inheritdoc />
+    public override IConsoleOutput CreateOutput ()
+    {
+        return _output;
+    }
+}
+
+internal class FakeNetComponentFactory : NetComponentFactory
+{
+    private readonly FakeNetInput _netInput;
+    private readonly FakeOutput _output;
+
+    public FakeNetComponentFactory (FakeNetInput netInput, FakeOutput output)
+    {
+        _netInput = netInput;
+        _output = output;
+    }
+
+    /// <inheritdoc />
+    public override IConsoleInput<ConsoleKeyInfo> CreateInput ()
+    {
+        return _netInput;
+    }
+
+    /// <inheritdoc />
+    public override IConsoleOutput CreateOutput ()
+    {
+        return _output;
     }
 }
