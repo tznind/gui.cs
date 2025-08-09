@@ -130,6 +130,7 @@ class FakeDriverV2 : ConsoleDriverFacade<ConsoleKeyInfo>, IFakeDriverV2
     public void SetBufferSize (int width, int height)
     {
         SizeMonitor.RaiseSizeChanging (new Size (width,height));
+        OutputBuffer.SetWindowSize (width,height);
     }
 }
 
