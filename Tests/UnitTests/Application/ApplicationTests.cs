@@ -942,7 +942,9 @@ public class ApplicationTests
         w.Ready += (s, e) => Application.RequestStop (); // Causes `End` to be called
         Application.Run (w);
 
+#if DEBUG_IDISPOSABLE
         Assert.False (w.WasDisposed);
+#endif
 
         Assert.NotNull (w);
         Assert.Equal (string.Empty, w.Title); // Valid - w has not been disposed. The user may want to run it again
