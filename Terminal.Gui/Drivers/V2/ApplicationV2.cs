@@ -27,7 +27,9 @@ public class ApplicationV2 : ApplicationImpl
     ///     factory methods will be used on Init calls to get things booted.
     /// </summary>
     public ApplicationV2 ()
-    { }
+    {
+        IsLegacy = false;
+    }
 
     internal ApplicationV2 (IComponentFactory componentFactory)
     {
