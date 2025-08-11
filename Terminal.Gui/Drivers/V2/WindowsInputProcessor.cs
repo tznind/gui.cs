@@ -83,10 +83,29 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
     {
         var mouseFlags = MouseFlags.None;
 
-        mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, WindowsConsole.ButtonState.Button1Pressed, MouseFlags.Button1Pressed, MouseFlags.Button1Released, 0);
-        mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, WindowsConsole.ButtonState.Button2Pressed, MouseFlags.Button2Pressed, MouseFlags.Button2Released, 1);
-        mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, WindowsConsole.ButtonState.Button4Pressed, MouseFlags.Button4Pressed, MouseFlags.Button4Released, 3);
+        mouseFlags = UpdateMouseFlags (
+                                       mouseFlags,
+                                       e.ButtonState,
+                                       WindowsConsole.ButtonState.Button1Pressed,
+                                       MouseFlags.Button1Pressed,
+                                       MouseFlags.Button1Released,
+                                       0);
 
+        mouseFlags = UpdateMouseFlags (
+                                       mouseFlags,
+                                       e.ButtonState,
+                                       WindowsConsole.ButtonState.Button2Pressed,
+                                       MouseFlags.Button2Pressed,
+                                       MouseFlags.Button2Released,
+                                       1);
+
+        mouseFlags = UpdateMouseFlags (
+                                       mouseFlags,
+                                       e.ButtonState,
+                                       WindowsConsole.ButtonState.Button4Pressed,
+                                       MouseFlags.Button4Pressed,
+                                       MouseFlags.Button4Released,
+                                       3);
 
         // Deal with button 3 separately because it is considered same as 'rightmost button'
         if (e.ButtonState.HasFlag (WindowsConsole.ButtonState.Button3Pressed) || e.ButtonState.HasFlag (WindowsConsole.ButtonState.RightmostButtonPressed))
