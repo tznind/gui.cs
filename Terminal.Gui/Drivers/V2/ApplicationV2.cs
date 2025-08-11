@@ -170,6 +170,12 @@ public class ApplicationV2 : ApplicationImpl
         Logging.Information ($"Run '{view}'");
         ArgumentNullException.ThrowIfNull (view);
 
+        if (Application.Driver == null)
+        {
+            // See Run_T_Init_Driver_Cleared_with_TestTopLevel_Throws
+            throw new  InvalidOperationException ("Driver was inexplicably null when trying to Run view");
+        }
+
         if (!Application.Initialized)
         {
             throw new NotInitializedException (nameof (Run));
