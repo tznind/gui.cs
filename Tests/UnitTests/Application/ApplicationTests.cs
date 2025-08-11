@@ -667,7 +667,6 @@ public class ApplicationTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Run_T_After_InitWithDriver_with_TopLevel_and_Driver_Does_Not_Throws ()
     {
         Application.Iteration += (s, e) => Application.RequestStop ();
