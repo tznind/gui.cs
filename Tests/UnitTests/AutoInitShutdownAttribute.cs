@@ -63,7 +63,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
     public override void After (MethodInfo methodUnderTest)
     {
-        Debug.WriteLine ($"After: {methodUnderTest.Name}");
+        Debug.WriteLine ($"After: {methodUnderTest?.Name ?? "Unknown Test"}");
 
         // Turn off diagnostic flags in case some test left them on
         View.Diagnostics = ViewDiagnosticFlags.Off;
@@ -112,7 +112,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
     public override void Before (MethodInfo methodUnderTest)
     {
-        Debug.WriteLine ($"Before: {methodUnderTest.Name}");
+        Debug.WriteLine ($"Before: {methodUnderTest?.Name ?? "Unknown Test"}");
 
         // Disable & force the ConfigurationManager to reset to its hardcoded defaults
         CM.Disable (true);

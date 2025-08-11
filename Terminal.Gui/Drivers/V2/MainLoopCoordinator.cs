@@ -87,7 +87,7 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
                 throw _inputTask.Exception;
             }
 
-            throw new ("Input loop exited during startup instead of entering read loop properly (i.e. and blocking)");
+            Logging.Logger.LogCritical("Input loop exited during startup instead of entering read loop properly (i.e. and blocking)");
         }
 
         Logging.Logger.LogInformation ("Main Loop Coordinator booting complete");
