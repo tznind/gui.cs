@@ -35,6 +35,9 @@ internal class WindowsInput : ConsoleInput<WindowsConsole.InputRecord>, IWindows
 
     private readonly uint _originalConsoleMode;
 
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool FlushConsoleInputBuffer (nint hConsoleInput);
+
     public WindowsInput ()
     {
         Logging.Logger.LogInformation ($"Creating {nameof (WindowsInput)}");
@@ -121,6 +124,11 @@ internal class WindowsInput : ConsoleInput<WindowsConsole.InputRecord>, IWindows
         if (ConsoleDriver.RunningUnitTests)
         {
             return;
+        }
+
+        if (!FlushConsoleInputBuffer (_inputHandle))
+        {
+            throw new ApplicationException ($"Failed to flush input buffer, error code: {Marshal.GetLastWin32Error ()}.");
         }
 
         SetConsoleMode (_inputHandle, _originalConsoleMode);
