@@ -22,6 +22,7 @@ public class GuiTestContext : IDisposable
     private readonly V2TestDriver _driver;
     private bool _finished;
     private readonly object _threadLock = new ();
+    private readonly FakeSizeMonitor _fakeSizeMonitor;
 
     internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, V2TestDriver driver)
     {
@@ -34,10 +35,11 @@ public class GuiTestContext : IDisposable
         _winInput = new (_cts.Token);
 
         _output.Size = new (width, height);
+        _fakeSizeMonitor = new FakeSizeMonitor ();
 
         var cf = driver == V2TestDriver.V2Net
-            ? new FakeNetComponentFactory (_netInput, _output, new FakeSizeMonitor ()):
-            (IComponentFactory)new FakeWindowsComponentFactory(_winInput,_output, new FakeSizeMonitor ());
+            ? new FakeNetComponentFactory (_netInput, _output, _fakeSizeMonitor):
+            (IComponentFactory)new FakeWindowsComponentFactory(_winInput,_output, _fakeSizeMonitor);
 
         var v2 = new ApplicationV2 (cf);
 
@@ -200,6 +202,7 @@ public class GuiTestContext : IDisposable
     public GuiTestContext ResizeConsole (int width, int height)
     {
         _output.Size = new (width, height);
+        _fakeSizeMonitor.RaiseSizeChanging (_output.Size);
 
         return WaitIteration ();
     }
