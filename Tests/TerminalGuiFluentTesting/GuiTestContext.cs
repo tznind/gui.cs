@@ -34,7 +34,7 @@ public class GuiTestContext : IDisposable
         _winInput = new (_cts.Token);
 
         _output.Size = new (width, height);
-        
+
         var cf = driver == V2TestDriver.V2Net
             ? new FakeNetComponentFactory (_netInput, _output, new FakeSizeMonitor ()):
             (IComponentFactory)new FakeWindowsComponentFactory(_winInput,_output, new FakeSizeMonitor ());
@@ -76,6 +76,7 @@ public class GuiTestContext : IDisposable
                                      catch (Exception ex)
                                      {
                                          _ex = ex;
+                                         _hardStop.Cancel();
                                      }
                                      finally
                                      {
@@ -94,6 +95,11 @@ public class GuiTestContext : IDisposable
         }
 
         WaitIteration ();
+
+        if (_ex != null)
+        {
+            throw new Exception("Application crashed",_ex);
+        }
     }
 
     private string GetDriverName ()

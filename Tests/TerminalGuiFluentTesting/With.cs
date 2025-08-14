@@ -19,17 +19,16 @@ public static class With
     }
 
     /// <summary>
-    /// Overload that takes an existing instance <paramref name="toplevel"/>
-    /// instead of creating one.
+    /// Overload that takes a function to create instance <paramref name="toplevelFactory"/> after application is initialized.
     /// </summary>
-    /// <param name="toplevel"></param>
+    /// <param name="toplevelFactory"></param>
     /// <param name="width"></param>
     /// <param name="height"></param>
     /// <param name="v2TestDriver"></param>
     /// <returns></returns>
-    public static GuiTestContext A (Toplevel toplevel, int width, int height, V2TestDriver v2TestDriver)
+    public static GuiTestContext A (Func<Toplevel> toplevelFactory, int width, int height, V2TestDriver v2TestDriver)
     {
-        return new (()=>toplevel, width, height, v2TestDriver);
+        return new (toplevelFactory, width, height, v2TestDriver);
     }
     /// <summary>
     ///     The global timeout to allow for any given application to run for before shutting down.
