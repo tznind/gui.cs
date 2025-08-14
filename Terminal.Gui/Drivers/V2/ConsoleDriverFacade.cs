@@ -73,7 +73,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     {
         get
         {
-            if (ConsoleDriver.RunningUnitTests)
+            if (ConsoleDriver.RunningUnitTests && _output is WindowsOutput or NetOutput)
             {
                 // In unit tests, we don't have a real output, so we return an empty rectangle.
                 return Rectangle.Empty;
