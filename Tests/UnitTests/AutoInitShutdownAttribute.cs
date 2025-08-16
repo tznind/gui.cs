@@ -154,7 +154,6 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     /// <param name="size"></param>
     public static void FakeResize (Size size)
     {
-
         var d = (IConsoleDriverFacade)Application.Driver!;
         d.OutputBuffer.SetWindowSize (size.Width, size.Height);
         ((FakeSizeMonitor)d.WindowSizeMonitor).RaiseSizeChanging (size);
@@ -162,6 +161,9 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         Application.LayoutAndDrawImpl ();
     }
 
+    /// <summary>
+    /// Runs a single iteration of the main loop (layout, draw, run timed events etc.)
+    /// </summary>
     public static void RunIteration ()
     {
         var a = (ApplicationV2)ApplicationImpl.Instance;
