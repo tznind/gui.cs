@@ -22,6 +22,8 @@ public class ApplicationV2 : ApplicationImpl
     /// <inheritdoc/>
     public override ITimedEvents TimedEvents => _timedEvents;
 
+    internal IMainLoopCoordinator? Coordinator => _coordinator;
+
     /// <summary>
     ///     Creates anew instance of the Application backend. The provided
     ///     factory methods will be used on Init calls to get things booted.
