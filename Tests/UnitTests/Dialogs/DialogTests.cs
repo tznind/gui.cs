@@ -849,8 +849,10 @@ public class DialogTests (ITestOutputHelper output)
         button2 = new () { Text = btn2Text };
         (runState, dlg) = BeginButtonTestDialog (title, width, Alignment.Center, button1, button2);
         button1.Visible = false;
-        RunIteration (ref runState, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
+
         buttonRow = $@"{Glyphs.VLine}         {btn2} {Glyphs.VLine}";
+
         DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
         End (runState);
         dlg.Dispose ();
@@ -861,7 +863,8 @@ public class DialogTests (ITestOutputHelper output)
         button2 = new () { Text = btn2Text };
         (runState, dlg) = BeginButtonTestDialog (title, width, Alignment.Fill, button1, button2);
         button1.Visible = false;
-        RunIteration (ref runState, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
+
         buttonRow = $@"{Glyphs.VLine}          {btn2}{Glyphs.VLine}";
         DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
         End (runState);
@@ -873,7 +876,8 @@ public class DialogTests (ITestOutputHelper output)
         button2 = new () { Text = btn2Text };
         (runState, dlg) = BeginButtonTestDialog (title, width, Alignment.End, button1, button2);
         button1.Visible = false;
-        RunIteration (ref runState, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
+
         DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
         End (runState);
         dlg.Dispose ();
@@ -884,7 +888,8 @@ public class DialogTests (ITestOutputHelper output)
         button2 = new () { Text = btn2Text };
         (runState, dlg) = BeginButtonTestDialog (title, width, Alignment.Start, button1, button2);
         button1.Visible = false;
-        RunIteration (ref runState, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
+
         buttonRow = $@"{Glyphs.VLine}        {btn2}  {Glyphs.VLine}";
         DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
         End (runState);
