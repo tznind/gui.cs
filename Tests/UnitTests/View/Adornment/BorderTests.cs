@@ -98,7 +98,7 @@ public class BorderTests (ITestOutputHelper output)
         var firstIteration = false;
 
         AutoInitShutdownAttribute.FakeResize(new Size(width, 5));
-        Application.RunIteration (ref rs, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
         switch (width)
@@ -365,7 +365,7 @@ public class BorderTests (ITestOutputHelper output)
         var firstIteration = false;
 
         AutoInitShutdownAttribute.FakeResize(new Size(width, 4));
-        Application.RunIteration (ref rs, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
         switch (width)
@@ -488,7 +488,7 @@ public class BorderTests (ITestOutputHelper output)
         var firstIteration = false;
 
         AutoInitShutdownAttribute.FakeResize(new Size(20, height));
-        Application.RunIteration (ref rs, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
         switch (height)
@@ -550,7 +550,7 @@ public class BorderTests (ITestOutputHelper output)
         var firstIteration = false;
 
         AutoInitShutdownAttribute.FakeResize(new Size(width, 3));
-        Application.RunIteration (ref rs, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
         switch (width)
@@ -734,7 +734,7 @@ public class BorderTests (ITestOutputHelper output)
         var firstIteration = false;
 
         AutoInitShutdownAttribute.FakeResize(new Size(5, 5));
-        Application.RunIteration (ref rs, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
 
         var expected = @"
 ╔═══╗
@@ -762,7 +762,7 @@ public class BorderTests (ITestOutputHelper output)
         var firstIteration = false;
 
         AutoInitShutdownAttribute.FakeResize(new Size(10, 4));
-        Application.RunIteration (ref rs, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
 
         var expected = @"
 ╔════════╗
@@ -785,7 +785,7 @@ public class BorderTests (ITestOutputHelper output)
         var firstIteration = false;
 
         AutoInitShutdownAttribute.FakeResize(new Size(3, 3));
-        Application.RunIteration (ref rs, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
 
         var expected = @"
 ┌─┐

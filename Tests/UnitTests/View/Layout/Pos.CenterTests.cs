@@ -36,7 +36,7 @@ public class PosCenterTests (ITestOutputHelper output)
         var firstIteration = false;
 
         AutoInitShutdownAttribute.FakeResize(new Size(20, height));
-        Application.RunIteration (ref rs, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
         switch (height)
@@ -183,7 +183,7 @@ public class PosCenterTests (ITestOutputHelper output)
         var firstIteration = false;
 
         AutoInitShutdownAttribute.FakeResize(new Size(width, 7));
-        Application.RunIteration (ref rs, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
         switch (width)

@@ -700,7 +700,7 @@ public class ToplevelTests
         Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Pressed });
 
         var firstIteration = false;
-        Application.RunIteration (ref rs, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (window.Border, Application.MouseGrabHandler.MouseGrabView);
 
         Assert.Equal (new (0, 0, 10, 3), window.Frame);
@@ -712,7 +712,7 @@ public class ToplevelTests
                                      });
 
         firstIteration = false;
-        Application.RunIteration (ref rs, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (window.Border, Application.MouseGrabHandler.MouseGrabView);
         Assert.Equal (new (1, 1, 10, 3), window.Frame);
 

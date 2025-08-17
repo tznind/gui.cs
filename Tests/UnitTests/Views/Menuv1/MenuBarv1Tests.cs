@@ -1442,7 +1442,7 @@ wo
         foreach (KeyCode key in keys)
         {
             Assert.True (top.NewKeyDownEvent (new (key)));
-            Application.MainLoop!.RunIteration ();
+            AutoInitShutdownAttribute.RunIteration ();
         }
 
         Assert.Equal (expectedAction, miAction);
@@ -1947,6 +1947,8 @@ wo
         Application.Iteration += (s, a) =>
                                  {
                                      Toplevel top = Application.Top;
+
+                                     // TODO: Can't do this, we are already in an iteration event handler - hello infinite loop
                                      AutoInitShutdownAttribute.RunIteration ();
 
                                      DriverAssert.AssertDriverContentsWithFrameAre (
@@ -2883,8 +2885,8 @@ Edit
         RunState rs = Application.Begin (top);
 
         menu.OpenMenu ();
-        var firstIteration = false;
-        Application.RunIteration (ref rs, firstIteration);
+
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -2896,8 +2898,8 @@ Edit
                                                      );
 
         AutoInitShutdownAttribute.FakeResize(new Size(20, 15));
-        firstIteration = false;
-        Application.RunIteration (ref rs, firstIteration);
+
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -3308,7 +3310,6 @@ Edit
     //  New    Copy
     public class ExpectedMenuBar : MenuBar
     {
-        private FakeDriver _d = (FakeDriver)Application.Driver;
 
         // The expected strings when the menu is closed
         public string ClosedMenuText => MenuBarText + "\n";
