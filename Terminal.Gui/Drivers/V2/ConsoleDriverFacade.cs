@@ -389,14 +389,14 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     /// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
     public void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl)
     {
-        var k = key switch
+        Key k = key switch
                 {
                     ConsoleKey.UpArrow => Key.CursorUp,
                     ConsoleKey.DownArrow => Key.CursorDown,
                     ConsoleKey.LeftArrow => Key.CursorLeft,
                     ConsoleKey.RightArrow => Key.CursorRight,
                     ConsoleKey.Escape => Key.Esc,
-                    _ => (Key)keyChar
+                    _ => ConsoleKeyMapping.MapConsoleKeyInfoToKeyCode (new (keyChar, key, shift, alt, ctrl))
                 };
 
         if (keyChar == '\n')
@@ -410,7 +410,6 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
         }
         if (shift)
         {
-            k = (Key)char.ToLower(keyChar);
             k = k.WithShift;
         }
         if (alt)
@@ -418,8 +417,12 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
             k = k.WithAlt;
         }
 
-        InputProcessor.OnKeyDown (k);
-        InputProcessor.OnKeyUp (k);
+        if ((InputProcessor is NetInputProcessor netInputProcessor && netInputProcessor.IsValidInput (k, out k))
+            || (InputProcessor is WindowsInputProcessor winInputProcessor && winInputProcessor.IsValidInput (k, out k)))
+        {
+            InputProcessor.OnKeyDown (k);
+            InputProcessor.OnKeyUp (k);
+        }
     }
 
     /// <summary>
