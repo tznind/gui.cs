@@ -72,7 +72,7 @@ public class FileDialogTests ()
 
         dlg.Path = openIn + Path.DirectorySeparatorChar;
 
-        Send ("X");
+        Send ("x");
 
         // nothing selected yet
         Assert.True (dlg.Canceled);
@@ -206,7 +206,7 @@ public class FileDialogTests ()
         }
         else
         {
-            Send ('O', ConsoleKey.O, false, true);
+            Send ('o', ConsoleKey.O, false, true);
         }
 
         Assert.False (dlg.Canceled);
@@ -261,7 +261,7 @@ public class FileDialogTests ()
         }
         else
         {
-            Send ('O', ConsoleKey.O, false, true);
+            Send ('o', ConsoleKey.O, false, true);
         }
 
         Assert.False (dlg.Canceled);
@@ -375,7 +375,7 @@ public class FileDialogTests ()
         Send ('>', ConsoleKey.LeftArrow);
         Send ('>', ConsoleKey.RightArrow);
 
-        Send ("SUBFOLDER");
+        Send ("subfolder");
 
         // Dialog has not yet been confirmed with a choice
         Assert.True (dlg.Canceled);
@@ -772,7 +772,7 @@ public class FileDialogTests ()
     {
         foreach (char ch in chars)
         {
-            Application.Driver?.SendKeys (ch, ConsoleKey.NoName, false, false, false);
+            Application.Driver?.SendKeys (ch, ConsoleKey.NoName,char.IsUpper (ch), false, false);
         }
     }
 
