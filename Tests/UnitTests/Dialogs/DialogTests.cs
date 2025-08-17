@@ -1310,12 +1310,10 @@ public class DialogTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     public void Zero_Buttons_Works ()
     {
         RunState? runState = null;
-
-        var d = (IFakeDriverV2)Driver!;
 
         var title = "1234";
 
