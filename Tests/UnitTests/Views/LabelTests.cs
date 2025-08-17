@@ -116,7 +116,7 @@ public class LabelTests (ITestOutputHelper output)
 
         label.Text = "Say Hello 你 changed";
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected = @"
 ┌────────────────────────────┐
@@ -156,7 +156,7 @@ public class LabelTests (ITestOutputHelper output)
 
         label.Text = "Say Hello 你 changed";
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected = @"
 ┌────────────────────────────┐
@@ -208,6 +208,8 @@ public class LabelTests (ITestOutputHelper output)
 
         tf2.Draw (new (new (0, 2), tfSize), label.GetAttributeForRole (VisualRole.Normal), label.GetAttributeForRole (VisualRole.HotNormal));
 
+        AutoInitShutdownAttribute.RunIteration ();
+
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
 This label needs to be cleared before rewritten.                       
@@ -250,7 +252,7 @@ This TextFormatter (tf2) is rewritten.                                 ",
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (0, 0, 16, 1), label.Frame);
 
@@ -271,7 +273,7 @@ Demo Simple Rune
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.NotNull (label.Width);
         Assert.NotNull (label.Height);
 
@@ -307,7 +309,7 @@ e
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var expected = @"
 デ
@@ -478,7 +480,7 @@ e
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (0, 0, 6, 3), label.Frame);
         Assert.Equal (new (0, 0, 4, 1), label.Viewport);
@@ -502,7 +504,7 @@ e
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 0, 6, 2), label.Frame);
         Assert.Equal (new (0, 0, 4, 1), label.Viewport);
         Application.Begin (top);
@@ -1224,7 +1226,7 @@ e
         Assert.Equal (10, text.Length);
 
         //label.Width = Dim.Fill () - text.Length;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
         Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
@@ -1283,7 +1285,7 @@ e
         Assert.Equal (10, text.Length);
 
         //label.Width = Dim.Fill () - text.Length;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
         Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);

@@ -357,7 +357,7 @@ public class MessageBoxTests
                                      }
                                      else if (iterations == 1)
                                      {
-                                         Application.LayoutAndDraw ();
+                                         AutoInitShutdownAttribute.RunIteration ();
 
                                          Assert.IsType<Dialog> (Application.Top);
                                          Assert.Equal (new (height, width), Application.Top.Frame.Size);
@@ -394,7 +394,7 @@ public class MessageBoxTests
                                      }
                                      else if (iterations == 1)
                                      {
-                                         Application.LayoutAndDraw ();
+                                         AutoInitShutdownAttribute.RunIteration ();
 
                                          Assert.IsType<Dialog> (Application.Top);
                                          Assert.Equal (new (height, width), Application.Top.Frame.Size);
@@ -427,7 +427,7 @@ public class MessageBoxTests
                                      }
                                      else if (iterations == 1)
                                      {
-                                         Application.LayoutAndDraw ();
+                                         AutoInitShutdownAttribute.RunIteration ();
 
                                          Assert.IsType<Dialog> (Application.Top);
                                          Assert.Equal (new (height, width), Application.Top.Frame.Size);

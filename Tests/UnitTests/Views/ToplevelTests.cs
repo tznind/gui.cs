@@ -324,7 +324,7 @@ public class ToplevelTests
                                                                           ScreenPosition = new (2, 2), Flags = MouseFlags.Button1Pressed
                                                                               | MouseFlags.ReportMousePosition
                                                                       });
-                                         Application.LayoutAndDraw ();
+                                         AutoInitShutdownAttribute.RunIteration ();
 
                                          Assert.Equal (Application.Top.Border, Application.MouseGrabHandler.MouseGrabView);
                                          Assert.Equal (new (1, 2, 10, 3), Application.Top.Frame);
@@ -347,7 +347,7 @@ public class ToplevelTests
                                                                           ScreenPosition = new (2, 1),
                                                                           Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                                                       });
-                                         Application.LayoutAndDraw ();
+                                         AutoInitShutdownAttribute.RunIteration ();
 
                                          Assert.Equal (Application.Top!.Border, Application.MouseGrabHandler.MouseGrabView);
                                          Assert.Equal (new (1, 1, 10, 3), Application.Top.Frame);
@@ -366,7 +366,7 @@ public class ToplevelTests
 
                                          // Ungrab the mouse
                                          Application.RaiseMouseEvent (new () { ScreenPosition = new (2, 1), Flags = MouseFlags.Button1Released });
-                                         Application.LayoutAndDraw ();
+                                         AutoInitShutdownAttribute.RunIteration ();
 
                                          Assert.Null (Application.MouseGrabHandler.MouseGrabView);
                                      }
@@ -598,7 +598,7 @@ public class ToplevelTests
         RunState rsTop = Application.Begin (top);
         AutoInitShutdownAttribute.FakeResize(new Size(40, 10));
         RunState rsWindow = Application.Begin (window);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
         Assert.Equal (new (0, 0, 20, 3), window.Frame);
 
@@ -614,7 +614,7 @@ public class ToplevelTests
                                          ScreenPosition = new (-11, -4), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                      });
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
         Assert.Equal (new (-11, -4, 20, 3), window.Frame);
 
@@ -627,7 +627,7 @@ public class ToplevelTests
                                          ScreenPosition = new (-1, -1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                      });
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 0, 20, 3), top.Frame);
         Assert.Equal (new (-1, -1, 20, 3), window.Frame);
 
@@ -640,7 +640,7 @@ public class ToplevelTests
                                          ScreenPosition = new (-1, -1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                      });
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 0, 19, 2), top.Frame);
         Assert.Equal (new (-1, -1, 20, 3), window.Frame);
 
@@ -650,7 +650,7 @@ public class ToplevelTests
                                          ScreenPosition = new (18, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                      });
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 0, 19, 2), top.Frame);
         Assert.Equal (new (18, 1, 20, 3), window.Frame);
 
@@ -661,7 +661,7 @@ public class ToplevelTests
                                          ScreenPosition = new (19, 2), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                      });
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 0, 19, 2), top.Frame);
         Assert.Equal (new (19, 2, 20, 3), window.Frame);
 

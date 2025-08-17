@@ -76,7 +76,7 @@ public class DrawTests (ITestOutputHelper output)
 
         var rs = Application.Begin (top);
         AutoInitShutdownAttribute.FakeResize(new Size(7, 7));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
