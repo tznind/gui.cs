@@ -928,7 +928,7 @@ public class DialogTests (ITestOutputHelper output)
 
                           dlg.Loaded += (s, a) =>
                                         {
-                                            LayoutAndDraw ();
+                                            AutoInitShutdownAttribute.RunIteration ();
 
                                             var expected = @$"
 ┌──────────────────┐
@@ -1033,7 +1033,7 @@ public class DialogTests (ITestOutputHelper output)
                          }
                          else if (iterations == 1)
                          {
-                             LayoutAndDraw ();
+                             AutoInitShutdownAttribute.RunIteration ();
 
                              // BUGBUG: This seems wrong; is it a bug in Dim.Percent(85)?? No
                              _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
@@ -1105,7 +1105,6 @@ public class DialogTests (ITestOutputHelper output)
                              case 0:
                                  Top!.SetNeedsLayout ();
                                  Top.SetNeedsDraw ();
-                                 LayoutAndDraw ();
 
                                  break;
 
@@ -1113,8 +1112,10 @@ public class DialogTests (ITestOutputHelper output)
                                  Assert.False (btn1.NewKeyDownEvent (Key.Space));
 
                                  break;
-                             case 2:
-                                 LayoutAndDraw ();
+
+                             // Now this happens on iteration 3 because Space triggers Run on the new dialog which itself causes another iteration
+                             // as it starts. Meaning we haven't exited case 1 when we enter case 2 from next Run stack frame.
+                             case 3:
 
                                  expected = @$"
   ┌───────────────────────┐
@@ -1130,8 +1131,7 @@ public class DialogTests (ITestOutputHelper output)
                                  Assert.False (btn2!.NewKeyDownEvent (Key.Space));
 
                                  break;
-                             case 3:
-                                 LayoutAndDraw ();
+                             case 5:
 
                                  DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                 @$"
@@ -1149,15 +1149,14 @@ public class DialogTests (ITestOutputHelper output)
                                  Assert.False (Top!.NewKeyDownEvent (Key.Enter));
 
                                  break;
-                             case 4:
-                                 LayoutAndDraw ();
+                             case 7:
 
                                  DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
                                  Assert.False (btn3!.NewKeyDownEvent (Key.Space));
 
                                  break;
-                             case 5:
+                             case 9:
                                  DriverAssert.AssertDriverContentsWithFrameAre ("", output);
 
                                  RequestStop ();
@@ -1169,7 +1168,7 @@ public class DialogTests (ITestOutputHelper output)
         Run ().Dispose ();
         Shutdown ();
 
-        Assert.Equal (5, iterations);
+        Assert.Equal (9, iterations);
     }
 
     [Fact]
