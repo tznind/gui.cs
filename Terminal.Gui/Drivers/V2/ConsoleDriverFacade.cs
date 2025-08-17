@@ -395,6 +395,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
                     ConsoleKey.DownArrow => Key.CursorDown,
                     ConsoleKey.LeftArrow => Key.CursorLeft,
                     ConsoleKey.RightArrow => Key.CursorRight,
+                    ConsoleKey.Escape => Key.Esc,
                     _ => (Key)keyChar
                 };
 
