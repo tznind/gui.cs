@@ -165,7 +165,8 @@ public abstract class InputProcessor<T> : IInputProcessor
 
     internal char _highSurrogate = '\0';
 
-    internal bool IsValidInput (Key key, out Key result)
+    /// <inheritdoc />
+    public bool IsValidInput (Key key, out Key result)
     {
         result = key;
 

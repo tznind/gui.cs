@@ -417,8 +417,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
             k = k.WithAlt;
         }
 
-        if ((InputProcessor is NetInputProcessor netInputProcessor && netInputProcessor.IsValidInput (k, out k))
-            || (InputProcessor is WindowsInputProcessor winInputProcessor && winInputProcessor.IsValidInput (k, out k)))
+        if (InputProcessor.IsValidInput (k, out k))
         {
             InputProcessor.OnKeyDown (k);
             InputProcessor.OnKeyUp (k);
