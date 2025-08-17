@@ -684,7 +684,7 @@ public class DrawTests (ITestOutputHelper output)
         Toplevel top = new ();
         top.Add (label, view);
         RunState runState = Application.Begin (top);
-        Application.RunIteration (ref runState);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -785,7 +785,7 @@ At 0,0
         Toplevel top = new ();
         top.Add (label, view);
         RunState runState = Application.Begin (top);
-        Application.RunIteration (ref runState);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
