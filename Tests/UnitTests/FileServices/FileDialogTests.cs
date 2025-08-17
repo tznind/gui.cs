@@ -46,9 +46,9 @@ public class FileDialogTests ()
                      );
 
         // continue typing the rest of the path
-        Send ("BOB");
+        Send ("bob");
         Send ('.', ConsoleKey.OemPeriod);
-        Send ("CSV");
+        Send ("csv");
 
         Assert.True (dlg.Canceled);
 

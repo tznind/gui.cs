@@ -389,7 +389,15 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     /// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
     public void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl)
     {
-        // TODO: implement
+        var k = (Key)keyChar;
+
+        if (keyChar == '\n')
+        {
+            k = Key.Enter;
+        }
+
+        InputProcessor.OnKeyDown (k);
+        InputProcessor.OnKeyUp (k);
     }
 
     /// <summary>
