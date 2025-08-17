@@ -25,6 +25,7 @@ public class SetLayoutTests (ITestOutputHelper output)
         Application.Top.Add (view);
 
         var rs = Application.Begin (Application.Top);
+        AutoInitShutdownAttribute.FakeResize (new Size (80,25));
 
         Assert.Equal (new (0, 0, 80, 25), new Rectangle (0, 0, Application.Screen.Width, Application.Screen.Height));
         Assert.Equal (new (0, 0, Application.Screen.Width, Application.Screen.Height), Application.Top.Frame);
@@ -36,6 +37,6 @@ public class SetLayoutTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 20, 10), Application.Top.Frame);
 
         Application.End (rs);
-
+        Application.Top.Dispose ();
     }
 }
