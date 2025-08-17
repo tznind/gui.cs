@@ -83,12 +83,14 @@ public class SendKeys : Scenario
             {
                 ConsoleKey ck = char.IsLetter (r)
                                     ? (ConsoleKey)char.ToUpper (r)
-                                    : (ConsoleKey)r;
+                                    : r < 256
+                                        ? (ConsoleKey)r
+                                        : ConsoleKey.NoName;
 
                 Application.Driver?.SendKeys (
-                                             r,
+                                             char.ToUpper (r),
                                              ck,
-                                             ckbShift.CheckedState == CheckState.Checked,
+                                             ckbShift.CheckedState == CheckState.Checked || char.IsUpper (r),
                                              ckbAlt.CheckedState == CheckState.Checked,
                                              ckbControl.CheckedState == CheckState.Checked
                                             );
