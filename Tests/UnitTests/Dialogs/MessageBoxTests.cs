@@ -505,16 +505,13 @@ public class MessageBoxTests
 
     [Theory]
     [MemberData (nameof (AcceptingKeys))]
+    [AutoInitShutdown]
     public void Button_IsDefault_True_Return_His_Index_On_Accepting (Key key)
     {
-        Application.Init (new FakeDriver ());
-
         Application.Iteration += (_, _) => Assert.True (Application.RaiseKeyDownEvent (key));
         int res = MessageBox.Query ("hey", "IsDefault", "Yes", "No");
 
         Assert.Equal (0, res);
-
-        Application.Shutdown ();
     }
 
     public static IEnumerable<object []> AcceptingKeys ()
