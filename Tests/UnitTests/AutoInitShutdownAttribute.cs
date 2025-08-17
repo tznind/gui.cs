@@ -138,7 +138,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
             {
                 var fa = new FakeApplicationFactory ();
                 _v2Cleanup = fa.SetupFakeApplication ();
-                AutoInitShutdownAttribute.FakeResize (new Size (10,80));
+                AutoInitShutdownAttribute.FakeResize (new Size (80,10));
             }
             else
             {

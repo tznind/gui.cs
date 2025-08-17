@@ -302,7 +302,8 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.X = -1;
-        Application.LayoutAndDraw ();
+
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -317,12 +318,12 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.X = -2;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre (@"", output);
 
         content.X = 0;
         content.Y = -1;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -337,7 +338,7 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.Y = -6;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -352,7 +353,7 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.Y = -19;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -363,12 +364,12 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.Y = -20;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre ("", output);
 
         content.X = -2;
         content.Y = 0;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre ("", output);
         top.Dispose ();
     }
@@ -408,7 +409,7 @@ public class DrawTests (ITestOutputHelper output)
         top.SubViewsLaidOut += Top_LayoutComplete;
         Application.Begin (top);
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
                                                       
@@ -419,7 +420,7 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.X = -1;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -431,7 +432,7 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.Y = -1;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -442,12 +443,12 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.Y = -2;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre ("", output);
 
         content.X = -20;
         content.Y = 0;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre ("", output);
         top.Dispose ();
 
@@ -495,7 +496,7 @@ public class DrawTests (ITestOutputHelper output)
         top.Add (container);
         Application.Begin (top);
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
                                                       
@@ -509,7 +510,7 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.X = -1;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -524,12 +525,12 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.X = -2;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre (@"", output);
 
         content.X = 0;
         content.Y = -1;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -544,7 +545,7 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.Y = -6;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -559,7 +560,7 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.Y = -19;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -570,12 +571,12 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.Y = -20;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre ("", output);
 
         content.X = -2;
         content.Y = 0;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre ("", output);
         top.Dispose ();
     }
