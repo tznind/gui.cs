@@ -204,11 +204,11 @@ public class LabelTests (ITestOutputHelper output)
         Assert.False (tf1.FillRemaining);
         Assert.True (tf2.FillRemaining);
 
+        AutoInitShutdownAttribute.RunIteration ();
+
         tf1.Draw (new (new (0, 1), tfSize), label.GetAttributeForRole (VisualRole.Normal), label.GetAttributeForRole (VisualRole.HotNormal));
 
         tf2.Draw (new (new (0, 2), tfSize), label.GetAttributeForRole (VisualRole.Normal), label.GetAttributeForRole (VisualRole.HotNormal));
-
-        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
