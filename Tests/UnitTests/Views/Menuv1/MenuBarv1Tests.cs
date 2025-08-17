@@ -30,12 +30,14 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Application.Begin (top);
 
         top.NewKeyDownEvent (Key.N.WithAlt);
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
+
         Assert.True (menuBar.IsMenuOpen);
         Assert.Equal ("", action);
 
         top.NewKeyDownEvent (Key.I);
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
+
         Assert.False (menuBar.IsMenuOpen);
         Assert.Equal ("I", action);
 
@@ -75,7 +77,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Assert.False (mi.Checked);
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.Enter));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.True (mi.Checked);
 
         Assert.True (
@@ -89,13 +91,13 @@ public class MenuBarv1Tests (ITestOutputHelper output)
                                                    new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked, View = menu._openMenu }
                                                   )
                     );
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.False (mi.Checked);
 
         mi.AllowNullChecked = true;
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.Enter));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Null (mi.Checked);
 
         Assert.True (
@@ -119,11 +121,11 @@ public class MenuBarv1Tests (ITestOutputHelper output)
                                                    new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked, View = menu._openMenu }
                                                   )
                     );
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.True (mi.Checked);
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.Enter));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.False (mi.Checked);
 
         Assert.True (
@@ -137,7 +139,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
                                                    new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked, View = menu._openMenu }
                                                   )
                     );
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Null (mi.Checked);
 
         mi.AllowNullChecked = false;
@@ -220,7 +222,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
 
         Assert.True (top.NewKeyDownEvent (Key.F.WithAlt));
         Assert.True (top.NewKeyDownEvent (Key.N.WithAlt));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.NotNull (win);
         Assert.False (CanExecuteNew ());
         Assert.True (CanExecuteClose ());
@@ -1115,13 +1117,13 @@ wo
         Assert.Equal (new (1, 0, 11, 1), pos);
 
         Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.N)));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.False (newAction); // not yet, hot keys don't work if the item is not visible
 
         Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.F)));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.N)));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.True (newAction);
         Application.Top.Draw ();
 
@@ -1144,7 +1146,7 @@ wo
 
         Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
         Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.C)));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.True (copyAction);
 #endif
         top.Dispose ();
@@ -1216,7 +1218,7 @@ wo
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
         Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.N));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.True (newAction);
 
         Assert.True (menu.NewKeyDownEvent (Key.E.WithAlt));
@@ -1225,7 +1227,7 @@ wo
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
 
         Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.C));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.True (copyAction);
         top.Dispose ();
     }
@@ -1385,7 +1387,7 @@ wo
         foreach (Key key in keys)
         {
             top.NewKeyDownEvent (key);
-            Application.MainLoop.RunIteration ();
+            AutoInitShutdownAttribute.RunIteration ();
         }
 
         Assert.Equal (expectedBarTitle, mbiCurrent != null ? mbiCurrent.Title : "Closed");
@@ -2968,7 +2970,7 @@ Edit
         Application.Begin (top);
 
         Application.RaiseKeyDownEvent (Key.S.WithCtrl);
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.True (saveAction);
         top.Dispose ();
