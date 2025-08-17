@@ -392,14 +392,13 @@ public class WizardTests ()
     // and that the title is correct
     public void OneStepWizard_Shows ()
     {
-        var d = (FakeDriver)Application.Driver;
 
         var title = "1234";
         var stepTitle = "ABCD";
 
         var width = 30;
         var height = 7;
-        d.SetBufferSize (width, height);
+        AutoInitShutdownAttribute.FakeResize (new Size (width, height));
 
         //	var btnBackText = "Back";
         var btnBack = string.Empty; // $"{Glyphs.LeftBracket} {btnBackText} {Glyphs.RightBracket}";
@@ -646,14 +645,12 @@ public class WizardTests ()
     // and that the title is correct
     public void ZeroStepWizard_Shows ()
     {
-        var d = (FakeDriver)Application.Driver;
-
         var title = "1234";
         var stepTitle = "";
 
         var width = 30;
         var height = 6;
-        d.SetBufferSize (width, height);
+        AutoInitShutdownAttribute.FakeResize (new Size (width, height));
 
         var btnBackText = "Back";
         var btnBack = $"{Glyphs.LeftBracket} {btnBackText} {Glyphs.RightBracket}";
