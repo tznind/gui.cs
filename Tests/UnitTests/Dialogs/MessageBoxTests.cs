@@ -217,9 +217,8 @@ public class MessageBoxTests
 
                                          Application.RequestStop ();
                                      }
-                                     else if (iterations == 1)
+                                     else if (iterations == 2)
                                      {
-                                         Application.LayoutAndDraw ();
 
                                          DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                         @"
@@ -234,9 +233,8 @@ public class MessageBoxTests
                                          // Really long text
                                          MessageBox.Query (string.Empty, new ('f', 500), 0, false, "btn");
                                      }
-                                     else if (iterations == 2)
+                                     else if (iterations == 4)
                                      {
-                                         Application.LayoutAndDraw ();
 
                                          DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                         @"
@@ -289,9 +287,8 @@ public class MessageBoxTests
 
                                          Application.RequestStop ();
                                      }
-                                     else if (iterations == 1)
+                                     else if (iterations == 2)
                                      {
-                                         Application.LayoutAndDraw ();
 
                                          DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                         @"
@@ -309,9 +306,8 @@ public class MessageBoxTests
                                          // Really long text
                                          MessageBox.Query (string.Empty, new ('f', 500), 0, true, "btn");
                                      }
-                                     else if (iterations == 2)
+                                     else if (iterations == 4)
                                      {
-                                         Application.LayoutAndDraw ();
 
                                          DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                         @"
@@ -446,7 +442,7 @@ public class MessageBoxTests
     public void UICatalog_AboutBox ()
     {
         int iterations = -1;
-        ((FakeDriver)Application.Driver).SetBufferSize (70, 15);
+        AutoInitShutdownAttribute.FakeResize (new Size (70, 15));
 
         // Override CM
         MessageBox.DefaultButtonAlignment = Alignment.End;
@@ -469,10 +465,8 @@ public class MessageBoxTests
 
                                          Application.RequestStop ();
                                      }
-                                     else if (iterations == 1)
+                                     else if (iterations == 2)
                                      {
-                                         Application.LayoutAndDraw ();
-
                                          var expectedText = """
                                                             ┌────────────────────────────────────────────────────────────────────┐
                                                             │   ╔═══════════════════════════════════════════════════════════╗    │
