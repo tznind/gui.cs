@@ -51,8 +51,6 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
         IComponentFactory<T> componentFactory
     )
     {
-        componentFactory.CreateInput ();
-        ;
         _timedEvents = timedEvents;
         _inputBuffer = inputBuffer;
         _inputProcessor = componentFactory.CreateInputProcessor (_inputBuffer);
