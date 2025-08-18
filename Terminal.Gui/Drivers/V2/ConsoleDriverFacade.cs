@@ -396,7 +396,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
                     ConsoleKey.LeftArrow => Key.CursorLeft,
                     ConsoleKey.RightArrow => Key.CursorRight,
                     ConsoleKey.Escape => Key.Esc,
-                    _ => ConsoleKeyMapping.MapConsoleKeyInfoToKeyCode (new (keyChar, key, shift, alt, ctrl))
+                    _ => (Key)keyChar
                 };
 
         if (keyChar == '\n')
