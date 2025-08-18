@@ -23,6 +23,9 @@ public class ApplicationV2Tests
 
             var m = new Mock<IComponentFactory<ConsoleKeyInfo>> ();
             m.Setup (f => f.CreateInput ()).Returns (netInput.Object);
+            m.Setup (f => f.CreateInputProcessor (It.IsAny<ConcurrentQueue<ConsoleKeyInfo>> ())).Returns (Mock.Of <IInputProcessor> ());
+            m.Setup (f => f.CreateOutput ()).Returns (Mock.Of<IConsoleOutput> ());
+            m.Setup (f => f.CreateWindowSizeMonitor (It.IsAny<IConsoleOutput> (),It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<IWindowSizeMonitor> ());
 
             return new (m.Object);
         }
@@ -33,7 +36,9 @@ public class ApplicationV2Tests
             SetupRunInputMockMethodToBlock (winInput);
             var m = new Mock<IComponentFactory<WindowsConsole.InputRecord>> ();
             m.Setup (f => f.CreateInput ()).Returns (winInput.Object);
-
+            m.Setup (f => f.CreateInputProcessor (It.IsAny<ConcurrentQueue<WindowsConsole.InputRecord>> ())).Returns (Mock.Of<IInputProcessor> ());
+            m.Setup (f => f.CreateOutput ()).Returns (Mock.Of<IConsoleOutput> ());
+            m.Setup (f => f.CreateWindowSizeMonitor (It.IsAny<IConsoleOutput> (), It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<IWindowSizeMonitor> ());
             return new (m.Object);
         }
     }

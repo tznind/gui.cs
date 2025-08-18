@@ -81,8 +81,8 @@ public class ApplicationV2 : ApplicationImpl
     {
         PlatformID p = Environment.OSVersion.Platform;
 
-        bool definetlyWin = driverName?.Contains ("win") ?? false;
-        bool definetlyNet = driverName?.Contains ("net") ?? false;
+        bool definetlyWin = (driverName?.Contains ("win") ?? false )|| _componentFactory is IComponentFactory<WindowsConsole.InputRecord>;
+        bool definetlyNet = (driverName?.Contains ("net") ?? false ) || _componentFactory is IComponentFactory<ConsoleKeyInfo>;
 
         if (definetlyWin)
         {
@@ -172,15 +172,15 @@ public class ApplicationV2 : ApplicationImpl
         Logging.Information ($"Run '{view}'");
         ArgumentNullException.ThrowIfNull (view);
 
+        if (!Application.Initialized)
+        {
+            throw new NotInitializedException (nameof (Run));
+        }
+
         if (Application.Driver == null)
         {
             // See Run_T_Init_Driver_Cleared_with_TestTopLevel_Throws
             throw new  InvalidOperationException ("Driver was inexplicably null when trying to Run view");
-        }
-
-        if (!Application.Initialized)
-        {
-            throw new NotInitializedException (nameof (Run));
         }
 
         Application.Top = view;
