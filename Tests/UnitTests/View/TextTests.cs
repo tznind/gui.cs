@@ -783,7 +783,7 @@ w ";
         var top = new Toplevel ();
         top.Add (frame);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (width + 2, 6);
+        AutoInitShutdownAttribute.FakeResize (new Size(width + 2, 6));
 
         // frame.Width is width + border wide (20 + 2) and 6 high
 

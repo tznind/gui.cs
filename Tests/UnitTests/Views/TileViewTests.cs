@@ -2254,6 +2254,8 @@ public class TileViewTests (ITestOutputHelper output)
 
         Application.Begin (Application.Top);
 
+        Application.Top.SetNeedsDraw();
+
         return tv;
     }
 

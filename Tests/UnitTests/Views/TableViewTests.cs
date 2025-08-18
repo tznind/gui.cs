@@ -518,7 +518,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // Now test making the width too small for the MinAcceptableWidth
         // the Column won't fit so should not be rendered
-        var driver = (FakeDriver)Application.Driver;
+        var driver = Application.Driver;
         driver.ClearContents ();
 
         tableView.Viewport = new (0, 0, 9, 5);

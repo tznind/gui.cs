@@ -5453,7 +5453,7 @@ This is the second line.
                                                        _output
                                                       );
 
-        ((FakeDriver)Application.Driver).SetBufferSize (6, 25);
+        AutoInitShutdownAttribute.FakeResize(new Size (6, 25));
         tv.SetRelativeLayout (Application.Screen.Size);
         tv.Draw ();
         Assert.Equal (new (4, 2), tv.CursorPosition);

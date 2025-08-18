@@ -57,6 +57,8 @@ class FakeApplicationLifecycle : IDisposable
     public void Dispose ()
     {
         _hardStop.Cancel();
+
+        Application.Top?.Dispose ();
         Application.Shutdown ();
         ApplicationImpl.ChangeInstance (_origApp);
     }
