@@ -1741,12 +1741,12 @@ wo
         Toplevel top = new ();
         top.Add (win);
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     AutoInitShutdownAttribute.FakeResize(new Size (40, 8));
+        Application.AddTimeout (TimeSpan.Zero, () =>
+                                                       {
+                                                           AutoInitShutdownAttribute.FakeResize(new Size (40, 8));
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │                                      │
@@ -1755,14 +1755,14 @@ wo
 │                                      │
 │                                      │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Assert.True (win.NewKeyDownEvent (menu.Key));
-                                     top.Draw ();
+                                                           Assert.True (win.NewKeyDownEvent (menu.Key));
+                                                           top.Draw ();
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │┌──────┐                              │
@@ -1771,14 +1771,14 @@ wo
 │                                      │
 │                                      │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Assert.True (menu.NewKeyDownEvent (Key.CursorRight));
-                                     AutoInitShutdownAttribute.RunIteration ();
+                                                           Assert.True (menu.NewKeyDownEvent (Key.CursorRight));
+                                                           AutoInitShutdownAttribute.RunIteration ();
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │      ┌─────────┐                     │
@@ -1787,14 +1787,14 @@ wo
 │                                      │
 │                                      │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorRight));
-                                     top.Draw ();
+                                                           Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorRight));
+                                                           top.Draw ();
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │      ┌─────────┐                     │
@@ -1803,15 +1803,15 @@ wo
 │                 │ Selected  │        │
 │                 └───────────┘        │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorRight));
-                                     View.SetClipToScreen ();
-                                     top.Draw ();
+                                                           Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorRight));
+                                                           View.SetClipToScreen ();
+                                                           top.Draw ();
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │┌──────┐                              │
@@ -1820,11 +1820,13 @@ wo
 │                                      │
 │                                      │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Application.RequestStop ();
-                                 };
+                                                           Application.RequestStop ();
+
+                                                           return false;
+                                                       });
 
         Application.Run (top);
         top.Dispose ();
@@ -1944,15 +1946,14 @@ wo
     {
         AutoInitShutdownAttribute.FakeResize(new Size(40, 8));
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     Toplevel top = Application.Top;
+        Application.AddTimeout (TimeSpan.Zero, () =>
+                                                       {
+                                                           Toplevel top = Application.Top;
 
-                                     // TODO: Can't do this, we are already in an iteration event handler - hello infinite loop
-                                     AutoInitShutdownAttribute.RunIteration ();
+                                                           AutoInitShutdownAttribute.RunIteration ();
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │                                      │
@@ -1961,14 +1962,14 @@ wo
 │                                      │
 │                                      │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Assert.True (top.NewKeyDownEvent (Key.F9));
-                                     top.Draw ();
+                                                           Assert.True (top.NewKeyDownEvent (Key.F9));
+                                                           top.Draw ();
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │┌──────┐                              │
@@ -1977,14 +1978,14 @@ wo
 │                                      │
 │                                      │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Assert.True (top.SubViews.ElementAt (0).NewKeyDownEvent (Key.CursorRight));
-                                     AutoInitShutdownAttribute.RunIteration ();
+                                                           Assert.True (top.SubViews.ElementAt (0).NewKeyDownEvent (Key.CursorRight));
+                                                           AutoInitShutdownAttribute.RunIteration ();
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │      ┌─────────┐                     │
@@ -1993,16 +1994,16 @@ wo
 │                                      │
 │                                      │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Assert.True (
-                                                  ((MenuBar)top.SubViews.ElementAt (0))._openMenu.NewKeyDownEvent (Key.CursorRight)
-                                                 );
-                                     top.Draw ();
+                                                           Assert.True (
+                                                                        ((MenuBar)top.SubViews.ElementAt (0))._openMenu.NewKeyDownEvent (Key.CursorRight)
+                                                                       );
+                                                           top.Draw ();
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │      ┌─────────┐                     │
@@ -2011,17 +2012,17 @@ wo
 │                 │ Selected  │        │
 │                 └───────────┘        │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Assert.True (
-                                                  ((MenuBar)top.SubViews.ElementAt (0))._openMenu.NewKeyDownEvent (Key.CursorRight)
-                                                 );
-                                     View.SetClipToScreen ();
-                                     top.Draw ();
+                                                           Assert.True (
+                                                                        ((MenuBar)top.SubViews.ElementAt (0))._openMenu.NewKeyDownEvent (Key.CursorRight)
+                                                                       );
+                                                           View.SetClipToScreen ();
+                                                           top.Draw ();
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │┌──────┐                              │
@@ -2030,11 +2031,13 @@ wo
 │                                      │
 │                                      │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Application.RequestStop ();
-                                 };
+                                                           Application.RequestStop ();
+
+                                                           return false;
+                                                       });
 
         Application.Run<CustomWindow> ().Dispose ();
     }
