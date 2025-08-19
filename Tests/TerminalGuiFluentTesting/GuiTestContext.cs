@@ -24,7 +24,7 @@ public class GuiTestContext : IDisposable
     private readonly object _threadLock = new ();
     private readonly FakeSizeMonitor _fakeSizeMonitor;
 
-    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, V2TestDriver driver)
+    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, V2TestDriver driver, TextWriter? logWriter = null)
     {
         IApplication origApp = ApplicationImpl.Instance;
         ILogger? origLogger = Logging.Logger;
@@ -78,7 +78,12 @@ public class GuiTestContext : IDisposable
                                      catch (Exception ex)
                                      {
                                          _ex = ex;
+                                         if (logWriter !=null)
+                                         {
+                                             WriteOutLogs (logWriter);
+                                         }
                                          _hardStop.Cancel();
+
                                      }
                                      finally
                                      {

@@ -16,7 +16,7 @@ public class BasicFluentAssertionTests
     [ClassData (typeof (V2TestDrivers))]
     public void GuiTestContext_NewInstance_Runs (V2TestDriver d)
     {
-        using GuiTestContext context = With.A<Window> (40, 10, d);
+        using GuiTestContext context = With.A<Window> (40, 10, d,_out);
         Assert.True (Application.Top!.Running);
 
         context.WriteOutLogs (_out);

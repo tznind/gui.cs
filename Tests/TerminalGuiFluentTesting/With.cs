@@ -12,10 +12,11 @@ public static class With
     /// <param name="width"></param>
     /// <param name="height"></param>
     /// <param name="v2TestDriver">Which v2 v2TestDriver to use for the test</param>
+    /// <param name="logWriter"></param>
     /// <returns></returns>
-    public static GuiTestContext A<T> (int width, int height, V2TestDriver v2TestDriver) where T : Toplevel, new ()
+    public static GuiTestContext A<T> (int width, int height, V2TestDriver v2TestDriver, TextWriter? logWriter = null) where T : Toplevel, new ()
     {
-        return new (() => new T (), width, height,v2TestDriver);
+        return new (() => new T (), width, height,v2TestDriver,logWriter);
     }
 
     /// <summary>
