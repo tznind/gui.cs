@@ -410,6 +410,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
         }
         if (shift)
         {
+            k = (Key)char.ToLower (keyChar);
             k = k.WithShift;
         }
         if (alt)

@@ -56,7 +56,7 @@ public class FileDialogTests ()
 
         Send ('\n', ConsoleKey.Enter);
         Assert.False (dlg.Canceled);
-        Assert.Equal ($"{path}.csv", Path.GetFileName (dlg.Path), StringComparer.CurrentCultureIgnoreCase);
+        Assert.Equal ($"{path}.csv", Path.GetFileName (dlg.Path));
         dlg.Dispose ();
     }
 
@@ -78,7 +78,7 @@ public class FileDialogTests ()
 
         // nothing selected yet
         Assert.True (dlg.Canceled);
-        Assert.Equal ("x", Path.GetFileName (dlg.Path), StringComparer.CurrentCultureIgnoreCase);
+        Assert.Equal ("x", Path.GetFileName (dlg.Path));
 
         // complete auto typing
         Send ('\t', ConsoleKey.Tab);
@@ -598,11 +598,11 @@ public class FileDialogTests ()
     {
         if (IsWindows ())
         {
-            Assert.Equal (@"c:\demo\subfolder", path, StringComparer.CurrentCultureIgnoreCase);
+            Assert.Equal (@"c:\demo\subfolder", path);
         }
         else
         {
-            Assert.Equal ("/demo/subfolder", path, StringComparer.CurrentCultureIgnoreCase);
+            Assert.Equal ("/demo/subfolder", path);
         }
     }
 
@@ -774,7 +774,7 @@ public class FileDialogTests ()
     {
         foreach (char ch in chars)
         {
-            Application.Driver?.SendKeys (char.ToUpper(ch), ConsoleKey.NoName, char.IsUpper (ch), false, false);
+            Application.Driver?.SendKeys (ch, ConsoleKey.NoName, char.IsUpper (ch), false, false);
         }
     }
 
