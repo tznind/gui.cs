@@ -774,23 +774,14 @@ public class FileDialogTests ()
     {
         foreach (char ch in chars)
         {
-            var ck = ConsoleKey.None;
-            var shift = false;
+            ConsoleKeyInfo consoleKeyInfo = EscSeqUtils.MapConsoleKeyInfo (new (ch, ConsoleKey.None, false, false, false));
 
-            switch (ch)
-            {
-                case >= 'A' and <= 'Z':
-                    ck = (ConsoleKey)ch;
-                    shift = true;
-
-                    break;
-                case >= 'a' and <= 'z':
-                    ck = (ConsoleKey)char.ToUpper (ch);
-
-                    break;
-            }
-
-            Application.Driver?.SendKeys (ch, ck, shift, false, false);
+            Application.Driver?.SendKeys (
+                                          ch,
+                                          consoleKeyInfo.Key,
+                                          (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+                                          (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                          (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
         }
     }
 

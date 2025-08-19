@@ -86,18 +86,15 @@ public class SendKeys : Scenario
 
             foreach (char r in txtInput.Text)
             {
-                ConsoleKey ck = char.IsLetter (r)
-                                    ? (ConsoleKey)char.ToUpper (r)
-                                    : r < 256
-                                        ? (ConsoleKey)r
-                                        : ConsoleKey.NoName;
+                ConsoleKeyInfo consoleKeyInfo = EscSeqUtils.MapConsoleKeyInfo (new (r, ConsoleKey.None, false, false, false));
+
 
                 Application.Driver?.SendKeys (
                                              char.ToUpper (r),
-                                             ck,
-                                             ckbShift.CheckedState == CheckState.Checked || char.IsUpper (r),
-                                             ckbAlt.CheckedState == CheckState.Checked,
-                                             ckbControl.CheckedState == CheckState.Checked
+                                             consoleKeyInfo.Key,
+                                             ckbShift.CheckedState == CheckState.Checked || (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+                                             ckbAlt.CheckedState == CheckState.Checked || (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                             ckbControl.CheckedState == CheckState.Checked || (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0
                                             );
             }
 
