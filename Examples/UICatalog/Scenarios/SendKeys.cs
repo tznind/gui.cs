@@ -1,4 +1,6 @@
-﻿namespace UICatalog.Scenarios;
+﻿using System.Text;
+
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("SendKeys", "SendKeys sample - Send key combinations.")]
 [ScenarioCategory ("Mouse and Keyboard")]
@@ -37,14 +39,7 @@ public class SendKeys : Scenario
 
         txtResult.KeyDown += (s, e) =>
                              {
-                                 if (e.AsRune.IsSurrogatePair ())
-                                 {
-                                     rKeys += e.AsRune;
-                                 }
-                                 else
-                                 {
-                                     rKeys += (char)e.KeyCode;
-                                 }
+                                 rKeys += new Rune ((uint)(e.KeyCode & ~KeyCode.AltMask & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask));
 
                                  if (!IsShift && e.IsShift)
                                  {
