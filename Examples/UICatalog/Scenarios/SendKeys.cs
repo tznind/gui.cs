@@ -90,7 +90,7 @@ public class SendKeys : Scenario
 
 
                 Application.Driver?.SendKeys (
-                                             char.ToUpper (r),
+                                             r,
                                              consoleKeyInfo.Key,
                                              ckbShift.CheckedState == CheckState.Checked || (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
                                              ckbAlt.CheckedState == CheckState.Checked || (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
