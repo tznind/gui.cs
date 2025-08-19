@@ -29,10 +29,10 @@ public class FileDialogTests ()
     }
 
     [Theory]
-    [InlineData ("Bob")]
-    [InlineData ("𝔹ob")]
+    [InlineData ("Bob", "csv")]
+    [InlineData ("𝔹ob", "CSV")]
     [AutoInitShutdown]
-    public void DirectTyping_Allowed (string path)
+    public void DirectTyping_Allowed (string path, string extension)
     {
         FileDialog dlg = GetInitializedFileDialog ();
         TextField tf = dlg.SubViews.OfType<TextField> ().First (t => t.HasFocus);
@@ -50,13 +50,13 @@ public class FileDialogTests ()
         // continue typing the rest of the path
         Send (path);
         Send ('.', ConsoleKey.OemPeriod);
-        Send ("csv");
+        Send (extension);
 
         Assert.True (dlg.Canceled);
 
         Send ('\n', ConsoleKey.Enter);
         Assert.False (dlg.Canceled);
-        Assert.Equal ($"{path}.csv", Path.GetFileName (dlg.Path));
+        Assert.Equal ($"{path}.{extension}", Path.GetFileName (dlg.Path));
         dlg.Dispose ();
     }
 
@@ -774,7 +774,23 @@ public class FileDialogTests ()
     {
         foreach (char ch in chars)
         {
-            Application.Driver?.SendKeys (ch, ConsoleKey.NoName, char.IsUpper (ch), false, false);
+            var ck = ConsoleKey.None;
+            var shift = false;
+
+            switch (ch)
+            {
+                case >= 'A' and <= 'Z':
+                    ck = (ConsoleKey)ch;
+                    shift = true;
+
+                    break;
+                case >= 'a' and <= 'z':
+                    ck = (ConsoleKey)char.ToUpper (ch);
+
+                    break;
+            }
+
+            Application.Driver?.SendKeys (ch, ck, shift, false, false);
         }
     }
 
