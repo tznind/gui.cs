@@ -1,4 +1,6 @@
-﻿namespace UICatalog.Scenarios;
+﻿using System.Text;
+
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("SendKeys", "SendKeys sample - Send key combinations.")]
 [ScenarioCategory ("Mouse and Keyboard")]
@@ -37,14 +39,7 @@ public class SendKeys : Scenario
 
         txtResult.KeyDown += (s, e) =>
                              {
-                                 if (e.AsRune.IsSurrogatePair ())
-                                 {
-                                     rKeys += e.AsRune;
-                                 }
-                                 else
-                                 {
-                                     rKeys += (char)e.KeyCode;
-                                 }
+                                 rKeys += new Rune ((uint)(e.KeyCode & ~KeyCode.AltMask & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask));
 
                                  if (!IsShift && e.IsShift)
                                  {
@@ -88,14 +83,13 @@ public class SendKeys : Scenario
             {
                 ConsoleKeyInfo consoleKeyInfo = EscSeqUtils.MapConsoleKeyInfo (new (r, ConsoleKey.None, false, false, false));
 
-
                 Application.Driver?.SendKeys (
-                                             char.ToUpper (r),
-                                             consoleKeyInfo.Key,
-                                             ckbShift.CheckedState == CheckState.Checked || (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
-                                             ckbAlt.CheckedState == CheckState.Checked || (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
-                                             ckbControl.CheckedState == CheckState.Checked || (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0
-                                            );
+                                              r,
+                                              consoleKeyInfo.Key,
+                                              ckbShift.CheckedState == CheckState.Checked || (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+                                              ckbAlt.CheckedState == CheckState.Checked || (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                              ckbControl.CheckedState == CheckState.Checked || (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0
+                                             );
             }
 
             lblShippedKeys.Text = rKeys;

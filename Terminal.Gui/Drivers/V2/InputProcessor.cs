@@ -180,6 +180,22 @@ public abstract class InputProcessor<T> : IInputProcessor
         if (_highSurrogate > 0 && char.IsLowSurrogate ((char)key))
         {
             result = (KeyCode)new Rune (_highSurrogate, (char)key).Value;
+
+            if (key.IsAlt)
+            {
+                result = new (result.KeyCode | KeyCode.AltMask);
+            }
+
+            if (key.IsCtrl)
+            {
+                result = new (result.KeyCode | KeyCode.CtrlMask);
+            }
+
+            if (key.IsShift)
+            {
+                result = new (result.KeyCode | KeyCode.ShiftMask);
+            }
+
             _highSurrogate = '\0';
 
             return true;
