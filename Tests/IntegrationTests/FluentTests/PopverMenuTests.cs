@@ -47,12 +47,15 @@ public class PopoverMenuTests
                                      .Stop ();
     }
 
+    private static object o = new  ();
 
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
     public void Activate_Sets_Application_Navigation_Correctly (V2TestDriver d)
     {
-        using GuiTestContext c = With.A<Window> (50, 20, d)
+        lock (o)
+        {
+            using GuiTestContext c = With.A<Window> (50, 20, d)
                                      .Then (
                                             () =>
                                             {
@@ -90,6 +93,8 @@ public class PopoverMenuTests
                                      .Then (() => Assert.Equal ("Cu_t", Application.Navigation!.GetFocused ()!.Title))
                                      .WriteOutLogs (_out)
                                      .Stop ();
+        }
+        
     }
 
     [Theory]

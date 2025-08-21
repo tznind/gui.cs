@@ -26,6 +26,9 @@ public class GuiTestContext : IDisposable
 
     internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, V2TestDriver driver, TextWriter? logWriter = null)
     {
+        // Remove frame limit
+        Application.MaximumIterationsPerSecond = ushort.MaxValue;
+
         IApplication origApp = ApplicationImpl.Instance;
         ILogger? origLogger = Logging.Logger;
         _logsSb = new ();
