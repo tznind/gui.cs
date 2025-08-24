@@ -133,28 +133,9 @@ public class TimedEvents : ITimedEvents
                 k -= 100;
             }
 
-            _timeouts.Add (NudgeToUniqueKey (k), timeout);
+            _timeouts.Add (k, timeout);
             Added?.Invoke (this, new (timeout, k));
         }
-    }
-
-    /// <summary>
-    ///     Finds the closest number to <paramref name="k"/> that is not present in <see cref="_timeouts"/>
-    ///     (incrementally).
-    /// </summary>
-    /// <param name="k"></param>
-    /// <returns></returns>
-    private long NudgeToUniqueKey (long k)
-    {
-        lock (_timeoutsLockToken)
-        {
-            while (_timeouts.ContainsKey (k))
-            {
-                k++;
-            }
-        }
-
-        return k;
     }
 
     private void RunTimersImpl ()
@@ -185,7 +166,7 @@ public class TimedEvents : ITimedEvents
             {
                 lock (_timeoutsLockToken)
                 {
-                    _timeouts.Add (NudgeToUniqueKey (k), timeout);
+                    _timeouts.Add (k, timeout);
                 }
             }
         }

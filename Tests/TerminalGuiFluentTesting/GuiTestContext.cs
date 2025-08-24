@@ -283,7 +283,7 @@ public class GuiTestContext : IDisposable
     {
         try
         {
-            doAction ();
+            WaitIteration (doAction);
         }
         catch (Exception)
         {
