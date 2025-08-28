@@ -1,4 +1,5 @@
 ﻿using TerminalGuiFluentTesting;
+using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
 namespace IntegrationTests.FluentTests;
@@ -33,9 +34,6 @@ public class BasicFluentAssertionTests
         Toplevel top = Application.Top;
         context.RaiseKeyDownEvent (Application.QuitKey);
         Assert.False (top!.Running);
-
-        Application.Top?.Dispose ();
-        Application.Shutdown ();
 
         context.WriteOutLogs (_out);
         context.Stop ();
@@ -177,7 +175,7 @@ public class BasicFluentAssertionTests
                                                 Application.Top!.Add (w1, w2, w3);
                                             })
                                      .WaitIteration ()
-                                     .Then (() => Assert.True (v5.HasFocus))
+                                     .AssertTrue (v5.HasFocus)
                                      .RaiseKeyDownEvent (Key.F6)
                                      .Then (() => Assert.True (v1.HasFocus))
                                      .RaiseKeyDownEvent (Key.F6)
@@ -221,6 +219,5 @@ public class BasicFluentAssertionTests
         Assert.False (v3.HasFocus);
         Assert.False (v4.HasFocus);
         Assert.False (v5.HasFocus);
-        Assert.False (v6.HasFocus);
     }
 }

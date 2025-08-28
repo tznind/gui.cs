@@ -133,7 +133,7 @@ public class GuiTestContext : IDisposable
             return this;
         }
 
-        Application.Invoke (() => { Application.RequestStop (); });
+        WaitIteration(() => { Application.RequestStop (); });
 
         // Wait for the application to stop, but give it a 1-second timeout
         if (!_runTask.Wait (TimeSpan.FromMilliseconds (1000)))
@@ -694,7 +694,7 @@ public class GuiTestContext : IDisposable
     /// <returns></returns>
     public GuiTestContext RaiseKeyDownEvent (Key key)
     {
-        Application.RaiseKeyDownEvent (key);
+        WaitIteration(()=>Application.RaiseKeyDownEvent (key));
 
         return this; //WaitIteration();
     }
