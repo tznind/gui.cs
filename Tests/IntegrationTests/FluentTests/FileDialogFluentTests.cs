@@ -116,7 +116,7 @@ public class FileDialogFluentTests
                           .LeftClick<Button> (b => b.Text == "_Save")
                           .WriteOutLogs (_out)
                           .Then (() => Assert.False (sd.Canceled))
-                          .Then (() => AssertIsFileSystemRoot (fs, sd))
+                          .AssertEqual (GetFileSystemRoot (fs), sd.FileName)
                           .Stop ();
     }
 
@@ -130,8 +130,8 @@ public class FileDialogFluentTests
                           .ScreenShot ("Save dialog", _out)
                           .Send (Key.S.WithAlt)
                           .WriteOutLogs (_out)
-                          .Then (() => Assert.False (sd.Canceled))
-                          .Then (() => AssertIsFileSystemRoot (fs, sd))
+                          .AssertFalse (sd.Canceled)
+                          .AssertEqual (GetFileSystemRoot (fs), sd.FileName)
                           .Stop ();
 
     }
@@ -147,20 +147,16 @@ public class FileDialogFluentTests
                           .Focus<Button> (b => b.Text == "_Save")
                           .Enter ()
                           .WriteOutLogs (_out)
-                          .Then (() => Assert.False (sd.Canceled))
-                          .Then (() => AssertIsFileSystemRoot (fs, sd))
+                          .AssertFalse(sd.Canceled)
+                          .AssertEqual (GetFileSystemRoot(fs), sd.FileName)
                           .Stop ();
     }
 
-    private void AssertIsFileSystemRoot (IFileSystem fs, SaveDialog sd)
+    private string GetFileSystemRoot (IFileSystem fs)
     {
-        var expectedPath =
-            RuntimeInformation.IsOSPlatform (OSPlatform.Windows) ?
+        return RuntimeInformation.IsOSPlatform (OSPlatform.Windows) ?
                 $@"C:{fs.Path.DirectorySeparatorChar}" :
                 "/";
-
-        Assert.Equal (expectedPath, sd.FileName);
-
     }
 
     [Theory]

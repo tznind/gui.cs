@@ -1,5 +1,6 @@
 using System.Globalization;
 using TerminalGuiFluentTesting;
+using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
 namespace IntegrationTests.FluentTests;
@@ -350,7 +351,7 @@ public class PopoverMenuTests
                                      .WaitIteration ()
                                      .Focus (testView)
                                      .RaiseKeyDownEvent (Application.QuitKey)
-                                     .Then (() => Assert.Equal (1, quitKeyDownCount))
+                                     .AssertEqual (1, quitKeyDownCount)
                                      .WriteOutLogs (_out)
                                      .Stop ();
     }

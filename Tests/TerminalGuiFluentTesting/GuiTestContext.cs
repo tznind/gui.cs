@@ -732,50 +732,65 @@ public class GuiTestContext : IDisposable
     /// <exception cref="ArgumentException"></exception>
     public GuiTestContext Focus<T> (Func<T, bool>? evaluator = null) where T : View
     {
-        evaluator ??= _ => true;
-        Toplevel? t = Application.Top;
+        string? fail = null;
 
-        HashSet<View> seen = new ();
+        var c = WaitIteration (
+                              () =>
+                              {
+                                  evaluator ??= _ => true;
+                                  Toplevel? t = Application.Top;
 
-        if (t == null)
+                                  HashSet<View> seen = new ();
+
+                                  if (t == null)
+                                  {
+                                      Fail ("Application.Top was null when trying to set focus");
+
+                                      return;
+                                  }
+
+                                  do
+                                  {
+                                      View? next = t.MostFocused;
+
+                                      // Is view found?
+                                      if (next is T v && evaluator (v))
+                                      {
+                                          return;
+                                      }
+
+                                      // No, try tab to the next (or first)
+                                      Tab ();
+                                      WaitIteration ();
+                                      next = t.MostFocused;
+
+                                      if (next is null)
+                                      {
+                                          fail =
+                                                "Failed to tab to a view which matched the Type and evaluator constraints of the test because MostFocused became or was always null";
+
+                                          return;
+                                      }
+
+                                      // Track the views we have seen
+                                      // We have looped around to the start again if it was already there
+                                      if (!seen.Add (next))
+                                      {
+                                          fail =
+                                                "Failed to tab to a view which matched the Type and evaluator constraints of the test before looping back to the original View";
+
+                                          return;
+                                      }
+                                  }
+                                  while (true);
+                              });
+
+        if (!string.IsNullOrWhiteSpace (fail))
         {
-            Fail ("Application.Top was null when trying to set focus");
-
-            return this;
+            Fail (fail);
         }
 
-        do
-        {
-            View? next = t.MostFocused;
-
-            // Is view found?
-            if (next is T v && evaluator (v))
-            {
-                return this;
-            }
-
-            // No, try tab to the next (or first)
-            Tab ();
-            WaitIteration ();
-            next = t.MostFocused;
-
-            if (next is null)
-            {
-                Fail ("Failed to tab to a view which matched the Type and evaluator constraints of the test because MostFocused became or was always null");
-
-                return this;
-            }
-
-            // Track the views we have seen
-            // We have looped around to the start again if it was already there
-            if (!seen.Add (next))
-            {
-                Fail ("Failed to tab to a view which matched the Type and evaluator constraints of the test before looping back to the original View");
-
-                return this;
-            }
-        }
-        while (true);
+        return c;
     }
 
     private T Find<T> (Func<T, bool> evaluator) where T : View
@@ -827,17 +842,19 @@ public class GuiTestContext : IDisposable
 
     public GuiTestContext Send (Key key)
     {
-        if (Application.Driver is IConsoleDriverFacade facade)
-        {
-            facade.InputProcessor.OnKeyDown (key);
-            facade.InputProcessor.OnKeyUp (key);
-        }
-        else
-        {
-            Fail ("Expected Application.Driver to be IConsoleDriverFacade");
-        }
-
-        return this;
+        return WaitIteration (
+                       () =>
+                       {
+                           if (Application.Driver is IConsoleDriverFacade facade)
+                           {
+                               facade.InputProcessor.OnKeyDown (key);
+                               facade.InputProcessor.OnKeyUp (key);
+                           }
+                           else
+                           {
+                               Fail ("Expected Application.Driver to be IConsoleDriverFacade");
+                           }
+                       });
     }
 
     /// <summary>
