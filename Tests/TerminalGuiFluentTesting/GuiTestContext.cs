@@ -143,7 +143,7 @@ public class GuiTestContext : IDisposable
             // Timeout occurred, force the task to stop
             _hardStop.Cancel ();
 
-            throw new TimeoutException ("Application failed to stop within the allotted time.");
+            throw new TimeoutException ("Application failed to stop within the allotted time.",_ex);
         }
 
         _cts.Cancel ();
@@ -159,8 +159,13 @@ public class GuiTestContext : IDisposable
     /// <summary>
     ///     Hard stops the application and waits for the background thread to exit.
     /// </summary>
-    public void HardStop ()
+    public void HardStop (Exception? ex = null)
     {
+        if (ex != null)
+        {
+            _ex = ex;
+        }
+
         _hardStop.Cancel ();
         Stop ();
     }
@@ -264,8 +269,16 @@ public class GuiTestContext : IDisposable
         Application.Invoke (
                             () =>
                             {
-                                a ();
-                                ctsLocal.Cancel ();
+                                try
+                                {
+                                    a ();
+                                    ctsLocal.Cancel ();
+                                }
+                                catch (Exception e)
+                                {
+                                    _ex = e;
+                                    _hardStop.Cancel();
+                                }
                             });
 
         // Blocks until either the token or the hardStopToken is cancelled.
@@ -292,8 +305,9 @@ public class GuiTestContext : IDisposable
         {
             WaitIteration (doAction);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _ex = ex;
             HardStop ();
 
             throw;

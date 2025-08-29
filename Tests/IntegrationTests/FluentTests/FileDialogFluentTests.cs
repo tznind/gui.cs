@@ -114,7 +114,7 @@ public class FileDialogFluentTests
                           .ScreenShot ("Save dialog", _out)
                           .LeftClick<Button> (b => b.Text == "_Save")
                           .WriteOutLogs (_out)
-                          .Then (() => Assert.False (sd.Canceled))
+                          .AssertFalse(sd.Canceled)
                           .AssertEqual (GetFileSystemRoot (fs), sd.FileName)
                           .Stop ();
     }
@@ -293,7 +293,7 @@ public class FileDialogFluentTests
         using var c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
                           .Then (() => sd.Style.PreserveFilenameOnDirectoryChanges = preserve)
                           .ScreenShot ("Save dialog", _out)
-                          .Then (() => Assert.True (sd.Canceled))
+                          .AssertTrue (sd.Canceled)
                           .Focus<TextField> (_ => true)
                           // Clear selection by pressing right in 'file path' text box
                           .RaiseKeyDownEvent (Key.CursorRight)
@@ -366,7 +366,8 @@ public class FileDialogFluentTests
              .AssertDoesNotContain ("hello", sd.Path);
         }
 
-        c.WriteOutLogs (_out)
-         .Stop ();
+        c.WriteOutLogs (_out);
+        c.WaitIteration ();
+        c.Stop ();
     }
 }
