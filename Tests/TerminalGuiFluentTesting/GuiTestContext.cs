@@ -13,7 +13,7 @@ public class GuiTestContext : IDisposable
     private readonly CancellationTokenSource _cts = new ();
     private readonly CancellationTokenSource _hardStop = new (With.Timeout);
     private readonly Task _runTask;
-    private Exception _ex;
+    private Exception? _ex;
     private readonly FakeOutput _output = new ();
     private readonly FakeWindowsInput _winInput;
     private readonly FakeNetInput _netInput;
@@ -175,7 +175,7 @@ public class GuiTestContext : IDisposable
         if (_hardStop.IsCancellationRequested)
         {
             throw new (
-                       "Application was hard stopped, typically this means it timed out or did not shutdown gracefully. Ensure you call Stop in your test");
+                       "Application was hard stopped, typically this means it timed out or did not shutdown gracefully. Ensure you call Stop in your test",_ex);
         }
 
         _hardStop.Cancel ();
@@ -217,12 +217,14 @@ public class GuiTestContext : IDisposable
 
     public GuiTestContext ScreenShot (string title, TextWriter writer)
     {
-        writer.WriteLine (title + ":");
-        var text = Application.ToString ();
+        return WaitIteration (
+                              () =>
+                              {
+                                  writer.WriteLine (title + ":");
+                                  var text = Application.ToString ();
 
-        writer.WriteLine (text);
-
-        return this; //WaitIteration();
+                                  writer.WriteLine (text);
+                              });
     }
 
     /// <summary>
@@ -249,6 +251,11 @@ public class GuiTestContext : IDisposable
         if (_finished || _cts.Token.IsCancellationRequested || _hardStop.Token.IsCancellationRequested)
         {
             return this;
+        }
+
+        if (Thread.CurrentThread.ManagedThreadId == Application.MainThreadId)
+        {
+            throw new NotSupportedException ("Cannot WaitIteration during Invoke");
         }
 
         a ??= () => { };
@@ -319,10 +326,17 @@ public class GuiTestContext : IDisposable
 
     private GuiTestContext Click<T> (WindowsConsole.ButtonState btn, Func<T, bool> evaluator) where T : View
     {
-        T v = Find (evaluator);
-        Point screen = v.ViewportToScreen (new Point (0, 0));
+        T v;
+        Point screen = Point.Empty;
 
-        return Click (btn, screen.X, screen.Y);
+        var ctx = WaitIteration (() => {
+            v = Find (evaluator);
+            screen = v.ViewportToScreen (new Point (0, 0));
+                              });
+
+        Click (btn, screen.X, screen.Y);
+
+        return ctx;
     }
 
     private GuiTestContext Click (WindowsConsole.ButtonState btn, int screenX, int screenY)
@@ -645,7 +659,11 @@ public class GuiTestContext : IDisposable
         WaitIteration ();
     }
 
-    private void SendNetKey (ConsoleKeyInfo consoleKeyInfo) { _netInput.InputBuffer.Enqueue (consoleKeyInfo); }
+    private void SendNetKey (ConsoleKeyInfo consoleKeyInfo)
+    {
+        _netInput.InputBuffer.Enqueue (consoleKeyInfo);
+        WaitIteration ();
+    }
 
     /// <summary>
     ///     Sends a special key e.g. cursor key that does not map to a specific character
@@ -732,65 +750,60 @@ public class GuiTestContext : IDisposable
     /// <exception cref="ArgumentException"></exception>
     public GuiTestContext Focus<T> (Func<T, bool>? evaluator = null) where T : View
     {
-        string? fail = null;
+        evaluator ??= _ => true;
+        Toplevel? t = Application.Top;
 
-        var c = WaitIteration (
-                              () =>
-                              {
-                                  evaluator ??= _ => true;
-                                  Toplevel? t = Application.Top;
+        HashSet<View> seen = new ();
 
-                                  HashSet<View> seen = new ();
-
-                                  if (t == null)
-                                  {
-                                      Fail ("Application.Top was null when trying to set focus");
-
-                                      return;
-                                  }
-
-                                  do
-                                  {
-                                      View? next = t.MostFocused;
-
-                                      // Is view found?
-                                      if (next is T v && evaluator (v))
-                                      {
-                                          return;
-                                      }
-
-                                      // No, try tab to the next (or first)
-                                      Tab ();
-                                      WaitIteration ();
-                                      next = t.MostFocused;
-
-                                      if (next is null)
-                                      {
-                                          fail =
-                                                "Failed to tab to a view which matched the Type and evaluator constraints of the test because MostFocused became or was always null";
-
-                                          return;
-                                      }
-
-                                      // Track the views we have seen
-                                      // We have looped around to the start again if it was already there
-                                      if (!seen.Add (next))
-                                      {
-                                          fail =
-                                                "Failed to tab to a view which matched the Type and evaluator constraints of the test before looping back to the original View";
-
-                                          return;
-                                      }
-                                  }
-                                  while (true);
-                              });
-
-        if (!string.IsNullOrWhiteSpace (fail))
+        if (t == null)
         {
-            Fail (fail);
+            Fail ("Application.Top was null when trying to set focus");
+
+            return this;
         }
 
-        return c;
+        do
+        {
+            View? next = t.MostFocused;
+
+            // Is view found?
+            if (next is T v && evaluator (v))
+            {
+                return this;
+            }
+
+            // No, try tab to the next (or first)
+            Tab ();
+            WaitIteration ();
+
+            next = t.MostFocused;
+
+            if (next is null)
+            {
+                Fail (
+                    "Failed to tab to a view which matched the Type and evaluator constraints of the test because MostFocused became or was always null" +
+                    DescribeSeenViews (seen));
+
+                return this;
+            }
+
+            // Track the views we have seen
+            // We have looped around to the start again if it was already there
+            if (!seen.Add (next))
+            {
+                Fail (
+                    "Failed to tab to a view which matched the Type and evaluator constraints of the test before looping back to the original View" +
+                    DescribeSeenViews (seen));
+
+                return this;
+            }
+        }
+        while (true);
+    }
+
+    private string DescribeSeenViews (HashSet<View> seen)
+    {
+        return Environment.NewLine + string.Join (Environment.NewLine, seen);
     }
 
     private T Find<T> (Func<T, bool> evaluator) where T : View
