@@ -70,9 +70,6 @@ public class FileDialogFluentTests
     [ClassData (typeof (V2TestDrivers))]
     public void CancelFileDialog_UsingCancelButton_TabThenEnter (V2TestDriver d)
     {
-        // TODO Remove after debugging
-        With.Timeout = TimeSpan.FromHours (1);
-        
         SaveDialog? sd = null;
         using var c = With.A (() => NewSaveDialog (out sd,modal:false), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
