@@ -153,6 +153,6 @@ public class FakeSizeMonitor : IWindowSizeMonitor
     /// <param name="newSize"></param>
     public void RaiseSizeChanging (Size newSize)
     {
-        SizeChanging.Invoke (this,new (newSize));
+        SizeChanging?.Invoke (this,new (newSize));
     }
 }
