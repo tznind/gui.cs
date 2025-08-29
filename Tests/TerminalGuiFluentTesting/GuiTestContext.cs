@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Terminal.Gui.ViewBase;
 
 namespace TerminalGuiFluentTesting;
 
@@ -104,7 +105,7 @@ public class GuiTestContext : IDisposable
             throw new TimeoutException ("Application failed to start within the allotted time.");
         }
 
-        WaitIteration ();
+        ResizeConsole (width, height);
 
         if (_ex != null)
         {
@@ -216,6 +217,9 @@ public class GuiTestContext : IDisposable
     {
         _output.Size = new (width, height);
         _fakeSizeMonitor.RaiseSizeChanging (_output.Size);
+
+        var d = (IConsoleDriverFacade)Application.Driver!;
+        d.OutputBuffer.SetWindowSize (width, height);
 
         return WaitIteration ();
     }
