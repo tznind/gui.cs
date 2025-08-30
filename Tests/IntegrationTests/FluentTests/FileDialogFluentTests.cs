@@ -113,6 +113,7 @@ public class FileDialogFluentTests
         using var c = With.A (() => NewSaveDialog (out sd,out fs), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .LeftClick<Button> (b => b.Text == "_Save")
+                          .WaitIteration ()
                           .WriteOutLogs (_out)
                           .AssertFalse(sd.Canceled)
                           .AssertEqual (GetFileSystemRoot (fs), sd.FileName)

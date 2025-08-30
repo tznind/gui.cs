@@ -23,7 +23,6 @@ public class GuiTestContext : IDisposable
     private readonly StringBuilder _logsSb;
     private readonly V2TestDriver _driver;
     private bool _finished;
-    private readonly object _threadLock = new ();
     private readonly FakeSizeMonitor _fakeSizeMonitor;
 
     internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, V2TestDriver driver, TextWriter? logWriter = null)
@@ -50,56 +49,53 @@ public class GuiTestContext : IDisposable
 
         var booting = new SemaphoreSlim (0, 1);
 
-        lock (_threadLock)
-        {
-            // Start the application in a background thread
-            _runTask = Task.Run (
-                                 () =>
+        // Start the application in a background thread
+        _runTask = Task.Run (
+                             () =>
+                             {
+                                 try
                                  {
-                                     try
+                                     ApplicationImpl.ChangeInstance (v2);
+
+                                     ILogger logger = LoggerFactory.Create (
+                                                                            builder =>
+                                                                                builder.SetMinimumLevel (LogLevel.Trace)
+                                                                                       .AddProvider (new TextWriterLoggerProvider (new StringWriter (_logsSb))))
+                                                                   .CreateLogger ("Test Logging");
+                                     Logging.Logger = logger;
+
+                                     v2.Init (null, GetDriverName ());
+
+                                     booting.Release ();
+
+                                     Toplevel t = topLevelBuilder ();
+                                     t.Closed += (s, e) => { _finished = true; };
+                                     Application.Run (t); // This will block, but it's on a background thread now
+
+                                     t.Dispose ();
+                                     Application.Shutdown ();
+                                     _cts.Cancel();
+                                 }
+                                 catch (OperationCanceledException)
+                                 { }
+                                 catch (Exception ex)
+                                 {
+                                     _ex = ex;
+                                     if (logWriter !=null)
                                      {
-                                         ApplicationImpl.ChangeInstance (v2);
-
-                                         ILogger logger = LoggerFactory.Create (
-                                                                                builder =>
-                                                                                    builder.SetMinimumLevel (LogLevel.Trace)
-                                                                                           .AddProvider (new TextWriterLoggerProvider (new StringWriter (_logsSb))))
-                                                                       .CreateLogger ("Test Logging");
-                                         Logging.Logger = logger;
-
-                                         v2.Init (null, GetDriverName ());
-
-                                         booting.Release ();
-
-                                         Toplevel t = topLevelBuilder ();
-                                         t.Closed += (s, e) => { _finished = true; };
-                                         Application.Run (t); // This will block, but it's on a background thread now
-
-                                         t.Dispose ();
-                                         Application.Shutdown ();
-                                         _cts.Cancel();
+                                         WriteOutLogs (logWriter);
                                      }
-                                     catch (OperationCanceledException)
-                                     { }
-                                     catch (Exception ex)
-                                     {
-                                         _ex = ex;
-                                         if (logWriter !=null)
-                                         {
-                                             WriteOutLogs (logWriter);
-                                         }
-                                         _hardStop.Cancel();
+                                     _hardStop.Cancel();
 
-                                     }
-                                     finally
-                                     {
-                                         ApplicationImpl.ChangeInstance (origApp);
-                                         Logging.Logger = origLogger;
-                                         _finished = true;
-                                     }
-                                 },
-                                 _cts.Token);
-        }
+                                 }
+                                 finally
+                                 {
+                                     ApplicationImpl.ChangeInstance (origApp);
+                                     Logging.Logger = origLogger;
+                                     _finished = true;
+                                 }
+                             },
+                             _cts.Token);
 
         // Wait for booting to complete with a timeout to avoid hangs
         if (!booting.WaitAsync (TimeSpan.FromSeconds (10)).Result)
