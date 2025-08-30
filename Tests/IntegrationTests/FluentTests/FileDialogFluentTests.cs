@@ -353,6 +353,7 @@ public class FileDialogFluentTests
         }
 
         c.LeftClick<Button> (b => b.Text == "_Save");
+        c.WaitIteration ();
         c.AssertFalse (sd.Canceled);
 
         if (preserve)

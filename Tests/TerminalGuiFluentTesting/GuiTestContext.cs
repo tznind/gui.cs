@@ -77,6 +77,7 @@ public class GuiTestContext : IDisposable
 
                                          t.Dispose ();
                                          Application.Shutdown ();
+                                         _cts.Cancel();
                                      }
                                      catch (OperationCanceledException)
                                      { }
@@ -406,8 +407,6 @@ public class GuiTestContext : IDisposable
                 }
 
                 return WaitIteration ();
-
-                break;
             default:
                 throw new ArgumentOutOfRangeException ();
         }
