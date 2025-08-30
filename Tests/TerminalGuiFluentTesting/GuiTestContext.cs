@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Diagnostics;
+using System.Drawing;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Terminal.Gui.ViewBase;
@@ -385,6 +386,8 @@ public class GuiTestContext : IDisposable
                                                    }
                                                });
 
+                return WaitUntil (()=>_winInput.InputBuffer.IsEmpty);
+
                 break;
             case V2TestDriver.V2Net:
 
@@ -399,17 +402,33 @@ public class GuiTestContext : IDisposable
 
                 foreach (ConsoleKeyInfo k in NetSequences.Click (netButton, screenX, screenY))
                 {
-                    SendNetKey (k);
+                    SendNetKey (k,false);
                 }
+
+                return WaitIteration ();
 
                 break;
             default:
                 throw new ArgumentOutOfRangeException ();
         }
+    }
 
-        return WaitIteration ();
+    private GuiTestContext WaitUntil (Func<bool> condition)
+    {
+        GuiTestContext? c = null;
+        var sw = Stopwatch.StartNew ();
 
-        ;
+        while (!condition ())
+        {
+            if (sw.Elapsed > With.Timeout)
+            {
+                throw new TimeoutException ("Failed to reach condition within the time limit");
+            }
+
+            c = WaitIteration ();
+        }
+
+        return c ?? this;
     }
 
     public GuiTestContext Down ()
@@ -677,10 +696,14 @@ public class GuiTestContext : IDisposable
         WaitIteration ();
     }
 
-    private void SendNetKey (ConsoleKeyInfo consoleKeyInfo)
+    private void SendNetKey (ConsoleKeyInfo consoleKeyInfo, bool wait = true)
     {
         _netInput.InputBuffer.Enqueue (consoleKeyInfo);
-        WaitIteration ();
+
+        if (wait)
+        {
+            WaitUntil (() => _netInput.InputBuffer.IsEmpty);
+        }
     }
 
     /// <summary>
