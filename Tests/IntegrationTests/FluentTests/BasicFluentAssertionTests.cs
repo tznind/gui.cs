@@ -69,6 +69,7 @@ public class BasicFluentAssertionTests
                                      .Add (lbl)
                                      .AssertEqual (38, lbl.Frame.Width) // Window has 2 border
                                      .ResizeConsole (20, 20)
+                                     .WaitIteration ()
                                      .AssertEqual (18, lbl.Frame.Width)
                                      .WriteOutLogs (_out)
                                      .Stop ();
