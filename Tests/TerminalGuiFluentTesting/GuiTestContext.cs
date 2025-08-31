@@ -20,6 +20,7 @@ public class GuiTestContext : IDisposable
     private readonly FakeWindowsInput _winInput;
     private readonly FakeNetInput _netInput;
     private View? _lastView;
+    private readonly object _logsLock = new ();
     private readonly StringBuilder _logsSb;
     private readonly V2TestDriver _driver;
     private bool _finished;
@@ -60,7 +61,7 @@ public class GuiTestContext : IDisposable
                                      ILogger logger = LoggerFactory.Create (
                                                                             builder =>
                                                                                 builder.SetMinimumLevel (LogLevel.Trace)
-                                                                                       .AddProvider (new TextWriterLoggerProvider (new StringWriter (_logsSb))))
+                                                                                       .AddProvider (new TextWriterLoggerProvider ( new ThreadSafeStringWriter (_logsSb, _logsLock))))
                                                                    .CreateLogger ("Test Logging");
                                      Logging.Logger = logger;
 
@@ -241,7 +242,10 @@ public class GuiTestContext : IDisposable
     /// <returns></returns>
     public GuiTestContext WriteOutLogs (TextWriter writer)
     {
-        writer.WriteLine (_logsSb.ToString ());
+        lock (_logsLock)
+        {
+            writer.WriteLine (_logsSb.ToString ());
+        }
 
         return this; //WaitIteration();
     }
