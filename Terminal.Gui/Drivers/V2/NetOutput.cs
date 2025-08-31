@@ -33,6 +33,7 @@ public class NetOutput : OutputBase, IConsoleOutput
         Console.Out.Write (text);
     }
 
+
     /// <inheritdoc/>
     public Size GetWindowSize ()
     {
@@ -45,13 +46,12 @@ public class NetOutput : OutputBase, IConsoleOutput
         return new (Console.WindowWidth, Console.WindowHeight);
     }
 
-
     /// <inheritdoc/>
     public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
 
     private Point? _lastCursorPosition;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {
         EscSeqUtils.CSI_AppendForegroundColorRGB (
@@ -70,6 +70,7 @@ public class NetOutput : OutputBase, IConsoleOutput
 
         EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
     }
+
 
     /// <inheritdoc />
     protected override void Write (StringBuilder output)
@@ -112,6 +113,7 @@ public class NetOutput : OutputBase, IConsoleOutput
     public void Dispose ()
     {
     }
+
 
     /// <inheritdoc/>
     public override void SetCursorVisibility (CursorVisibility visibility)

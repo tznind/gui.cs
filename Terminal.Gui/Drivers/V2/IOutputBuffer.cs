@@ -9,7 +9,6 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public interface IOutputBuffer
 {
-
     /// <summary>
     ///     The contents of the application output. The driver outputs this buffer to the terminal when UpdateScreen is called.
     /// </summary>
