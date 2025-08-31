@@ -11,6 +11,8 @@ public class SpinnerViewTests (ITestOutputHelper output)
     [InlineData (false)]
     public void TestSpinnerView_AutoSpin (bool callStop)
     {
+        ConsoleDriver.RunningUnitTests = true;
+
         SpinnerView view = GetSpinnerView ();
 
         Assert.Empty (Application.MainLoop.TimedEvents.Timeouts);
@@ -105,6 +107,9 @@ public class SpinnerViewTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
+
+        // Required to clear the initial 'Invoke nothing' that Begin does
+        Application.MainLoop.TimedEvents.Timeouts.Clear ();
 
         Assert.Equal (1, view.Frame.Width);
         Assert.Equal (1, view.Frame.Height);

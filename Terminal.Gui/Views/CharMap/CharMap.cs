@@ -767,7 +767,7 @@ public class CharMap : View, IDesignable
         }
 
         // BUGBUG: This is a workaround for some weird ScrollView related mouse grab bug
-        Application.GrabMouse (this);
+        Application.MouseGrabHandler.GrabMouse (this);
     }
 
     #endregion Details Dialog
