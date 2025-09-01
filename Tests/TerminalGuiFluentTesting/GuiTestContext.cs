@@ -147,6 +147,18 @@ public class GuiTestContext : IDisposable
             // Timeout occurred, force the task to stop
             _hardStop.Cancel ();
 
+            // App is having trouble shutting down, try sending some more shutdown stuff from this thread.
+            // If this doesn't work there will be test cascade failures as the main loop continues to run during next test.
+            try
+            {
+                Application.RequestStop ();
+                Application.Shutdown ();
+            }
+            catch (Exception)
+            {
+                throw new TimeoutException ("Application failed to stop within the allotted time.", _ex);
+            }
+
             throw new TimeoutException ("Application failed to stop within the allotted time.", _ex);
         }
 
