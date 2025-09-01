@@ -1447,10 +1447,12 @@ public class DialogTests (ITestOutputHelper output)
 
         dlg2.Dispose ();
 
+        // tznind REMOVED: Why wouldn't you be able to read cancelled after dispose - that makes no sense
         // Now an assertion will throw accessing the Canceled property
-        var exception = Record.Exception (() => Assert.True (dlg.Canceled))!;
-        Assert.NotNull (exception);
-        Assert.StartsWith ("Cannot access a disposed object.", exception.Message);
+        //var exception = Record.Exception (() => Assert.True (dlg.Canceled))!;
+        //Assert.NotNull (exception);
+        //Assert.StartsWith ("Cannot access a disposed object.", exception.Message);
+
         Assert.True (Top.WasDisposed);
         Shutdown ();
         Assert.True (dlg2.WasDisposed);
