@@ -94,6 +94,8 @@ public class GuiTestContext : IDisposable
                                      ApplicationImpl.ChangeInstance (origApp);
                                      Logging.Logger = origLogger;
                                      _finished = true;
+
+                                     Application.MaximumIterationsPerSecond = Application.DefaultMaximumIterationsPerSecond;
                                  }
                              },
                              _cts.Token);
