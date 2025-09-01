@@ -57,12 +57,19 @@ public class NetOutput : OutputBase, IConsoleOutput
                                                   attr.Foreground.B
                                                  );
 
-        EscSeqUtils.CSI_AppendBackgroundColorRGB (
+        if (attr.Background.R == 0 && attr.Background.G == 0 && attr.Background.B == 0)
+        {
+            EscSeqUtils.CSI_ResetBackgroundColor (output);
+        }
+        else
+        {
+                EscSeqUtils.CSI_AppendBackgroundColorRGB (
                                                   output,
                                                   attr.Background.R,
                                                   attr.Background.G,
                                                   attr.Background.B
                                                  );
+        }
 
         EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
     }
