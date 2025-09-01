@@ -214,13 +214,15 @@ public class GuiTestContext : IDisposable
     /// <returns></returns>
     public GuiTestContext ResizeConsole (int width, int height)
     {
-        _output.Size = new (width, height);
-        _fakeSizeMonitor.RaiseSizeChanging (_output.Size);
+        return WaitIteration (
+                       () =>
+                       {
+                           _output.Size = new (width, height);
+                           _fakeSizeMonitor.RaiseSizeChanging (_output.Size);
 
-        var d = (IConsoleDriverFacade)Application.Driver!;
-        d.OutputBuffer.SetWindowSize (width, height);
-
-        return WaitIteration ();
+                           var d = (IConsoleDriverFacade)Application.Driver!;
+                           d.OutputBuffer.SetWindowSize (width, height);
+                       });
     }
 
     public GuiTestContext ScreenShot (string title, TextWriter writer)
