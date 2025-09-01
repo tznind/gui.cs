@@ -102,10 +102,7 @@ public class GuiTestContext : IDisposable
                              },
                              _cts.Token);
 
-        // Wait for booting to complete with a timeout to avoid hangs
-        if (!booting.WaitAsync (TimeSpan.FromSeconds (10)).Result)
-        {
-            throw new TimeoutException ("Application failed to start within the allotted time.");
+            WaitIteration ();
         }
 
         ResizeConsole (width, height);
