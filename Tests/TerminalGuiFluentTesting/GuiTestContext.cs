@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.Text;
 using Microsoft.Extensions.Logging;
-using Terminal.Gui.ViewBase;
 
 namespace TerminalGuiFluentTesting;
 
@@ -40,11 +39,11 @@ public class GuiTestContext : IDisposable
         _winInput = new (_cts.Token);
 
         _output.Size = new (width, height);
-        _fakeSizeMonitor = new FakeSizeMonitor ();
+        _fakeSizeMonitor = new ();
 
-        var cf = driver == V2TestDriver.V2Net
-            ? new FakeNetComponentFactory (_netInput, _output, _fakeSizeMonitor):
-            (IComponentFactory)new FakeWindowsComponentFactory(_winInput,_output, _fakeSizeMonitor);
+        IComponentFactory cf = driver == V2TestDriver.V2Net
+                                   ? new FakeNetComponentFactory (_netInput, _output, _fakeSizeMonitor)
+                                   : (IComponentFactory)new FakeWindowsComponentFactory (_winInput, _output, _fakeSizeMonitor);
 
         var v2 = new ApplicationV2 (cf);
 
@@ -61,7 +60,9 @@ public class GuiTestContext : IDisposable
                                      ILogger logger = LoggerFactory.Create (
                                                                             builder =>
                                                                                 builder.SetMinimumLevel (LogLevel.Trace)
-                                                                                       .AddProvider (new TextWriterLoggerProvider ( new ThreadSafeStringWriter (_logsSb, _logsLock))))
+                                                                                       .AddProvider (
+                                                                                                     new TextWriterLoggerProvider (
+                                                                                                      new ThreadSafeStringWriter (_logsSb, _logsLock))))
                                                                    .CreateLogger ("Test Logging");
                                      Logging.Logger = logger;
 
@@ -75,19 +76,20 @@ public class GuiTestContext : IDisposable
 
                                      t.Dispose ();
                                      Application.Shutdown ();
-                                     _cts.Cancel();
+                                     _cts.Cancel ();
                                  }
                                  catch (OperationCanceledException)
                                  { }
                                  catch (Exception ex)
                                  {
                                      _ex = ex;
-                                     if (logWriter !=null)
+
+                                     if (logWriter != null)
                                      {
                                          WriteOutLogs (logWriter);
                                      }
-                                     _hardStop.Cancel();
 
+                                     _hardStop.Cancel ();
                                  }
                                  finally
                                  {
@@ -110,7 +112,7 @@ public class GuiTestContext : IDisposable
 
         if (_ex != null)
         {
-            throw new Exception("Application crashed",_ex);
+            throw new ("Application crashed", _ex);
         }
     }
 
@@ -135,7 +137,7 @@ public class GuiTestContext : IDisposable
             return this;
         }
 
-        WaitIteration(() => { Application.RequestStop (); });
+        WaitIteration (() => { Application.RequestStop (); });
 
         // Wait for the application to stop, but give it a 1-second timeout
         if (!_runTask.Wait (TimeSpan.FromMilliseconds (1000)))
@@ -145,7 +147,7 @@ public class GuiTestContext : IDisposable
             // Timeout occurred, force the task to stop
             _hardStop.Cancel ();
 
-            throw new TimeoutException ("Application failed to stop within the allotted time.",_ex);
+            throw new TimeoutException ("Application failed to stop within the allotted time.", _ex);
         }
 
         _cts.Cancel ();
@@ -182,7 +184,8 @@ public class GuiTestContext : IDisposable
         if (_hardStop.IsCancellationRequested)
         {
             throw new (
-                       "Application was hard stopped, typically this means it timed out or did not shutdown gracefully. Ensure you call Stop in your test",_ex);
+                       "Application was hard stopped, typically this means it timed out or did not shutdown gracefully. Ensure you call Stop in your test",
+                       _ex);
         }
 
         _hardStop.Cancel ();
@@ -217,14 +220,14 @@ public class GuiTestContext : IDisposable
     public GuiTestContext ResizeConsole (int width, int height)
     {
         return WaitIteration (
-                       () =>
-                       {
-                           _output.Size = new (width, height);
-                           _fakeSizeMonitor.RaiseSizeChanging (_output.Size);
+                              () =>
+                              {
+                                  _output.Size = new (width, height);
+                                  _fakeSizeMonitor.RaiseSizeChanging (_output.Size);
 
-                           var d = (IConsoleDriverFacade)Application.Driver!;
-                           d.OutputBuffer.SetWindowSize (width, height);
-                       });
+                                  var d = (IConsoleDriverFacade)Application.Driver!;
+                                  d.OutputBuffer.SetWindowSize (width, height);
+                              });
     }
 
     public GuiTestContext ScreenShot (string title, TextWriter writer)
@@ -287,7 +290,7 @@ public class GuiTestContext : IDisposable
                                 catch (Exception e)
                                 {
                                     _ex = e;
-                                    _hardStop.Cancel();
+                                    _hardStop.Cancel ();
                                 }
                             });
 
@@ -351,12 +354,14 @@ public class GuiTestContext : IDisposable
     private GuiTestContext Click<T> (WindowsConsole.ButtonState btn, Func<T, bool> evaluator) where T : View
     {
         T v;
-        Point screen = Point.Empty;
+        var screen = Point.Empty;
 
-        var ctx = WaitIteration (() => {
-            v = Find (evaluator);
-            screen = v.ViewportToScreen (new Point (0, 0));
-                              });
+        GuiTestContext ctx = WaitIteration (
+                                            () =>
+                                            {
+                                                v = Find (evaluator);
+                                                screen = v.ViewportToScreen (new Point (0, 0));
+                                            });
 
         Click (btn, screen.X, screen.Y);
 
@@ -391,7 +396,7 @@ public class GuiTestContext : IDisposable
                                                    }
                                                });
 
-                return WaitUntil (()=>_winInput.InputBuffer.IsEmpty);
+                return WaitUntil (() => _winInput.InputBuffer.IsEmpty);
 
                 break;
             case V2TestDriver.V2Net:
@@ -407,7 +412,7 @@ public class GuiTestContext : IDisposable
 
                 foreach (ConsoleKeyInfo k in NetSequences.Click (netButton, screenX, screenY))
                 {
-                    SendNetKey (k,false);
+                    SendNetKey (k, false);
                 }
 
                 return WaitIteration ();
@@ -756,7 +761,7 @@ public class GuiTestContext : IDisposable
     /// <returns></returns>
     public GuiTestContext RaiseKeyDownEvent (Key key)
     {
-        WaitIteration(()=>Application.RaiseKeyDownEvent (key));
+        WaitIteration (() => Application.RaiseKeyDownEvent (key));
 
         return this; //WaitIteration();
     }
@@ -787,9 +792,11 @@ public class GuiTestContext : IDisposable
     ///     is found (of Type T) or all views are looped through (back to the beginning)
     ///     in which case triggers hard stop and Exception
     /// </summary>
-    /// <param name="evaluator">Delegate that returns true if the passed View is the one
-    /// you are trying to focus. Leave <see langword="null"/> to focus the first view of type
-    /// <typeparamref name="T"/></param>
+    /// <param name="evaluator">
+    ///     Delegate that returns true if the passed View is the one
+    ///     you are trying to focus. Leave <see langword="null"/> to focus the first view of type
+    ///     <typeparamref name="T"/>
+    /// </param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
     public GuiTestContext Focus<T> (Func<T, bool>? evaluator = null) where T : View
@@ -825,8 +832,8 @@ public class GuiTestContext : IDisposable
             if (next is null)
             {
                 Fail (
-                    "Failed to tab to a view which matched the Type and evaluator constraints of the test because MostFocused became or was always null" +
-                    DescribeSeenViews (seen));
+                      "Failed to tab to a view which matched the Type and evaluator constraints of the test because MostFocused became or was always null"
+                      + DescribeSeenViews (seen));
 
                 return this;
             }
@@ -836,8 +843,8 @@ public class GuiTestContext : IDisposable
             if (!seen.Add (next))
             {
                 Fail (
-                    "Failed to tab to a view which matched the Type and evaluator constraints of the test before looping back to the original View" +
-                    DescribeSeenViews (seen));
+                      "Failed to tab to a view which matched the Type and evaluator constraints of the test before looping back to the original View"
+                      + DescribeSeenViews (seen));
 
                 return this;
             }
@@ -845,10 +852,7 @@ public class GuiTestContext : IDisposable
         while (true);
     }
 
-    private string DescribeSeenViews (HashSet<View> seen)
-    {
-        return Environment.NewLine + string.Join (Environment.NewLine, seen);
-    }
+    private string DescribeSeenViews (HashSet<View> seen) { return Environment.NewLine + string.Join (Environment.NewLine, seen); }
 
     private T Find<T> (Func<T, bool> evaluator) where T : View
     {
@@ -900,28 +904,25 @@ public class GuiTestContext : IDisposable
     public GuiTestContext Send (Key key)
     {
         return WaitIteration (
-                       () =>
-                       {
-                           if (Application.Driver is IConsoleDriverFacade facade)
-                           {
-                               facade.InputProcessor.OnKeyDown (key);
-                               facade.InputProcessor.OnKeyUp (key);
-                           }
-                           else
-                           {
-                               Fail ("Expected Application.Driver to be IConsoleDriverFacade");
-                           }
-                       });
+                              () =>
+                              {
+                                  if (Application.Driver is IConsoleDriverFacade facade)
+                                  {
+                                      facade.InputProcessor.OnKeyDown (key);
+                                      facade.InputProcessor.OnKeyUp (key);
+                                  }
+                                  else
+                                  {
+                                      Fail ("Expected Application.Driver to be IConsoleDriverFacade");
+                                  }
+                              });
     }
 
     /// <summary>
-    /// Returns the last set position of the cursor.
+    ///     Returns the last set position of the cursor.
     /// </summary>
     /// <returns></returns>
-    public Point GetCursorPosition ()
-    {
-        return _output.CursorPosition;
-    }
+    public Point GetCursorPosition () { return _output.CursorPosition; }
 }
 
 internal class FakeWindowsComponentFactory : WindowsComponentFactory
@@ -937,23 +938,14 @@ internal class FakeWindowsComponentFactory : WindowsComponentFactory
         _fakeSizeMonitor = fakeSizeMonitor;
     }
 
-    /// <inheritdoc />
-    public override IConsoleInput<WindowsConsole.InputRecord> CreateInput ()
-    {
-        return _winInput;
-    }
+    /// <inheritdoc/>
+    public override IConsoleInput<WindowsConsole.InputRecord> CreateInput () { return _winInput; }
 
-    /// <inheritdoc />
-    public override IConsoleOutput CreateOutput ()
-    {
-        return _output;
-    }
+    /// <inheritdoc/>
+    public override IConsoleOutput CreateOutput () { return _output; }
 
-    /// <inheritdoc />
-    public override IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
-    {
-        return _fakeSizeMonitor;
-    }
+    /// <inheritdoc/>
+    public override IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer) { return _fakeSizeMonitor; }
 }
 
 internal class FakeNetComponentFactory : NetComponentFactory
@@ -962,28 +954,19 @@ internal class FakeNetComponentFactory : NetComponentFactory
     private readonly FakeOutput _output;
     private readonly FakeSizeMonitor _fakeSizeMonitor;
 
-    public FakeNetComponentFactory (FakeNetInput netInput, FakeOutput output,FakeSizeMonitor fakeSizeMonitor)
+    public FakeNetComponentFactory (FakeNetInput netInput, FakeOutput output, FakeSizeMonitor fakeSizeMonitor)
     {
         _netInput = netInput;
         _output = output;
         _fakeSizeMonitor = fakeSizeMonitor;
     }
 
-    /// <inheritdoc />
-    public override IConsoleInput<ConsoleKeyInfo> CreateInput ()
-    {
-        return _netInput;
-    }
+    /// <inheritdoc/>
+    public override IConsoleInput<ConsoleKeyInfo> CreateInput () { return _netInput; }
 
-    /// <inheritdoc />
-    public override IConsoleOutput CreateOutput ()
-    {
-        return _output;
-    }
+    /// <inheritdoc/>
+    public override IConsoleOutput CreateOutput () { return _output; }
 
-    /// <inheritdoc />
-    public override IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
-    {
-        return _fakeSizeMonitor;
-    }
+    /// <inheritdoc/>
+    public override IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer) { return _fakeSizeMonitor; }
 }
