@@ -50,14 +50,21 @@ public class NetOutput : OutputBase, IConsoleOutput
     /// <inheritdoc/>
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {
-        EscSeqUtils.CSI_AppendForegroundColorRGB (
-                                                  output,
-                                                  attr.Foreground.R,
-                                                  attr.Foreground.G,
-                                                  attr.Foreground.B
-                                                 );
+        if (attr.Foreground == Color.Transparent)
+        {
+            EscSeqUtils.CSI_ResetForegroundColor (output);
+        }
+        else
+        {
+            EscSeqUtils.CSI_AppendForegroundColorRGB (
+                                                      output,
+                                                      attr.Foreground.R,
+                                                      attr.Foreground.G,
+                                                      attr.Foreground.B
+                                                     );
+        }
 
-        if (attr.Background.R == 0 && attr.Background.G == 0 && attr.Background.B == 0)
+        if (attr.Background == Color.Transparent)
         {
             EscSeqUtils.CSI_ResetBackgroundColor (output);
         }

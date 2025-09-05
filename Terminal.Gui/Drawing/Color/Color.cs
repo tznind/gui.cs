@@ -22,6 +22,11 @@ namespace Terminal.Gui.Drawing;
 public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Color>, ISpanFormattable,
                                               IUtf8SpanFormattable, IMinMaxValue<Color>
 {
+    /// <summary>
+    /// Transparent color (0 for all elements). This is interpreted as default console color.
+    /// </summary>
+    public static readonly Color Transparent = new Color (0, 0, 0, 0);
+
     /// <summary>The value of the alpha channel component</summary>
     /// <remarks>
     ///     The alpha channel is not currently supported, so the value of the alpha channel bits will not affect

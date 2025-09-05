@@ -1821,6 +1821,15 @@ public static class EscSeqUtils
     }
 
     /// <summary>
+    /// Clears the foreground color such that it uses the terminal default
+    /// </summary>
+    /// <param name="builder"></param>
+    public static void CSI_ResetForegroundColor (StringBuilder builder)
+    {
+        builder.Append ($"{CSI}39m");
+    }
+
+    /// <summary>
     /// Clears the background color such that is uses the terminal default (including any transparency)
     /// </summary>
     /// <param name="builder"></param>
