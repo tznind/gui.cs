@@ -48,40 +48,6 @@ public class NetOutput : OutputBase, IConsoleOutput
     private Point? _lastCursorPosition;
 
     /// <inheritdoc/>
-    protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
-    {
-        if (attr.Foreground == Color.Transparent)
-        {
-            EscSeqUtils.CSI_ResetForegroundColor (output);
-        }
-        else
-        {
-            EscSeqUtils.CSI_AppendForegroundColorRGB (
-                                                      output,
-                                                      attr.Foreground.R,
-                                                      attr.Foreground.G,
-                                                      attr.Foreground.B
-                                                     );
-        }
-
-        if (attr.Background == Color.Transparent)
-        {
-            EscSeqUtils.CSI_ResetBackgroundColor (output);
-        }
-        else
-        {
-                EscSeqUtils.CSI_AppendBackgroundColorRGB (
-                                                  output,
-                                                  attr.Background.R,
-                                                  attr.Background.G,
-                                                  attr.Background.B
-                                                 );
-        }
-
-        EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
-    }
-
-    /// <inheritdoc/>
     protected override void Write (StringBuilder output) { Console.Out.Write (output); }
 
     protected override bool SetCursorPositionImpl (int col, int row)

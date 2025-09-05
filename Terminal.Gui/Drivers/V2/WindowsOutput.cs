@@ -318,9 +318,7 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
         {
             if (_isVirtualTerminal)
             {
-                output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
-                output.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
-                EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
+                base.AppendOrWriteAttribute (output,attr,redrawTextStyle);
             }
             else
             {
@@ -330,9 +328,7 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
         }
         else
         {
-            EscSeqUtils.CSI_AppendForegroundColorRGB (output, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
-            EscSeqUtils.CSI_AppendBackgroundColorRGB (output, attr.Background.R, attr.Background.G, attr.Background.B);
-            EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
+            base.AppendOrWriteAttribute (output, attr, redrawTextStyle);
         }
     }
 

@@ -144,7 +144,44 @@ public abstract class OutputBase
         _cachedCursorVisibility = savedVisibility;
     }
 
-    protected abstract void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle);
+    /// <summary>
+    /// Change the color being used to render text.
+    /// </summary>
+    /// <param name="output">The output stream</param>
+    /// <param name="attr">The foreground and background color to switch to</param>
+    /// <param name="redrawTextStyle">Style</param>
+    protected virtual void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
+    {
+        if (attr.Foreground == Color.Transparent)
+        {
+            EscSeqUtils.CSI_ResetForegroundColor (output);
+        }
+        else
+        {
+            EscSeqUtils.CSI_AppendForegroundColorRGB (
+                                                      output,
+                                                      attr.Foreground.R,
+                                                      attr.Foreground.G,
+                                                      attr.Foreground.B
+                                                     );
+        }
+
+        if (attr.Background == Color.Transparent)
+        {
+            EscSeqUtils.CSI_ResetBackgroundColor (output);
+        }
+        else
+        {
+            EscSeqUtils.CSI_AppendBackgroundColorRGB (
+                                                      output,
+                                                      attr.Background.R,
+                                                      attr.Background.G,
+                                                      attr.Background.B
+                                                     );
+        }
+
+        EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
+    }
 
     private void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
     {
