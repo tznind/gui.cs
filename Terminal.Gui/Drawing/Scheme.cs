@@ -171,7 +171,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         {
             return new ()
             {
-                Normal = new (StandardColor.LightBlue, Color.Transparent)
+                Normal = new (StandardColor.LightBlue, StandardColor.Transparent)
             };
         }
 
@@ -179,7 +179,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         {
             return new ()
             {
-                Normal = new (StandardColor.IndianRed, Color.Transparent)
+                Normal = new (StandardColor.IndianRed, StandardColor.Transparent)
             };
         }
 

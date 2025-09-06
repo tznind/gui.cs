@@ -19,7 +19,7 @@ namespace Terminal.Gui.Drawing;
 /// <seealso cref="ColorName16"/>
 [JsonConverter (typeof (ColorJsonConverter))]
 [StructLayout (LayoutKind.Explicit)]
-public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Color>, ISpanFormattable,
+public readonly partial record struct  Color : ISpanParsable<Color>, IUtf8SpanParsable<Color>, ISpanFormattable,
                                               IUtf8SpanFormattable, IMinMaxValue<Color>
 {
     /// <summary>
@@ -91,14 +91,26 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Color"/> class with an encoded signed 32-bit color value in
-    ///     ARGB32 format.
+    ///     RGB32 format. Note that <see langword="int"/> is insufficient to represent alpha so assumed to be 255 unless
+    ///     the value is <see cref="StandardColor.Transparent"/>
     /// </summary>
-    /// <param name="rgba">The encoded 32-bit color value (see <see cref="Rgba"/>).</param>
+    /// <param name="rgb">The encoded 32-bit color value (see <see cref="Rgba"/>).</param>
     /// <remarks>
     ///     The alpha channel is not currently supported, so the value of the alpha channel bits will not affect
     ///     rendering.
     /// </remarks>
-    public Color (int rgba) { Rgba = rgba; }
+    public Color (int rgb) {
+
+        if (rgb != (int)StandardColor.Transparent)
+        {
+            Rgba = rgb;
+            A = byte.MaxValue;
+        }
+        else
+        {
+            // Leave everything 0 for transparent
+        }
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Color"/> class with an encoded unsigned 32-bit color value in

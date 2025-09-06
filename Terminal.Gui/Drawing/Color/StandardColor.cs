@@ -81,6 +81,18 @@ public enum StandardColor
     /// </summary>
     Black = 0x000000,
 
+
+    /// <summary>
+    ///     Transparent RGBA(0, 0, 0, 0).
+    ///     <para>
+    ///         Note that this is the only member of <see cref="StandardColor"/> that does not directly map
+    ///         to RGB. This is because all other values are assumed to have A 255 (not representable within
+    ///         signed int32 limitations of <see langword="enum"/>). See <see cref="Terminal.Gui.Drawing.Color.Color(int)"/>
+    ///         constructor for more info.
+    ///     </para>
+    /// </summary>
+    Transparent = 0xF000000,
+
     /// <summary>
     ///     Blanched almond RGB(255, 235, 205).
     ///     <para>
