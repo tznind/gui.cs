@@ -7,7 +7,7 @@
 /// <remarks>
 ///     Based on https://www.w3schools.com/colors/color_tryit.asp page.
 /// </remarks>
-public enum StandardColor
+public enum StandardColor : uint
 {
     /// <summary>
     ///     Alice blue RGB(240, 248, 255).
@@ -15,7 +15,7 @@ public enum StandardColor
     ///         A very pale shade of blue, almost white.
     ///     </para>
     /// </summary>
-    AliceBlue = 0xF0F8FF,
+    AliceBlue = 0xFFF0F8FF,
 
     /// <summary>
     ///     Antique white RGB(250, 235, 215).
@@ -23,7 +23,7 @@ public enum StandardColor
     ///         A light beige color with a hint of orange.c
     ///     </para>
     /// </summary>
-    AntiqueWhite = 0xFAEBD7,
+    AntiqueWhite = 0xFFFAEBD7,
 
     /// <summary>
     ///     Amber Phosphor RGB(255, 191, 0).
@@ -31,7 +31,7 @@ public enum StandardColor
     ///     Matches the Amber Phosphor color used on classic terminals.
     /// </para>
     /// </summary>
-    AmberPhosphor = 0xFFBF00,
+    AmberPhosphor = 0xFFFFBF00,
 
     /// <summary>
     ///     Aqua RGB(0, 255, 255).
@@ -39,7 +39,7 @@ public enum StandardColor
     ///         A bright cyan color, often associated with water.
     ///     </para>
     /// </summary>
-    Aqua = 0x00FFFF,
+    Aqua = 0xFF00FFFF,
 
     /// <summary>
     ///     Aquamarine RGB(127, 255, 212).
@@ -47,7 +47,7 @@ public enum StandardColor
     ///         A light greenish-blue color, resembling the gemstone aquamarine.
     ///     </para>
     /// </summary>
-    Aquamarine = 0x7FFFD4,
+    Aquamarine = 0xFF7FFFD4,
 
     /// <summary>
     ///     Azure RGB(240, 255, 255).
@@ -55,7 +55,7 @@ public enum StandardColor
     ///         A pale cyan color, resembling the color of the sky on a clear day.
     ///     </para>
     /// </summary>
-    Azure = 0xF0FFFF,
+    Azure = 0xFFF0FFFF,
 
     /// <summary>
     ///     Beige RGB(245, 245, 220).
@@ -63,7 +63,7 @@ public enum StandardColor
     ///         A pale sandy yellow color, often used in interior design.
     ///     </para>
     /// </summary>
-    Beige = 0xF5F5DC,
+    Beige = 0xFFF5F5DC,
 
     /// <summary>
     ///     Bisque RGB(255, 228, 196).
@@ -71,7 +71,7 @@ public enum StandardColor
     ///         A pale orange color, resembling the color of bisque pottery.
     ///     </para>
     /// </summary>
-    Bisque = 0xFFE4C4,
+    Bisque = 0xFFFFE4C4,
 
     /// <summary>
     ///     Black RGB(0, 0, 0).
@@ -79,19 +79,17 @@ public enum StandardColor
     ///         The darkest color, representing the absence of light.
     ///     </para>
     /// </summary>
-    Black = 0x000000,
+    Black = 0xFF000000,
 
 
     /// <summary>
     ///     Transparent RGBA(0, 0, 0, 0).
     ///     <para>
-    ///         Note that this is the only member of <see cref="StandardColor"/> that does not directly map
-    ///         to RGB. This is because all other values are assumed to have A 255 (not representable within
-    ///         signed int32 limitations of <see langword="enum"/>). See <see cref="Terminal.Gui.Drawing.Color.Color(int)"/>
-    ///         constructor for more info.
+    ///         No color and transparent, typically means to use below color or console default
+    ///         color (i.e. clear attribute)
     ///     </para>
     /// </summary>
-    Transparent = 0xF000000,
+    Transparent = 0x00000000,
 
     /// <summary>
     ///     Blanched almond RGB(255, 235, 205).
@@ -99,7 +97,7 @@ public enum StandardColor
     ///         A pale yellowish-orange color, resembling blanched almonds.
     ///     </para>
     /// </summary>
-    BlanchedAlmond = 0xFFEBCD,
+    BlanchedAlmond = 0xFFFFEBCD,
 
     /// <summary>
     ///     Blue RGB(0, 0, 255).
@@ -107,7 +105,7 @@ public enum StandardColor
     ///         A primary color, often associated with the sky and the sea.
     ///     </para>
     /// </summary>
-    Blue = 0x0000FF,
+    Blue = 0xFF0000FF,
 
     /// <summary>
     ///     Blue violet RGB(138, 43, 226).
@@ -115,7 +113,7 @@ public enum StandardColor
     ///         A deep purple color with a hint of blue.
     ///     </para>
     /// </summary>
-    BlueViolet = 0x8A2BE2,
+    BlueViolet = 0xFF8A2BE2,
 
     /// <summary>
     ///     Brown RGB(165, 42, 42).
@@ -123,7 +121,7 @@ public enum StandardColor
     ///         A dark reddish-brown color, resembling the color of wood or soil.
     ///     </para>
     /// </summary>
-    Brown = 0xA52A2A,
+    Brown = 0xFFA52A2A,
 
     /// <summary>
     ///     Burly wood RGB(222, 184, 135).
@@ -131,7 +129,7 @@ public enum StandardColor
     ///         A light brown color, resembling the color of burly wood.
     ///     </para>
     /// </summary>
-    BurlyWood = 0xDEB887,
+    BurlyWood = 0xFFDEB887,
 
     /// <summary>
     ///     Cadet blue RGB(95, 158, 160).
@@ -139,7 +137,7 @@ public enum StandardColor
     ///         A light bluish-green color, first used as a color name in English in 1892.
     ///     </para>
     /// </summary>
-    CadetBlue = 0x5F9EA0,
+    CadetBlue = 0xFF5F9EA0,
 
     /// <summary>
     ///     Charcoal RGB(54, 69, 79).
@@ -147,7 +145,7 @@ public enum StandardColor
     ///         A dark grayish-black color, resembling burnt wood.
     ///     </para>
     /// </summary>
-    Charcoal = 0x36454F,
+    Charcoal = 0xFF36454F,
 
     /// <summary>
     ///     Cornflower blue RGB(100, 149, 237).
@@ -155,7 +153,7 @@ public enum StandardColor
     ///         A medium blue color, resembling the cornflower plant.
     ///     </para>
     /// </summary>
-    CornflowerBlue = 0x6495ED,
+    CornflowerBlue = 0xFF6495ED,
 
     /// <summary>
     ///     Cornsilk RGB(255, 248, 220).
@@ -163,7 +161,7 @@ public enum StandardColor
     ///         A pale yellow color, resembling the silky threads of corn.
     ///     </para>
     /// </summary>
-    Cornsilk = 0xFFF8DC,
+    Cornsilk = 0xFFFFF8DC,
 
     /// <summary>
     ///     Crimson RGB(220, 20, 60).
@@ -171,7 +169,7 @@ public enum StandardColor
     ///         A deep red color, resembling the color of blood.
     ///     </para>
     /// </summary>
-    Crimson = 0xDC143C,
+    Crimson = 0xFFDC143C,
 
     /// <summary>
     ///     Cyan RGB(0, 255, 255).
@@ -187,7 +185,7 @@ public enum StandardColor
     ///         A very dark shade of blue.
     ///     </para>
     /// </summary>
-    DarkBlue = 0x00008B,
+    DarkBlue = 0xFF00008B,
 
     /// <summary>
     ///     Dark cyan RGB(0, 139, 139).
@@ -195,7 +193,7 @@ public enum StandardColor
     ///         A dark shade of cyan.
     ///     </para>
     /// </summary>
-    DarkCyan = 0x008B8B,
+    DarkCyan = 0xFF008B8B,
 
     /// <summary>
     ///     Dark goldenrod RGB(184, 134, 11).
@@ -203,7 +201,7 @@ public enum StandardColor
     ///         A dark yellowish-brown color.
     ///     </para>
     /// </summary>
-    DarkGoldenrod = 0xB8860B,
+    DarkGoldenrod = 0xFFB8860B,
 
     /// <summary>
     ///     Dark gray RGB(169, 169, 169).
@@ -211,7 +209,7 @@ public enum StandardColor
     ///         A medium-dark shade of gray.
     ///     </para>
     /// </summary>
-    DarkGray = 0xA9A9A9,
+    DarkGray = 0xFFA9A9A9,
 
     /// <summary>
     ///     Dark green RGB(0, 100, 0).
@@ -219,7 +217,7 @@ public enum StandardColor
     ///         A dark shade of green.
     ///     </para>
     /// </summary>
-    DarkGreen = 0x006400,
+    DarkGreen = 0xFF006400,
 
     /// <summary>
     ///     Dark grey RGB(169, 169, 169).
@@ -235,7 +233,7 @@ public enum StandardColor
     ///         A dark yellowish-brown color.
     ///     </para>
     /// </summary>
-    DarkKhaki = 0xBDB76B,
+    DarkKhaki = 0xFFBDB76B,
 
     /// <summary>
     ///     Dark magenta RGB(139, 0, 139).
@@ -243,7 +241,7 @@ public enum StandardColor
     ///         A dark shade of magenta.
     ///     </para>
     /// </summary>
-    DarkMagenta = 0x8B008B,
+    DarkMagenta = 0xFF8B008B,
 
     /// <summary>
     ///     Dark olive green RGB(85, 107, 47).
@@ -251,7 +249,7 @@ public enum StandardColor
     ///         A dark yellowish-green color.
     ///     </para>
     /// </summary>
-    DarkOliveGreen = 0x556B2F,
+    DarkOliveGreen = 0xFF556B2F,
 
     /// <summary>
     ///     Dark orange RGB(255, 140, 0).
@@ -259,7 +257,7 @@ public enum StandardColor
     ///         A dark shade of orange.
     ///     </para>
     /// </summary>
-    DarkOrange = 0xFF8C00,
+    DarkOrange = 0xFFFF8C00,
 
     /// <summary>
     ///     Dark orchid RGB(153, 50, 204).
@@ -267,7 +265,7 @@ public enum StandardColor
     ///         A dark purple color with a hint of blue.
     ///     </para>
     /// </summary>
-    DarkOrchid = 0x9932CC,
+    DarkOrchid = 0xFF9932CC,
 
     /// <summary>
     ///     Dark red RGB(139, 0, 0).
@@ -275,7 +273,7 @@ public enum StandardColor
     ///         A dark shade of red.
     ///     </para>
     /// </summary>
-    DarkRed = 0x8B0000,
+    DarkRed = 0xFF8B0000,
 
     /// <summary>
     ///     Dark salmon RGB(233, 150, 122).
@@ -283,7 +281,7 @@ public enum StandardColor
     ///         A dark pinkish-orange color.
     ///     </para>
     /// </summary>
-    DarkSalmon = 0xE9967A,
+    DarkSalmon = 0xFFE9967A,
 
     /// <summary>
     ///     Dark sea green RGB(143, 188, 143).
@@ -291,7 +289,7 @@ public enum StandardColor
     ///         A dark shade of sea green.
     ///     </para>
     /// </summary>
-    DarkSeaGreen = 0x8FBC8F,
+    DarkSeaGreen = 0xFF8FBC8F,
 
     /// <summary>
     ///     Dark slate blue RGB(72, 61, 139).
@@ -299,7 +297,7 @@ public enum StandardColor
     ///         A dark blue color with a hint of gray.
     ///     </para>
     /// </summary>
-    DarkSlateBlue = 0x483D8B,
+    DarkSlateBlue = 0xFF483D8B,
 
     /// <summary>
     ///     Dark slate gray RGB(47, 79, 79).
@@ -307,7 +305,7 @@ public enum StandardColor
     ///         A very dark gray color with a hint of green.
     ///     </para>
     /// </summary>
-    DarkSlateGray = 0x2F4F4F,
+    DarkSlateGray = 0xFF2F4F4F,
 
     /// <summary>
     ///     Dark slate grey RGB(47, 79, 79).
@@ -323,7 +321,7 @@ public enum StandardColor
     ///         A dark shade of turquoise.
     ///     </para>
     /// </summary>
-    DarkTurquoise = 0x00CED1,
+    DarkTurquoise = 0xFF00CED1,
 
     /// <summary>
     ///     Dark violet RGB(148, 0, 211).
@@ -331,7 +329,7 @@ public enum StandardColor
     ///         A dark shade of violet.
     ///     </para>
     /// </summary>
-    DarkViolet = 0x9400D3,
+    DarkViolet = 0xFF9400D3,
 
     /// <summary>
     ///     Deep pink RGB(255, 20, 147).
@@ -339,7 +337,7 @@ public enum StandardColor
     ///         A bright and intense pink color.
     ///     </para>
     /// </summary>
-    DeepPink = 0xFF1493,
+    DeepPink = 0xFFFF1493,
 
     /// <summary>
     ///     Deep sky blue RGB(0, 191, 255).
@@ -347,7 +345,7 @@ public enum StandardColor
     ///         A bright and intense sky blue color.
     ///     </para>
     /// </summary>
-    DeepSkyBlue = 0x00BFFF,
+    DeepSkyBlue = 0xFF00BFFF,
 
     /// <summary>
     ///     Dim gray RGB(105, 105, 105).
@@ -355,7 +353,7 @@ public enum StandardColor
     ///         A medium-dark shade of gray.
     ///     </para>
     /// </summary>
-    DimGray = 0x696969,
+    DimGray = 0xFF696969,
 
     /// <summary>
     ///     Dim grey RGB(105, 105, 105).
@@ -371,7 +369,7 @@ public enum StandardColor
     ///         A bright and vibrant blue color.
     ///     </para>
     /// </summary>
-    DodgerBlue = 0x1E90FF,
+    DodgerBlue = 0xFF1E90FF,
 
     /// <summary>
     ///     Ebony RGB(85, 93, 80).
@@ -379,7 +377,7 @@ public enum StandardColor
     ///         A very dark gray color with a slight greenish tint.
     ///     </para>
     /// </summary>
-    Ebony = 0x555D50,
+    Ebony = 0xFF555D50,
 
     /// <summary>
     ///     Fire brick RGB(178, 34, 34).
@@ -387,7 +385,7 @@ public enum StandardColor
     ///         A dark reddish-brown color, resembling bricks.
     ///     </para>
     /// </summary>
-    FireBrick = 0xB22222,
+    FireBrick = 0xFFB22222,
 
     /// <summary>
     ///     Floral white RGB(255, 250, 240).
@@ -395,7 +393,7 @@ public enum StandardColor
     ///         A very pale shade of white with a hint of orange.
     ///     </para>
     /// </summary>
-    FloralWhite = 0xFFFAF0,
+    FloralWhite = 0xFFFFFAF0,
 
 
     /// <summary>
@@ -412,7 +410,7 @@ public enum StandardColor
     ///         A dark green color, resembling the color of a forest.
     ///     </para>
     /// </summary>
-    ForestGreen = 0x228B22,
+    ForestGreen = 0xFF228B22,
 
     /// <summary>
     ///     Fuchsia RGB(255, 0, 255).
@@ -420,7 +418,7 @@ public enum StandardColor
     ///         A bright and vibrant magenta color.
     ///     </para>
     /// </summary>
-    Fuchsia = 0xFF00FF,
+    Fuchsia = 0xFFFF00FF,
 
     /// <summary>
     ///     Gainsboro RGB(220, 220, 220).
@@ -428,7 +426,7 @@ public enum StandardColor
     ///         A very light gray color.
     ///     </para>
     /// </summary>
-    Gainsboro = 0xDCDCDC,
+    Gainsboro = 0xFFDCDCDC,
 
     /// <summary>
     ///     Ghost white RGB(248, 248, 255).
@@ -436,7 +434,7 @@ public enum StandardColor
     ///         A very pale shade of white with a hint of blue.
     ///     </para>
     /// </summary>
-    GhostWhite = 0xF8F8FF,
+    GhostWhite = 0xFFF8F8FF,
 
     /// <summary>
     ///     Gold RGB(255, 215, 0).
@@ -444,7 +442,7 @@ public enum StandardColor
     ///         A bright yellow color, resembling gold.
     ///     </para>
     /// </summary>
-    Gold = 0xFFD700,
+    Gold = 0xFFFFD700,
 
     /// <summary>
     ///     Goldenrod RGB(218, 165, 32).
@@ -452,7 +450,7 @@ public enum StandardColor
     ///         A dark yellow color with a hint of brown.
     ///     </para>
     /// </summary>
-    Goldenrod = 0xDAA520,
+    Goldenrod = 0xFFDAA520,
 
     /// <summary>
     ///     Gray RGB(128, 128, 128).
@@ -460,7 +458,7 @@ public enum StandardColor
     ///         A medium shade of gray.
     ///     </para>
     /// </summary>
-    Gray = 0x808080,
+    Gray = 0xFF808080,
 
     /// <summary>
     ///     Green RGB(0, 128, 0).
@@ -468,7 +466,7 @@ public enum StandardColor
     ///         A medium shade of green.
     ///     </para>
     /// </summary>
-    Green = 0x008000,
+    Green = 0xFF008000,
 
     /// <summary>
     ///     Green Phosphor RGB(0, 255, 102).
@@ -476,7 +474,7 @@ public enum StandardColor
     ///     Matches the Green Phosphor color used on classic terminals.
     /// </para>
     /// </summary>
-    GreenPhosphor = 0x00FF66,
+    GreenPhosphor = 0xFF00FF66,
 
     /// <summary>
     ///     Green yellow RGB(173, 255, 47).
@@ -484,7 +482,7 @@ public enum StandardColor
     ///         A bright yellowish-green color.
     ///     </para>
     /// </summary>
-    GreenYellow = 0xADFF2F,
+    GreenYellow = 0xFFADFF2F,
 
     /// <summary>
     ///     Grey RGB(128, 128, 128).
@@ -508,7 +506,7 @@ public enum StandardColor
     ///         A very pale greenish-white color.
     ///     </para>
     /// </summary>
-    HoneyDew = 0xF0FFF0,
+    HoneyDew = 0xFFF0FFF0,
 
     /// <summary>
     ///     Hot pink RGB(255, 105, 180).
@@ -516,7 +514,7 @@ public enum StandardColor
     ///         A bright and vibrant pink color.
     ///     </para>
     /// </summary>
-    HotPink = 0xFF69B4,
+    HotPink = 0xFFFF69B4,
 
     /// <summary>
     ///     Indian red RGB(205, 92, 92).
@@ -524,7 +522,7 @@ public enum StandardColor
     ///         A dark reddish-brown color.
     ///     </para>
     /// </summary>
-    IndianRed = 0xCD5C5C,
+    IndianRed = 0xFFCD5C5C,
 
     /// <summary>
     ///     Indigo RGB(75, 0, 130).
@@ -532,7 +530,7 @@ public enum StandardColor
     ///         A dark blue-purple color.
     ///     </para>
     /// </summary>
-    Indigo = 0x4B0082,
+    Indigo = 0xFF4B0082,
 
     /// <summary>
     ///     Ivory RGB(255, 255, 240).
@@ -540,7 +538,7 @@ public enum StandardColor
     ///         A very pale yellowish-white color.
     ///     </para>
     /// </summary>
-    Ivory = 0xFFFFF0,
+    Ivory = 0xFFFFFFF0,
 
     /// <summary>
     ///     Jet RGB(52, 52, 52).
@@ -548,7 +546,7 @@ public enum StandardColor
     ///         A very dark gray, often used as a near-black.
     ///     </para>
     /// </summary>
-    Jet = 0x343434,
+    Jet = 0xFF343434,
 
     /// <summary>
     ///     Khaki RGB(240, 230, 140).
@@ -556,7 +554,7 @@ public enum StandardColor
     ///         A pale yellowish-brown color.
     ///     </para>
     /// </summary>
-    Khaki = 0xF0E68C,
+    Khaki = 0xFFF0E68C,
 
     /// <summary>
     ///     Lavender RGB(230, 230, 250).
@@ -564,7 +562,7 @@ public enum StandardColor
     ///         A pale purple color, resembling the lavender flower.
     ///     </para>
     /// </summary>
-    Lavender = 0xE6E6FA,
+    Lavender = 0xFFE6E6FA,
 
     /// <summary>
     ///     Lavender blush RGB(255, 240, 245).
@@ -572,7 +570,7 @@ public enum StandardColor
     ///         A very pale pinkish-white color.
     ///     </para>
     /// </summary>
-    LavenderBlush = 0xFFF0F5,
+    LavenderBlush = 0xFFFFF0F5,
 
     /// <summary>
     ///     Lawn green RGB(124, 252, 0).
@@ -580,7 +578,7 @@ public enum StandardColor
     ///         A bright green color, resembling freshly cut grass.
     ///     </para>
     /// </summary>
-    LawnGreen = 0x7CFC00,
+    LawnGreen = 0xFF7CFC00,
 
     /// <summary>
     ///     Lemon chiffon RGB(255, 250, 205).
@@ -588,7 +586,7 @@ public enum StandardColor
     ///         A pale yellow color, resembling lemon chiffon cake.
     ///     </para>
     /// </summary>
-    LemonChiffon = 0xFFFACD,
+    LemonChiffon = 0xFFFFFACD,
 
     /// <summary>
     ///     Light blue RGB(173, 216, 230).
@@ -596,7 +594,7 @@ public enum StandardColor
     ///         A pale shade of blue.
     ///     </para>
     /// </summary>
-    LightBlue = 0xADD8E6,
+    LightBlue = 0xFFADD8E6,
 
     /// <summary>
     ///     Light coral RGB(240, 128, 128).
@@ -604,7 +602,7 @@ public enum StandardColor
     ///         A pale pinkish-orange color.
     ///     </para>
     /// </summary>
-    LightCoral = 0xF08080,
+    LightCoral = 0xFFF08080,
 
     /// <summary>
     ///     Light cyan RGB(224, 255, 255).
@@ -612,7 +610,7 @@ public enum StandardColor
     ///         A pale shade of cyan.
     ///     </para>
     /// </summary>
-    LightCyan = 0xE0FFFF,
+    LightCyan = 0xFFE0FFFF,
 
     /// <summary>
     ///     Light goldenrod yellow RGB(250, 250, 210).
@@ -620,7 +618,7 @@ public enum StandardColor
     ///         A pale yellow color with a hint of gold.
     ///     </para>
     /// </summary>
-    LightGoldenrodYellow = 0xFAFAD2,
+    LightGoldenrodYellow = 0xFFFAFAD2,
 
     /// <summary>
     ///     Light gray RGB(211, 211, 211).
@@ -628,7 +626,7 @@ public enum StandardColor
     ///         A pale shade of gray.
     ///     </para>
     /// </summary>
-    LightGray = 0xD3D3D3,
+    LightGray = 0xFFD3D3D3,
 
     /// <summary>
     ///     Light green RGB(144, 238, 144).
@@ -636,7 +634,7 @@ public enum StandardColor
     ///         A pale shade of green.
     ///     </para>
     /// </summary>
-    LightGreen = 0x90EE90,
+    LightGreen = 0xFF90EE90,
 
     /// <summary>
     ///     Light grey RGB(211, 211, 211).
@@ -652,7 +650,7 @@ public enum StandardColor
     ///         A pale shade of pink.
     ///     </para>
     /// </summary>
-    LightPink = 0xFFB6C1,
+    LightPink = 0xFFFFB6C1,
 
     /// <summary>
     ///     Light salmon RGB(255, 160, 122).
@@ -660,7 +658,7 @@ public enum StandardColor
     ///         A pale pinkish-orange color.
     ///     </para>
     /// </summary>
-    LightSalmon = 0xFFA07A,
+    LightSalmon = 0xFFFFA07A,
 
     /// <summary>
     ///     Light sea green RGB(32, 178, 170).
@@ -668,7 +666,7 @@ public enum StandardColor
     ///         A pale shade of sea green.
     ///     </para>
     /// </summary>
-    LightSeaGreen = 0x20B2AA,
+    LightSeaGreen = 0xFF20B2AA,
 
     /// <summary>
     ///     Light sky blue RGB(135, 206, 250).
@@ -676,7 +674,7 @@ public enum StandardColor
     ///         A pale shade of sky blue.
     ///     </para>
     /// </summary>
-    LightSkyBlue = 0x87CEFA,
+    LightSkyBlue = 0xFF87CEFA,
 
     /// <summary>
     ///     Light slate gray RGB(119, 136, 153).
@@ -684,7 +682,7 @@ public enum StandardColor
     ///         A pale shade of slate gray.
     ///     </para>
     /// </summary>
-    LightSlateGray = 0x778899,
+    LightSlateGray = 0xFF778899,
 
     /// <summary>
     ///     Light slate grey RGB(119, 136, 153).
@@ -700,7 +698,7 @@ public enum StandardColor
     ///         A pale shade of steel blue.
     ///     </para>
     /// </summary>
-    LightSteelBlue = 0xB0C4DE,
+    LightSteelBlue = 0xFFB0C4DE,
 
     /// <summary>
     ///     Light yellow RGB(255, 255, 224).
@@ -708,7 +706,7 @@ public enum StandardColor
     ///         A pale shade of yellow.
     ///     </para>
     /// </summary>
-    LightYellow = 0xFFFFE0,
+    LightYellow = 0xFFFFFFE0,
 
     /// <summary>
     ///     Lime RGB(0, 255, 0).
@@ -716,7 +714,7 @@ public enum StandardColor
     ///         A bright green color.
     ///     </para>
     /// </summary>
-    Lime = 0x00FF00,
+    Lime = 0xFF00FF00,
 
     /// <summary>
     ///     Lime green RGB(50, 205, 50).
@@ -724,7 +722,7 @@ public enum StandardColor
     ///         A bright green color with a hint of yellow.
     ///     </para>
     /// </summary>
-    LimeGreen = 0x32CD32,
+    LimeGreen = 0xFF32CD32,
 
     /// <summary>
     ///     Linen RGB(250, 240, 230).
@@ -732,7 +730,7 @@ public enum StandardColor
     ///         A pale beige color, resembling linen fabric.
     ///     </para>
     /// </summary>
-    Linen = 0xFAF0E6,
+    Linen = 0xFFFAF0E6,
 
     /// <summary>
     ///     Magenta RGB(255, 0, 255).
@@ -740,7 +738,7 @@ public enum StandardColor
     ///         A bright and vibrant pinkish-purple color.
     ///     </para>
     /// </summary>
-    Magenta = 0xFF00FF,
+    Magenta = 0xFFFF00FF,
 
     /// <summary>
     ///     Maroon RGB(128, 0, 0).
@@ -748,7 +746,7 @@ public enum StandardColor
     ///         A dark reddish-brown color.
     ///     </para>
     /// </summary>
-    Maroon = 0x800000,
+    Maroon = 0xFF800000,
 
     /// <summary>
     ///     Medium aqua marine RGB(102, 205, 170).
@@ -756,7 +754,7 @@ public enum StandardColor
     ///         A medium shade of greenish-blue.
     ///     </para>
     /// </summary>
-    MediumAquaMarine = 0x66CDAA,
+    MediumAquaMarine = 0xFF66CDAA,
 
     /// <summary>
     ///     Medium blue RGB(0, 0, 205).
@@ -764,7 +762,7 @@ public enum StandardColor
     ///         A medium shade of blue.
     ///     </para>
     /// </summary>
-    MediumBlue = 0x0000CD,
+    MediumBlue = 0xFF0000CD,
 
     /// <summary>
     ///     Medium orchid RGB(186, 85, 211).
@@ -772,7 +770,7 @@ public enum StandardColor
     ///         A medium shade of purple with a hint of pink.
     ///     </para>
     /// </summary>
-    MediumOrchid = 0xBA55D3,
+    MediumOrchid = 0xFFBA55D3,
 
     /// <summary>
     ///     Medium purple RGB(147, 112, 219).
@@ -780,7 +778,7 @@ public enum StandardColor
     ///         A medium shade of purple.
     ///     </para>
     /// </summary>
-    MediumPurple = 0x9370DB,
+    MediumPurple = 0xFF9370DB,
 
     /// <summary>
     ///     Medium sea green RGB(60, 179, 113).
@@ -788,7 +786,7 @@ public enum StandardColor
     ///         A medium shade of sea green.
     ///     </para>
     /// </summary>
-    MediumSeaGreen = 0x3CB371,
+    MediumSeaGreen = 0xFF3CB371,
 
     /// <summary>
     ///     Medium slate blue RGB(123, 104, 238).
@@ -796,7 +794,7 @@ public enum StandardColor
     ///         A medium shade of slate blue.
     ///     </para>
     /// </summary>
-    MediumSlateBlue = 0x7B68EE,
+    MediumSlateBlue = 0xFF7B68EE,
 
     /// <summary>
     ///     Medium spring green RGB(0, 250, 154).
@@ -804,7 +802,7 @@ public enum StandardColor
     ///         A medium shade of spring green.
     ///     </para>
     /// </summary>
-    MediumSpringGreen = 0x00FA9A,
+    MediumSpringGreen = 0xFF00FA9A,
 
     /// <summary>
     ///     Medium turquoise RGB(72, 209, 204).
@@ -812,7 +810,7 @@ public enum StandardColor
     ///         A medium shade of turquoise.
     ///     </para>
     /// </summary>
-    MediumTurquoise = 0x48D1CC,
+    MediumTurquoise = 0xFF48D1CC,
 
     /// <summary>
     ///     Medium violet red RGB(199, 21, 133).
@@ -820,7 +818,7 @@ public enum StandardColor
     ///         A medium shade of violet-red.
     ///     </para>
     /// </summary>
-    MediumVioletRed = 0xC71585,
+    MediumVioletRed = 0xFFC71585,
 
     /// <summary>
     ///     Midnight blue RGB(25, 25, 112).
@@ -828,7 +826,7 @@ public enum StandardColor
     ///         A very dark shade of blue.
     ///     </para>
     /// </summary>
-    MidnightBlue = 0x191970,
+    MidnightBlue = 0xFF191970,
 
     /// <summary>
     ///     Mint cream RGB(245, 255, 250).
@@ -836,7 +834,7 @@ public enum StandardColor
     ///         A very pale greenish-white color.
     ///     </para>
     /// </summary>
-    MintCream = 0xF5FFFA,
+    MintCream = 0xFFF5FFFA,
 
     /// <summary>
     ///     Misty rose RGB(255, 228, 225).
@@ -844,7 +842,7 @@ public enum StandardColor
     ///         A very pale pinkish-white color.
     ///     </para>
     /// </summary>
-    MistyRose = 0xFFE4E1,
+    MistyRose = 0xFFFFE4E1,
 
     /// <summary>
     ///     Moccasin RGB(255, 228, 181).
@@ -852,7 +850,7 @@ public enum StandardColor
     ///         A pale orange color, resembling moccasin leather.
     ///     </para>
     /// </summary>
-    Moccasin = 0xFFE4B5,
+    Moccasin = 0xFFFFE4B5,
 
     /// <summary>
     ///     Navajo white RGB(255, 222, 173).
@@ -860,7 +858,7 @@ public enum StandardColor
     ///         A pale orange color, resembling Navajo pottery.
     ///     </para>
     /// </summary>
-    NavajoWhite = 0xFFDEAD,
+    NavajoWhite = 0xFFFFDEAD,
 
     /// <summary>
     ///     Navy RGB(0, 0, 128).
@@ -868,7 +866,7 @@ public enum StandardColor
     ///         A very dark shade of blue.
     ///     </para>
     /// </summary>
-    Navy = 0x000080,
+    Navy = 0xFF000080,
 
     /// <summary>
     ///     Old lace RGB(253, 245, 230).
@@ -876,7 +874,7 @@ public enum StandardColor
     ///         A very pale beige color, resembling old lace fabric.
     ///     </para>
     /// </summary>
-    OldLace = 0xFDF5E6,
+    OldLace = 0xFFFDF5E6,
 
     /// <summary>
     ///     Olive RGB(128, 128, 0).
@@ -884,7 +882,7 @@ public enum StandardColor
     ///         A dark yellowish-green color.
     ///     </para>
     /// </summary>
-    Olive = 0x808000,
+    Olive = 0xFF808000,
 
     /// <summary>
     ///     Olive drab RGB(107, 142, 35).
@@ -892,7 +890,7 @@ public enum StandardColor
     ///         A dark yellowish-green color, resembling olive drab fabric.
     ///     </para>
     /// </summary>
-    OliveDrab = 0x6B8E23,
+    OliveDrab = 0xFF6B8E23,
 
     /// <summary>
     ///     Onyx RGB(53, 56, 57).
@@ -900,7 +898,7 @@ public enum StandardColor
     ///         A dark grayish-black color, resembling the onyx gemstone.
     ///     </para>
     /// </summary>
-    Onyx = 0x353839,
+    Onyx = 0xFF353839,
 
     /// <summary>
     ///     Orange RGB(255, 165, 0).
@@ -908,7 +906,7 @@ public enum StandardColor
     ///         A bright orange color.
     ///     </para>
     /// </summary>
-    Orange = 0xFFA500,
+    Orange = 0xFFFFA500,
 
     /// <summary>
     ///     Orange red RGB(255, 69, 0).
@@ -916,7 +914,7 @@ public enum StandardColor
     ///         A bright reddish-orange color.
     ///     </para>
     /// </summary>
-    OrangeRed = 0xFF4500,
+    OrangeRed = 0xFFFF4500,
 
     /// <summary>
     ///     Orchid RGB(218, 112, 214).
@@ -924,7 +922,7 @@ public enum StandardColor
     ///         A pale purple color with a hint of pink.
     ///     </para>
     /// </summary>
-    Orchid = 0xDA70D6,
+    Orchid = 0xFFDA70D6,
 
     /// <summary>
     ///     Outer space RGB(65, 74, 76).
@@ -932,7 +930,7 @@ public enum StandardColor
     ///         A dark gray color with a bluish tint, resembling the color of outer space.
     ///     </para>
     /// </summary>
-    OuterSpace = 0x414A4C,
+    OuterSpace = 0xFF414A4C,
 
     /// <summary>
     ///     Pale goldenrod RGB(238, 232, 170).
@@ -940,7 +938,7 @@ public enum StandardColor
     ///         A pale yellow color with a hint of gold.
     ///     </para>
     /// </summary>
-    PaleGoldenrod = 0xEEE8AA,
+    PaleGoldenrod = 0xFFEEE8AA,
 
     /// <summary>
     ///     Pale green RGB(152, 251, 152).
@@ -948,7 +946,7 @@ public enum StandardColor
     ///         A pale shade of green.
     ///     </para>
     /// </summary>
-    PaleGreen = 0x98FB98,
+    PaleGreen = 0xFF98FB98,
 
     /// <summary>
     ///     Pale turquoise RGB(175, 238, 238).
@@ -956,7 +954,7 @@ public enum StandardColor
     ///         A pale shade of turquoise.
     ///     </para>
     /// </summary>
-    PaleTurquoise = 0xAFEEEE,
+    PaleTurquoise = 0xFFAFEEEE,
 
     /// <summary>
     ///     Pale violet red RGB(219, 112, 147).
@@ -964,7 +962,7 @@ public enum StandardColor
     ///         A pale shade of violet-red.
     ///     </para>
     /// </summary>
-    PaleVioletRed = 0xDB7093,
+    PaleVioletRed = 0xFFDB7093,
 
     /// <summary>
     ///     Papaya whip RGB(255, 239, 213).
@@ -972,7 +970,7 @@ public enum StandardColor
     ///         A pale orange color, resembling papaya fruit.
     ///     </para>
     /// </summary>
-    PapayaWhip = 0xFFEFD5,
+    PapayaWhip = 0xFFFFEFD5,
 
     /// <summary>
     ///     Peach puff RGB(255, 218, 185).
@@ -980,7 +978,7 @@ public enum StandardColor
     ///         A pale orange color, resembling peach skin.
     ///     </para>
     /// </summary>
-    PeachPuff = 0xFFDAB9,
+    PeachPuff = 0xFFFFDAB9,
 
     /// <summary>
     ///     Peru RGB(205, 133, 63).
@@ -988,7 +986,7 @@ public enum StandardColor
     ///         A dark orange-brown color.
     ///     </para>
     /// </summary>
-    Peru = 0xCD853F,
+    Peru = 0xFFCD853F,
 
     /// <summary>
     ///     Pink RGB(255, 192, 203).
@@ -996,7 +994,7 @@ public enum StandardColor
     ///         A pale shade of pink.
     ///     </para>
     /// </summary>
-    Pink = 0xFFC0CB,
+    Pink = 0xFFFFC0CB,
 
     /// <summary>
     ///     Plum RGB(221, 160, 221).
@@ -1004,7 +1002,7 @@ public enum StandardColor
     ///         A pale purple color.
     ///     </para>
     /// </summary>
-    Plum = 0xDDA0DD,
+    Plum = 0xFFDDA0DD,
 
     /// <summary>
     ///     Powder blue RGB(176, 224, 230).
@@ -1012,7 +1010,7 @@ public enum StandardColor
     ///         A pale shade of blue.
     ///     </para>
     /// </summary>
-    PowderBlue = 0xB0E0E6,
+    PowderBlue = 0xFFB0E0E6,
 
     /// <summary>
     ///     Purple RGB(128, 0, 128).
@@ -1020,7 +1018,7 @@ public enum StandardColor
     ///         A dark shade of purple.
     ///     </para>
     /// </summary>
-    Purple = 0x800080,
+    Purple = 0xFF800080,
 
     /// <summary>
     ///     Raisin black RGB(36, 33, 36).
@@ -1028,7 +1026,7 @@ public enum StandardColor
     ///         A very dark grayish-black color, resembling the color of raisins.
     ///     </para>
     /// </summary>
-    RaisinBlack = 0x242124,
+    RaisinBlack = 0xFF242124,
 
     /// <summary>
     ///     Rebecca purple RGB(102, 51, 153).
@@ -1036,7 +1034,7 @@ public enum StandardColor
     ///         A medium-dark shade of purple.
     ///     </para>
     /// </summary>
-    RebeccaPurple = 0x663399,
+    RebeccaPurple = 0xFF663399,
 
     /// <summary>
     ///     Red RGB(255, 0, 0).
@@ -1044,7 +1042,7 @@ public enum StandardColor
     ///         A bright red color.
     ///     </para>
     /// </summary>
-    Red = 0xFF0000,
+    Red = 0xFFFF0000,
 
     /// <summary>
     ///     Rosy brown RGB(188, 143, 143).
@@ -1052,7 +1050,7 @@ public enum StandardColor
     ///         A pale reddish-brown color.
     ///     </para>
     /// </summary>
-    RosyBrown = 0xBC8F8F,
+    RosyBrown = 0xFFBC8F8F,
 
     /// <summary>
     ///     Royal blue RGB(65, 105, 225).
@@ -1060,7 +1058,7 @@ public enum StandardColor
     ///         A medium shade of blue.
     ///     </para>
     /// </summary>
-    RoyalBlue = 0x4169E1,
+    RoyalBlue = 0xFF4169E1,
 
     /// <summary>
     ///     Saddle brown RGB(139, 69, 19).
@@ -1068,7 +1066,7 @@ public enum StandardColor
     ///         A dark reddish-brown color.
     ///     </para>
     /// </summary>
-    SaddleBrown = 0x8B4513,
+    SaddleBrown = 0xFF8B4513,
 
     /// <summary>
     ///     Salmon RGB(250, 128, 114).
@@ -1076,7 +1074,7 @@ public enum StandardColor
     ///         A pale pinkish-orange color.
     ///     </para>
     /// </summary>
-    Salmon = 0xFA8072,
+    Salmon = 0xFFFA8072,
 
     /// <summary>
     ///     Sandy brown RGB(244, 164, 96).
@@ -1084,7 +1082,7 @@ public enum StandardColor
     ///         A pale orange-brown color.
     ///     </para>
     /// </summary>
-    SandyBrown = 0xF4A460,
+    SandyBrown = 0xFFF4A460,
 
     /// <summary>
     ///     Sea green RGB(46, 139, 87).
@@ -1092,7 +1090,7 @@ public enum StandardColor
     ///         A medium-dark shade of green.
     ///     </para>
     /// </summary>
-    SeaGreen = 0x2E8B57,
+    SeaGreen = 0xFF2E8B57,
 
     /// <summary>
     ///     Sea shell RGB(255, 245, 238).
@@ -1100,7 +1098,7 @@ public enum StandardColor
     ///         A very pale orange color, resembling seashells.
     ///     </para>
     /// </summary>
-    SeaShell = 0xFFF5EE,
+    SeaShell = 0xFFFFF5EE,
 
     /// <summary>
     ///     Sienna RGB(160, 82, 45).
@@ -1108,7 +1106,7 @@ public enum StandardColor
     ///         A dark orange-brown color.
     ///     </para>
     /// </summary>
-    Sienna = 0xA0522D,
+    Sienna = 0xFFA0522D,
 
     /// <summary>
     ///     Silver RGB(192, 192, 192).
@@ -1116,7 +1114,7 @@ public enum StandardColor
     ///         A pale gray color, resembling silver.
     ///     </para>
     /// </summary>
-    Silver = 0xC0C0C0,
+    Silver = 0xFFC0C0C0,
 
     /// <summary>
     ///     Sky blue RGB(135, 206, 235).
@@ -1124,7 +1122,7 @@ public enum StandardColor
     ///         A pale shade of blue, resembling the sky.
     ///     </para>
     /// </summary>
-    SkyBlue = 0x87CEEB,
+    SkyBlue = 0xFF87CEEB,
 
     /// <summary>
     ///     Slate blue RGB(106, 90, 205).
@@ -1132,7 +1130,7 @@ public enum StandardColor
     ///         A medium-dark shade of blue.
     ///     </para>
     /// </summary>
-    SlateBlue = 0x6A5ACD,
+    SlateBlue = 0xFF6A5ACD,
 
     /// <summary>
     ///     Slate gray RGB(112, 128, 144).
@@ -1140,7 +1138,7 @@ public enum StandardColor
     ///         A medium-dark shade of gray.
     ///     </para>
     /// </summary>
-    SlateGray = 0x708090,
+    SlateGray = 0xFF708090,
 
     /// <summary>
     ///     Slate grey RGB(112, 128, 144).
@@ -1156,7 +1154,7 @@ public enum StandardColor
     ///         A very pale shade of white with a hint of pink.
     ///     </para>
     /// </summary>
-    Snow = 0xFFFAFA,
+    Snow = 0xFFFFFAFA,
 
     /// <summary>
     ///     Spring green RGB(0, 255, 127).
@@ -1164,7 +1162,7 @@ public enum StandardColor
     ///         A bright green color with a hint of yellow.
     ///     </para>
     /// </summary>
-    SpringGreen = 0x00FF7F,
+    SpringGreen = 0xFF00FF7F,
 
     /// <summary>
     ///     Steel blue RGB(70, 130, 180).
@@ -1172,7 +1170,7 @@ public enum StandardColor
     ///         A medium-dark shade of blue.
     ///     </para>
     /// </summary>
-    SteelBlue = 0x4682B4,
+    SteelBlue = 0xFF4682B4,
 
     /// <summary>
     ///     Tan RGB(210, 180, 140).
@@ -1180,7 +1178,7 @@ public enum StandardColor
     ///         A pale orange-brown color.
     ///     </para>
     /// </summary>
-    Tan = 0xD2B48C,
+    Tan = 0xFFD2B48C,
 
     /// <summary>
     ///     Teal RGB(0, 128, 128).
@@ -1188,7 +1186,7 @@ public enum StandardColor
     ///         A medium-dark shade of greenish-blue.
     ///     </para>
     /// </summary>
-    Teal = 0x008080,
+    Teal = 0xFF008080,
 
     /// <summary>
     ///     Thistle RGB(216, 191, 216).
@@ -1196,7 +1194,7 @@ public enum StandardColor
     ///         A pale purple color.
     ///     </para>
     /// </summary>
-    Thistle = 0xD8BFD8,
+    Thistle = 0xFFD8BFD8,
 
     /// <summary>
     ///     Tomato RGB(255, 99, 71).
@@ -1204,7 +1202,7 @@ public enum StandardColor
     ///         A bright reddish-orange color, resembling tomatoes.
     ///     </para>
     /// </summary>
-    Tomato = 0xFF6347,
+    Tomato = 0xFFFF6347,
 
     /// <summary>
     ///     Turquoise RGB(64, 224, 208).
@@ -1212,7 +1210,7 @@ public enum StandardColor
     ///         A bright greenish-blue color.
     ///     </para>
     /// </summary>
-    Turquoise = 0x40E0D0,
+    Turquoise = 0xFF40E0D0,
 
     /// <summary>
     ///     Violet RGB(238, 130, 238).
@@ -1220,7 +1218,7 @@ public enum StandardColor
     ///         A bright purple color.
     ///     </para>
     /// </summary>
-    Violet = 0xEE82EE,
+    Violet = 0xFFEE82EE,
 
     /// <summary>
     ///     Wheat RGB(245, 222, 179).
@@ -1228,7 +1226,7 @@ public enum StandardColor
     ///         A pale yellowish-brown color, resembling wheat.
     ///     </para>
     /// </summary>
-    Wheat = 0xF5DEB3,
+    Wheat = 0xFFF5DEB3,
 
     /// <summary>
     ///     White RGB(255, 255, 255).
@@ -1236,7 +1234,7 @@ public enum StandardColor
     ///         The lightest color, representing the presence of all colors of light.
     ///     </para>
     /// </summary>
-    White = 0xFFFFFF,
+    White = 0xFFFFFFFF,
 
     /// <summary>
     ///     White smoke RGB(245, 245, 245).
@@ -1244,7 +1242,7 @@ public enum StandardColor
     ///         A very pale shade of gray, resembling smoke.
     ///     </para>
     /// </summary>
-    WhiteSmoke = 0xF5F5F5,
+    WhiteSmoke = 0xFFF5F5F5,
 
     /// <summary>
     ///     Yellow RGB(255, 255, 0).
@@ -1252,7 +1250,7 @@ public enum StandardColor
     ///         A bright yellow color.
     ///     </para>
     /// </summary>
-    Yellow = 0xFFFF00,
+    Yellow = 0xFFFFFF00,
 
     /// <summary>
     ///     Yellow green RGB(154, 205, 50).
@@ -1260,5 +1258,5 @@ public enum StandardColor
     ///         A bright yellowish-green color.
     ///     </para>
     /// </summary>
-    YellowGreen = 0x9ACD32
+    YellowGreen = 0xFF9ACD32
 }

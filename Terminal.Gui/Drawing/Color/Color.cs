@@ -99,18 +99,7 @@ public readonly partial record struct  Color : ISpanParsable<Color>, IUtf8SpanPa
     ///     The alpha channel is not currently supported, so the value of the alpha channel bits will not affect
     ///     rendering.
     /// </remarks>
-    public Color (int rgb) {
-
-        if (rgb != (int)StandardColor.Transparent)
-        {
-            Rgba = rgb;
-            A = byte.MaxValue;
-        }
-        else
-        {
-            // Leave everything 0 for transparent
-        }
-    }
+    public Color (int rgb) { Rgba = rgb; }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Color"/> class with an encoded unsigned 32-bit color value in
@@ -130,7 +119,7 @@ public readonly partial record struct  Color : ISpanParsable<Color>, IUtf8SpanPa
 
     /// <summary>Initializes a new instance of the <see cref="Color"/> color from a value in the <see cref="StandardColor"/> enum.</summary>
     /// <param name="colorName">The 16-color value.</param>
-    public Color (in StandardColor colorName) : this ((int)colorName) { }
+    public Color (in StandardColor colorName) : this ((uint)colorName) { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Color"/> color from string. See
