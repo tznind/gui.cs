@@ -45,7 +45,7 @@ internal static class ColorExtensions
             { new Color(255, 0, 255), ColorName16.Magenta },
             { new Color(255, 255, 0), ColorName16.Yellow },
             { new Color(128, 128, 128), ColorName16.Gray },
-            { new Color(118, 118, 118), ColorName16.DarkGray },
+            { new Color(169, 169, 169), ColorName16.DarkGray },
             { new Color(59, 120, 255), ColorName16.BrightBlue },
             { new Color(22, 198, 12), ColorName16.BrightGreen },
             { new Color(97, 214, 214), ColorName16.BrightCyan },
