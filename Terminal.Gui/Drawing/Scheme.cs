@@ -306,7 +306,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                                VisualRole.Focus =>
                                    GetAttributeForRoleCore (VisualRole.Normal, stack) with
                                    {
-                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Background,
+                                       Foreground = SwapTransparentForBlack(GetAttributeForRoleCore (VisualRole.Normal, stack).Background),
                                        Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground
                                    },
 
@@ -369,6 +369,11 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         stack.Remove (role);
 
         return result;
+    }
+
+    private Color SwapTransparentForBlack (Color c)
+    {
+        return c == Color.Transparent ? Color.Black : c;
     }
 
     /// <summary>
