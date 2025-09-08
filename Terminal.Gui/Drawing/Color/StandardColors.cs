@@ -80,12 +80,6 @@ internal static class StandardColors
 
     internal static uint GetArgb (StandardColor standardColor)
     {
-        const int ALPHA_SHIFT = 24;
-        const uint ALPHA_MASK = 0xFFU << ALPHA_SHIFT;
-
-        int rgb = (int)standardColor;
-
-        uint argb = (uint)rgb | ALPHA_MASK;
-        return argb;
+        return (uint)standardColor;
     }
 }

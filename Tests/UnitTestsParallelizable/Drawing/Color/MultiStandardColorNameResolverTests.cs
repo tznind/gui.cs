@@ -121,8 +121,8 @@ public class MultiStandardColorNameResolverTests (ITestOutputHelper output)
 
     [Theory]
     [InlineData ("12", 231, 72, 86)] // ColorName16.BrightRed
-    [InlineData ("16737095", 255, 99, 71)] // StandardColor.Tomato
-    [InlineData ("#FF0000", 255, 0, 0)] // Red
+    [InlineData ("4294927175", 255, 99, 71)] // StandardColor.Tomato
+    [InlineData ("#FFFF0000", 255, 0, 0)] // Red
     public void TryParseColor_ResolvesValidEnumNumber (string inputName, byte r, byte g, byte b)
     {
         bool success = _candidate.TryParseColor (inputName, out Color actualColor);
@@ -151,5 +151,18 @@ public class MultiStandardColorNameResolverTests (ITestOutputHelper output)
         bool success = _candidate.TryParseColor (input, out Color actualColor);
         Assert.False (success);
         Assert.Equal (default, actualColor);
+    }
+
+
+    [Fact]
+    public void TestDarkGraysAreSame ()
+    {
+        var c1 = new Color (StandardColor.DarkGray);
+        var c2 = new Color (ColorName16.DarkGray);
+
+        Assert.Equal (c1.R, c2.R);
+        Assert.Equal (c1.G, c2.G);
+        Assert.Equal (c1.B, c2.B);
+        Assert.Equal (c1.A, c2.A);
     }
 }

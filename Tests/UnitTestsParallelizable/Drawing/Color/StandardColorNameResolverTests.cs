@@ -185,7 +185,7 @@ public class StandardColorNameResolverTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData ("16737095", 255, 99, 71)] // W3cColor.Tomato
+    [InlineData ("4294927175", 255, 99, 71)] // W3cColor.Tomato
     public void TryParseColor_ResolvesValidEnumNumber (string inputName, byte r, byte g, byte b)
     {
         var expected = (true, new Color(r, g, b));

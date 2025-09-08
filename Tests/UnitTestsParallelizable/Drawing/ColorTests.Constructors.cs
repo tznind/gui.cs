@@ -169,6 +169,28 @@ public partial class ColorTests
                          () => Assert.Equal (a, color.A)
                         );
     }
+
+    [Fact]
+    public void TestBlackVsTransparent ()
+    {
+        var black = new Color (StandardColor.Black);
+        var transparent = new Color (StandardColor.Transparent);
+
+        Assert.Multiple(
+                        ()=>Assert.Equal (0,black.R),
+                        () => Assert.Equal (0, black.G),
+                        () => Assert.Equal (0, black.B),
+                        () => Assert.Equal (255, black.A) // Difference between black and transparent is the Alpha (black is opaque)
+                        );
+
+
+        Assert.Multiple (
+                         () => Assert.Equal (0, transparent.R),
+                         () => Assert.Equal (0, transparent.G),
+                         () => Assert.Equal (0, transparent.B),
+                         () => Assert.Equal (0, transparent.A)
+                        );
+    }
 }
 
 public static partial class ColorTestsTheoryDataGenerators
