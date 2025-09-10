@@ -78,6 +78,7 @@ public class NetOutput : OutputBase, IConsoleOutput
         Console.Out.Write (output);
     }
 
+    /// <inheritdoc />
     protected override bool SetCursorPositionImpl (int col, int row)
     {
         if (_lastCursorPosition is { } && _lastCursorPosition.Value.X == col && _lastCursorPosition.Value.Y == row)
@@ -115,7 +116,7 @@ public class NetOutput : OutputBase, IConsoleOutput
     }
 
 
-    /// <inheritdoc/>
+    /// <inheritdoc cref="IConsoleOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
         Console.Out.Write (visibility == CursorVisibility.Default ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);

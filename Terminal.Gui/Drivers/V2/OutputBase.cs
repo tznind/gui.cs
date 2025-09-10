@@ -161,9 +161,24 @@ public abstract class OutputBase
         outputWidth = 0;
     }
 
+    /// <summary>
+    /// Output the contents of the <paramref name="output"/> to the console.
+    /// </summary>
+    /// <param name="output"></param>
     protected abstract void Write (StringBuilder output);
 
+    /// <summary>
+    /// When overriden in derived class, positions the terminal output cursor to the specified point on the screen.
+    /// </summary>
+    /// <param name="screenPositionX">Column to move cursor to</param>
+    /// <param name="screenPositionY">Row to move cursor to</param>
+    /// <returns></returns>
     protected abstract bool SetCursorPositionImpl (int screenPositionX, int screenPositionY);
 
+    /// <summary>
+    /// Changes the visibility of the cursor in the terminal to the specified <paramref name="visibility"/> e.g.
+    /// the flashing indicator, invisible, box indicator etc.
+    /// </summary>
+    /// <param name="visibility"></param>
     public abstract void SetCursorVisibility (CursorVisibility visibility);
 }

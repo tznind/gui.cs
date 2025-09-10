@@ -9,6 +9,11 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public interface IComponentFactory
 {
+    /// <summary>
+    /// Create the <see cref="IConsoleOutput"/> class for the current driver implementation i.e. the class responsible for
+    /// rendering <see cref="IOutputBuffer"/> into the console.
+    /// </summary>
+    /// <returns></returns>
     IConsoleOutput CreateOutput ();
 }
 
@@ -20,14 +25,14 @@ public interface IComponentFactory
 public interface IComponentFactory<T> : IComponentFactory
 {
     /// <summary>
-    /// Create <see cref="IConsoleInput{T}"/> class for the current implementation i.e. the class responsible for reading
+    /// Create <see cref="IConsoleInput{T}"/> class for the current driver implementation i.e. the class responsible for reading
     /// user input from the console.
     /// </summary>
     /// <returns></returns>
     IConsoleInput<T> CreateInput ();
 
     /// <summary>
-    /// Creates the <see cref="InputProcessor{T}"/> class for the current implementation i.e. the class responsible for
+    /// Creates the <see cref="InputProcessor{T}"/> class for the current driver implementation i.e. the class responsible for
     /// translating raw console input into Terminal.Gui common event <see cref="Key"/> and <see cref="MouseEventArgs"/>.
     /// </summary>
     /// <param name="inputBuffer"></param>
@@ -35,7 +40,7 @@ public interface IComponentFactory<T> : IComponentFactory
     IInputProcessor CreateInputProcessor (ConcurrentQueue<T> inputBuffer);
 
     /// <summary>
-    /// Creates <see cref="IWindowSizeMonitor"/> class for the current implementation i.e. the class responsible for
+    /// Creates <see cref="IWindowSizeMonitor"/> class for the current driver implementation i.e. the class responsible for
     /// reporting the current size of the terminal window.
     /// </summary>
     /// <param name="consoleOutput"></param>
