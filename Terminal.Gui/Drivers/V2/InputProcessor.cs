@@ -183,17 +183,17 @@ public abstract class InputProcessor<T> : IInputProcessor
 
             if (key.IsAlt)
             {
-                result = new (result.KeyCode | KeyCode.AltMask);
+                result = result.WithAlt;
             }
 
             if (key.IsCtrl)
             {
-                result = new (result.KeyCode | KeyCode.CtrlMask);
+                result = result.WithCtrl;
             }
 
             if (key.IsShift)
             {
-                result = new (result.KeyCode | KeyCode.ShiftMask);
+                result = result.WithShift;
             }
 
             _highSurrogate = '\0';
