@@ -31,19 +31,10 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
     ///     Creates a new coordinator
     /// </summary>
     /// <param name="timedEvents"></param>
-    /// <param name="inputFactory">
-    ///     Function to create a new input. This must call <see langword="new"/>
-    ///     explicitly and cannot return an existing instance. This requirement arises because Windows
-    ///     console screen buffer APIs are thread-specific for certain operations.
-    /// </param>
     /// <param name="inputBuffer"></param>
-    /// <param name="inputProcessor"></param>
-    /// <param name="outputFactory">
-    ///     Function to create a new output. This must call <see langword="new"/>
-    ///     explicitly and cannot return an existing instance. This requirement arises because Windows
-    ///     console screen buffer APIs are thread-specific for certain operations.
-    /// </param>
     /// <param name="loop"></param>
+    /// <param name="componentFactory">Factory for creating driver components
+    /// (<see cref="IConsoleOutput"/>, <see cref="IConsoleInput{T}"/> etc)</param>
     public MainLoopCoordinator (
         ITimedEvents timedEvents,
         ConcurrentQueue<T> inputBuffer,

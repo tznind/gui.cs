@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Terminal.Gui.Drivers;
 
+/// <summary>
+/// Abstract base class to assist with implementing <see cref="IConsoleOutput"/>.
+/// </summary>
 public abstract class OutputBase
 {
     private CursorVisibility? _cachedCursorVisibility;
@@ -13,7 +16,7 @@ public abstract class OutputBase
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
     private TextStyle _redrawTextStyle = TextStyle.None;
 
-    /// <inheritdoc/>
+    /// <inheritdoc cref="IConsoleOutput.Write(IOutputBuffer)"/>
     public virtual void Write (IOutputBuffer buffer)
     {
         if (ConsoleDriver.RunningUnitTests)
@@ -150,6 +153,14 @@ public abstract class OutputBase
         _cachedCursorVisibility = savedVisibility;
     }
 
+    /// <summary>
+    /// Changes the color and text style of the console to the given <paramref name="attr"/> and <paramref name="redrawTextStyle"/>.
+    /// If command can be buffered in line with other output (e.g. CSI sequence) then it should be appended to <paramref name="output"/>
+    /// otherwise the relevant output state should be flushed directly (e.g. by calling relevant win 32 API method)
+    /// </summary>
+    /// <param name="output"></param>
+    /// <param name="attr"></param>
+    /// <param name="redrawTextStyle"></param>
     protected abstract void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle);
 
     private void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
