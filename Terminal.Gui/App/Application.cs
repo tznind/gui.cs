@@ -55,7 +55,7 @@ public static partial class Application
     /// Maximum number of iterations of the main loop (and hence draws)
     /// to allow to occur per second. Defaults to <see cref="DefaultMaximumIterationsPerSecond"/>> which is a 40ms sleep
     /// after iteration (factoring in how long iteration took to run).
-    /// <remarks>Note that not ever iteration draws (see <see cref="View.NeedsDraw"/>).
+    /// <remarks>Note that not every iteration draws (see <see cref="View.NeedsDraw"/>).
     /// Only affects v2 drivers.</remarks>
     /// </summary>
     public static ushort MaximumIterationsPerSecond = DefaultMaximumIterationsPerSecond;
