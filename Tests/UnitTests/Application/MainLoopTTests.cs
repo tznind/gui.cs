@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Moq;
 
-namespace UnitTests.ConsoleDrivers.V2;
+namespace Terminal.Gui.ApplicationTests;
 public class MainLoopTTests
 {
     [Fact]
