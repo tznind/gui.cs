@@ -8,8 +8,8 @@ using Microsoft.Extensions.Logging;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Implementation of <see cref="IApplication"/> that boots the new 'v2'
-///     main loop architecture.
+///     Implementation of <see cref="IApplication"/> that uses the modern
+///     main loop architecture with component factories for different platforms.
 /// </summary>
 public class ApplicationV2 : ApplicationImpl
 {
@@ -81,19 +81,19 @@ public class ApplicationV2 : ApplicationImpl
     {
         PlatformID p = Environment.OSVersion.Platform;
 
-        bool definetlyWin = (driverName?.Contains ("win") ?? false) || _componentFactory is IComponentFactory<WindowsConsole.InputRecord>;
-        bool definetlyNet = (driverName?.Contains ("net") ?? false) || _componentFactory is IComponentFactory<ConsoleKeyInfo>;
-        bool definetlyUnix = (driverName?.Contains ("unix") ?? false) || _componentFactory is IComponentFactory<char>;
+        bool definitelyWindows = (driverName?.Contains ("win", StringComparison.OrdinalIgnoreCase) ?? false) || _componentFactory is IComponentFactory<WindowsConsole.InputRecord>;
+        bool definitelyDotNet = (driverName?.Contains ("dotnet", StringComparison.OrdinalIgnoreCase) ?? false) || (driverName?.Contains ("net", StringComparison.OrdinalIgnoreCase) ?? false) || _componentFactory is IComponentFactory<ConsoleKeyInfo>;
+        bool definitelyUnix = (driverName?.Contains ("unix", StringComparison.OrdinalIgnoreCase) ?? false) || _componentFactory is IComponentFactory<char>;
 
-        if (definetlyWin)
+        if (definitelyWindows)
         {
             _coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
         }
-        else if (definetlyNet)
+        else if (definitelyDotNet)
         {
             _coordinator = CreateSubcomponents (() => new NetComponentFactory ());
         }
-        else if (definetlyUnix)
+        else if (definitelyUnix)
         {
             _coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
         }

@@ -1,5 +1,4 @@
 ﻿using System.Runtime.InteropServices;
-using Unix.Terminal;
 
 namespace Terminal.Gui.Drivers;
 
@@ -23,12 +22,6 @@ internal class CursesClipboard : ClipboardBase
 
             if (exitCode == 0)
             {
-                if (Application.Driver is CursesDriver)
-                {
-                    Curses.raw ();
-                    Curses.noecho ();
-                }
-
                 return File.ReadAllText (tempFileName);
             }
         }
@@ -51,12 +44,6 @@ internal class CursesClipboard : ClipboardBase
         try
         {
             (int exitCode, _) = ClipboardProcessRunner.Bash ($"{_xclipPath} {xclipargs}", text);
-
-            if (exitCode == 0 && Application.Driver is CursesDriver)
-            {
-                Curses.raw ();
-                Curses.noecho ();
-            }
         }
         catch (Exception e)
         {
@@ -207,12 +194,6 @@ internal class WSLClipboard : ClipboardBase
 
         if (exitCode == 0)
         {
-            if (Application.Driver is CursesDriver)
-            {
-                Curses.raw ();
-                Curses.noecho ();
-            }
-
             if (output.EndsWith ("\r\n"))
             {
                 output = output.Substring (0, output.Length - 2);
@@ -235,15 +216,6 @@ internal class WSLClipboard : ClipboardBase
                                                                         _powershellPath,
                                                                         $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\""
                                                                        );
-
-        if (exitCode == 0)
-        {
-            if (Application.Driver is CursesDriver)
-            {
-                Curses.raw ();
-                Curses.noecho ();
-            }
-        }
     }
 
     private bool CheckSupport ()

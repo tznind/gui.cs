@@ -65,7 +65,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
         {
             Clipboard = new MacOSXClipboard ();
         }
-        else if (CursesDriver.Is_WSL_Platform ())
+        else if (PlatformDetection.IsWSLPlatform ())
         {
             Clipboard = new WSLClipboard ();
         }

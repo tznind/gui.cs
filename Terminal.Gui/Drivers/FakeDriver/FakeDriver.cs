@@ -70,7 +70,7 @@ public class FakeDriver : ConsoleDriver
             }
             else
             {
-                if (CursesDriver.Is_WSL_Platform ())
+                if (PlatformDetection.IsWSLPlatform ())
                 {
                     Clipboard = new WSLClipboard ();
                 }

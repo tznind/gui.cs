@@ -10,7 +10,7 @@ namespace Terminal.Gui.App;
 public class ApplicationImpl : IApplication
 {
     // Private static readonly Lazy instance of Application
-    private static Lazy<IApplication> _lazyInstance = new (() => new ApplicationImpl ());
+    private static Lazy<IApplication> _lazyInstance = new (() => new ApplicationV2 ());
 
     /// <summary>
     /// Gets the currently configured backend implementation of <see cref="Application"/> gateway methods.
@@ -95,11 +95,6 @@ public class ApplicationImpl : IApplication
         {
             // Init() has NOT been called.
             Application.InternalInit (driver, Application.ForceDriver, true);
-        }
-
-        if (Instance is ApplicationV2)
-        {
-            return Instance.Run<T> (errorHandler, driver);
         }
 
         var top = new T ();
@@ -242,7 +237,7 @@ public class ApplicationImpl : IApplication
             Application.OnInitializedChanged (this, new (in init));
         }
 
-        _lazyInstance = new (() => new ApplicationImpl ());
+        _lazyInstance = new (() => new ApplicationV2 ());
     }
 
     /// <inheritdoc />

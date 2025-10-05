@@ -90,45 +90,13 @@ public static partial class Application // Initialization (Init/Shutdown)
             ForceDriver = driverName;
         }
 
+        // All initialization is now handled by ApplicationV2 (the default implementation)
+        // which is set as the default in ApplicationImpl._lazyInstance
         if (Driver is null)
         {
-            PlatformID p = Environment.OSVersion.Platform;
-
-            if (string.IsNullOrEmpty (ForceDriver))
-            {
-                if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
-                {
-                    Driver = new WindowsDriver ();
-                }
-                else
-                {
-                    Driver = new CursesDriver ();
-                }
-            }
-            else
-            {
-                (List<Type?> drivers, List<string?> driverTypeNames) = GetDriverTypes ();
-                Type? driverType = drivers.FirstOrDefault (t => t!.Name.Equals (ForceDriver, StringComparison.InvariantCultureIgnoreCase));
-
-                if (driverType is { })
-                {
-                    Driver = (IConsoleDriver)Activator.CreateInstance (driverType)!;
-                }
-                else if (ForceDriver?.StartsWith ("v2") ?? false)
-                {
-                    ApplicationImpl.ChangeInstance (new ApplicationV2 ());
-                    ApplicationImpl.Instance.Init (driver, ForceDriver);
-                    Debug.Assert (Driver is { });
-
-                    return;
-                }
-                else
-                {
-                    throw new ArgumentException (
-                                                 $"Invalid driver name: {ForceDriver}. Valid names are {string.Join (", ", drivers.Select (t => t!.Name))}"
-                                                );
-                }
-            }
+            ApplicationImpl.Instance.Init (driver, driverName);
+            Debug.Assert (Driver is { });
+            return;
         }
 
         Debug.Assert (Navigation is null);
@@ -217,7 +185,7 @@ public static partial class Application // Initialization (Init/Shutdown)
         List<string?> driverTypeNames = driverTypes
                                         .Where (d => !typeof (IConsoleDriverFacade).IsAssignableFrom (d))
                                         .Select (d => d!.Name)
-                                        .Union (["v2", "v2win", "v2net", "v2unix"])
+                                        .Union (["dotnet", "windows", "unix"])
                                         .ToList ()!;
 
         return (driverTypes, driverTypeNames);
