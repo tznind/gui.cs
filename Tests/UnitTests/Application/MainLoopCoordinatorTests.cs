@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace UnitTests.ConsoleDrivers.V2;
+namespace Terminal.Gui.ApplicationTests;
 public class MainLoopCoordinatorTests
 {
     [Fact]

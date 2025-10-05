@@ -1,6 +1,6 @@
 ﻿using Moq;
 
-namespace UnitTests.ConsoleDrivers.V2;
+namespace Terminal.Gui.DriverTests;
 public class MouseInterpreterTests
 {
     [Theory]

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using TerminalGuiFluentTesting;
 
-namespace UnitTests.ConsoleDrivers.V2;
+namespace Terminal.Gui.ApplicationTests;
 public class ApplicationV2Tests
 {
     public ApplicationV2Tests ()
