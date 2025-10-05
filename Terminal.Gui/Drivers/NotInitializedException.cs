@@ -4,7 +4,7 @@
 ///     Thrown when user code attempts to access a property or perform a method
 ///     that is only supported after Initialization e.g. of an <see cref="IMainLoop{T}"/>
 /// </summary>
-public class NotInitializedException : Exception
+public class NotInitializedException : InvalidOperationException
 {
     /// <summary>
     ///     Creates a new instance of the exception indicating that the class

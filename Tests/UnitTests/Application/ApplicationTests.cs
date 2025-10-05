@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
+using Terminal.Gui.Drivers;
 using UnitTests;
 using Xunit.Abstractions;
 using static Terminal.Gui.Configuration.ConfigurationManager;
@@ -1056,7 +1057,7 @@ public class ApplicationTests
 
         Assert.Null (Application.Top);
 
-        Assert.Throws<InvalidOperationException> (() => Application.Run (new Toplevel ()));
+        Assert.Throws<NotInitializedException> (() => Application.Run (new Toplevel ()));
 
         Application.Init (driver);
 

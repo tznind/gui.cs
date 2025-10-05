@@ -40,6 +40,26 @@ public static partial class Application // Initialization (Init/Shutdown)
     [RequiresDynamicCode ("AOT")]
     public static void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
+        // Check if this is a request for a legacy driver (like FakeDriver)
+        // that isn't supported by the modern ApplicationV2 architecture
+        if (driver is null)
+        {
+            var driverNameToCheck = string.IsNullOrWhiteSpace (driverName) ? ForceDriver : driverName;
+            if (!string.IsNullOrEmpty (driverNameToCheck))
+            {
+                (List<Type?> drivers, List<string?> driverTypeNames) = GetDriverTypes ();
+                Type? driverType = drivers.FirstOrDefault (t => t!.Name.Equals (driverNameToCheck, StringComparison.InvariantCultureIgnoreCase));
+                
+                // If it's a legacy IConsoleDriver (not a Facade), use InternalInit which supports legacy drivers
+                if (driverType is { } && !typeof (IConsoleDriverFacade).IsAssignableFrom (driverType))
+                {
+                    InternalInit (driver, driverName);
+                    return;
+                }
+            }
+        }
+        
+        // Otherwise delegate to the ApplicationImpl instance (which may be ApplicationV2)
         ApplicationImpl.Instance.Init (driver, driverName);
     }
 
@@ -90,13 +110,32 @@ public static partial class Application // Initialization (Init/Shutdown)
             ForceDriver = driverName;
         }
 
-        // All initialization is now handled by ApplicationV2 (the default implementation)
-        // which is set as the default in ApplicationImpl._lazyInstance
+        // Check if we need to use a legacy driver (like FakeDriver)
+        // or go through the modern ApplicationV2 architecture
         if (Driver is null)
         {
-            ApplicationImpl.Instance.Init (driver, driverName);
-            Debug.Assert (Driver is { });
-            return;
+            // Try to find a legacy IConsoleDriver type that matches the driver name
+            bool useLegacyDriver = false;
+            if (!string.IsNullOrEmpty (ForceDriver))
+            {
+                (List<Type?> drivers, List<string?> driverTypeNames) = GetDriverTypes ();
+                Type? driverType = drivers.FirstOrDefault (t => t!.Name.Equals (ForceDriver, StringComparison.InvariantCultureIgnoreCase));
+                
+                if (driverType is { } && !typeof (IConsoleDriverFacade).IsAssignableFrom (driverType))
+                {
+                    // This is a legacy driver (not a ConsoleDriverFacade)
+                    Driver = (IConsoleDriver)Activator.CreateInstance (driverType)!;
+                    useLegacyDriver = true;
+                }
+            }
+            
+            // Use the modern ApplicationV2 architecture
+            if (!useLegacyDriver)
+            {
+                ApplicationImpl.Instance.Init (driver, driverName);
+                Debug.Assert (Driver is { });
+                return;
+            }
         }
 
         Debug.Assert (Navigation is null);

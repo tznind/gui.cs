@@ -81,19 +81,26 @@ public class ApplicationV2 : ApplicationImpl
     {
         PlatformID p = Environment.OSVersion.Platform;
 
-        bool definitelyWindows = (driverName?.Contains ("win", StringComparison.OrdinalIgnoreCase) ?? false) || _componentFactory is IComponentFactory<WindowsConsole.InputRecord>;
-        bool definitelyDotNet = (driverName?.Contains ("dotnet", StringComparison.OrdinalIgnoreCase) ?? false) || (driverName?.Contains ("net", StringComparison.OrdinalIgnoreCase) ?? false) || _componentFactory is IComponentFactory<ConsoleKeyInfo>;
-        bool definitelyUnix = (driverName?.Contains ("unix", StringComparison.OrdinalIgnoreCase) ?? false) || _componentFactory is IComponentFactory<char>;
+        // Check component factory type first - this takes precedence over driverName
+        bool factoryIsWindows = _componentFactory is IComponentFactory<WindowsConsole.InputRecord>;
+        bool factoryIsDotNet = _componentFactory is IComponentFactory<ConsoleKeyInfo>;
+        bool factoryIsUnix = _componentFactory is IComponentFactory<char>;
 
-        if (definitelyWindows)
+        // Then check driverName
+        bool nameIsWindows = driverName?.Contains ("win", StringComparison.OrdinalIgnoreCase) ?? false;
+        bool nameIsDotNet = (driverName?.Contains ("dotnet", StringComparison.OrdinalIgnoreCase) ?? false) || (driverName?.Contains ("net", StringComparison.OrdinalIgnoreCase) ?? false);
+        bool nameIsUnix = driverName?.Contains ("unix", StringComparison.OrdinalIgnoreCase) ?? false;
+
+        // Decide which driver to use - component factory type takes priority
+        if (factoryIsWindows || (!factoryIsDotNet && !factoryIsUnix && nameIsWindows))
         {
             _coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
         }
-        else if (definitelyDotNet)
+        else if (factoryIsDotNet || (!factoryIsWindows && !factoryIsUnix && nameIsDotNet))
         {
             _coordinator = CreateSubcomponents (() => new NetComponentFactory ());
         }
-        else if (definitelyUnix)
+        else if (factoryIsUnix || (!factoryIsWindows && !factoryIsDotNet && nameIsUnix))
         {
             _coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
         }
