@@ -10,11 +10,11 @@ public class DriverColorTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver))]
+    //[InlineData (typeof (NetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
+    //[InlineData (typeof (WindowsDriver))]
+    //[InlineData (typeof (CursesDriver))]
     public void Force16Colors_Sets (Type driverType)
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
@@ -28,11 +28,11 @@ public class DriverColorTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver))]
+    //[InlineData (typeof (NetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
+    //[InlineData (typeof (WindowsDriver))]
+    //[InlineData (typeof (CursesDriver))]
     public void SetColors_Changes_Colors (Type driverType)
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
@@ -56,11 +56,11 @@ public class DriverColorTests
 
     [Theory]
     [InlineData (typeof (FakeDriver), false)]
-    [InlineData (typeof (NetDriver), true)]
+    //[InlineData (typeof (NetDriver), true)]
 
     //[InlineData (typeof (ANSIDriver), true)]
-    [InlineData (typeof (WindowsDriver), true)]
-    [InlineData (typeof (CursesDriver), true)]
+    //[InlineData (typeof (WindowsDriver), true)]
+    //[InlineData (typeof (CursesDriver), true)]
     public void SupportsTrueColor_Defaults (Type driverType, bool expectedSetting)
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);

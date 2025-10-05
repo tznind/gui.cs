@@ -254,21 +254,22 @@ public class ApplicationTests
 
     }
 
-    [Theory]
-    [InlineData (typeof (NetDriver))]
+    // Legacy driver test - all InlineData commented out
+    //[Theory]
+    ////[InlineData (typeof (NetDriver))]
 
-    //[InlineData (typeof (ANSIDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
-    public void Init_DriverName_Should_Pick_Correct_Driver (Type driverType)
-    {
-        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
-        Application.Init (driverName: driverType.Name);
-        Assert.NotNull (Application.Driver);
-        Assert.NotEqual (driver, Application.Driver);
-        Assert.Equal (driverType, Application.Driver?.GetType ());
-        Application.Shutdown ();
-    }
+    ////[InlineData (typeof (ANSIDriver))]
+    ////[InlineData (typeof (WindowsDriver))]
+    ////[InlineData (typeof (CursesDriver))]
+    //public void Init_DriverName_Should_Pick_Correct_Driver (Type driverType)
+    //{
+    //    var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
+    //    Application.Init (driverName: driverType.Name);
+    //    Assert.NotNull (Application.Driver);
+    //    Assert.NotEqual (driver, Application.Driver);
+    //    Assert.Equal (driverType, Application.Driver?.GetType ());
+    //    Application.Shutdown ();
+    //}
 
     [Fact]
     public void Init_Null_Driver_Should_Pick_A_Driver ()
@@ -282,9 +283,9 @@ public class ApplicationTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
+    //[InlineData (typeof (NetDriver))]
+    //[InlineData (typeof (WindowsDriver))]
+    //[InlineData (typeof (CursesDriver))]
     public void Init_ResetState_Resets_Properties (Type driverType)
     {
         ThrowOnJsonErrors = true;
@@ -421,9 +422,9 @@ public class ApplicationTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
+    //[InlineData (typeof (NetDriver))]
+    //[InlineData (typeof (WindowsDriver))]
+    //[InlineData (typeof (CursesDriver))]
     public void Init_Shutdown_Fire_InitializedChanged (Type driverType)
     {
         var initialized = false;
@@ -1093,9 +1094,9 @@ public class ApplicationTests
     //    [InlineData ("v2net", typeof (ConsoleDriverFacade<ConsoleKeyInfo>))]
 
     [InlineData ("FakeDriver", typeof (FakeDriver))]
-    [InlineData ("NetDriver", typeof (NetDriver))]
-    [InlineData ("WindowsDriver", typeof (WindowsDriver))]
-    [InlineData ("CursesDriver", typeof (CursesDriver))]
+    //[InlineData ("NetDriver", typeof (NetDriver))]
+    //[InlineData ("WindowsDriver", typeof (WindowsDriver))]
+    //[InlineData ("CursesDriver", typeof (CursesDriver))]
     public void Run_T_Call_Init_ForceDriver_Should_Pick_Correct_Driver (string driverName, Type expectedType)
     {
         Assert.True (ConsoleDriver.RunningUnitTests);

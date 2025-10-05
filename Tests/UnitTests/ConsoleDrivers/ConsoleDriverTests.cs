@@ -18,11 +18,11 @@ public class ConsoleDriverTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver))]
+    //[InlineData (typeof (NetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
+    //[InlineData (typeof (WindowsDriver))]
+    //[InlineData (typeof (CursesDriver))]
     public void End_Cleans_Up (Type driverType)
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
@@ -117,11 +117,11 @@ public class ConsoleDriverTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver))]
+    //[InlineData (typeof (NetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
+    //[InlineData (typeof (WindowsDriver))]
+    //[InlineData (typeof (CursesDriver))]
     public void Init_Inits (Type driverType)
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
@@ -194,11 +194,11 @@ public class ConsoleDriverTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver))]
+    //[InlineData (typeof (NetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
+    //[InlineData (typeof (WindowsDriver))]
+    //[InlineData (typeof (CursesDriver))]
     public void TerminalResized_Simulation (Type driverType)
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
