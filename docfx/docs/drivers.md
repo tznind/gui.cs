@@ -1,8 +1,4 @@
-
 # Cross-Platform Driver Model
-
-[!IMPORTANT]
-> In v1, the driver model was a source of pain and confusion. In v2, our goal is to make the driver model a source of pride and joy. It is still a work in progress. We will update this document as we add more information.
 
 ## Overview
 
@@ -10,15 +6,20 @@ The driver model is the mechanism by which Terminal.Gui can support multiple pla
 
 ## Drivers
 
-### Legacy
+Terminal.Gui provides three console drivers optimized for different scenarios:
 
-- `WindowsDriver` - A driver that uses the Windows API to draw to the console.
-- `NetDriver` - A driver that uses the .NET `System.Console` to draw to the console.
-- `CursesDriver` - A driver that uses the ncurses library to draw to the console.
+- **DotNetDriver (`dotnet`)** - A cross-platform driver that uses the .NET `System.Console` API. Works on all platforms (Windows, macOS, Linux).
+- **WindowsDriver (`windows`)** - A Windows-optimized driver that uses Windows Console APIs for better performance and features on Windows.
+- **UnixDriver (`unix`)** - A Unix-optimized driver for macOS and Linux systems.
 
-### In Development for v2
+The appropriate driver is automatically selected based on the platform. You can also explicitly specify a driver using `Application.ForceDriver` or by passing the driver name to `Application.Init()`.
 
-- `v2win` - A driver optimized for Windows.
-- `v2net` - A driver that uses the .NET `System.Console` to draw to the console and works on all platforms.
+Example:
+```csharp
+// Let Terminal.Gui choose the best driver for the platform
+Application.Init();
 
-
+// Or explicitly specify a driver
+Application.ForceDriver = "dotnet";
+Application.Init();
+```
