@@ -262,7 +262,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     {
         string type = InputProcessor.DriverName ?? throw new ArgumentNullException (nameof (InputProcessor.DriverName));
 
-        return "v2" + type;
+        return type;
     }
 
     /// <summary>Tests if the specified rune is supported by the driver.</summary>

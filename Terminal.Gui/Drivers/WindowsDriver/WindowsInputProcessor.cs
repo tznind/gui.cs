@@ -15,7 +15,7 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
     /// <inheritdoc/>
     public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer) : base (inputBuffer, new WindowsKeyConverter ())
     {
-        DriverName = "win";
+        DriverName = "Windows";
     }
 
     /// <inheritdoc/>

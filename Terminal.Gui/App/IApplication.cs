@@ -44,7 +44,7 @@ public interface IApplication
     ///     <paramref name="driverName"/> are specified the default driver for the platform will be used.
     /// </param>
     /// <param name="driverName">
-    ///     The short name (e.g. "net", "windows", "ansi", "fake", or "curses") of the
+    ///     The driver name (e.g. "dotnet", "windows", "fake", or "unix") of the
     ///     <see cref="IConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are
     ///     specified the default driver for the platform will be used.
     /// </param>

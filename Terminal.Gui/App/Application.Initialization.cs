@@ -224,7 +224,7 @@ public static partial class Application // Initialization (Init/Shutdown)
         List<string?> driverTypeNames = driverTypes
                                         .Where (d => !typeof (IConsoleDriverFacade).IsAssignableFrom (d))
                                         .Select (d => d!.Name)
-                                        .Union (["dotnet", "windows", "unix"])
+                                        .Union (["dotnet", "windows", "unix", "fake"])
                                         .ToList ()!;
 
         return (driverTypes, driverTypeNames);

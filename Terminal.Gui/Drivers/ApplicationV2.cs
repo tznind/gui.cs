@@ -88,7 +88,7 @@ public class ApplicationV2 : ApplicationImpl
 
         // Then check driverName
         bool nameIsWindows = driverName?.Contains ("win", StringComparison.OrdinalIgnoreCase) ?? false;
-        bool nameIsDotNet = (driverName?.Contains ("dotnet", StringComparison.OrdinalIgnoreCase) ?? false) || (driverName?.Contains ("net", StringComparison.OrdinalIgnoreCase) ?? false);
+        bool nameIsDotNet = (driverName?.Contains ("dotnet", StringComparison.OrdinalIgnoreCase) ?? false);
         bool nameIsUnix = driverName?.Contains ("unix", StringComparison.OrdinalIgnoreCase) ?? false;
 
         // Decide which driver to use - component factory type takes priority
