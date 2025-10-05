@@ -19,14 +19,14 @@ internal class WindowsKeyConverter : IKeyConverter<WindowsConsole.InputRecord>
             // Used to pass Unicode characters as if they were keystrokes.
             // The VK_PACKET key is the low word of a 32-bit
             // Virtual Key value used for non-keyboard input methods.
-            inputEvent.KeyEvent = WindowsDriver.FromVKPacketToKeyEventRecord (inputEvent.KeyEvent);
+            inputEvent.KeyEvent = WindowsKeyHelper.FromVKPacketToKeyEventRecord (inputEvent.KeyEvent);
         }
 
-        var keyInfo = WindowsDriver.ToConsoleKeyInfoEx (inputEvent.KeyEvent);
+        var keyInfo = WindowsKeyHelper.ToConsoleKeyInfoEx (inputEvent.KeyEvent);
 
         //Debug.WriteLine ($"event: KBD: {GetKeyboardLayoutName()} {inputEvent.ToString ()} {keyInfo.ToString (keyInfo)}");
 
-        KeyCode map = WindowsDriver.MapKey (keyInfo);
+        KeyCode map = WindowsKeyHelper.MapKey (keyInfo);
 
         if (map == KeyCode.Null)
         {
