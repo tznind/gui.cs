@@ -14,7 +14,7 @@ public static class With
     /// <param name="v2TestDriver">Which v2 v2TestDriver to use for the test</param>
     /// <param name="logWriter"></param>
     /// <returns></returns>
-    public static GuiTestContext A<T> (int width, int height, V2TestDriver v2TestDriver, TextWriter? logWriter = null) where T : Toplevel, new ()
+    public static GuiTestContext A<T> (int width, int height, TestDriver v2TestDriver, TextWriter? logWriter = null) where T : Toplevel, new ()
     {
         return new (() => new T (), width, height,v2TestDriver,logWriter);
     }
@@ -27,7 +27,7 @@ public static class With
     /// <param name="height"></param>
     /// <param name="v2TestDriver"></param>
     /// <returns></returns>
-    public static GuiTestContext A (Func<Toplevel> toplevelFactory, int width, int height, V2TestDriver v2TestDriver)
+    public static GuiTestContext A (Func<Toplevel> toplevelFactory, int width, int height, TestDriver v2TestDriver)
     {
         return new (toplevelFactory, width, height, v2TestDriver);
     }

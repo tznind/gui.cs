@@ -13,10 +13,10 @@ public class ModernApplicationImplTests
         ConsoleDriver.RunningUnitTests = true;
     }
 
-    private ModernApplicationImpl NewModernApplicationImpl (V2TestDriver driver = V2TestDriver.V2Net)
+    private ModernApplicationImpl NewModernApplicationImpl (TestDriver driver = TestDriver.DotNet)
     {
 
-        if (driver == V2TestDriver.V2Net)
+        if (driver == TestDriver.DotNet)
         {
             var netInput = new Mock<INetInput> ();
             SetupRunInputMockMethodToBlock (netInput);
