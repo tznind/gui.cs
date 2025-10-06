@@ -103,14 +103,20 @@ public class ApplicationImpl : IApplication
         bool factoryIsWindows = _componentFactory is IComponentFactory<WindowsConsole.InputRecord>;
         bool factoryIsDotNet = _componentFactory is IComponentFactory<ConsoleKeyInfo>;
         bool factoryIsUnix = _componentFactory is IComponentFactory<char>;
+        bool factoryIsFake = _componentFactory is IComponentFactory<ConsoleKeyInfo>;
 
         // Then check driverName
         bool nameIsWindows = driverName?.Contains ("win", StringComparison.OrdinalIgnoreCase) ?? false;
         bool nameIsDotNet = (driverName?.Contains ("dotnet", StringComparison.OrdinalIgnoreCase) ?? false);
         bool nameIsUnix = driverName?.Contains ("unix", StringComparison.OrdinalIgnoreCase) ?? false;
+        bool nameIsFake = driverName?.Contains ("fake", StringComparison.OrdinalIgnoreCase) ?? false;
 
         // Decide which driver to use - component factory type takes priority
-        if (factoryIsWindows || (!factoryIsDotNet && !factoryIsUnix && nameIsWindows))
+        if (factoryIsFake || (!factoryIsWindows && !factoryIsDotNet && !factoryIsUnix && nameIsFake))
+        {
+            _coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
+        }
+        else if (factoryIsWindows || (!factoryIsDotNet && !factoryIsUnix && nameIsWindows))
         {
             _coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
         }
@@ -215,7 +221,7 @@ public class ApplicationImpl : IApplication
         {
             if (_coordinator is null)
             {
-                throw new ($"{nameof (IMainLoopCoordinator)}inexplicably became null during Run");
+                throw new ($"{nameof (IMainLoopCoordinator)} inexplicably became null during Run");
             }
 
             _coordinator.RunIteration ();

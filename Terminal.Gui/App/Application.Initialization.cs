@@ -114,23 +114,23 @@ public static partial class Application // Initialization (Init/Shutdown)
         // or go through the modern application architecture
         if (Driver is null)
         {
-            // Try to find a legacy IConsoleDriver type that matches the driver name
-            bool useLegacyDriver = false;
-            if (!string.IsNullOrEmpty (ForceDriver))
-            {
-                (List<Type?> drivers, List<string?> driverTypeNames) = GetDriverTypes ();
-                Type? driverType = drivers.FirstOrDefault (t => t!.Name.Equals (ForceDriver, StringComparison.InvariantCultureIgnoreCase));
+            //// Try to find a legacy IConsoleDriver type that matches the driver name
+            //bool useLegacyDriver = false;
+            //if (!string.IsNullOrEmpty (ForceDriver))
+            //{
+            //    (List<Type?> drivers, List<string?> driverTypeNames) = GetDriverTypes ();
+            //    Type? driverType = drivers.FirstOrDefault (t => t!.Name.Equals (ForceDriver, StringComparison.InvariantCultureIgnoreCase));
                 
-                if (driverType is { } && !typeof (IConsoleDriverFacade).IsAssignableFrom (driverType))
-                {
-                    // This is a legacy driver (not a ConsoleDriverFacade)
-                    Driver = (IConsoleDriver)Activator.CreateInstance (driverType)!;
-                    useLegacyDriver = true;
-                }
-            }
+            //    if (driverType is { } && !typeof (IConsoleDriverFacade).IsAssignableFrom (driverType))
+            //    {
+            //        // This is a legacy driver (not a ConsoleDriverFacade)
+            //        Driver = (IConsoleDriver)Activator.CreateInstance (driverType)!;
+            //        useLegacyDriver = true;
+            //    }
+            //}
             
-            // Use the modern application architecture
-            if (!useLegacyDriver)
+            //// Use the modern application architecture
+            //if (!useLegacyDriver)
             {
                 ApplicationImpl.Instance.Init (driver, driverName);
                 Debug.Assert (Driver is { });
