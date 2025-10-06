@@ -1,6 +1,6 @@
 ﻿#nullable enable
 //
-// MainLoop.cs: IMainLoopDriver and MainLoop for Terminal.Gui
+// LegacyMainLoopDriver.cs: IMainLoopDriver and MainLoop for legacy v1 driver based applications
 //
 // Authors:
 //   Miguel de Icaza (miguel@gnome.org)
@@ -10,11 +10,20 @@ using System.Collections.ObjectModel;
 
 namespace Terminal.Gui.App;
 
-/// <summary>The main event loop of v1 driver based applications.</summary>
+/// <summary>
+///     The main event loop of legacy v1 driver based applications.
+/// </summary>
 /// <remarks>
-///     Monitoring of file descriptors is only available on Unix, there does not seem to be a way of supporting this
-///     on Windows.
+///     <para>
+///         This class is provided for backward compatibility with the legacy FakeDriver implementation.
+///         New code should use the modern <see cref="ApplicationMainLoop{T}"/> architecture instead.
+///     </para>
+///     <para>
+///         Monitoring of file descriptors is only available on Unix, there does not seem to be a way of supporting this
+///         on Windows.
+///     </para>
 /// </remarks>
+[Obsolete ("This class is for legacy FakeDriver compatibility only. Use ApplicationMainLoop<T> for new code.")]
 public class MainLoop : IDisposable
 {
     /// <summary>
