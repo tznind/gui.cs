@@ -1,7 +1,9 @@
+using UnitTests;
 using Xunit;
+
 using Xunit.Abstractions;
 
-namespace UnitTests.ConsoleDrivers;
+namespace Terminal.Gui.DriverTests;
 
 /// <summary>
 /// Tests for the FakeDriver to ensure it works properly with the modern component factory architecture.
@@ -71,7 +73,7 @@ public class FakeDriverTests (ITestOutputHelper output)
         var label = new Label { Text = "Hello World" };
         Application.Top!.Add (label);
 
-        Assert.Contains (label, Application.Top!.Subviews);
+        Assert.Contains (label, Application.Top!.SubViews);
         Assert.Same (Application.Top, label.SuperView);
     }
 
@@ -282,13 +284,13 @@ public class FakeDriverTests (ITestOutputHelper output)
         AutoInitShutdownAttribute.RunIteration ();
 
         Assert.True (window.IsInitialized);
-        Assert.Contains (window, Application.Top!.Subviews);
+        Assert.Contains (window, Application.Top!.SubViews);
 
         // Remove window
         Application.Top.Remove (window);
         AutoInitShutdownAttribute.RunIteration ();
 
-        Assert.DoesNotContain (window, Application.Top!.Subviews);
+        Assert.DoesNotContain (window, Application.Top!.SubViews);
     }
 
     #endregion
