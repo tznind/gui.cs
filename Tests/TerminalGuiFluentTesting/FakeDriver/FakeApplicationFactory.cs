@@ -23,10 +23,10 @@ public class FakeApplicationFactory
 
         var sizeMonitor = new FakeSizeMonitor ();
 
-        var v2 = new ModernApplicationImpl (new FakeNetComponentFactory (fakeInput, output, sizeMonitor));
+        var impl = new ApplicationImpl (new FakeNetComponentFactory (fakeInput, output, sizeMonitor));
 
-        ApplicationImpl.ChangeInstance (v2);
-        v2.Init (null, "v2net");
+        ApplicationImpl.ChangeInstance (impl);
+        impl.Init (null, "v2net");
 
         ConsoleDriverFacade<ConsoleKeyInfo> d = (ConsoleDriverFacade<ConsoleKeyInfo>)Application.Driver!;
 

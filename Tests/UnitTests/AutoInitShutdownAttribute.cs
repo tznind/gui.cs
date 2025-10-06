@@ -170,7 +170,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     /// </summary>
     public static void RunIteration ()
     {
-        var a = (ModernApplicationImpl)ApplicationImpl.Instance;
+        var a = (ApplicationImpl)ApplicationImpl.Instance;
         a.Coordinator?.RunIteration ();
     }
 }

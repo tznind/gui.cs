@@ -6,14 +6,14 @@ using Moq;
 using TerminalGuiFluentTesting;
 
 namespace Terminal.Gui.ApplicationTests;
-public class ModernApplicationImplTests
+public class ApplicationImplTests
 {
-    public ModernApplicationImplTests ()
+    public ApplicationImplTests ()
     {
         ConsoleDriver.RunningUnitTests = true;
     }
 
-    private ModernApplicationImpl NewModernApplicationImpl (TestDriver driver = TestDriver.DotNet)
+    private ApplicationImpl NewApplicationImpl (TestDriver driver = TestDriver.DotNet)
     {
 
         if (driver == TestDriver.DotNet)
@@ -48,7 +48,7 @@ public class ModernApplicationImplTests
     {
         var orig = ApplicationImpl.Instance;
 
-        var v2 = NewModernApplicationImpl ();
+        var v2 = NewApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         Application.KeyBindings.Clear ();
@@ -69,7 +69,7 @@ public class ModernApplicationImplTests
     {
         var orig = ApplicationImpl.Instance;
 
-        var v2 = NewModernApplicationImpl ();
+        var v2 = NewApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         Assert.Null (Application.Driver);
@@ -204,7 +204,7 @@ public class ModernApplicationImplTests
         var orig = ApplicationImpl.Instance;
 
         Assert.Null (Application.Driver);
-        var app = NewModernApplicationImpl ();
+        var app = NewApplicationImpl ();
         ApplicationImpl.ChangeInstance (app);
 
         var ex = Assert.Throws<NotInitializedException> (() => app.Run (new Window ()));
@@ -219,7 +219,7 @@ public class ModernApplicationImplTests
     {
         var orig = ApplicationImpl.Instance;
 
-        var v2 = NewModernApplicationImpl ();
+        var v2 = NewApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         v2.Init ();
@@ -258,7 +258,7 @@ public class ModernApplicationImplTests
     {
         var orig = ApplicationImpl.Instance;
 
-        var v2 = NewModernApplicationImpl ();
+        var v2 = NewApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         v2.Init ();
@@ -303,7 +303,7 @@ public class ModernApplicationImplTests
     {
         var orig = ApplicationImpl.Instance;
 
-        var v2 = NewModernApplicationImpl ();
+        var v2 = NewApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         Assert.Null (Application.Top);
@@ -367,7 +367,7 @@ public class ModernApplicationImplTests
     {
         var orig = ApplicationImpl.Instance;
 
-        var v2 = NewModernApplicationImpl ();
+        var v2 = NewApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         v2.Init ();
@@ -412,7 +412,7 @@ public class ModernApplicationImplTests
     {
         var orig = ApplicationImpl.Instance;
 
-        var v2 = NewModernApplicationImpl ();
+        var v2 = NewApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         v2.Init ();
@@ -437,7 +437,7 @@ public class ModernApplicationImplTests
     {
         var orig = ApplicationImpl.Instance;
 
-        var v2 = NewModernApplicationImpl ();
+        var v2 = NewApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         v2.Init ();
@@ -522,7 +522,7 @@ public class ModernApplicationImplTests
     {
         var orig = ApplicationImpl.Instance;
 
-        var v2 = NewModernApplicationImpl ();
+        var v2 = NewApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         Assert.Null (Application.Driver);
@@ -558,7 +558,7 @@ public class ModernApplicationImplTests
     {
         var orig = ApplicationImpl.Instance;
 
-        var v2 = NewModernApplicationImpl ();
+        var v2 = NewApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         v2.Init ();

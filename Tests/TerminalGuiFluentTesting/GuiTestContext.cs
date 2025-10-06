@@ -46,7 +46,7 @@ public class GuiTestContext : IDisposable
                                    ? new FakeNetComponentFactory (_netInput, _output, _fakeSizeMonitor)
                                    : (IComponentFactory)new FakeWindowsComponentFactory (_winInput, _output, _fakeSizeMonitor);
 
-        var v2 = new ModernApplicationImpl (cf);
+        var impl = new ApplicationImpl (cf);
 
         var booting = new SemaphoreSlim (0, 1);
 
@@ -56,7 +56,7 @@ public class GuiTestContext : IDisposable
                              {
                                  try
                                  {
-                                     ApplicationImpl.ChangeInstance (v2);
+                                     ApplicationImpl.ChangeInstance (impl);
 
                                      ILogger logger = LoggerFactory.Create (
                                                                             builder =>
@@ -67,7 +67,7 @@ public class GuiTestContext : IDisposable
                                                                    .CreateLogger ("Test Logging");
                                      Logging.Logger = logger;
 
-                                     v2.Init (null, GetDriverName ());
+                                     impl.Init (null, GetDriverName ());
 
                                      booting.Release ();
 
