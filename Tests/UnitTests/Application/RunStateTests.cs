@@ -85,7 +85,7 @@ public class RunStateTests
 
     private void Init ()
     {
-        Application.Init (new FakeDriver ());
+        Application.Init (null, "fakedriver");
         Assert.NotNull (Application.Driver);
         Assert.NotNull (Application.MainLoop);
         Assert.NotNull (SynchronizationContext.Current);
