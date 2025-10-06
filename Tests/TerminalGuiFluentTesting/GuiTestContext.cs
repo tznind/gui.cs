@@ -46,7 +46,7 @@ public class GuiTestContext : IDisposable
                                    ? new FakeNetComponentFactory (_netInput, _output, _fakeSizeMonitor)
                                    : (IComponentFactory)new FakeWindowsComponentFactory (_winInput, _output, _fakeSizeMonitor);
 
-        var v2 = new ApplicationV2 (cf);
+        var v2 = new ModernApplicationImpl (cf);
 
         var booting = new SemaphoreSlim (0, 1);
 

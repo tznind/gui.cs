@@ -80,7 +80,7 @@ public class SyncrhonizationContextTests
             Application.Run ().Dispose ();
             Assert.True (success);
 
-            if (ApplicationImpl.Instance is ApplicationV2)
+            if (ApplicationImpl.Instance is ModernApplicationImpl)
             {
                 ApplicationImpl.Instance.Shutdown ();
             }

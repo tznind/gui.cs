@@ -41,7 +41,7 @@ public static partial class Application // Initialization (Init/Shutdown)
     public static void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
         // Check if this is a request for a legacy driver (like FakeDriver)
-        // that isn't supported by the modern ApplicationV2 architecture
+        // that isn't supported by the modern application architecture
         if (driver is null)
         {
             var driverNameToCheck = string.IsNullOrWhiteSpace (driverName) ? ForceDriver : driverName;
@@ -59,7 +59,7 @@ public static partial class Application // Initialization (Init/Shutdown)
             }
         }
         
-        // Otherwise delegate to the ApplicationImpl instance (which may be ApplicationV2)
+        // Otherwise delegate to the ApplicationImpl instance (which uses the modern architecture)
         ApplicationImpl.Instance.Init (driver, driverName);
     }
 
@@ -111,7 +111,7 @@ public static partial class Application // Initialization (Init/Shutdown)
         }
 
         // Check if we need to use a legacy driver (like FakeDriver)
-        // or go through the modern ApplicationV2 architecture
+        // or go through the modern application architecture
         if (Driver is null)
         {
             // Try to find a legacy IConsoleDriver type that matches the driver name
@@ -129,7 +129,7 @@ public static partial class Application // Initialization (Init/Shutdown)
                 }
             }
             
-            // Use the modern ApplicationV2 architecture
+            // Use the modern application architecture
             if (!useLegacyDriver)
             {
                 ApplicationImpl.Instance.Init (driver, driverName);

@@ -11,7 +11,7 @@ namespace Terminal.Gui.Drivers;
 ///     Implementation of <see cref="IApplication"/> that uses the modern
 ///     main loop architecture with component factories for different platforms.
 /// </summary>
-public class ApplicationV2 : ApplicationImpl
+public class ModernApplicationImpl : ApplicationImpl
 {
     private readonly IComponentFactory? _componentFactory;
     private IMainLoopCoordinator? _coordinator;
@@ -28,12 +28,12 @@ public class ApplicationV2 : ApplicationImpl
     ///     Creates anew instance of the Application backend. The provided
     ///     factory methods will be used on Init calls to get things booted.
     /// </summary>
-    public ApplicationV2 ()
+    public ModernApplicationImpl ()
     {
         IsLegacy = false;
     }
 
-    internal ApplicationV2 (IComponentFactory componentFactory)
+    internal ModernApplicationImpl (IComponentFactory componentFactory)
     {
         _componentFactory = componentFactory;
         IsLegacy = false;
