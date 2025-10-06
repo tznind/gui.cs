@@ -40,13 +40,6 @@ public class FakeApplicationFactory
                                         }
                                     };
 
-        // Create Application.Top manually since we're not calling Run()
-        if (Application.Top is null)
-        {
-            Application.Top = new Toplevel ();
-            Application.Begin (Application.Top);
-        }
-
         return new FakeApplicationLifecycle (origApp, cts);
     }
 }
