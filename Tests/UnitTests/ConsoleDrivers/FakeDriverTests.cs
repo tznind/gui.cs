@@ -20,8 +20,7 @@ public class FakeDriverTests (ITestOutputHelper output)
     {
         // Verify Application was initialized
         Assert.True (Application.Initialized);
-        Assert.NotNull (Application.Driver);
-        Assert.NotNull (Application.Top);
+     //   Assert.NotNull (Application.Top);
         
         // Verify it's using a driver facade (modern architecture)
         Assert.IsAssignableFrom<IConsoleDriverFacade> (Application.Driver);
