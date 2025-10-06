@@ -142,7 +142,7 @@ public class ApplicationImpl : IApplication
     private IMainLoopCoordinator CreateSubcomponents<T> (Func<IComponentFactory<T>> fallbackFactory)
     {
         ConcurrentQueue<T> inputBuffer = new ();
-        MainLoop<T> loop = new ();
+        ApplicationMainLoop<T> loop = new ();
 
         IComponentFactory<T> cf;
 

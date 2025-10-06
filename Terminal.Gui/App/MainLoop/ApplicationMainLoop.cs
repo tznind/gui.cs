@@ -5,8 +5,22 @@ using System.Diagnostics;
 
 namespace Terminal.Gui.App;
 
-/// <inheritdoc/>
-public class MainLoop<T> : IMainLoop<T>
+/// <summary>
+///     The main application loop that runs Terminal.Gui's UI rendering and event processing.
+/// </summary>
+/// <remarks>
+///     This class coordinates the Terminal.Gui application lifecycle by:
+///     <list type="bullet">
+///         <item>Processing buffered input events and translating them to UI events</item>
+///         <item>Executing user timeout callbacks at scheduled intervals</item>
+///         <item>Detecting which views need redrawing or layout updates</item>
+///         <item>Rendering UI changes to the console output buffer</item>
+///         <item>Managing cursor position and visibility</item>
+///         <item>Throttling iterations to respect <see cref="Application.MaximumIterationsPerSecond"/></item>
+///     </list>
+/// </remarks>
+/// <typeparam name="T">Type of raw input events, e.g. <see cref="ConsoleKeyInfo"/> for .NET driver</typeparam>
+public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
 {
     private ITimedEvents? _timedEvents;
     private ConcurrentQueue<T>? _inputBuffer;

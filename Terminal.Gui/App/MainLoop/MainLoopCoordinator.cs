@@ -6,17 +6,21 @@ namespace Terminal.Gui.App;
 
 /// <summary>
 ///     <para>
-///         Handles creating the input loop thread and bootstrapping the
-///         <see cref="MainLoop{T}"/> that handles layout/drawing/events etc.
+///         Coordinates the creation and startup of the main UI loop and input thread.
+///     </para>
+///     <para>
+///         This class bootstraps the <see cref="ApplicationMainLoop{T}"/> that handles
+///         UI layout, drawing, and event processing while also managing a separate thread
+///         for reading console input asynchronously.
 ///     </para>
 ///     <para>This class is designed to be managed by <see cref="ApplicationImpl"/></para>
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">Type of raw input events, e.g. <see cref="ConsoleKeyInfo"/> for .NET driver</typeparam>
 internal class MainLoopCoordinator<T> : IMainLoopCoordinator
 {
     private readonly ConcurrentQueue<T> _inputBuffer;
     private readonly IInputProcessor _inputProcessor;
-    private readonly IMainLoop<T> _loop;
+    private readonly IApplicationMainLoop<T> _loop;
     private readonly IComponentFactory<T> _componentFactory;
     private readonly CancellationTokenSource _tokenSource = new ();
     private IConsoleInput<T> _input;
@@ -29,17 +33,16 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
     private readonly SemaphoreSlim _startupSemaphore = new (0, 1);
 
     /// <summary>
-    ///     Creates a new coordinator
+    ///     Creates a new coordinator that will manage the main UI loop and input thread.
     /// </summary>
-    /// <param name="timedEvents"></param>
-    /// <param name="inputBuffer"></param>
-    /// <param name="loop"></param>
-    /// <param name="componentFactory">Factory for creating driver components
-    /// (<see cref="IConsoleOutput"/>, <see cref="IConsoleInput{T}"/> etc)</param>
+    /// <param name="timedEvents">Handles scheduling and execution of user timeout callbacks</param>
+    /// <param name="inputBuffer">Thread-safe queue for buffering raw console input</param>
+    /// <param name="loop">The main application loop instance</param>
+    /// <param name="componentFactory">Factory for creating driver-specific components (input, output, etc.)</param>
     public MainLoopCoordinator (
         ITimedEvents timedEvents,
         ConcurrentQueue<T> inputBuffer,
-        IMainLoop<T> loop,
+        IApplicationMainLoop<T> loop,
         IComponentFactory<T> componentFactory
     )
     {

@@ -4,10 +4,19 @@ using System.Collections.Concurrent;
 namespace Terminal.Gui.App;
 
 /// <summary>
-///     Interface for main loop that runs the core Terminal.Gui UI loop.
+///     Interface for the main application loop that runs the core Terminal.Gui UI rendering and event processing.
 /// </summary>
-/// <typeparam name="T">Type of raw input events processed by the loop e.g. <see cref="ConsoleKeyInfo"/></typeparam>
-public interface IMainLoop<T> : IDisposable
+/// <remarks>
+///     This interface defines the contract for the main loop that coordinates:
+///     <list type="bullet">
+///         <item>Processing input events from the console</item>
+///         <item>Running user timeout callbacks</item>
+///         <item>Detecting UI changes that need redrawing</item>
+///         <item>Rendering UI updates to the console</item>
+///     </list>
+/// </remarks>
+/// <typeparam name="T">Type of raw input events processed by the loop, e.g. <see cref="ConsoleKeyInfo"/> for cross-platform .NET driver</typeparam>
+public interface IApplicationMainLoop<T> : IDisposable
 {
     /// <summary>
     ///     Gets the class responsible for servicing user timeouts
