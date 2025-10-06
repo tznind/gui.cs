@@ -21,7 +21,7 @@ public class MainLoopCoordinatorTests
         var c = new MainLoopCoordinator<char> (new TimedEvents (),
                                                // Rest runs on main thread
                                                new ConcurrentQueue<char> (),
-                                               Mock.Of<IMainLoop<char>>(),
+                                               Mock.Of<IApplicationMainLoop<char>>(),
                                                m.Object);
 
         // StartAsync boots the main loop and the input thread. But if the input class bombs
