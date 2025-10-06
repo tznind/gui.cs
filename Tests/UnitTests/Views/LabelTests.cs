@@ -1041,7 +1041,7 @@ e
     [SetupFakeDriver]
     public void Label_Height_Zero_Stays_Zero ()
     {
-        ((IFakeDriverV2)Application.Driver!).SetBufferSize (10, 4);
+        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (10, 4);
         var text = "Label";
 
         var label = new Label

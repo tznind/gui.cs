@@ -7,17 +7,17 @@ using System.Threading.Tasks;
 namespace TerminalGuiFluentTesting;
 
 /// <summary>
-/// Which v2 driver simulation should be used
+/// Which driver simulation should be used for testing
 /// </summary>
-public enum V2TestDriver
+public enum TestDriver
 {
     /// <summary>
-    /// The v2 windows driver with simulation I/O but core driver classes
+    /// The Windows driver with simulation I/O but core driver classes
     /// </summary>
-    V2Win,
+    Windows,
 
     /// <summary>
-    /// The v2 net driver with simulation I/O but core driver classes
+    /// The DotNet driver with simulation I/O but core driver classes
     /// </summary>
-    V2Net
+    DotNet
 }

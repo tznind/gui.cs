@@ -23,7 +23,7 @@ public class FakeApplicationFactory
 
         var sizeMonitor = new FakeSizeMonitor ();
 
-        var v2 = new ApplicationV2 (new FakeNetComponentFactory (fakeInput, output, sizeMonitor));
+        var v2 = new ModernApplicationImpl (new FakeNetComponentFactory (fakeInput, output, sizeMonitor));
 
         ApplicationImpl.ChangeInstance (v2);
         v2.Init (null, "v2net");

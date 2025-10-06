@@ -10,7 +10,7 @@ namespace Terminal.Gui.App;
 public class ApplicationImpl : IApplication
 {
     // Private static readonly Lazy instance of Application
-    private static Lazy<IApplication> _lazyInstance = new (() => new ApplicationV2 ());
+    private static Lazy<IApplication> _lazyInstance = new (() => new ModernApplicationImpl ());
 
     /// <summary>
     /// Gets the currently configured backend implementation of <see cref="Application"/> gateway methods.
@@ -236,7 +236,7 @@ public class ApplicationImpl : IApplication
             Application.OnInitializedChanged (this, new (in init));
         }
 
-        _lazyInstance = new (() => new ApplicationV2 ());
+        _lazyInstance = new (() => new ModernApplicationImpl ());
     }
 
     /// <inheritdoc />

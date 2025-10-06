@@ -8,7 +8,7 @@ namespace Terminal.Gui.Drivers;
 ///         Handles creating the input loop thread and bootstrapping the
 ///         <see cref="MainLoop{T}"/> that handles layout/drawing/events etc.
 ///     </para>
-///     <para>This class is designed to be managed by <see cref="ApplicationV2"/></para>
+///     <para>This class is designed to be managed by <see cref="ModernApplicationImpl"/></para>
 /// </summary>
 /// <typeparam name="T"></typeparam>
 internal class MainLoopCoordinator<T> : IMainLoopCoordinator

@@ -12,9 +12,9 @@ namespace Terminal.Gui.Drivers;
 ///     This is a lightweight alternative to <see cref="GuiTestContext"/> (if you don't
 ///     need the entire application main loop running).
 /// </summary>
-internal class FakeDriverV2 : ConsoleDriverFacade<ConsoleKeyInfo>, IFakeDriverV2
+internal class FakeConsoleDriver : ConsoleDriverFacade<ConsoleKeyInfo>, IFakeConsoleDriver
 {
-    internal FakeDriverV2 (
+    internal FakeConsoleDriver (
         ConcurrentQueue<ConsoleKeyInfo> inputBuffer,
         OutputBuffer outputBuffer,
         FakeOutput fakeOutput,
