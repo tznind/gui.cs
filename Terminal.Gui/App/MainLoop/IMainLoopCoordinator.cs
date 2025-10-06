@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Drivers;
+﻿namespace Terminal.Gui.App;
 
 /// <summary>
 ///     Interface for main Terminal.Gui loop manager in v2.

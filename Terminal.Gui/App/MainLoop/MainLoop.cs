@@ -1,8 +1,9 @@
 ﻿#nullable enable
+using Terminal.Gui.Drivers;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 
-namespace Terminal.Gui.Drivers;
+namespace Terminal.Gui.App;
 
 /// <inheritdoc/>
 public class MainLoop<T> : IMainLoop<T>

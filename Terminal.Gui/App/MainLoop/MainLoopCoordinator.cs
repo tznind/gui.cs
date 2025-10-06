@@ -1,7 +1,8 @@
 ﻿using System.Collections.Concurrent;
+using Terminal.Gui.Drivers;
 using Microsoft.Extensions.Logging;
 
-namespace Terminal.Gui.Drivers;
+namespace Terminal.Gui.App;
 
 /// <summary>
 ///     <para>

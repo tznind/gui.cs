@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Drivers;
+﻿namespace Terminal.Gui.App;
 
 /// <summary>
 ///     Thrown when user code attempts to access a property or perform a method

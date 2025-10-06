@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
 
-namespace Terminal.Gui.Drivers;
+namespace Terminal.Gui.App;
 
 /// <summary>
 ///     Interface for main loop that runs the core Terminal.Gui UI loop.

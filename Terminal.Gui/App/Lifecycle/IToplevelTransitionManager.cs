@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Drivers;
+﻿namespace Terminal.Gui.App;
 
 /// <summary>
 ///     Interface for class that handles bespoke behaviours that occur when application
