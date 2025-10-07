@@ -40,4 +40,10 @@ public class FakeComponentFactory : ComponentFactory<ConsoleKeyInfo>
     {
         return new NetInputProcessor (inputBuffer);
     }
+
+    /// <inheritdoc />
+    public override IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
+    {
+        return new FakeWindowSizeMonitor(consoleOutput, outputBuffer);
+    }
 }

@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Text;
 
 namespace Terminal.Gui.Drivers;
@@ -82,5 +83,11 @@ public class FakeConsoleOutput : OutputBase, IConsoleOutput
     protected override void Write (StringBuilder output)
     {
         _output.Append (output);
+    }
+
+    /// <inheritdoc />
+    public override void Write (IOutputBuffer buffer)
+    {
+        base.Write(buffer);
     }
 }

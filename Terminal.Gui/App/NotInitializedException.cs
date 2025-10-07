@@ -1,8 +1,9 @@
-﻿namespace Terminal.Gui.Drivers;
+﻿namespace Terminal.Gui.App;
 
 /// <summary>
 ///     Thrown when user code attempts to access a property or perform a method
-///     that is only supported after Initialization e.g. of an <see cref="IMainLoop{T}"/>
+///     Exception type thrown when trying to use a property or method
+///     that is only supported after initialization, e.g. of an <see cref="IApplicationMainLoop{T}"/>
 /// </summary>
 public class NotInitializedException : InvalidOperationException
 {

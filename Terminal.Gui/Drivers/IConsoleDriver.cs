@@ -3,11 +3,6 @@
 namespace Terminal.Gui.Drivers;
 
 /// <summary>Base interface for Terminal.Gui ConsoleDriver implementations.</summary>
-/// <remarks>
-///     There are currently four implementations: - <see cref="CursesDriver"/> (for Unix and Mac) -
-///     <see cref="WindowsDriver"/> - <see cref="NetDriver"/> that uses the .NET Console API - <see cref="FakeConsole"/>
-///     for unit testing.
-/// </remarks>
 public interface IConsoleDriver
 {
     /// <summary>Get the operating system clipboard.</summary>

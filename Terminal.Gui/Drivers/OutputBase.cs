@@ -24,12 +24,12 @@ public abstract class OutputBase
             return;
         }
 
-        if (Console.WindowHeight < 1
-            || buffer.Contents.Length != buffer.Rows * buffer.Cols
-            || buffer.Rows != Console.WindowHeight)
-        {
-            //     return;
-        }
+        //if (Console.WindowHeight < 1
+        //    || buffer.Contents.Length != buffer.Rows * buffer.Cols
+        //    || buffer.Rows != Console.WindowHeight)
+        //{
+        //    //     return;
+        //}
 
         var top = 0;
         var left = 0;
@@ -47,10 +47,10 @@ public abstract class OutputBase
 
         for (int row = top; row < rows; row++)
         {
-            if (Console.WindowHeight < 1)
-            {
-                return;
-            }
+            //if (Console.WindowHeight < 1)
+            //{
+            //    return;
+            //}
 
             if (!SetCursorPositionImpl (0, row))
             {

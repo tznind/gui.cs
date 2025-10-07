@@ -1,6 +1,7 @@
 ﻿#nullable enable
+using Terminal.Gui.Drivers;
 
-namespace Terminal.Gui.Drivers;
+namespace Terminal.Gui.App;
 
 /// <summary>
 ///     Handles bespoke behaviours that occur when application top level changes.

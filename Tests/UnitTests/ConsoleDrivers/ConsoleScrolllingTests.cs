@@ -4,7 +4,6 @@
 using Console = Terminal.Gui.Drivers.FakeConsole;
 
 namespace Terminal.Gui.DriverTests;
-
 public class ConsoleScrollingTests
 {
     private readonly ITestOutputHelper output;

@@ -25,12 +25,9 @@ public class SyncrhonizationContextTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    //[InlineData (typeof (NetDriver))]
-    //[InlineData (typeof (WindowsDriver))]
-    //[InlineData (typeof (CursesDriver))]
-    [InlineData (typeof (ConsoleDriverFacade<WindowsConsole.InputRecord>), "v2win")]
-    [InlineData (typeof (ConsoleDriverFacade<ConsoleKeyInfo>), "v2net")]
-    [InlineData (typeof (ConsoleDriverFacade<char>), "v2unix")]
+    [InlineData (typeof (ConsoleDriverFacade<WindowsConsole.InputRecord>), "windows")]
+    [InlineData (typeof (ConsoleDriverFacade<ConsoleKeyInfo>), "dotnet")]
+    [InlineData (typeof (ConsoleDriverFacade<char>), "unix")]
     public void SynchronizationContext_Post (Type driverType, string driverName = null)
     {
         lock (_lockPost)

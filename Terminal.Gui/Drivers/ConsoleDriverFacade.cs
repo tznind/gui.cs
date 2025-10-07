@@ -50,7 +50,9 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     {
         if (FakeDriver.FakeBehaviors.UseFakeClipboard)
         {
-            Clipboard = new FakeDriver.FakeClipboard ();
+            Clipboard = new FakeDriver.FakeClipboard (
+                FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException,
+                FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse);
 
             return;
         }

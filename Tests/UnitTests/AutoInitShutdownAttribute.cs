@@ -162,7 +162,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         d.OutputBuffer.SetWindowSize (size.Width, size.Height);
         ((FakeSizeMonitor)d.WindowSizeMonitor).RaiseSizeChanging (size);
 
-        Application.LayoutAndDrawImpl ();
+        Application.LayoutAndDraw ();
     }
 
     /// <summary>
