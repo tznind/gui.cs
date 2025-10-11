@@ -1060,6 +1060,7 @@ public class TextAnnotationTests
     [InlineData (null)]
     [InlineData ("  ")]
     [InlineData ("\t\t")]
+    [AutoInitShutdown]
     public void TestTextAnnotation_EmptyText (string whitespace)
     {
         GraphView gv = GraphViewTests.GetGraph ();
@@ -1091,6 +1092,7 @@ public class TextAnnotationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestTextAnnotation_GraphUnits ()
     {
         GraphView gv = GraphViewTests.GetGraph ();
@@ -1137,6 +1139,7 @@ public class TextAnnotationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestTextAnnotation_LongText ()
     {
         GraphView gv = GraphViewTests.GetGraph ();
@@ -1171,6 +1174,7 @@ public class TextAnnotationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestTextAnnotation_Offscreen ()
     {
         GraphView gv = GraphViewTests.GetGraph ();
@@ -1201,6 +1205,7 @@ public class TextAnnotationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestTextAnnotation_ScreenUnits ()
     {
         GraphView gv = GraphViewTests.GetGraph ();
@@ -1291,6 +1296,7 @@ public class LegendTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void LegendNormalUsage_WithBorder ()
     {
         GraphView gv = GraphViewTests.GetGraph ();
@@ -1317,6 +1323,7 @@ public class LegendTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void LegendNormalUsage_WithoutBorder ()
     {
         GraphView gv = GraphViewTests.GetGraph ();
@@ -1402,6 +1409,7 @@ public class PathAnnotationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void PathAnnotation_Box ()
     {
         GraphView gv = GraphViewTests.GetGraph ();
@@ -1435,6 +1443,7 @@ public class PathAnnotationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void PathAnnotation_Diamond ()
     {
         GraphView gv = GraphViewTests.GetGraph ();
@@ -1468,6 +1477,7 @@ public class PathAnnotationTests
     }
 
     [Theory]
+    [AutoInitShutdown]
     [InlineData (true)]
     [InlineData (false)]
     public void ViewChangeText_RendersCorrectly (bool useFill)
