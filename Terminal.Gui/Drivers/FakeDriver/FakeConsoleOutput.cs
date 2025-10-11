@@ -85,9 +85,4 @@ public class FakeConsoleOutput : OutputBase, IConsoleOutput
         _output.Append (output);
     }
 
-    /// <inheritdoc />
-    public override void Write (IOutputBuffer buffer)
-    {
-        base.Write(buffer);
-    }
 }

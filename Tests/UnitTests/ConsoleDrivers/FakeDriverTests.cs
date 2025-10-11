@@ -60,6 +60,10 @@ public class FakeDriverTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void FakeDriver_Top_Is_Created ()
     {
+        Application.Top = new Toplevel ();
+
+        Application.Begin (Application.Top);
+
         Assert.NotNull (Application.Top);
         Assert.True (Application.Top.IsInitialized);
         Assert.Equal (new (0, 0, 80, 25), Application.Top.Frame);
@@ -69,6 +73,8 @@ public class FakeDriverTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void FakeDriver_Can_Add_View_To_Top ()
     {
+        Application.Top = new Toplevel ();
+
         var label = new Label { Text = "Hello World" };
         Application.Top!.Add (label);
 
@@ -80,8 +86,13 @@ public class FakeDriverTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void FakeDriver_RunIteration_Works ()
     {
+        Application.Top = new Toplevel ();
+
         var label = new Label { Text = "Hello" };
         Application.Top!.Add (label);
+
+
+        Application.Begin (Application.Top);
 
         // Run a single iteration - this should layout and draw
         AutoInitShutdownAttribute.RunIteration ();
@@ -200,6 +211,8 @@ public class FakeDriverTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void FakeDriver_Can_Draw_Simple_View ()
     {
+        Application.Top = new Toplevel ();
+
         var window = new Window 
         { 
             Title = "Test Window",
@@ -219,6 +232,8 @@ public class FakeDriverTests (ITestOutputHelper output)
         window.Add (label);
         Application.Top!.Add (window);
 
+        Application.Begin (Application.Top);
+
         // Run iteration to layout and draw
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -233,6 +248,8 @@ public class FakeDriverTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void FakeDriver_Multiple_RunIterations_Work ()
     {
+        Application.Top = new Toplevel ();
+
         var label = new Label { Text = "Iteration Test" };
         Application.Top!.Add (label);
 
@@ -241,6 +258,8 @@ public class FakeDriverTests (ITestOutputHelper output)
         {
             AutoInitShutdownAttribute.RunIteration ();
         }
+
+        Application.Begin (Application.Top);
 
         // Should still be working
         Assert.True (Application.Initialized);
@@ -251,6 +270,8 @@ public class FakeDriverTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void FakeDriver_Resize_Triggers_Layout ()
     {
+        Application.Top = new Toplevel ();
+
         var view = new View 
         { 
             Width = Dim.Fill (),
@@ -258,6 +279,9 @@ public class FakeDriverTests (ITestOutputHelper output)
         };
         Application.Top!.Add (view);
 
+        Application.Begin (Application.Top);
+
+        AutoInitShutdownAttribute.FakeResize (new Size (80,25));
         AutoInitShutdownAttribute.RunIteration ();
 
         // Check initial size
@@ -277,8 +301,12 @@ public class FakeDriverTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void FakeDriver_Window_Can_Be_Shown_And_Closed ()
     {
+        Application.Top = new Toplevel ();
+
         var window = new Window { Title = "Test" };
         Application.Top!.Add (window);
+
+        Application.Begin (Application.Top);
 
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -330,6 +358,8 @@ public class FakeDriverTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void FakeDriver_Handles_Invalid_Coordinates_Gracefully ()
     {
+        Application.Top = new Toplevel ();
+
         // Try to add a view with invalid coordinates - should not crash
         var view = new View 
         { 
@@ -338,7 +368,7 @@ public class FakeDriverTests (ITestOutputHelper output)
             Width = 10,
             Height = 10
         };
-        
+
         Application.Top!.Add (view);
         
         // Should not throw
