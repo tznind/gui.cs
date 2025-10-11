@@ -747,6 +747,7 @@ public class BarSeriesTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestTwoTallBars_WithOffset ()
     {
         GraphView graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
@@ -803,6 +804,7 @@ public class BarSeriesTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestZeroHeightBar_WithName ()
     {
         GraphView graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
@@ -901,6 +903,7 @@ public class AxisTests
 
     /// <summary>Tests that the horizontal axis is computed correctly and does not over spill it's bounds</summary>
     [Fact]
+    [AutoInitShutdown]
     public void TestHAxisLocation_NoMargin ()
     {
         GraphView gv = GetGraph (out FakeHAxis axis);
@@ -923,6 +926,7 @@ public class AxisTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestHAxisLocation_MarginBottom ()
     {
         GraphView gv = GetGraph (out FakeHAxis axis);
@@ -947,6 +951,7 @@ public class AxisTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestHAxisLocation_MarginLeft ()
     {
         GraphView gv = GetGraph (out FakeHAxis axis);
@@ -977,6 +982,7 @@ public class AxisTests
 
     /// <summary>Tests that the horizontal axis is computed correctly and does not over spill it's bounds</summary>
     [Fact]
+    [AutoInitShutdown]
     public void TestVAxisLocation_NoMargin ()
     {
         GraphView gv = GetGraph (out FakeVAxis axis);
@@ -1000,6 +1006,7 @@ public class AxisTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestVAxisLocation_MarginBottom ()
     {
         GraphView gv = GetGraph (out FakeVAxis axis);
@@ -1025,6 +1032,7 @@ public class AxisTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestVAxisLocation_MarginLeft ()
     {
         GraphView gv = GetGraph (out FakeVAxis axis);
