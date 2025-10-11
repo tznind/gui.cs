@@ -46,17 +46,14 @@ internal class FakeVAxis : VerticalAxis
 
 public class GraphViewTests
 {
-    private static string LastInitFakeDriver;
-
     /// <summary>
     ///     A cell size of 0 would result in mapping all graph space into the same cell of the console.  Since
     ///     <see cref="GraphView.CellSize"/> is mutable a sensible place to check this is in redraw.
     /// </summary>
     [Fact]
+    [AutoInitShutdown]
     public void CellSizeZero ()
     {
-        InitFakeDriver ();
-
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
@@ -77,8 +74,6 @@ public class GraphViewTests
     /// <returns></returns>
     public static GraphView GetGraph ()
     {
-        InitFakeDriver ();
-
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
@@ -91,33 +86,6 @@ public class GraphViewTests
         return gv;
     }
 
-    public static FakeDriver InitFakeDriver ()
-    {
-        var driver = new FakeDriver ();
-
-        try
-        {
-            Application.Init (driver);
-        }
-        catch (InvalidOperationException)
-        {
-            // close it so that we don't get a thousand of these errors in a row
-            Application.Shutdown ();
-
-            // but still report a failure and name the test that didn't shut down.  Note
-            // that the test that didn't shutdown won't be the one currently running it will
-            // be the last one
-            throw new Exception (
-                                 "A test did not call shutdown correctly.  Test stack trace was:" + LastInitFakeDriver
-                                );
-        }
-
-        driver.Init ();
-
-        LastInitFakeDriver = Environment.StackTrace;
-
-        return driver;
-    }
 
     /// <summary>
     ///     Tests that each point in the screen space maps to a rectangle of (float) graph space and that each corner of
@@ -442,10 +410,9 @@ public class GraphViewTests
 public class SeriesTests
 {
     [Fact]
+    [AutoInitShutdown]
     public void Series_GetsPassedCorrectViewport_AllAtOnce ()
     {
-        GraphViewTests.InitFakeDriver ();
-
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
@@ -495,10 +462,9 @@ public class SeriesTests
     ///     <see cref="GraphView.CellSize"/> results in multiple units of graph space being condensed into each cell of console
     /// </summary>
     [Fact]
+    [AutoInitShutdown]
     public void Series_GetsPassedCorrectViewport_AllAtOnce_LargeCellSize ()
     {
-        GraphViewTests.InitFakeDriver ();
-
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
@@ -635,10 +601,9 @@ public class MultiBarSeriesTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestRendering_MultibarSeries ()
     {
-        GraphViewTests.InitFakeDriver ();
-
         var gv = new GraphView ();
         //gv.Scheme = new Scheme ();
 
@@ -873,8 +838,6 @@ public class BarSeriesTests
 
     private GraphView GetGraph (out FakeBarSeries series, out FakeHAxis axisX, out FakeVAxis axisY)
     {
-        GraphViewTests.InitFakeDriver ();
-
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
@@ -919,8 +882,6 @@ public class AxisTests
 
     private GraphView GetGraph (out FakeHAxis axisX, out FakeVAxis axisY)
     {
-        GraphViewTests.InitFakeDriver ();
-
         var gv = new GraphView ();
         gv.Viewport = new Rectangle (0, 0, 50, 30);
        // gv.Scheme = new Scheme ();
@@ -1567,9 +1528,9 @@ public class PathAnnotationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void XAxisLabels_With_MarginLeft ()
     {
-        GraphViewTests.InitFakeDriver ();
         var gv = new GraphView { Viewport = new Rectangle (0, 0, 10, 7) };
 
         gv.CellSize = new PointF (1, 0.5f);
@@ -1606,9 +1567,9 @@ public class PathAnnotationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void YAxisLabels_With_MarginBottom ()
     {
-        GraphViewTests.InitFakeDriver ();
         var gv = new GraphView { Viewport = new Rectangle (0, 0, 10, 7) };
 
         gv.CellSize = new PointF (1, 0.5f);
