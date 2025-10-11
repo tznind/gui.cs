@@ -188,6 +188,12 @@ public class ApplicationImpl : IApplication
     public T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
         where T : Toplevel, new()
     {
+        if (!Application.Initialized)
+        {
+            // Init() has NOT been called. Auto-initialize as per interface contract.
+            Init (driver, null);
+        }
+
         var top = new T ();
         Run (top, errorHandler);
         return top;
