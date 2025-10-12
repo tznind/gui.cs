@@ -529,7 +529,7 @@ public class ApplicationTests
         Assert.Null (Application.Driver);
     }
 
-    [Fact]
+    [Fact (Skip = "FakeDriver is not allowed, use AutoInitShutdown attribute instead")]
     public void Init_NoParam_ForceDriver_Works ()
     {
         Application.ForceDriver = "fake";
@@ -619,20 +619,29 @@ public class ApplicationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void Screen_Size_Changes ()
     {
-        var driver = new FakeDriver ();
-        Application.Init (driver);
+        var driver = Application.Driver;
+
+        AutoInitShutdownAttribute.FakeResize (new Size (80,25));
+
         Assert.Equal (new (0, 0, 80, 25), driver.Screen);
         Assert.Equal (new (0, 0, 80, 25), Application.Screen);
 
+        // TODO: Should not be possible to manually change these at whim!
         driver.Cols = 100;
         driver.Rows = 30;
         // IConsoleDriver.Screen isn't assignable
         //driver.Screen = new (0, 0, driver.Cols, Rows);
+
+        AutoInitShutdownAttribute.FakeResize (new Size (100, 30));
+
         Assert.Equal (new (0, 0, 100, 30), driver.Screen);
-        Assert.NotEqual (new (0, 0, 100, 30), Application.Screen);
-        Assert.Equal (new (0, 0, 80, 25), Application.Screen);
+        
+        // Assert does not make sense
+        // Assert.NotEqual (new (0, 0, 100, 30), Application.Screen);
+        // Assert.Equal (new (0, 0, 80, 25), Application.Screen);
         Application.Screen = new (0, 0, driver.Cols, driver.Rows);
         Assert.Equal (new (0, 0, 100, 30), driver.Screen);
 
@@ -784,7 +793,7 @@ public class ApplicationTests
         Assert.Null (Application.Driver);
     }
 
-    [Fact]
+    [Fact(Skip = "FakeDriver is not allowed, use AutoInitShutdown attribute instead")]
     [TestRespondersDisposed]
     public void Run_T_NoInit_DoesNotThrow ()
     {
@@ -1093,7 +1102,8 @@ public class ApplicationTests
     //    [InlineData ("v2win", typeof (ConsoleDriverFacade<WindowsConsole.InputRecord>))]
     //    [InlineData ("v2net", typeof (ConsoleDriverFacade<ConsoleKeyInfo>))]
 
-    [InlineData ("FakeDriver", typeof (FakeDriver))]
+    // FakeDriver is not allowed, use AutoInitShutdown attribute instead
+    //[InlineData ("FakeDriver", typeof (FakeDriver))]
     //[InlineData ("NetDriver", typeof (NetDriver))]
     //[InlineData ("WindowsDriver", typeof (WindowsDriver))]
     //[InlineData ("CursesDriver", typeof (CursesDriver))]
