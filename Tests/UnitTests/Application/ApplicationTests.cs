@@ -584,7 +584,6 @@ public class ApplicationTests
     [AutoInitShutdown]
     public void Invoke_Adds_Idle ()
     {
-        Application.Init (null, driverName: "fake");
         var top = new Toplevel ();
         RunState rs = Application.Begin (top);
         var firstIteration = false;
