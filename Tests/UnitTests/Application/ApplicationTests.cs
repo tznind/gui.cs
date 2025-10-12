@@ -167,8 +167,8 @@ public class ApplicationTests
     public void Begin_Sets_Application_Top_To_Console_Size ()
     {
         Assert.Null (Application.Top);
-        AutoInitShutdownAttribute.FakeResize (new Size (80,25));
         Toplevel top = new ();
+        AutoInitShutdownAttribute.FakeResize (new Size (80, 25));
         Application.Begin (top);
         Assert.Equal (new (0, 0, 80, 25), Application.Top!.Frame);
         AutoInitShutdownAttribute.FakeResize(new Size(5, 5));
@@ -532,7 +532,7 @@ public class ApplicationTests
     [Fact]
     public void Init_NoParam_ForceDriver_Works ()
     {
-        Application.ForceDriver = "FakeDriver";
+        Application.ForceDriver = "fake";
         Application.Init ();
         Assert.IsType<FakeDriver> (Application.Driver);
         Application.ResetState ();
@@ -576,16 +576,15 @@ public class ApplicationTests
     // Invoke Tests
     // TODO: Test with threading scenarios
     [Fact]
+    [AutoInitShutdown]
     public void Invoke_Adds_Idle ()
     {
-        Application.Init (new FakeDriver ());
         var top = new Toplevel ();
         RunState rs = Application.Begin (top);
         var firstIteration = false;
 
         var actionCalled = 0;
         Application.Invoke (() => { actionCalled++; });
-        Application.MainLoop.Running = true;
         Application.RunIteration (ref rs, firstIteration);
         Assert.Equal (1, actionCalled);
         top.Dispose ();
