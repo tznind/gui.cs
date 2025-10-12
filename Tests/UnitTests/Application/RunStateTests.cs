@@ -1,5 +1,7 @@
 // Alias Console to MockConsole so we don't accidentally use Console
 
+using Terminal.Gui.Drivers;
+
 namespace Terminal.Gui.ApplicationTests;
 
 /// <summary>These tests focus on Application.RunState and the various ways it can be changed.</summary>
@@ -85,7 +87,7 @@ public class RunStateTests
 
     private void Init ()
     {
-        Application.Init (null, "fakedriver");
+        Application.Init (new FakeDriver (), null);
         Assert.NotNull (Application.Driver);
         Assert.NotNull (Application.MainLoop);
         Assert.NotNull (SynchronizationContext.Current);
