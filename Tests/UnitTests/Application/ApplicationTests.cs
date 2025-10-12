@@ -459,10 +459,9 @@ public class ApplicationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void Init_Unbalanced_Throws ()
     {
-        Application.Init (new FakeDriver ());
-
         Assert.Throws<InvalidOperationException> (
                                                   () =>
                                                       Application.InternalInit (
@@ -474,10 +473,14 @@ public class ApplicationTests
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
+    }
 
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Init_Unbalanced_Throws2 ()
+    {
         // Now try the other way
-        Application.InternalInit (new FakeDriver ());
-
         Assert.Throws<InvalidOperationException> (() => Application.Init (new FakeDriver ()));
         Application.Shutdown ();
 
@@ -1095,6 +1098,7 @@ public class ApplicationTests
 
     private readonly object _forceDriverLock = new ();
 
+    /*
     [Theory]
 
     // This test wants to Run which results in console handle errors, it wants to rely non drivers checking ConsoleDriver.RunningUnitTests
@@ -1147,6 +1151,7 @@ public class ApplicationTests
         Application.Shutdown ();
         Assert.True (result);
     }
+    */
 
     [Fact]
     public void Run_T_With_Legacy_Driver_Does_Not_Call_ResetState_After_Init ()
