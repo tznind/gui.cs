@@ -60,7 +60,7 @@ public static partial class Application // Initialization (Init/Shutdown)
         }
         
         // Otherwise delegate to the ApplicationImpl instance (which uses the modern architecture)
-        ApplicationImpl.Instance.Init (driver, driverName);
+        ApplicationImpl.Instance.Init (driver, driverName ?? ForceDriver);
     }
 
     internal static int MainThreadId { get; set; } = -1;

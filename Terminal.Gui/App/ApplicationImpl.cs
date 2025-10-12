@@ -67,13 +67,19 @@ public class ApplicationImpl : IApplication
     {
         if (Application.Initialized)
         {
-            Logging.Logger.LogError ("Init called multiple times without shutdown, ignoring.");
-            return;
+            Logging.Logger.LogError ("Init called multiple times without shutdown, aborting.");
+
+            throw new InvalidOperationException ("Init called multiple times without Shutdown");
         }
 
         if (!string.IsNullOrWhiteSpace (driverName))
         {
             _driverName = driverName;
+        }
+
+        if (string.IsNullOrWhiteSpace (_driverName))
+        {
+            _driverName = Application.ForceDriver;
         }
 
         Debug.Assert(Application.Navigation is null);
