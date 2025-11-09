@@ -279,6 +279,15 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
         base.Write (outputBuffer);
 
+        foreach (SixelToRender s in Application.Sixel)
+        {
+            if (!string.IsNullOrWhiteSpace (s.SixelData))
+            {
+                SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
+                _everythingStringBuilder.Append (s.SixelData);
+            }
+        }
+
         try
         {
             if (_force16Colors && !_isVirtualTerminal)
@@ -300,8 +309,6 @@ internal partial class WindowsOutput : OutputBase, IOutput
                     }
                 }
             }
-
-            base.WriteSixels ();
         }
         catch (Exception e)
         {
