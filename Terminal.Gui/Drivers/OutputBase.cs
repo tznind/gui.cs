@@ -136,17 +136,21 @@ public abstract class OutputBase
             }
         }
 
+
+        SetCursorVisibility (savedVisibility ?? CursorVisibility.Default);
+        _cachedCursorVisibility = savedVisibility;
+    }
+
+    protected void WriteSixels ()
+    {
         foreach (SixelToRender s in Application.Sixel)
         {
             if (!string.IsNullOrWhiteSpace (s.SixelData))
             {
-                SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
+                Console.SetCursorPosition (s.ScreenPosition.X, s.ScreenPosition.Y);
                 Console.Out.Write (s.SixelData);
             }
         }
-
-        SetCursorVisibility (savedVisibility ?? CursorVisibility.Default);
-        _cachedCursorVisibility = savedVisibility;
     }
 
     /// <summary>

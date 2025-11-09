@@ -300,6 +300,8 @@ internal partial class WindowsOutput : OutputBase, IOutput
                     }
                 }
             }
+
+            base.WriteSixels ();
         }
         catch (Exception e)
         {
